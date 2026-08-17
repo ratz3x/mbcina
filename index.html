@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260816_072000">
+  <link rel="stylesheet" href="css/styles.css?v=20260818_053800">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -9159,6 +9159,7 @@
         </form>
       </div>
     </div>
+  </div>
   <!-- MODAL FORUM SPONSOR: BUAT THREAD BARU -->
   <div id="modal-sponsor-new-thread" class="modal-overlay" style="display:none;">
     <div class="modal-content glass-panel" style="max-width:600px; padding:24px;">
@@ -9203,8 +9204,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/auth.js?v=20260817_110000"></script>
-  <script src="js/app.js?v=20260817_110000"></script>
+  <script src="js/auth.js?v=20260818_053800"></script>
+  <script src="js/app.js?v=20260818_053800"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
@@ -9265,6 +9266,13 @@
             }
           };
         }
+      }
+      if (typeof window.openAdminVerifyIklanModal !== 'function') {
+        window.openAdminVerifyIklanModal = function(productId) {
+          if (window.M7Engine && typeof window.M7Engine.openAdminVerifyIklanModal === 'function') {
+            window.M7Engine.openAdminVerifyIklanModal(productId);
+          }
+        };
       }
     }, 100);
   </script>

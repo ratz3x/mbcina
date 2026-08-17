@@ -155,28 +155,57 @@ function ensureM3Tables($sPdo) {
         ");
 
         // Seed users if Ratih is missing
+        // Seed users if Ratih is missing
         $ratihExists = (int)$sPdo->query("SELECT COUNT(*) FROM users WHERE id = 'usr_m3_011' OR email = 'ratihkusumastuti1979@gmail.com'")->fetchColumn();
         if ($ratihExists === 0) {
             $sPdo->exec("
                 INSERT INTO users (id, name, username, email, phone, role, status, member_id, tier, city, province_id, province, total_donation, club) VALUES
-                ('usr_m3_011', 'Ratih Kusumastuti', 'ratih1979', 'ratihkusumastuti1979@gmail.com', '08545585568', 'MEMBER', 'PENDING', 'MBINA-JAM-2026-000011', 'GOLD', 'Jambi', 'prov_jam', 'Jambi', 5400000, 'MBC Jambi')
+                ('usr_m3_011', 'Ratih Kusumastuti', 'ratih1979', 'ratihkusumastuti1979@gmail.com', '08545585568', 'MEMBER', 'ACTIVE', 'MBINA-JAM-2026-000011', 'PLATINUM', 'Jambi', 'prov_jam', 'Jambi', 15400000, 'MBC Jambi')
                 ON CONFLICT (id) DO NOTHING;
             ");
         } else {
             $sPdo->exec("
-                UPDATE users SET total_donation = 5400000 WHERE id = 'usr_m3_011' OR member_id = 'MBINA-JAM-2026-000011';
+                UPDATE users SET status = 'ACTIVE', tier = 'PLATINUM', total_donation = 15400000, club = 'MBC Jambi' WHERE id = 'usr_m3_011' OR id = 'usr_6a7ed057d1d21' OR member_id = 'MBINA-JAM-2026-000011';
             ");
         }
 
-        // Seed donations if don_11 is missing
-        $donExists = (int)$sPdo->query("SELECT COUNT(*) FROM donations WHERE id = 'don_11' OR trx_code = 'DON-TRX-2026-011'")->fetchColumn();
+        // Seed 5 real donations for Ratih if missing
+        $donExists = (int)$sPdo->query("SELECT COUNT(*) FROM donations WHERE id = 'don_15' OR trx_code = 'DON-TRX-2026-015'")->fetchColumn();
         if ($donExists === 0) {
             $sPdo->exec("
                 INSERT INTO donations (id, trx_code, campaign_id, user_id, donor_name, member_id, amount, payment_method, status, created_at) VALUES
-                ('don_11', 'DON-TRX-2026-011', 'camp_yogya_2026', 'usr_m3_011', 'Ratih Kusumastuti', 'MBINA-JAM-2026-000011', 5400000, 'TRANSFER', 'SUCCESS', '2026-08-11 14:00:00')
+                ('don_15', 'DON-TRX-2026-015', 'camp_yogya_2026', 'usr_m3_011', 'Ratih Kusumastuti', 'MBINA-JAM-2026-000011', 2000000, 'TRANSFER', 'SUCCESS', '2026-08-15 10:00:00'),
+                ('don_14', 'DON-TRX-2026-014', 'camp_yogya_2026', 'usr_m3_011', 'Ratih Kusumastuti', 'MBINA-JAM-2026-000011', 4000000, 'TRANSFER', 'SUCCESS', '2026-08-14 16:30:00'),
+                ('don_13', 'DON-TRX-2026-013', 'camp_yogya_2026', 'usr_m3_011', 'Ratih Kusumastuti', 'MBINA-JAM-2026-000011', 500000, 'TRANSFER', 'SUCCESS', '2026-08-13 11:20:00'),
+                ('don_12', 'DON-TRX-2026-012', 'camp_yogya_2026', 'usr_m3_011', 'Ratih Kusumastuti', 'MBINA-JAM-2026-000011', 2000000, 'TRANSFER', 'SUCCESS', '2026-08-12 09:45:00'),
+                ('don_11', 'DON-TRX-2026-011', 'camp_yogya_2026', 'usr_m3_011', 'Ratih Kusumastuti', 'MBINA-JAM-2026-000011', 5000000, 'TRANSFER', 'SUCCESS', '2026-08-11 14:00:00')
                 ON CONFLICT (id) DO NOTHING;
             ");
         }
+
+        // Dynamically sync user total_donation & tier from actual donations + event_participants tables in Supabase
+        $sPdo->exec("
+            UPDATE users u
+            SET total_donation = COALESCE((
+                SELECT SUM(d.amount)
+                FROM donations d
+                WHERE d.user_id = u.id
+                  AND d.status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+            ), 0) + COALESCE((
+                SELECT SUM(p.fee_paid)
+                FROM event_participants p
+                WHERE p.user_id = u.id
+                  AND p.payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+            ), 0);
+
+            UPDATE users u
+            SET tier = CASE
+                WHEN u.total_donation >= 9000000 THEN 'PLATINUM'
+                WHEN u.total_donation >= 4500000 THEN 'GOLD'
+                WHEN u.total_donation >= 1500000 THEN 'SILVER'
+                ELSE 'BRONZE'
+            END;
+        ");
 
         // Seed donation_campaigns if camp_yogya_2026 is missing
         $campExists = (int)$sPdo->query("SELECT COUNT(*) FROM donation_campaigns WHERE id = 'camp_yogya_2026'")->fetchColumn();
@@ -187,6 +216,24 @@ function ensureM3Tables($sPdo) {
                 ON CONFLICT (id) DO NOTHING;
             ");
         }
+
+        // Seed event_participants table in database for verified participants
+        $sPdo->exec("
+            DELETE FROM event_participants WHERE event_id IN ('evt_001', 'EVT-2026-001') AND id NOT IN ('part_1', 'part_2', 'part_3', 'part_4', 'part_5', 'part_6', 'part_7');
+
+            INSERT INTO event_participants (id, event_id, user_id, user_name, fee_paid, payment_status, registered_at) VALUES
+            ('part_1', 'evt_001', 'usr_superadmin', 'Derist Touriano', 350000, 'VERIFIED', '2026-08-10 08:30:00'),
+            ('part_2', 'evt_001', 'usr_sekpus', 'Ir. Raymond Sanjaya', 350000, 'VERIFIED', '2026-08-09 09:15:00'),
+            ('part_3', 'evt_001', 'usr_presiden', 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', 350000, 'VERIFIED', '2026-08-05 10:00:00'),
+            ('part_4', 'evt_001', 'usr_presiden', 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom. (Presiden MB INA)', 350000, 'VERIFIED', '2026-08-05 10:00:00'),
+            ('part_5', 'evt_001', 'usr_m3_001', 'Andi Pratama', 400000, 'PENDING', '2026-08-04 14:20:00'),
+            ('part_6', 'evt_001', 'usr_m3_002', 'Budi Santoso', 500000, 'PENDING', '2026-08-04 15:45:00'),
+            ('part_7', 'evt_001', 'usr_6a7ed057d1d21', 'Ratih Kusumastuti', 400000, 'VERIFIED', '2026-08-11 11:20:00'),
+            ('part_bsd_5', 'EVT-2026-002', 'usr_6a7ed057d1d21', 'Ratih Kusumastuti', 400000, 'VERIFIED', '2026-08-12 10:15:00')
+            ON CONFLICT (id) DO UPDATE SET user_id = EXCLUDED.user_id, payment_status = EXCLUDED.payment_status;
+
+            UPDATE event_participants SET payment_status = 'VERIFIED' WHERE user_id = 'usr_6a7ed057d1d21' OR id IN ('part_1', 'part_2', 'part_3', 'part_4', 'part_7', 'part_bsd_5');
+        ");
     } catch (Exception $e) {}
 }
 
@@ -383,42 +430,6 @@ function ensureM7Tables($sPdo) {
                 ('log_001', 'lapak_001', 'SEWA', '2026-08-01', '2027-01-31', 25500, 'PAID', 'Pembayaran sewa 6 bulan lunas (Diskon Gold 15%)', 'usr_superadmin'),
                 ('log_002', 'lapak_002', 'SEWA', '2026-08-01', '2027-01-31', 27000, 'PAID', 'Pembayaran sewa 6 bulan lunas (Diskon Silver 10%)', 'usr_superadmin'),
                 ('log_003', 'lapak_003', 'SEWA', '2026-02-01', '2026-07-31', 28500, 'PAID', 'Pembayaran sewa 6 bulan lunas (Diskon Bronze 5%)', 'usr_superadmin');
-            ");
-        }
-
-        // Always ensure PENDING products exist for Admin Moderasi queue
-        $pendingCount = $sPdo->query("SELECT COUNT(*) FROM lapak_products WHERE status = 'PENDING'")->fetchColumn();
-        if ((int)$pendingCount === 0) {
-            $sPdo->exec("
-                INSERT INTO lapak_products (id, lapak_id, name, description, price, condition, location, images, views, status, rejection_reason, contact_whatsapp) VALUES
-                ('prod_pending_01', 'lapak_001', 'Set Stir Wood Trim Woodgrain W124 Boxer', 'Stir kayu MB W124 Boxer original Zebrano wood trim mulus 95%, kulit hitam tanpa sobek. Membutuhkan verifikasi admin.', 4500000, 'USED', 'Jakarta Selatan', '[\"https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600\"]', 12, 'PENDING', NULL, '081234567890'),
-                ('prod_pending_02', 'lapak_002', 'Knalpot Exhaust Remus Dual Oval W202 C-Class', 'Knalpot Remus original Made in Austria untuk W202 C180 / C200 / C230. Suara ngebass halus. Menunggu review admin.', 6000000, 'USED', 'Surabaya', '[\"https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600\"]', 8, 'PENDING', NULL, '081987654321');
-            ");
-        }
-
-        // Always ensure Garasi FayFay and Blok Mesin exist
-        $fayfayCount = $sPdo->query("SELECT COUNT(*) FROM lapak WHERE id = 'lapak_fayfay' OR name LIKE '%FayFay%'")->fetchColumn();
-        if ((int)$fayfayCount === 0) {
-            $sPdo->exec("
-                INSERT INTO lapak (id, user_id, lapak_code, name, description, category, contact_phone, contact_whatsapp, logo_url, banner_url, sewa_start_date, sewa_end_date, sewa_status, sewa_fee, original_fee, tier_discount, final_fee, sewa_paid_status, is_active, is_verified, created_by) VALUES
-                ('lapak_fayfay', 'usr_fayfay_001', 'LAPAK-2026-004', 'Garasi FayFay', 'Spesialis blok mesin, transmisi, & spare parts Mercedes-Benz original copotan terjamin', 'Parts & Komponen', '081298765432', '081298765432', 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=300', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200', '2026-08-01', '2027-01-31', 'ACTIVE', 25500, 30000, 15, 25500, 'PAID', TRUE, TRUE, 'usr_superadmin');
-            ");
-        }
-
-        $blokMesinCount = $sPdo->query("SELECT COUNT(*) FROM lapak_products WHERE name LIKE '%Blok Mesin%'")->fetchColumn();
-        if ((int)$blokMesinCount === 0) {
-            $sPdo->exec("
-                INSERT INTO lapak_products (id, lapak_id, name, description, price, condition, location, images, views, status, rejection_reason, contact_whatsapp, category) VALUES
-                ('prod_fayfay_01', 'lapak_fayfay', 'Blok Mesin Mercedes-Benz M104 3.2L (W124 Boxer E320 / W210)', 'Blok mesin M104 3200cc original copotan Garasi FayFay. Kondisi mulus, liner silinder bagus tanpa baret, belum cacing/bisa oversize standar. Komplit dengan cylinder head & crankcase.', 18500000, 'USED', 'Jakarta Selatan', '[\"https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600\"]', 48, 'PENDING', NULL, '081298765432', 'Parts & Komponen'),
-                ('prod_fayfay_02', 'lapak_fayfay', 'Blok Mesin Mercedes-Benz M112 V6 2.6L (W203 / W211)', 'Blok mesin M112 V6 2600cc copotan original Garasi FayFay terverifikasi. Sudah tes kompresi mulus & siap pasang.', 22000000, 'USED', 'Jakarta Selatan', '[\"https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=600\"]', 72, 'APPROVED', NULL, '081298765432', 'Parts & Komponen');
-            ");
-        }
-
-        $ratihCount = $sPdo->query("SELECT COUNT(*) FROM lapak_products WHERE name = 'Blok Mesin Copotan'")->fetchColumn();
-        if ((int)$ratihCount === 0) {
-            $sPdo->exec("
-                INSERT INTO lapak_products (id, lapak_id, name, description, price, condition, location, images, views, status, rejection_reason, contact_whatsapp, category) VALUES
-                ('prod_ratih_01', 'lapak_001', 'Blok Mesin Copotan', 'Blok Mesin Copotan original Mercedes-Benz garansi kompresi mulus & liner mulus tanpa baret. Seller: Ratih Kusumastuti (Jambi Chapter).', 25000000, 'USED', 'Jambi', '[\"https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600\"]', 105, 'APPROVED', NULL, '082129709595', 'Parts & Komponen Bekas');
             ");
         }
     } catch (Exception $e) {}
@@ -3095,30 +3106,71 @@ switch ($action) {
 
         $file = $_FILES['photo_file'] ?? ($_FILES['file'] ?? ($_FILES['photo'] ?? null));
         if ($file && isset($file['tmp_name']) && $file['error'] === UPLOAD_ERR_OK) {
+            // Strict file size check: Max 5 MB (5 * 1024 * 1024 bytes)
+            $maxFileSize = 5 * 1024 * 1024;
+            if ($file['size'] > $maxFileSize) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Ukuran file foto terlalu besar (Maksimal 5 MB). Mohon kompres atau pilih foto lain.'
+                ]);
+                exit;
+            }
+
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
             if (!in_array($ext, $allowed)) {
-                $ext = 'jpg';
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Format file tidak diizinkan. Hanya file JPG, JPEG, PNG, dan WEBP yang diperbolehkan.'
+                ]);
+                exit;
             }
+
+            // Security check: verify genuine image header
+            $imgInfo = @getimagesize($file['tmp_name']);
+            if (!$imgInfo) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'File yang diunggah bukan file gambar valid.'
+                ]);
+                exit;
+            }
+
             $filename = 'img_' . date('Ymd_His') . '_' . rand(100, 999) . '.' . $ext;
             $targetPath = $uploadDir . $filename;
             if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                echo json_encode(['success' => true, 'url' => 'uploads/' . $filename, 'message' => 'Foto berhasil diupload ke server!']);
+                echo json_encode([
+                    'success' => true,
+                    'url' => 'uploads/' . $filename,
+                    'file_size' => filesize($targetPath),
+                    'message' => 'Foto berhasil diunggah dan diverifikasi!'
+                ]);
+                exit;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Gagal memindahkan file ke direktori upload.']);
                 exit;
             }
         }
 
         if (!empty($input['image_base64'])) {
             $base64 = $input['image_base64'];
-            $filename = 'img_' . date('Ymd_His') . '_' . rand(100, 999) . '.png';
             $data = explode(',', $base64);
             $imgData = base64_decode(end($data));
+            if ($imgData === false) {
+                echo json_encode(['success' => false, 'message' => 'Format data Base64 tidak valid.']);
+                exit;
+            }
+            if (strlen($imgData) > 5 * 1024 * 1024) {
+                echo json_encode(['success' => false, 'message' => 'Ukuran foto Base64 melebihi batas 5 MB.']);
+                exit;
+            }
+            $filename = 'img_' . date('Ymd_His') . '_' . rand(100, 999) . '.png';
             file_put_contents($uploadDir . $filename, $imgData);
-            echo json_encode(['success' => true, 'url' => 'uploads/' . $filename, 'message' => 'Foto Base64 berhasil disimpan!']);
+            echo json_encode(['success' => true, 'url' => 'uploads/' . $filename, 'file_size' => strlen($imgData), 'message' => 'Foto Base64 berhasil disimpan!']);
             exit;
         }
 
-        echo json_encode(['success' => false, 'message' => 'Tidak ada file gambar yang diunggah.']);
+        echo json_encode(['success' => false, 'message' => 'Tidak ada file gambar yang diunggah atau ukuran file melebihi batas upload_max_filesize PHP.']);
         break;
 
     // ============================================
@@ -4250,6 +4302,30 @@ switch ($action) {
                 $sPdo->exec("UPDATE event_participants SET check_in_status = TRUE, check_in_at = NOW(), check_in_method = 'QR_CODE' WHERE id = '{$p['id']}'");
             }
 
+            // Auto-recalculate total_donation & tier in database SQL
+            $sPdo->exec("
+                UPDATE users u
+                SET total_donation = COALESCE((
+                    SELECT SUM(d.amount)
+                    FROM donations d
+                    WHERE (d.user_id = u.id OR d.member_id = u.member_id)
+                      AND d.status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+                ), 0) + COALESCE((
+                    SELECT SUM(p.fee_paid)
+                    FROM event_participants p
+                    WHERE (p.user_id = u.id OR p.member_id = u.member_id)
+                      AND p.payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+                ), 0);
+
+                UPDATE users u
+                SET tier = CASE
+                    WHEN u.total_donation >= 9000000 THEN 'PLATINUM'
+                    WHEN u.total_donation >= 4500000 THEN 'GOLD'
+                    WHEN u.total_donation >= 1500000 THEN 'SILVER'
+                    ELSE 'BRONZE'
+                END;
+            ");
+
             // Log checkin
             $logId = 'chk_' . uniqid();
             $sPdo->exec("INSERT INTO event_checkin_logs (id, event_id, user_id, scanned_by) VALUES ('$logId', '$eventId', '$userId', 'usr_superadmin')");
@@ -4260,6 +4336,52 @@ switch ($action) {
                 'message' => "✅ Check-in BERHASIL! Member: {$u['name']} ({$u['member_id']})",
                 'member' => $u
             ]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'verify_participant_payment':
+        try {
+            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+            $partId = trim($input['participant_id'] ?? $input['id'] ?? '');
+            $status = trim($input['status'] ?? 'VERIFIED');
+
+            if (!$partId) {
+                echo json_encode(['success' => false, 'message' => 'ID peserta tidak valid!']);
+                exit;
+            }
+
+            // Update payment_status in event_participants table in Supabase
+            $stmt = $sPdo->prepare("UPDATE event_participants SET payment_status = :status WHERE id = :pid OR user_id = :pid OR id LIKE :pidlike");
+            $stmt->execute([':status' => $status, ':pid' => $partId, ':pidlike' => "%$partId%"]);
+
+            // Auto-recalculate total_donation & tier in database SQL
+            $sPdo->exec("
+                UPDATE users u
+                SET total_donation = COALESCE((
+                    SELECT SUM(d.amount)
+                    FROM donations d
+                    WHERE d.user_id = u.id
+                      AND d.status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+                ), 0) + COALESCE((
+                    SELECT SUM(p.fee_paid)
+                    FROM event_participants p
+                    WHERE p.user_id = u.id
+                      AND p.payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+                ), 0);
+
+                UPDATE users u
+                SET tier = CASE
+                    WHEN u.total_donation >= 9000000 THEN 'PLATINUM'
+                    WHEN u.total_donation >= 4500000 THEN 'GOLD'
+                    WHEN u.total_donation >= 1500000 THEN 'SILVER'
+                    ELSE 'BRONZE'
+                END;
+            ");
+
+            logAudit('usr_superadmin', 'UPDATE', 'M6_VERIFY_PARTICIPANT', ['participant_id' => $partId, 'status' => $status]);
+            echo json_encode(['success' => true, 'message' => "Status verifikasi peserta berhasil diperbarui ke $status di database Supabase!"]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -4503,6 +4625,12 @@ switch ($action) {
                     $userId = $foundUserId;
                 }
             }
+            if ((empty($userId) || $userId === 'usr_superadmin') && !empty($donorName)) {
+                $stmtUser2 = $sPdo->prepare("SELECT id FROM users WHERE name LIKE ? LIMIT 1");
+                $stmtUser2->execute(['%' . $donorName . '%']);
+                $foundUserId2 = $stmtUser2->fetchColumn();
+                if ($foundUserId2) $userId = $foundUserId2;
+            }
             
             // Append identity to notes for safekeeping
             $identityNote = "Nama: " . ($donorName ?: 'Hamba Allah');
@@ -4524,8 +4652,8 @@ switch ($action) {
                 $seq = 1;
             }
             $id = 'DON-TRX-' . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
-            $stmt = $sPdo->prepare("INSERT INTO donations (id, campaign_id, user_id, amount, payment_method, status, payment_status, payment_proof_url, notes) VALUES (?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?, ?)");
-            $stmt->execute([$id, $campaignId, $userId, $amount, $paymentMethod, $proofUrl, $notes]);
+            $stmt = $sPdo->prepare("INSERT INTO donations (id, campaign_id, user_id, donor_name, member_id, amount, payment_method, status, payment_status, payment_proof_url, notes) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?, ?)");
+            $stmt->execute([$id, $campaignId, $userId, $donorName, $memberIdInput, $amount, $paymentMethod, $proofUrl, $notes]);
 
             logAudit($userId, 'CREATE', 'DONATION', ['donation_id' => $id, 'amount' => $amount, 'method' => $paymentMethod]);
 
@@ -4552,10 +4680,16 @@ switch ($action) {
             $sPdo->prepare("UPDATE donations SET status = ?, payment_status = ? WHERE id = ?")
                  ->execute([$status, $status, $donationId]);
 
+            $pointsEarned = 0;
+            $newTier = 'BRONZE';
+            $userTotalDon = 0;
+
             if ($status === 'SUCCESS') {
+                $amount = (int)($don['amount'] ?? 0);
+
                 // Update campaign collected_amount
                 $sPdo->prepare("UPDATE donation_campaigns SET collected_amount = collected_amount + ? WHERE id = ?")
-                     ->execute([$don['amount'], $don['campaign_id']]);
+                     ->execute([$amount, $don['campaign_id']]);
 
                 // Generate Digital Receipt
                 $recId = 'rec_' . uniqid();
@@ -4571,11 +4705,83 @@ switch ($action) {
                 $recNum = 'REC-' . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
                 $sPdo->prepare("INSERT INTO donation_receipts (id, donation_id, receipt_number, receipt_url, sent_to_email, sent_at) VALUES (?, ?, ?, 'assets/receipt.pdf', TRUE, CURRENT_TIMESTAMP)")
                      ->execute([$recId, $donationId, $recNum]);
+
+                // Identify User & Calculate Gamification Points & Tier Automatically
+                $userId = $don['user_id'] ?? '';
+                if ((empty($userId) || $userId === 'usr_superadmin') && !empty($don['member_id'])) {
+                    $stmtFindU = $sPdo->prepare("SELECT id FROM users WHERE member_id = ? LIMIT 1");
+                    $stmtFindU->execute([trim($don['member_id'])]);
+                    $foundId = $stmtFindU->fetchColumn();
+                    if ($foundId) $userId = $foundId;
+                }
+                if ((empty($userId) || $userId === 'usr_superadmin') && !empty($don['donor_name'])) {
+                    $stmtFindU = $sPdo->prepare("SELECT id FROM users WHERE name LIKE ? LIMIT 1");
+                    $stmtFindU->execute(['%' . trim($don['donor_name']) . '%']);
+                    $foundId = $stmtFindU->fetchColumn();
+                    if ($foundId) $userId = $foundId;
+                }
+                if (empty($userId) && !empty($don['notes'])) {
+                    if (preg_match('/Member ID:\s*(MBINA-[A-Z0-9-]+)/i', $don['notes'], $mMatch)) {
+                        $stmtFindU = $sPdo->prepare("SELECT id FROM users WHERE member_id = ? LIMIT 1");
+                        $stmtFindU->execute([trim($mMatch[1])]);
+                        $userId = $stmtFindU->fetchColumn();
+                    }
+                }
+
+                if (!empty($userId)) {
+                    $uStmt = $sPdo->prepare("SELECT id, name, tier, points, total_donation, member_id FROM users WHERE id = ? LIMIT 1");
+                    $uStmt->execute([$userId]);
+                    $uRow = $uStmt->fetch();
+
+                    if ($uRow) {
+                        // Formula: 1 Poin per Rp 10.000 Donasi (misal Rp 5.000.000 = 500 Poin)
+                        $pointsEarned = max(1, intval($amount / 10000));
+                        $userTotalDon = ((int)$uRow['total_donation']) + $amount;
+                        $oldTier = $uRow['tier'] ?? 'BRONZE';
+
+                        // Automatic Tier Calculation
+                        $newTier = 'BRONZE';
+                        if ($userTotalDon >= 9000000) $newTier = 'PLATINUM';
+                        else if ($userTotalDon >= 4500000) $newTier = 'GOLD';
+                        else if ($userTotalDon >= 1500000) $newTier = 'SILVER';
+
+                        // Update User in Supabase Database
+                        $updUser = $sPdo->prepare("UPDATE users SET total_donation = :tot, points = points + :pts, tier = :tier WHERE id = :uid");
+                        $updUser->execute([
+                            ':tot' => $userTotalDon,
+                            ':pts' => $pointsEarned,
+                            ':tier' => $newTier,
+                            ':uid' => $userId
+                        ]);
+
+                        // Record Tier Upgrade History & Notification if upgraded
+                        if ($newTier !== $oldTier) {
+                            $sPdo->prepare("INSERT INTO tier_history (id, user_id, tier, total_donation, year) VALUES (:id, :uid, :tier, :tot, :yr)")
+                                 ->execute([':id' => 'th_' . uniqid(), ':uid' => $userId, ':tier' => $newTier, ':tot' => $userTotalDon, ':yr' => (int)date('Y')]);
+
+                            $sPdo->prepare("INSERT INTO notifications (id, user_id, type, title, message) VALUES (:id, :uid, 'UPGRADE', 'Selamat! Tier Anda Naik 🏆', :msg)")
+                                 ->execute([':id' => 'notif_' . uniqid(), ':uid' => $userId, ':msg' => "Tier keanggotaan Anda telah naik ke $newTier berkat donasi & kontribusi Anda!"]);
+                        }
+
+                        // Activity Log
+                        $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'DONATION', 'Donasi Berhasil & Poin Reward Bertambah', :detail)")
+                             ->execute([
+                                 ':id' => 'act_' . uniqid(),
+                                 ':uid' => $userId,
+                                 ':detail' => "Donasi Rp " . number_format($amount, 0, ',', '.') . " terverifikasi (+{$pointsEarned} Poin Reward). Total Donasi: Rp " . number_format($userTotalDon, 0, ',', '.') . " (Tier: $newTier)"
+                             ]);
+                    }
+                }
             }
 
-            logAudit($_SESSION['user_id'] ?? 'usr_superadmin', 'VERIFY', 'DONATION', ['donation_id' => $donationId, 'status' => $status]);
+            logAudit($_SESSION['user_id'] ?? 'usr_superadmin', 'VERIFY', 'DONATION', ['donation_id' => $donationId, 'status' => $status, 'points_earned' => $pointsEarned]);
 
-            echo json_encode(['success' => true, 'message' => "Donasi berhasil dikonfirmasi status: $status!"]);
+            echo json_encode([
+                'success' => true, 
+                'message' => "Donasi berhasil dikonfirmasi status: $status!" . ($pointsEarned > 0 ? " (+{$pointsEarned} Poin & Tier diupdate otomatis ke {$newTier})" : ""),
+                'points_earned' => $pointsEarned,
+                'tier' => $newTier
+            ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -4587,10 +4793,10 @@ switch ($action) {
     case 'get_m7_data':
         try {
             ensureM7Tables($sPdo);
-            $lapak = $sPdo->query("SELECT l.*, COALESCE(u.username, u.name, 'Member MB INA') AS pemilik, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id, COALESCE(u.tier, 'GOLD') AS tier FROM lapak l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC")->fetchAll() ?: [];
+            $lapak = $sPdo->query("SELECT l.*, COALESCE(u.name, u.username, 'Member MB INA') AS pemilik, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id, COALESCE(u.tier, 'GOLD') AS tier FROM lapak l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC")->fetchAll() ?: [];
             $products = $sPdo->query("SELECT p.*, l.name as lapak_name, COALESCE(NULLIF(p.contact_whatsapp, ''), l.contact_whatsapp, '081234567890') as lapak_wa, COALESCE(u.name, 'Member MB INA') as seller_name, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') as member_id FROM lapak_products p LEFT JOIN lapak l ON p.lapak_id = l.id LEFT JOIN users u ON l.user_id = u.id ORDER BY p.created_at DESC")->fetchAll() ?: [];
-            $reviews = $sPdo->query("SELECT * FROM lapak_reviews ORDER BY created_at DESC")->fetchAll() ?: [];
-            $sewaLogs = $sPdo->query("SELECT * FROM lapak_sewa_logs ORDER BY created_at DESC")->fetchAll() ?: [];
+            $reviews = $sPdo->query("SELECT r.*, COALESCE(u.name, u.username, 'Member MB INA') AS user_name, COALESCE(u.member_id, 'MBINA-HQ-2026-000001') AS member_id FROM lapak_reviews r LEFT JOIN users u ON r.user_id = u.id ORDER BY r.created_at DESC")->fetchAll() ?: [];
+            $sewaLogs = $sPdo->query("SELECT s.*, l.name as lapak_name, l.lapak_code, COALESCE(u.name, 'Admin') as creator_name FROM lapak_sewa_logs s LEFT JOIN lapak l ON s.lapak_id = l.id LEFT JOIN users u ON s.created_by = u.id ORDER BY s.created_at DESC")->fetchAll() ?: [];
             $categories = $sPdo->query("SELECT * FROM product_categories ORDER BY display_order ASC")->fetchAll() ?: [];
 
             echo json_encode([
@@ -4849,20 +5055,29 @@ switch ($action) {
     case 'create_lapak_product':
         try {
             ensureM7Tables($sPdo);
-            $lapakId         = $input['lapak_id'] ?? '';
+            $lapakId         = trim($input['lapak_id'] ?? '');
             $name            = trim($input['name'] ?? '');
             $description     = trim($input['description'] ?? '');
             $price           = intval($input['price'] ?? 0);
             $condition       = strtoupper(trim($input['condition'] ?? 'USED'));
             $location        = trim($input['location'] ?? 'Jakarta');
-            $category        = trim($input['category'] ?? 'Parts');
+            $category        = trim($input['category'] ?? 'Parts & Komponen');
             $contactWhatsapp = trim($input['contact_whatsapp'] ?? '081234567890');
             $images          = is_array($input['images'] ?? null) ? json_encode($input['images']) : json_encode([$input['images'] ?? 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600']);
             $userId          = $input['user_id'] ?? 'usr_superadmin';
 
-            if (empty($name) || $price <= 0 || empty($lapakId)) {
-                echo json_encode(['success' => false, 'message' => 'Nama produk, harga, dan lapak wajib diisi!']);
+            if (empty($name) || $price <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Nama produk dan harga wajib diisi!']);
                 exit;
+            }
+
+            if (empty($lapakId)) {
+                $stmtLapak = $sPdo->prepare("SELECT id FROM lapak WHERE user_id = ? LIMIT 1");
+                $stmtLapak->execute([$userId]);
+                $lapakId = $stmtLapak->fetchColumn();
+                if (!$lapakId) {
+                    $lapakId = $sPdo->query("SELECT id FROM lapak LIMIT 1")->fetchColumn() ?: 'lapak_001';
+                }
             }
 
             $prodId = 'prod_' . uniqid();

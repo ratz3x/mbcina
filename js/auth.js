@@ -578,30 +578,13 @@ const AuthEngine = {
         const idLower = email.toLowerCase();
         let foundMember = null;
 
-        // Cari di master list members jika sudah ter-load
-        if (window.AppEngine.m3Data && Array.isArray(window.AppEngine.m3Data.members)) {
+        // Cari di master list members jika sudah ter-load dari database
+        if (window.AppEngine && window.AppEngine.m3Data && Array.isArray(window.AppEngine.m3Data.members)) {
           foundMember = window.AppEngine.m3Data.members.find(m => 
             (m.email && m.email.toLowerCase() === idLower) ||
             (m.username && m.username.toLowerCase() === idLower) ||
             (m.member_id && m.member_id.toLowerCase() === idLower)
           );
-        }
-
-        // Jika belum ada di m3Data, periksa data default Ratih Kusumastuti
-        if (!foundMember && idLower.includes('ratihkusumastuti')) {
-          foundMember = {
-            id: 'usr_6a7ed057d1d21',
-            name: 'Ratih Kusumastuti',
-            username: 'ratih1979',
-            email: 'ratihkusumastuti1979@gmail.com',
-            phone: '08545585568',
-            role: 'MEMBER',
-            status: 'ACTIVE',
-            tier: 'GOLD',
-            member_id: 'MBINA-JAM-2026-000011',
-            province: 'Jambi',
-            city: 'Jambi'
-          };
         }
 
         if (foundMember) {
@@ -610,7 +593,7 @@ const AuthEngine = {
           loginMessage = `Login Berhasil! Selamat Datang kembali, ${foundMember.name}.`;
         }
       } catch (memErr) {
-        console.warn('Member list fallback lookup error:', memErr);
+        console.warn('Member list lookup error:', memErr);
       }
     }
 

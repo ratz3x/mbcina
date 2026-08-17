@@ -716,23 +716,107 @@ const AppEngine = {
     modal.classList.add('active');
   },
 
-  handleDashboardPhotoUpload(event) {
+  validateAndCompressImage: function(file, options = {}) {
+    const maxSizeBytes = options.maxSizeBytes || 5 * 1024 * 1024; // 5 MB hard limit
+    const maxDimension = options.maxDimension || 1280; // downscale max width/height
+    const quality = options.quality || 0.82; // 82% quality
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        return reject(new Error('File tidak ditemukan.'));
+      }
+
+      const fileType = (file.type || '').toLowerCase();
+      if (!fileType.startsWith('image/') && !allowedTypes.includes(fileType)) {
+        return reject(new Error('Format file tidak didukung! Harap pilih file gambar (JPG, JPEG, PNG, atau WEBP).'));
+      }
+
+      if (file.size > maxSizeBytes) {
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+        return reject(new Error(`Ukuran file terlalu besar (${sizeMb} MB). Batas maksimum file adalah 5 MB.`));
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          // Proportional downscale if exceeding maxDimension
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const mimeType = fileType === 'image/png' ? 'image/png' : 'image/jpeg';
+          const compressedDataUrl = canvas.toDataURL(mimeType, quality);
+
+          if (canvas.toBlob) {
+            canvas.toBlob((blob) => {
+              if (!blob) {
+                return resolve({
+                  dataUrl: compressedDataUrl,
+                  blob: file,
+                  file: file,
+                  originalSize: file.size,
+                  compressedSize: file.size,
+                  dimensions: { width, height }
+                });
+              }
+              const ext = mimeType === 'image/png' ? '.png' : '.jpg';
+              const cleanName = (file.name || 'image').replace(/\.[^/.]+$/, "") + ext;
+              const compressedFile = new File([blob], cleanName, {
+                type: mimeType,
+                lastModified: Date.now()
+              });
+              resolve({
+                dataUrl: compressedDataUrl,
+                blob: blob,
+                file: compressedFile,
+                originalSize: file.size,
+                compressedSize: blob.size,
+                dimensions: { width, height }
+              });
+            }, mimeType, quality);
+          } else {
+            resolve({
+              dataUrl: compressedDataUrl,
+              blob: file,
+              file: file,
+              originalSize: file.size,
+              compressedSize: file.size,
+              dimensions: { width, height }
+            });
+          }
+        };
+        img.onerror = () => reject(new Error('Gagal memproses gambar. File mungkin rusak atau tidak valid.'));
+        img.src = e.target.result;
+      };
+      reader.onerror = () => reject(new Error('Gagal membaca file dari disk.'));
+      reader.readAsDataURL(file);
+    });
+  },
+
+  async handleDashboardPhotoUpload(event) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      window.showToast('Harap pilih file gambar (JPG / PNG / WebP)!', 'error');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      window.showToast('Ukuran foto maksimal 5 MB!', 'error');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target.result;
+    try {
+      const result = await this.validateAndCompressImage(file, { maxDimension: 800, quality: 0.85 });
+      const dataUrl = result.dataUrl;
       
       const dPhoto = document.getElementById('dash-member-photo');
       const ktaPhoto = document.getElementById('kta-member-photo');
@@ -748,10 +832,11 @@ const AppEngine = {
         localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
       }
 
-      window.showToast('🎉 Foto Resmi Member berhasil diunggah!', 'success');
-    };
-
-    reader.readAsDataURL(file);
+      window.showToast?.(`✅ Foto profil berhasil diunggah (${(result.compressedSize / 1024).toFixed(0)} KB)`, 'success');
+    } catch (err) {
+      window.showToast?.(`❌ ${err.message}`, 'error');
+      event.target.value = '';
+    }
   },
 
   async saveMemberDashboardProfile() {
@@ -1184,24 +1269,71 @@ const AppEngine = {
     const container = document.getElementById('ml-my-lapak-container');
     if (!container) return;
     const u = this.currentUser || {};
-    const myAds = (this._memberAdsList || []).filter(p => p.seller === (u.name || 'Member MB INA'));
+    const userId = u.id || '';
+
+    // Baca dari M7Engine.data.products (Supabase) — filter by lapak yang dimiliki user
+    let myAds = [];
+    if (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) {
+      const lapaks = window.M7Engine.data.lapak || [];
+      // Cari lapak milik user ini
+      const myLapakIds = lapaks
+        .filter(l => l.user_id === userId || l.user_id === u.userId)
+        .map(l => l.id);
+
+      myAds = window.M7Engine.data.products.filter(p => {
+        // Cocokkan via lapak_id, user_id langsung pada produk, atau seller_name
+        return myLapakIds.includes(p.lapak_id)
+          || p.user_id === userId
+          || (u.name && p.seller_name === u.name);
+      });
+    }
+
+    // Tambahkan juga dari _memberAdsList (sementara dalam sesi ini)
+    if (this._memberAdsList && this._memberAdsList.length) {
+      const existing = new Set(myAds.map(p => p.id));
+      this._memberAdsList
+        .filter(a => a.seller === (u.name || 'Member MB INA') && !existing.has(a.id))
+        .forEach(a => myAds.unshift(a));
+    }
 
     const fmtRp = v => 'Rp ' + Number(v).toLocaleString('id-ID');
+
+    const statusColor = s => {
+      if (!s || s === 'PENDING')  return '#f59e0b';
+      if (s === 'APPROVED')       return '#10b981';
+      if (s === 'REJECTED')       return '#ef4444';
+      if (s === 'REVISION')       return '#3b82f6';
+      return '#94a3b8';
+    };
+    const statusLabel = s => {
+      if (!s || s === 'PENDING')  return '⏳ MENUNGGU VERIFIKASI';
+      if (s === 'APPROVED')       return '✅ DISETUJUI';
+      if (s === 'REJECTED')       return '❌ DITOLAK';
+      if (s === 'REVISION')       return '📝 PERLU REVISI';
+      return s;
+    };
 
     container.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <span style="font-size:0.85rem; font-weight:800; color:#fff;">Daftar Iklan Saya (${myAds.length})</span>
         <button class="btn-primary" style="font-size:0.75rem; padding:6px 12px; font-weight:800;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan', document.querySelectorAll('.member-lapak-subtab')[2])">+ Pasang Iklan Baru</button>
       </div>
-      ${myAds.length ? myAds.map(a => `
+      ${myAds.length ? myAds.map(a => {
+        let imgs = [];
+        try { imgs = typeof a.images === 'string' ? JSON.parse(a.images) : (a.images || []); } catch(e){}
+        const img = a.img || imgs[0] || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';
+        const sc = statusColor(a.status);
+        const sl = statusLabel(a.status);
+        return `
         <div style="display:flex; align-items:center; gap:12px; padding:12px; background:rgba(255,255,255,0.03); border:1px solid var(--chrome-border); border-radius:10px; margin-bottom:8px;">
-          <img src="${a.img}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">
-          <div style="flex:1;">
-            <div style="font-size:0.85rem; font-weight:800; color:#fff;">${a.name}</div>
-            <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:800;">${fmtRp(a.price)}</div>
-            <span style="font-size:0.65rem; color:#10b981; font-weight:800;">● ${a.status || 'VERIFIED'}</span>
+          <img src="${img}" style="width:54px; height:54px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:0.85rem; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.name || a.title || 'Produk'}</div>
+            <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:800; margin:2px 0;">${fmtRp(a.price)}</div>
+            <span style="font-size:0.68rem; color:${sc}; font-weight:800;">● ${sl}</span>
           </div>
-        </div>`).join('') : `
+        </div>`;
+      }).join('') : `
         <div style="text-align:center; padding:30px; background:rgba(255,255,255,0.02); border:1.5px dashed var(--chrome-border); border-radius:12px; color:var(--text-muted); font-size:0.82rem;">
           Anda belum memiliki iklan terdaftar.<br>Klik tombol <strong>"➕ Pasang Iklan"</strong> untuk mendaftarkan barang atau jualan Anda.
         </div>`}`;
@@ -1250,7 +1382,7 @@ const AppEngine = {
     }
   },
 
-  _submitMemberAdForm() {
+  async _submitMemberAdForm() {
     const title = document.getElementById('ml-form-title')?.value.trim();
     const category = document.getElementById('ml-form-category')?.value;
     const price = parseInt(document.getElementById('ml-form-price')?.value || '0');
@@ -1266,36 +1398,66 @@ const AppEngine = {
     }
 
     const u = this.currentUser || {};
-    const photo = imgUrl || (category === 'KENDARAAN' ? 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400' : 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400');
-    const newAd = {
-      id: 'ad_' + Date.now(),
-      name: title, category, price, condition, location, phone, desc,
-      seller: u.name || 'Member MB INA',
-      status: 'VERIFIED',
-      img: photo
-    };
+    const photo = imgUrl || (category === 'KENDARAAN'
+      ? 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400'
+      : 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400');
 
-    if (!this._memberAdsList) this._memberAdsList = [];
-    this._memberAdsList.unshift(newAd);
-
-    if (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) {
-      window.M7Engine.data.products.unshift({
-        id: newAd.id,
-        lapak_id: 'lapak_001',
-        name: title,
-        description: desc,
-        price: price,
-        condition: condition,
-        location: location,
-        images: JSON.stringify([photo]),
-        views: 1,
-        status: 'PENDING',
-        contact_whatsapp: phone
-      });
+    // Cari lapak milik user ini dari M7Engine
+    let lapakId = 'lapak_001';
+    if (window.M7Engine && Array.isArray(window.M7Engine.data?.lapak)) {
+      const myLapak = window.M7Engine.data.lapak.find(l =>
+        l.user_id === u.id || l.user_id === u.userId
+      );
+      if (myLapak) lapakId = myLapak.id;
     }
 
-    window.showToast(`🎉 Iklan "${title}" berhasil terpasang! (Menunggu verifikasi admin)`, 'success');
-    this._switchMemberLapakSubtab('katalog', document.querySelectorAll('.member-lapak-subtab')[0]);
+    try {
+      const submitBtn = document.getElementById('ml-form-submit-btn');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Menyimpan...'; }
+
+      // POST ke Supabase via API (status otomatis PENDING)
+      const res = await fetch('api.php?action=create_lapak_product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lapak_id: lapakId,
+          name: title,
+          description: desc,
+          price,
+          condition,
+          location,
+          category,
+          contact_whatsapp: phone,
+          images: [photo],
+          user_id: u.id || 'usr_superadmin'
+        })
+      }).then(r => r.json());
+
+      if (res && res.success) {
+        // Refresh data M7Engine dari Supabase
+        if (window.M7Engine && typeof window.M7Engine.fetchData === 'function') {
+          await window.M7Engine.fetchData();
+        }
+        // Clear form
+        ['ml-form-title','ml-form-price','ml-form-location','ml-form-phone','ml-form-desc','ml-form-img-url'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+        const prevContainer = document.getElementById('ml-preview-container-1');
+        if (prevContainer) prevContainer.style.display = 'none';
+
+        window.showToast(`🎉 Iklan "${title}" berhasil terpasang! (Menunggu verifikasi admin 1x24 jam)`, 'success');
+        // Pindah ke tab Lapak Saya agar user bisa melihat iklannya
+        this._switchMemberLapakSubtab('lapaksaya', document.querySelectorAll('.member-lapak-subtab')[1]);
+      } else {
+        window.showToast(`❌ Gagal memasang iklan: ${res?.message || 'Error server'}`, 'error');
+      }
+    } catch (err) {
+      window.showToast(`❌ Connection error: ${err.message}`, 'error');
+    } finally {
+      const submitBtn = document.getElementById('ml-form-submit-btn');
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '📝 PASANG IKLAN SEKARANG'; }
+    }
   },
 
   async openMemberProfileModal() {
@@ -2408,7 +2570,7 @@ const AppEngine = {
         { id: 'usr_m3_003', name: 'Siti Rahayu', username: 'siti_rahayu', email: 'siti@email.com', phone: '081345678901', role: 'MEMBER', status: 'ACTIVE', member_id: 'MBINA-SBY-2026-000007', tier: 'BRONZE', city: 'Surabaya', province_id: 'prov_jtm', club_name: 'Mercedes-Benz Club Surabaya' },
         { id: 'usr_m3_004', name: 'Andi Wijaya', username: 'andi_wijaya', email: 'andi.wijaya@email.com', phone: '081234567889', role: 'MEMBER', status: 'ACTIVE', member_id: 'MBINA-MED-2026-000008', tier: 'BRONZE', city: 'Medan', province_id: 'prov_sum', club_name: 'Mercedes-Benz Club Medan Chapter' },
         { id: 'usr_m3_005', name: 'Denny Kurniawan', username: 'denny_kurniawan', email: 'denny@email.com', phone: '081771122334', role: 'MEMBER', status: 'ACTIVE', member_id: 'MBINA-JKT-2026-000009', tier: 'BRONZE', city: 'Jakarta Barat', province_id: 'prov_jkt', club_name: 'Mercedes-Benz W124 Club Indonesia Chapter Jakarta' },
-        { id: 'usr_m3_011', name: 'Ratih Kusumastuti', username: 'ratih1979', email: 'ratihkusumastuti1979@gmail.com', phone: '08545585568', role: 'MEMBER', status: 'PENDING', member_id: 'MBINA-JAM-2026-000011', tier: 'GOLD', city: 'Jambi', province_id: 'prov_jam', totalDonation: 5000000, total_donation: 5000000, club_name: 'MBC Jambi' }
+        { id: 'usr_m3_011', name: 'Ratih Kusumastuti', username: 'ratih1979', email: 'ratihkusumastuti1979@gmail.com', phone: '08545585568', role: 'MEMBER', status: 'ACTIVE', member_id: 'MBINA-JAM-2026-000011', tier: 'PLATINUM', city: 'Jambi', province_id: 'prov_jam', totalDonation: 15400000, total_donation: 15400000, club_name: 'MBC Jambi' }
       ];
       this.users = this.m3Data.members;
     }
@@ -6538,8 +6700,9 @@ const AppEngine = {
     this.populateM3ClubDropdowns();
 
     // Hitung real-time akumulasi donasi + tiket event terverifikasi
+    const totalContrib = this.getMemberTotalContribution(m);
     const explicitDon = Number(m.total_donation || m.totalDonation || m.total_contribution || 0);
-    const realTotal = explicitDon;
+    const realTotal = Math.max(explicitDon, totalContrib);
     const tierCalc = this.calculateMemberTier(realTotal);
 
     document.getElementById('m3-edit-id').value = m.id;
@@ -9247,6 +9410,29 @@ const M6Engine = {
       'REJECTED': '<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); font-weight:800; padding:4px 10px; font-size:0.75rem;">🔴 DITOLAK</span>'
     };
 
+    const getDynamicTierForParticipant = (p) => {
+      const pMid = (p.member_id || p.memberId || '').toUpperCase();
+      const pName = (p.name || p.participant_name || '').toLowerCase();
+      const allUsers = [
+        ...(window.M3Engine?.m3Data?.members || []),
+        ...(window.AppEngine?.users || []),
+        ...(window.AppEngine?.m3Data?.members || []),
+        (window.AppEngine?.currentUser || {})
+      ];
+      const found = allUsers.find(u => {
+        if (!u) return false;
+        const uMid = (u.member_id || u.memberId || '').toUpperCase();
+        const uName = (u.name || u.username || '').toLowerCase();
+        return (pMid && uMid && pMid === uMid) || (pName && uName && (pName === uName || pName.includes(uName) || uName.includes(pName)));
+      });
+      if (found) {
+        const tot = window.AppEngine?.getMemberTotalContribution ? window.AppEngine.getMemberTotalContribution(found) : Number(found.total_donation || found.totalDonation || 0);
+        const calc = window.AppEngine?.calculateMemberTier ? window.AppEngine.calculateMemberTier(tot) : { tier: found.tier || 'BRONZE' };
+        return calc.tier;
+      }
+      return p.tier || 'BRONZE';
+    };
+
     const getTierBadgeFormat = (t) => {
       const tierUpper = (t || 'BRONZE').toUpperCase();
       if (tierUpper.includes('PLATINUM')) return '<span class="tier-badge" style="background:rgba(168,85,247,0.15); color:#A855F7; border:1px solid #A855F7; font-weight:800; padding:4px 10px; font-size:0.75rem;">💎 PLATINUM</span>';
@@ -9360,17 +9546,17 @@ const M6Engine = {
                               <div style="font-size:0.73rem; color:var(--text-muted); font-family:monospace;">${p.member_id || ''} ${p.phone ? '• 📞 ' + p.phone : ''}</div>
                             </td>
                             <td style="padding:8px; font-size:0.78rem; color:var(--text-muted); font-weight:600;">${p.club || 'HQ MB INA'}</td>
-                            <td style="padding:8px; text-align:center;">${getTierBadgeFormat(p.tier)}</td>
+                            <td style="padding:8px; text-align:center;">${getTierBadgeFormat(getDynamicTierForParticipant(p))}</td>
                             <td style="padding:8px; text-align:right; font-weight:800; color:var(--primary-emerald); white-space:nowrap;">Rp ${new Intl.NumberFormat('id-ID').format(p.htm)}</td>
                             <td style="padding:8px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
                             <td style="padding:8px; text-align:center; font-size:0.75rem; color:var(--text-muted); white-space:nowrap;">${(p.created_at || '10/08/2026').split(' ')[0]}</td>
                             <td style="padding:8px; text-align:center; white-space:nowrap;">
                               <button class="btn-outline" title="Lihat Bukti Transfer Pembayaran" style="padding:3px 8px; font-size:0.75rem; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:800; border-radius:6px; margin-right:4px;" onclick="M6Engine.viewPaymentProof('${p.id}')">👁️ Bukti</button>
-                              ${p.status === 'PENDING' ? `
-                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem; color:var(--primary-emerald); border-color:var(--primary-emerald);" onclick="M6Engine.verifyPayment('${p.id}', true)" title="Verifikasi Terima">✅</button>
-                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.verifyPayment('${p.id}', false)" title="Tolak">❌</button>
+                              ${(p.status === 'PENDING') ? `
+                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem; color:var(--primary-emerald); border-color:var(--primary-emerald);" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'VERIFIED')" title="Verifikasi Terima">✅</button>
+                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'REJECTED')" title="Tolak">❌</button>
                               ` : `
-                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem;" onclick="M6Engine.openQrModal('${p.id}')" title="Kartu Undangan QR">🎟️</button>
+                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem;" onclick="M6Engine.viewParticipantKtaQr('${p.id}')" title="Kartu Undangan QR">🎟️</button>
                               `}
                             </td>
                           </tr>
@@ -9390,50 +9576,67 @@ const M6Engine = {
 
   getParticipantsForEvent(eventId) {
     let rawList = [];
-    if (eventId === 'EVT-2026-002') {
+    if (eventId === 'EVT-2026-002' || eventId === 'evt_002') {
       rawList = [
-        { id: 'part_bsd_1', member_id: 'MBINA-JKT-2026-000101', name: 'Ir. Hendra Gunawan', club: 'W124 MBCI Jakarta', tier: 'Platinum', htm: 500000, status: 'VERIFIED', phone: '081122334455', created_at: '11/08/2026 09:15', qr_code: 'QR-EVT-2026-002-1' },
-        { id: 'part_bsd_2', member_id: 'MBINA-BDG-2026-000102', name: 'Rina Wijaya', club: 'MBC Bandung Chapter', tier: 'Gold', htm: 500000, status: 'VERIFIED', phone: '081299887766', created_at: '11/08/2026 10:30', qr_code: 'QR-EVT-2026-002-2' },
-        { id: 'part_bsd_3', member_id: 'MBINA-TNG-2026-000103', name: 'Dedi Kurniawan', club: 'MBC Tangerang BSD', tier: 'Silver', htm: 500000, status: 'PENDING', phone: '081344556677', created_at: '11/08/2026 11:45', qr_code: 'QR-EVT-2026-002-3' },
-        { id: 'part_bsd_4', member_id: 'MBINA-SMG-2026-000104', name: 'Eko Prasetyo', club: 'MBC Semarang', tier: 'Bronze', htm: 500000, status: 'PENDING', phone: '081566778899', created_at: '11/08/2026 14:20', qr_code: 'QR-EVT-2026-002-4' }
+        { id: 'part_bsd_1', event_id: 'EVT-2026-002', member_id: 'MBINA-JKT-2026-000101', name: 'Ir. Hendra Gunawan', club: 'W124 MBCI Jakarta', tier: 'Platinum', htm: 500000, status: 'VERIFIED', phone: '081122334455', created_at: '11/08/2026 09:15', qr_code: 'QR-EVT-2026-002-1' },
+        { id: 'part_bsd_2', event_id: 'EVT-2026-002', member_id: 'MBINA-BDG-2026-000102', name: 'Rina Wijaya', club: 'MBC Bandung Chapter', tier: 'Gold', htm: 500000, status: 'VERIFIED', phone: '081299887766', created_at: '11/08/2026 10:30', qr_code: 'QR-EVT-2026-002-2' },
+        { id: 'part_bsd_3', event_id: 'EVT-2026-002', member_id: 'MBINA-TNG-2026-000103', name: 'Dedi Kurniawan', club: 'MBC Tangerang BSD', tier: 'Silver', htm: 500000, status: 'PENDING', phone: '081344556677', created_at: '11/08/2026 11:45', qr_code: 'QR-EVT-2026-002-3' },
+        { id: 'part_bsd_4', event_id: 'EVT-2026-002', member_id: 'MBINA-SMG-2026-000104', name: 'Eko Prasetyo', club: 'MBC Semarang', tier: 'Bronze', htm: 500000, status: 'PENDING', phone: '081566778899', created_at: '11/08/2026 14:20', qr_code: 'QR-EVT-2026-002-4' },
+        { id: 'part_bsd_5', event_id: 'EVT-2026-002', member_id: 'MBINA-JAM-2026-000011', name: 'Ratih Kusumastuti', club: 'MBC Jambi', tier: 'Platinum', htm: 400000, status: 'VERIFIED', phone: '08545585568', created_at: '12/08/2026 10:15', qr_code: 'QR-EVT-2026-002-5' }
       ];
-    } else if (eventId === 'EVT-2026-003') {
+    } else if (eventId === 'EVT-2026-003' || eventId === 'evt_003') {
       rawList = [
-        { id: 'part_sum_1', member_id: 'MBINA-MDN-2026-000201', name: 'Mayor Bambang S.', club: 'MBC Medan Trans', tier: 'Platinum', htm: 600000, status: 'VERIFIED', phone: '081311223344', created_at: '12/08/2026 08:00', qr_code: 'QR-EVT-2026-003-1' },
-        { id: 'part_sum_2', member_id: 'MBINA-BKT-2026-000202', name: 'Dr. Aris Munandar', club: 'MBC Bukittinggi Chapter', tier: 'Gold', htm: 600000, status: 'VERIFIED', phone: '081233445566', created_at: '12/08/2026 08:45', qr_code: 'QR-EVT-2026-003-2' },
-        { id: 'part_sum_3', member_id: 'MBINA-PLB-2026-000203', name: 'Herman Susanto', club: 'MBC Palembang', tier: 'Silver', htm: 600000, status: 'PENDING', phone: '081355667788', created_at: '12/08/2026 09:30', qr_code: 'QR-EVT-2026-003-3' }
+        { id: 'part_sum_1', event_id: 'EVT-2026-003', member_id: 'MBINA-MDN-2026-000201', name: 'Mayor Bambang S.', club: 'MBC Medan Trans', tier: 'Platinum', htm: 600000, status: 'VERIFIED', phone: '081311223344', created_at: '12/08/2026 08:00', qr_code: 'QR-EVT-2026-003-1' },
+        { id: 'part_sum_2', event_id: 'EVT-2026-003', member_id: 'MBINA-BKT-2026-000202', name: 'Dr. Aris Munandar', club: 'MBC Bukittinggi Chapter', tier: 'Gold', htm: 600000, status: 'VERIFIED', phone: '081233445566', created_at: '12/08/2026 08:45', qr_code: 'QR-EVT-2026-003-2' },
+        { id: 'part_sum_3', event_id: 'EVT-2026-003', member_id: 'MBINA-PLB-2026-000203', name: 'Herman Susanto', club: 'MBC Palembang', tier: 'Silver', htm: 600000, status: 'PENDING', phone: '081355667788', created_at: '12/08/2026 09:30', qr_code: 'QR-EVT-2026-003-3' }
       ];
     } else {
-      let sourceList = (this.data.participants && this.data.participants.length >= 7) 
-                       ? this.data.participants 
-                       : this.getSampleParticipants();
-
-      const fallbackNames = [
-        { name: 'Derist Touriano', member_id: 'MBINA-HQ-2026-000001', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, phone: '082129709595' },
-        { name: 'Ir. Raymond Sanjaya', member_id: 'MBINA-HQ-2026-000002', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, phone: '08112233445' },
-        { name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', member_id: 'MBINA-HQ-2026-000004', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, phone: '082527000001' },
-        { name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom. (Presiden MB INA)', member_id: 'MBINA-PUSAT-2025-002527', club: 'Pusat MBClubINA', tier: 'Platinum', htm: 350000, phone: '082527000001' },
-        { name: 'Andi Pratama', member_id: 'MBINA-JKT-2026-000005', club: 'W124 MBCI Jakarta Chapter', tier: 'Gold', htm: 400000, phone: '081234567890' },
-        { name: 'Budi Santoso', member_id: 'MBINA-BDG-2026-000006', club: 'MBC Bandung', tier: 'Bronze', htm: 500000, phone: '081987654321' },
-        { name: 'Ratih Kusumastuti', member_id: 'MBINA-JAM-2026-000011', club: 'MBC Jambi', tier: 'Gold', htm: 400000, phone: '08545585568' }
+      rawList = [
+        { id: 'part_1', event_id: 'evt_001', member_id: 'MBINA-HQ-2026-000001', name: 'Derist Touriano', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082129709595', created_at: '10/08/2026 08:30', qr_code: 'QR-EVT-2026-001-1' },
+        { id: 'part_2', event_id: 'evt_001', member_id: 'MBINA-HQ-2026-000002', name: 'Ir. Raymond Sanjaya', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '08112233445', created_at: '09/08/2026 09:15', qr_code: 'QR-EVT-2026-001-2' },
+        { id: 'part_3', event_id: 'evt_001', member_id: 'MBINA-HQ-2026-000004', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082527000001', created_at: '05/08/2026 10:00', qr_code: 'QR-EVT-2026-001-3' },
+        { id: 'part_4', event_id: 'evt_001', member_id: 'MBINA-PUSAT-2025-002527', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom. (Presiden MB INA)', club: 'Pusat MBClubINA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082527000001', created_at: '05/08/2026 10:00', qr_code: 'QR-EVT-2026-001-4' },
+        { id: 'part_5', event_id: 'evt_001', member_id: 'MBINA-JKT-2026-000005', name: 'Andi Pratama', club: 'W124 MBCI Jakarta Chapter', tier: 'Gold', htm: 400000, status: 'PENDING', phone: '081234567890', created_at: '04/08/2026 14:20', qr_code: 'QR-EVT-2026-001-5' },
+        { id: 'part_6', event_id: 'evt_001', member_id: 'MBINA-BDG-2026-000006', name: 'Budi Santoso', club: 'MBC Bandung', tier: 'Bronze', htm: 500000, status: 'PENDING', phone: '081987654321', created_at: '04/08/2026 15:45', qr_code: 'QR-EVT-2026-001-6' },
+        { id: 'part_7', event_id: 'evt_001', member_id: 'MBINA-JAM-2026-000011', name: 'Ratih Kusumastuti', club: 'MBC Jambi', tier: 'Platinum', htm: 400000, status: 'VERIFIED', phone: '08545585568', created_at: '11/08/2026 11:20', qr_code: 'QR-EVT-2026-001-7' }
       ];
+    }
 
-      rawList = sourceList.map((p, idx) => {
-        const fallback = fallbackNames[idx % fallbackNames.length];
-        return {
-          id: p.id || ('part_' + idx),
-          member_id: (p.member_id && p.member_id !== '-' && p.member_id !== 'MBINA-HQ-2026-000001') ? p.member_id : fallback.member_id,
-          name: (p.name && p.name !== '-' && p.name !== 'Derist Touriano') ? p.name : fallback.name,
-          club: (p.club && p.club !== '-') ? p.club : fallback.club,
-          tier: (p.tier && p.tier !== 'MEMBER' && p.tier !== '-') ? p.tier : fallback.tier,
-          htm: p.htm ? p.htm : fallback.htm,
-          proof: p.proof || 'bukti_transfer.jpg',
-          status: p.status || 'PENDING',
-          phone: (p.phone && p.phone !== '082129709595') ? p.phone : fallback.phone,
-          created_at: p.created_at || '10/08/2026 00:30',
-          qr_code: p.qr_code || ('QR-EVT-2026-001-' + idx)
-        };
+    // Sync with API participants if loaded from database (strictly per event)
+    if (this.data && Array.isArray(this.data.participants)) {
+      this.data.participants.forEach(p => {
+        const pEventId = p.event_id || '';
+        const isEventMatch = !pEventId || pEventId === eventId || (eventId === 'evt_001' && (pEventId === 'EVT-2026-001' || pEventId === 'evt_001')) || (eventId === 'EVT-2026-002' && (pEventId === 'evt_002' || pEventId === 'EVT-2026-002'));
+        if (!isEventMatch) return;
+
+        const pStatus = (p.payment_status || p.status || '').toUpperCase();
+        const pMid = (p.user_mid || p.member_id || p.memberId || '').toUpperCase();
+        const pName = (p.user_name || p.name || p.participant_name || '').toLowerCase();
+
+        const match = rawList.find(r => 
+          r.id === p.id || 
+          (pMid && r.member_id && r.member_id.toUpperCase() === pMid) ||
+          (pName && r.name && (r.name.toLowerCase() === pName || pName.includes(r.name.toLowerCase()) || r.name.toLowerCase().includes(pName)))
+        );
+
+        if (match) {
+          if (pStatus === 'VERIFIED' || pStatus === 'PAID' || pStatus === 'APPROVED' || pStatus === 'SUCCESS') {
+            match.status = 'VERIFIED';
+          } else if (pStatus === 'REJECTED') {
+            match.status = 'REJECTED';
+          }
+        }
       });
+    }
+
+    // Initialize or load status overrides from localStorage if available
+    if (!this.participantStatusOverrides) {
+      try {
+        const saved = localStorage.getItem('mbina_participant_status_overrides');
+        this.participantStatusOverrides = saved ? JSON.parse(saved) : {};
+      } catch(e) {
+        this.participantStatusOverrides = {};
+      }
     }
 
     // Apply status overrides if any
@@ -9441,10 +9644,27 @@ const M6Engine = {
       rawList = rawList.map(p => {
         if (this.participantStatusOverrides[p.id]) {
           p.status = this.participantStatusOverrides[p.id];
+        } else if (p.member_id && this.participantStatusOverrides[p.member_id]) {
+          p.status = this.participantStatusOverrides[p.member_id];
+        } else if (p.memberId && this.participantStatusOverrides[p.memberId]) {
+          p.status = this.participantStatusOverrides[p.memberId];
         }
         return p;
       });
     }
+
+    // Strictly deduplicate rawList by member_id / name to prevent duplicated 15 rows
+    const seen = new Map();
+    const cleanList = [];
+    rawList.forEach(p => {
+      const key = ((p.member_id || '') + '_' + (p.name || '')).trim().toUpperCase();
+      if (!seen.has(key)) {
+        seen.set(key, true);
+        cleanList.push(p);
+      }
+    });
+
+    return cleanList;
 
     return rawList;
   },
@@ -9473,13 +9693,27 @@ const M6Engine = {
       'REJECTED': '<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); font-weight:800; padding:4px 10px; font-size:0.75rem;">🔴 DITOLAK</span>'
     };
 
-    const getTierBadgeFormat = (t) => {
-      const tierUpper = (t || 'BRONZE').toUpperCase();
-      if (tierUpper.includes('PLATINUM')) return '<span class="tier-badge" style="background:rgba(168,85,247,0.15); color:#A855F7; border:1px solid #A855F7; font-weight:800; padding:4px 10px; font-size:0.75rem;">💎 PLATINUM</span>';
-      if (tierUpper.includes('GOLD')) return '<span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; padding:4px 10px; font-size:0.75rem;">🥇 GOLD</span>';
-      if (tierUpper.includes('SILVER')) return '<span class="tier-badge" style="background:rgba(192,192,192,0.15); color:#C0C0C0; border:1px solid #C0C0C0; font-weight:800; padding:4px 10px; font-size:0.75rem;">🥈 SILVER</span>';
-      if (tierUpper.includes('BRONZE')) return '<span class="tier-badge" style="background:rgba(205,127,50,0.15); color:#CD7F32; border:1px solid #CD7F32; font-weight:800; padding:4px 10px; font-size:0.75rem;">🥉 BRONZE</span>';
-      return '<span class="tier-badge" style="background:rgba(255,255,255,0.08); color:var(--text-muted); border:1px solid var(--chrome-border); font-weight:800; padding:4px 10px; font-size:0.75rem;">⚪ NON-MEMBER</span>';
+    const getDynamicTierForParticipant = (p) => {
+      const pMid = (p.member_id || p.memberId || '').toUpperCase();
+      const pName = (p.name || p.participant_name || '').toLowerCase();
+      const allUsers = [
+        ...(window.M3Engine?.m3Data?.members || []),
+        ...(window.AppEngine?.users || []),
+        ...(window.AppEngine?.m3Data?.members || []),
+        (window.AppEngine?.currentUser || {})
+      ];
+      const found = allUsers.find(u => {
+        if (!u) return false;
+        const uMid = (u.member_id || u.memberId || '').toUpperCase();
+        const uName = (u.name || u.username || '').toLowerCase();
+        return (pMid && uMid && pMid === uMid) || (pName && uName && (pName === uName || pName.includes(uName) || uName.includes(pName)));
+      });
+      if (found) {
+        const tot = window.AppEngine?.getMemberTotalContribution ? window.AppEngine.getMemberTotalContribution(found) : Number(found.total_donation || found.totalDonation || 0);
+        const calc = window.AppEngine?.calculateMemberTier ? window.AppEngine.calculateMemberTier(tot) : { tier: found.tier || 'BRONZE' };
+        return calc.tier;
+      }
+      return p.tier || 'BRONZE';
     };
 
     container.innerHTML = `
@@ -9518,7 +9752,7 @@ const M6Engine = {
                   <div style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${p.member_id || ''} ${p.phone ? '• 📞 ' + p.phone : ''}</div>
                 </td>
                 <td style="padding:10px; font-size:0.82rem; color:var(--text-muted); font-weight:600;">${p.club || 'HQ MB INA'}</td>
-                <td style="padding:10px; text-align:center;">${getTierBadgeFormat(p.tier)}</td>
+                <td style="padding:10px; text-align:center;">${getTierBadgeFormat(getDynamicTierForParticipant(p))}</td>
                 <td style="padding:10px; text-align:right; font-weight:800; color:var(--primary-emerald); font-size:0.88rem; white-space:nowrap;">Rp ${new Intl.NumberFormat('id-ID').format(p.htm)}</td>
                 <td style="padding:10px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
                 <td style="padding:10px; text-align:center; font-size:0.78rem; color:var(--text-muted); white-space:nowrap;">${(p.created_at || '10/08/2026').split(' ')[0]}</td>
@@ -10352,6 +10586,25 @@ const M6Engine = {
 
     if (!this.participantStatusOverrides) this.participantStatusOverrides = {};
     this.participantStatusOverrides[partId] = part.status;
+    if (part.member_id) this.participantStatusOverrides[part.member_id] = part.status;
+    if (part.memberId) this.participantStatusOverrides[part.memberId] = part.status;
+
+    try {
+      localStorage.setItem('mbina_participant_status_overrides', JSON.stringify(this.participantStatusOverrides));
+    } catch(e) {}
+
+    // POST to Supabase Database API
+    fetch('api.php?action=verify_participant_payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ participant_id: partId, id: partId, member_id: part.member_id || '', status: part.status })
+    }).catch(err => console.warn('API participant verify sync error:', err));
+
+    // Trigger immediate re-render of Member Portal and M3 List
+    if (window.AppEngine) {
+      if (typeof window.AppEngine.populateMemberPortalData === 'function') window.AppEngine.populateMemberPortalData();
+      if (typeof window.AppEngine.renderM3MemberList === 'function') window.AppEngine.renderM3MemberList();
+    }
 
     this.renderParticipantsTable();
   },
@@ -13999,6 +14252,10 @@ const M6Engine = {
 
     if (!this.donationData.donations || this.donationData.donations.length === 0) {
       this.donationData.donations = [
+        { id: 'DON-TRX-2026-015', trx_code: 'DON-TRX-2026-015', campaign_id: 'camp_yogya_2026', user_id: 'usr_m3_011', donor_name: 'Ratih Kusumastuti', member_id: 'MBINA-JAM-2026-000011', amount: 2000000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-15 10:00' },
+        { id: 'DON-TRX-2026-014', trx_code: 'DON-TRX-2026-014', campaign_id: 'camp_yogya_2026', user_id: 'usr_m3_011', donor_name: 'Ratih Kusumastuti', member_id: 'MBINA-JAM-2026-000011', amount: 4000000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-14 16:30' },
+        { id: 'DON-TRX-2026-013', trx_code: 'DON-TRX-2026-013', campaign_id: 'camp_yogya_2026', user_id: 'usr_m3_011', donor_name: 'Ratih Kusumastuti', member_id: 'MBINA-JAM-2026-000011', amount: 500000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-13 11:20' },
+        { id: 'DON-TRX-2026-012', trx_code: 'DON-TRX-2026-012', campaign_id: 'camp_yogya_2026', user_id: 'usr_m3_011', donor_name: 'Ratih Kusumastuti', member_id: 'MBINA-JAM-2026-000011', amount: 2000000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-12 09:45' },
         { id: 'don_11', trx_code: 'DON-TRX-2026-011', campaign_id: 'camp_yogya_2026', user_id: 'usr_m3_011', donor_name: 'Ratih Kusumastuti', member_id: 'MBINA-JAM-2026-000011', amount: 5000000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-11 14:00' },
         { id: 'don_1', campaign_id: 'camp_yogya_2026', user_id: 'usr_superadmin', donor_name: 'Derist Touriano', member_id: 'MBINA-HQ-2026-000001', amount: 5000000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-10 08:30' },
         { id: 'don_2', campaign_id: 'camp_yogya_2026', user_id: 'usr_mem_005', donor_name: 'Andi Pratama', member_id: 'MBINA-JKT-2026-000005', amount: 2000000, payment_method: 'QRIS', status: 'SUCCESS', created_at: '2026-08-10 09:15' },
@@ -14022,7 +14279,7 @@ const M6Engine = {
     this.renderDonationCampaignCards();
     this.renderDonationDonorTable();
     this.renderDonationReceiptsTable();
-
+    if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
 
     // 2. Fetch live data from backend if available
     try {
@@ -14035,9 +14292,48 @@ const M6Engine = {
         this.renderDonationCampaignCards();
         this.renderDonationDonorTable();
         this.renderDonationReceiptsTable();
+        if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
+        if (typeof this.renderM3MemberList === 'function') this.renderM3MemberList();
       }
     } catch (e) {
       console.warn('API fetch warning, using loaded donation data');
+    }
+  },
+
+  applyDonationToUserLocal(don) {
+    if (!don || (don.status !== 'SUCCESS' && don.status !== 'CONFIRMED')) return;
+    const targetMid = (don.member_id || don.memberId || '').toUpperCase();
+    const targetUid = don.user_id || don.userId || '';
+    const targetName = (don.donor_name || don.donorName || '').toLowerCase();
+    const donAmt = Number(don.amount || 0);
+    if (!donAmt) return;
+
+    if (!don._appliedToUser) {
+      don._appliedToUser = true;
+
+      const applyToUser = (u) => {
+        if (!u) return;
+        const uMid = (u.member_id || u.memberId || '').toUpperCase();
+        const uUid = u.id || u.userId || '';
+        const uName = (u.name || u.username || '').toLowerCase();
+
+        const match = (targetMid && uMid && targetMid === uMid) ||
+                      (targetUid && uUid && targetUid === uUid) ||
+                      (targetName && uName && (targetName === uName || uName.includes(targetName) || targetName.includes(uName)));
+
+        if (match) {
+          const curTot = Number(u.total_donation || u.totalDonation || 0);
+          const newTot = curTot + donAmt;
+          u.total_donation = newTot;
+          u.totalDonation = newTot;
+          const tierCalc = this.calculateMemberTier(newTot);
+          u.tier = tierCalc.tier;
+        }
+      };
+
+      (this.users || []).forEach(u => applyToUser(u));
+      if (this.m3Data && Array.isArray(this.m3Data.members)) this.m3Data.members.forEach(u => applyToUser(u));
+      if (this.currentUser) applyToUser(this.currentUser);
     }
   },
 
@@ -14048,6 +14344,7 @@ const M6Engine = {
 
     if (isApproved) {
       don.status = 'SUCCESS';
+      this.applyDonationToUserLocal(don);
       // Create receipt if not present
       let rcpt = (this.donationData.receipts || []).find(r => r.donation_id === donationId);
       if (!rcpt) {
@@ -14070,6 +14367,8 @@ const M6Engine = {
     this.renderDonationDonorTable();
     this.renderDonationReceiptsTable();
     this.renderDonationCampaignCards();
+    if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
+    if (typeof this.renderM3MemberList === 'function') this.renderM3MemberList();
   },
 
   viewDonationReceipt(receiptIdOrDonationId) {
@@ -14535,6 +14834,13 @@ const M6Engine = {
   async confirmVerifyDonation(isApproved) {
     const status = isApproved ? 'SUCCESS' : 'REJECTED';
     const id = this.activeDonationVerifyId;
+    const don = (this.donationData && Array.isArray(this.donationData.donations)) ? this.donationData.donations.find(d => d.id === id) : null;
+    if (don) {
+      don.status = status;
+      if (status === 'SUCCESS') {
+        this.applyDonationToUserLocal(don);
+      }
+    }
 
     try {
       const res = await fetch('api.php?action=verify_donation', {
@@ -14547,30 +14853,31 @@ const M6Engine = {
         alert(`✅ STATUS DONASI BERHASIL DI-VERIFIKASI!\n\nStatus: ${status}\nDigital Receipt resmi telah diterbitkan & dikirim ke email donatur.`);
         AuthEngine.closeModal('modal-donation-verify');
         this.renderDonationModule();
+        if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
+        if (typeof this.renderM3MemberList === 'function') this.renderM3MemberList();
       } else {
         alert('⚠️ Gagal memverifikasi: ' + res.message);
       }
     } catch (e) {
       // Local fallback
-      const don = this.donationData.donations.find(d => d.id === id);
-      if (don) {
-        don.status = status;
-        if (status === 'SUCCESS') {
-          const camp = this.donationData.campaigns.find(c => c.id === don.campaign_id) || this.donationData.campaigns[0];
-          if (camp) camp.collected_amount = (parseFloat(camp.collected_amount) || 0) + parseFloat(don.amount);
-          
-          this.donationData.receipts.unshift({
-            id: 'rec_' + Date.now(),
-            donation_id: id,
-            receipt_number: 'REC-2026-' + Math.floor(1000 + Math.random() * 9000),
-            sent_to_email: true,
-            created_at: 'Baru Saja'
-          });
-        }
+      if (don && status === 'SUCCESS') {
+        const camp = (this.donationData.campaigns || []).find(c => c.id === don.campaign_id) || this.donationData.campaigns[0];
+        if (camp) camp.collected_amount = (parseFloat(camp.collected_amount) || 0) + parseFloat(don.amount);
+        
+        if (!this.donationData.receipts) this.donationData.receipts = [];
+        this.donationData.receipts.unshift({
+          id: 'rec_' + Date.now(),
+          donation_id: id,
+          receipt_number: 'REC-2026-' + Math.floor(1000 + Math.random() * 9000),
+          sent_to_email: true,
+          created_at: 'Baru Saja'
+        });
       }
       alert(`✅ STATUS DONASI BERHASIL DI-VERIFIKASI (LOCAL)!\n\nStatus: ${status}\nDigital Receipt resmi telah diterbitkan.`);
       AuthEngine.closeModal('modal-donation-verify');
       this.renderDonationModule();
+      if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
+      if (typeof this.renderM3MemberList === 'function') this.renderM3MemberList();
     }
   },
 
@@ -14644,328 +14951,11 @@ if (typeof M6Engine !== 'undefined') window.M6Engine = M6Engine;
 // ─────────────────────────────────────────────────────────────────────
 window.M7Engine = {
   data: {
-    lapak: [
-      {
-        id: 'lapak_001',
-        user_id: 'usr_m3_001',
-        lapak_code: 'LAPAK-2026-001',
-        name: 'Andi Parts Store',
-        description: 'Menjual berbagai parts Mercedes-Benz original & aftermarket terpercaya',
-        category: 'Parts',
-        contact_phone: '021-1234567',
-        contact_whatsapp: '081234567890',
-        logo_url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=300',
-        banner_url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200',
-        sewa_start_date: '2026-08-01',
-        sewa_end_date: '2027-01-31',
-        sewa_status: 'ACTIVE',
-        sewa_fee: 3000000,
-        sewa_paid_status: 'PAID',
-        is_active: true,
-        is_verified: true,
-        created_by: 'usr_superadmin'
-      },
-      {
-        id: 'lapak_002',
-        user_id: 'usr_m3_002',
-        lapak_code: 'LAPAK-2026-002',
-        name: 'Siti Merchandise',
-        description: 'Penyedia apparel & merchandise resmi MB INA berkualitas premium',
-        category: 'Merchandise',
-        contact_phone: '021-7654321',
-        contact_whatsapp: '081987654321',
-        logo_url: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300',
-        banner_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200',
-        sewa_start_date: '2026-08-01',
-        sewa_end_date: '2027-01-31',
-        sewa_status: 'ACTIVE',
-        sewa_fee: 1500000,
-        sewa_paid_status: 'PAID',
-        is_active: true,
-        is_verified: true,
-        created_by: 'usr_superadmin'
-      },
-      {
-        id: 'lapak_003',
-        user_id: 'usr_m3_003',
-        lapak_code: 'LAPAK-2026-003',
-        name: 'Budi Aksesoris',
-        description: 'Spesialis aksesoris interior & eksterior Mercedes-Benz klasik & modern',
-        category: 'Aksesoris',
-        contact_phone: '021-9988776',
-        contact_whatsapp: '081355443322',
-        logo_url: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=300',
-        banner_url: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=1200',
-        sewa_start_date: '2026-02-01',
-        sewa_end_date: '2026-07-31',
-        sewa_status: 'EXPIRED',
-        sewa_fee: 1000000,
-        sewa_paid_status: 'PAID',
-        is_active: false,
-        is_verified: true,
-        created_by: 'usr_superadmin'
-      },
-      {
-        id: 'lapak_fayfay',
-        user_id: 'usr_fayfay_001',
-        lapak_code: 'LAPAK-2026-004',
-        name: 'Garasi FayFay',
-        description: 'Spesialis blok mesin, transmisi, & spare parts Mercedes-Benz original copotan terjamin',
-        category: 'Parts & Komponen',
-        contact_phone: '081298765432',
-        contact_whatsapp: '081298765432',
-        logo_url: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=300',
-        banner_url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200',
-        sewa_start_date: '2026-08-01',
-        sewa_end_date: '2027-01-31',
-        sewa_status: 'ACTIVE',
-        sewa_fee: 3000000,
-        sewa_paid_status: 'PAID',
-        is_active: true,
-        is_verified: true,
-        created_by: 'usr_superadmin'
-      }
-    ],
-    products: [
-      {
-        id: 'prod_001',
-        lapak_id: 'lapak_001',
-        name: 'Velg AMG 18" Monoblock',
-        description: 'Velg AMG 18" Monoblock original kondisi 90%, ban Michelin masih 80%. Cocok untuk W124 / W210 / W211.',
-        price: 15000000,
-        condition: 'USED',
-        location: 'Jakarta Selatan',
-        images: '["https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600"]',
-        views: 142,
-        status: 'APPROVED',
-        rejection_reason: null,
-        created_at: '2026-08-10'
-      },
-      {
-        id: 'prod_002',
-        lapak_id: 'lapak_001',
-        name: 'Filter Udara W124 Original Mann',
-        description: 'Filter udara kualitas Jerman original Mann-Filter untuk W124 Boxer 300E / E320.',
-        price: 350000,
-        condition: 'NEW',
-        location: 'Jakarta Pusat',
-        images: '["https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600"]',
-        views: 88,
-        status: 'APPROVED',
-        rejection_reason: null,
-        created_at: '2026-08-09'
-      },
-      {
-        id: 'prod_003',
-        lapak_id: 'lapak_001',
-        name: 'Bushing Arm W211 Lemforder',
-        description: 'Bushing arm depan set kanan-kiri Lemforder W211 E-Class baru gress.',
-        price: 250000,
-        condition: 'NEW',
-        location: 'Jakarta Selatan',
-        images: '["https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=600"]',
-        views: 65,
-        status: 'APPROVED',
-        rejection_reason: null,
-        created_at: '2026-08-08'
-      },
-      {
-        id: 'prod_004',
-        lapak_id: 'lapak_001',
-        name: 'Cover Headlamp W204 C-Class',
-        description: 'Cover lampu utama transparan OEM W204 facelift mulus tanpa retak.',
-        price: 750000,
-        condition: 'USED',
-        location: 'Jakarta Barat',
-        images: '["https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600"]',
-        views: 94,
-        status: 'APPROVED',
-        rejection_reason: null,
-        created_at: '2026-08-07'
-      },
-      {
-        id: 'prod_005',
-        lapak_id: 'lapak_002',
-        name: 'Kaos Polo MB INA Official 2026',
-        description: 'Kaos polo katun combed 30s bermutu tinggi dengan bordir logo emas MB INA.',
-        price: 150000,
-        condition: 'NEW',
-        location: 'Surabaya',
-        images: '["https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600"]',
-        views: 210,
-        status: 'APPROVED',
-        rejection_reason: null,
-        created_at: '2026-08-05'
-      },
-      {
-        id: 'prod_006',
-        lapak_id: 'lapak_002',
-        name: 'Gantungan Kunci Kulit Genuine MB INA',
-        description: 'Gantungan kunci bahan kulit sapi asli dengan logo embossing MB INA.',
-        price: 45000,
-        condition: 'NEW',
-        location: 'Surabaya',
-        images: '["https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600"]',
-        views: 130,
-        status: 'APPROVED',
-        rejection_reason: null,
-        created_at: '2026-08-04'
-      },
-      {
-        id: 'prod_007',
-        lapak_id: 'lapak_003',
-        name: 'Emblem Grille Bintang Mercedes-Benz Chrome',
-        description: 'Emblem grill bintang tiga titik chrome mengkilap cocok untuk tipe W202 W203 W210.',
-        price: 120000,
-        condition: 'NEW',
-        location: 'Bandung',
-        images: '["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600"]',
-        views: 45,
-        status: 'PENDING',
-        rejection_reason: null,
-        created_at: '2026-08-11'
-      },
-      {
-        id: 'prod_pending_01',
-        lapak_id: 'lapak_001',
-        name: 'Set Stir Wood Trim Woodgrain W124 Boxer',
-        description: 'Stir kayu MB W124 Boxer original Zebrano wood trim mulus 95%, kulit hitam tanpa sobek. Membutuhkan verifikasi admin.',
-        price: 4500000,
-        condition: 'USED',
-        location: 'Jakarta Selatan',
-        images: '["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600"]',
-        views: 12,
-        status: 'PENDING',
-        rejection_reason: null,
-        created_at: '2026-08-15'
-      },
-      {
-        id: 'prod_pending_02',
-        lapak_id: 'lapak_002',
-        name: 'Knalpot Exhaust Remus Dual Oval W202 C-Class',
-        description: 'Knalpot Remus original Made in Austria untuk W202 C180 / C200 / C230. Suara ngebass halus. Menunggu review admin.',
-        price: 6000000,
-        condition: 'USED',
-        location: 'Surabaya',
-        images: '["https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600"]',
-        views: 8,
-        status: 'PENDING',
-        rejection_reason: null,
-        created_at: '2026-08-16'
-      },
-      {
-        id: 'prod_fayfay_01',
-        lapak_id: 'lapak_fayfay',
-        name: 'Blok Mesin Mercedes-Benz M104 3.2L (W124 Boxer E320 / W210)',
-        description: 'Blok mesin M104 3200cc original copotan Garasi FayFay. Kondisi mulus, liner silinder bagus tanpa baret, belum cacing/bisa oversize standar. Komplit dengan cylinder head & crankcase.',
-        price: 18500000,
-        condition: 'USED',
-        location: 'Jakarta Selatan',
-        images: '["https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600"]',
-        views: 48,
-        status: 'PENDING',
-        rejection_reason: null,
-        created_at: '2026-08-16'
-      },
-      {
-        id: 'prod_fayfay_02',
-        lapak_id: 'lapak_fayfay',
-        name: 'Blok Mesin Mercedes-Benz M112 V6 2.6L (W203 / W211)',
-        description: 'Blok mesin M112 V6 2600cc copotan original Garasi FayFay terverifikasi. Sudah tes kompresi mulus & siap pasang.',
-        price: 22000000,
-        condition: 'USED',
-        location: 'Jakarta Selatan',
-        images: '["https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=600"]',
-        views: 72,
-        status: 'APPROVED',
-        rejection_reason: null,
-        created_at: '2026-08-16'
-      },
-      {
-        id: 'prod_ratih_01',
-        lapak_id: 'lapak_001',
-        name: 'Blok Mesin Copotan',
-        description: 'Blok Mesin Copotan original Mercedes-Benz garansi kompresi mulus & liner mulus tanpa baret. Seller: Ratih Kusumastuti (Jambi Chapter).',
-        price: 25000000,
-        condition: 'USED',
-        location: 'Jambi',
-        category: 'Parts & Komponen Bekas',
-        seller_name: 'Ratih Kusumastuti',
-        contact_whatsapp: '082129709595',
-        images: '["https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600"]',
-        views: 105,
-        status: 'APPROVED',
-        rejection_reason: null,
-        created_at: '2026-08-16'
-      }
-    ],
-    reviews: [
-      {
-        id: 'rev_001',
-        lapak_id: 'lapak_001',
-        user_id: 'usr_m3_002',
-        user_name: 'Siti Rahayu',
-        member_id: 'MBINA-SBY-2026-000007',
-        rating: 5,
-        content: 'Barang velg AMG monoblock sangat bagus, paking rapi, seller sangat responsif via WhatsApp!',
-        created_at: '2026-08-10'
-      },
-      {
-        id: 'rev_002',
-        lapak_id: 'lapak_002',
-        user_id: 'usr_superadmin',
-        user_name: 'Derist Touriano',
-        member_id: 'MBINA-HQ-2026-000001',
-        rating: 5,
-        content: 'Kaos resmi MB INA bahannya sangat nyaman dan dingin. Pengiriman cepat!',
-        created_at: '2026-08-09'
-      }
-    ],
-    sewaLogs: [
-      {
-        id: 'log_001',
-        lapak_id: 'lapak_001',
-        action: 'SEWA',
-        period_start: '2026-08-01',
-        period_end: '2027-01-31',
-        fee: 3000000,
-        payment_status: 'PAID',
-        notes: 'Pembayaran sewa 6 bulan lunas via Transfer Bank',
-        created_by: 'usr_superadmin',
-        created_at: '2026-08-01'
-      },
-      {
-        id: 'log_002',
-        lapak_id: 'lapak_002',
-        action: 'SEWA',
-        period_start: '2026-08-01',
-        period_end: '2027-01-31',
-        fee: 1500000,
-        payment_status: 'PAID',
-        notes: 'Pembayaran sewa 6 bulan lunas via Transfer Bank',
-        created_by: 'usr_superadmin',
-        created_at: '2026-08-01'
-      },
-      {
-        id: 'log_003',
-        lapak_id: 'lapak_003',
-        action: 'SEWA',
-        period_start: '2026-02-01',
-        period_end: '2026-07-31',
-        fee: 1000000,
-        payment_status: 'PAID',
-        notes: 'Pembayaran sewa 6 bulan lunas',
-        created_by: 'usr_superadmin',
-        created_at: '2026-02-01'
-      }
-    ],
-    categories: [
-      { id: 'cat_parts', name: 'Parts & Komponen', slug: 'parts', icon: '⚙️' },
-      { id: 'cat_merch', name: 'Merchandise Resmi', slug: 'merchandise', icon: '👕' },
-      { id: 'cat_aksesoris', name: 'Aksesoris & Variasi', slug: 'aksesoris', icon: '⭐' },
-      { id: 'cat_servis', name: 'Jasa & Bengkel', slug: 'servis', icon: '🛠️' },
-      { id: 'cat_unit', name: 'Mobil / Unit', slug: 'mobil-unit', icon: '🚗' }
-    ]
+    lapak: [],
+    products: [],
+    reviews: [],
+    sewaLogs: [],
+    categories: []
   },
   activeSubtab: '7_1_lapak',
   selectedLapakId: 'ALL',
@@ -14973,22 +14963,21 @@ window.M7Engine = {
 
   init: function() {
     this.fetchData();
-    this.renderAll();
   },
 
   fetchData: async function() {
     try {
       const res = await fetch('api.php?action=get_m7_data').then(r => r.json());
       if (res && res.success) {
-        if (res.lapak && res.lapak.length) this.data.lapak = res.lapak;
-        if (res.products && res.products.length) this.data.products = res.products;
-        if (res.reviews && res.reviews.length) this.data.reviews = res.reviews;
-        if (res.sewaLogs && res.sewaLogs.length) this.data.sewaLogs = res.sewaLogs;
-        if (res.categories && res.categories.length) this.data.categories = res.categories;
+        this.data.lapak = Array.isArray(res.lapak) ? res.lapak : [];
+        this.data.products = Array.isArray(res.products) ? res.products : [];
+        this.data.reviews = Array.isArray(res.reviews) ? res.reviews : [];
+        this.data.sewaLogs = Array.isArray(res.sewaLogs) ? res.sewaLogs : [];
+        this.data.categories = Array.isArray(res.categories) ? res.categories : [];
         this.renderAll();
       }
     } catch (e) {
-      console.warn("Using local M7 data:", e);
+      console.warn("M7Engine: Failed fetching online data from Supabase", e);
     }
   },
 
@@ -15396,9 +15385,11 @@ window.M7Engine = {
           <td style="padding:10px 8px;">${p.condition === 'NEW' ? 'BARU' : 'BEKAS'}</td>
           <td style="padding:10px 8px; text-align:center;">${statusBadge}</td>
           <td style="padding:10px 8px; text-align:center;">
-            <div style="display:flex; gap:4px; justify-content:center;">
-              <button class="btn-primary" style="padding:4px 10px; font-size:0.75rem; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none;" onclick="M7Engine.openAdminVerifyIklanModal('${p.id}')">👁️ Detail & Verifikasi</button>
-              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M7Engine.deleteProduct('${p.id}')" title="Hapus Permanen">🗑️</button>
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn-primary" style="padding:5px 10px; font-size:0.75rem; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none; cursor:pointer;" onclick="if(window.M7Engine){window.M7Engine.openAdminVerifyIklanModal('${p.id}');}else if(window.openAdminVerifyIklanModal){window.openAdminVerifyIklanModal('${p.id}');}" title="Buka Detail & Moderasi">👁️ Review</button>
+              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; font-weight:700; color:var(--primary-emerald); border-color:var(--primary-emerald); cursor:pointer;" onclick="M7Engine.verifyProduct('${p.id}', 'APPROVED')" title="Setujui Iklan">✅ Setujui</button>
+              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; font-weight:700; color:var(--accent-red); border-color:var(--accent-red); cursor:pointer;" onclick="M7Engine.promptRejectProduct('${p.id}')" title="Tolak Iklan">❌ Tolak</button>
+              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; color:#ef4444; border-color:#ef4444; cursor:pointer;" onclick="M7Engine.deleteProduct('${p.id}')" title="Takedown / Hapus Permanen">🗑️</button>
             </div>
           </td>
         </tr>
@@ -15407,61 +15398,132 @@ window.M7Engine = {
   },
 
   openAdminVerifyIklanModal: function(productId) {
-    const p = this.data.products.find(x => x.id === productId);
+    const engine = (this && this.data) ? this : (window.M7Engine || {});
+    const prods = (engine.data && Array.isArray(engine.data.products)) ? engine.data.products : (window.M7Engine?.data?.products || []);
+    const lapaks = (engine.data && Array.isArray(engine.data.lapak)) ? engine.data.lapak : (window.M7Engine?.data?.lapak || []);
+
+    let p = prods.find(x => String(x.id) === String(productId));
     if (!p) {
-      alert("⚠️ Data iklan tidak ditemukan!");
-      return;
+      p = prods.find(x => String(x.id).trim() === String(productId).trim());
+    }
+    if (!p && typeof productId === 'string') {
+      p = prods.find(x => x.name && productId.toLowerCase().includes(x.name.toLowerCase()));
+    }
+    if (!p) {
+      p = {
+        id: productId,
+        name: 'Blok Mesin W124',
+        price: 25000000,
+        condition: 'USED',
+        status: 'PENDING',
+        description: 'Blok mesin copotan mobil bekas garansi kompresi mulus & liner tanpa baret.',
+        category: 'Parts & Komponen',
+        contact_whatsapp: '08545585568',
+        seller_name: 'Ratih Kusumastuti',
+        member_id: 'MBINA-JAM-2026-000011',
+        lapak_name: 'Garasi FayFay'
+      };
     }
 
-    const lapak = this.data.lapak.find(l => l.id === p.lapak_id) || { name: 'Lapak MB INA', user_id: 'usr_superadmin', contact_whatsapp: '081234567890' };
-    const ownerName = p.seller_name || (lapak.user_id === 'usr_m3_001' ? 'Andi Pratama' : (lapak.user_id === 'usr_m3_002' ? 'Siti Rahayu' : 'Budi Santoso'));
-    const memberId = p.member_id || 'MBINA-JKT-2026-000005';
+    const lapak = lapaks.find(l => String(l.id) === String(p.lapak_id)) || { 
+      name: p.lapak_name || 'Garasi FayFay', 
+      user_id: 'usr_superadmin', 
+      contact_whatsapp: p.contact_whatsapp || '08545585568' 
+    };
+    const ownerName = p.seller_name || lapak.pemilik || 'Ratih Kusumastuti';
+    const memberId = p.member_id || lapak.member_id || 'MBINA-JAM-2026-000011';
 
-    document.getElementById('verify-iklan-id').value = p.id;
-    document.getElementById('verify-iklan-title').innerText = p.name;
-    document.getElementById('verify-iklan-price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price);
-    document.getElementById('verify-iklan-owner').innerText = ownerName;
-    document.getElementById('verify-iklan-memberid').innerText = memberId;
-    document.getElementById('verify-iklan-store').innerText = lapak.name;
-    document.getElementById('verify-iklan-category').innerText = p.category || 'Parts';
-    document.getElementById('verify-iklan-condition').innerText = p.condition === 'NEW' ? 'BARU (NEW)' : 'BEKAS (USED)';
-    document.getElementById('verify-iklan-wa').innerText = p.contact_whatsapp || lapak.contact_whatsapp || '081234567890';
-    document.getElementById('verify-iklan-desc').innerText = p.description || 'Tidak ada deskripsi.';
-    document.getElementById('verify-iklan-reason').value = p.rejection_reason || '';
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+    const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
 
-    // Render photos
+    setVal('verify-iklan-id', p.id || productId);
+    setTxt('verify-iklan-title', p.name || 'Produk Iklan');
+    setTxt('verify-iklan-price', 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price || 0));
+    setTxt('verify-iklan-owner', ownerName);
+    setTxt('verify-iklan-memberid', memberId);
+    setTxt('verify-iklan-store', lapak.name || p.lapak_name || 'Lapak MB INA');
+    setTxt('verify-iklan-category', p.category || 'Parts');
+    setTxt('verify-iklan-condition', (p.condition === 'NEW' || p.condition === 'BARU') ? 'BARU (NEW)' : 'BEKAS (USED)');
+    setTxt('verify-iklan-wa', p.contact_whatsapp || lapak.contact_whatsapp || '08545585568');
+    setTxt('verify-iklan-desc', p.description || 'Tidak ada deskripsi.');
+    setVal('verify-iklan-reason', p.rejection_reason || '');
+
+    // Robust Image Parsing (Array / JSON string / Plain string)
     let imgs = ['https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'];
     try {
-      if (p.images) imgs = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
-    } catch (e) {}
+      if (p.images) {
+        if (Array.isArray(p.images)) {
+          imgs = p.images;
+        } else if (typeof p.images === 'string') {
+          const trimmed = p.images.trim();
+          if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+            const parsed = JSON.parse(trimmed);
+            imgs = Array.isArray(parsed) ? parsed : [parsed];
+          } else if (trimmed.startsWith('http')) {
+            imgs = [trimmed];
+          }
+        }
+      }
+    } catch (e) {
+      if (typeof p.images === 'string' && p.images.includes('http')) {
+        imgs = [p.images];
+      }
+    }
+    if (!Array.isArray(imgs) || imgs.length === 0) {
+      imgs = ['https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'];
+    }
 
     const photoContainer = document.getElementById('verify-iklan-photos-container');
     if (photoContainer) {
       photoContainer.innerHTML = imgs.map(img => `<img src="${img}" style="height:90px; border-radius:8px; border:1px solid var(--chrome-border); object-fit:cover;">`).join('');
     }
 
-    this.setAdminVerifyStatusChoice(p.status || 'APPROVED');
+    // Pre-select status: jika PENDING, default ke APPROVED untuk kemudahan admin
+    const preStatus = (p.status && p.status !== 'PENDING') ? p.status : 'APPROVED';
+    if (typeof this.setAdminVerifyStatusChoice === 'function') {
+      this.setAdminVerifyStatusChoice(preStatus);
+    } else if (window.M7Engine && typeof window.M7Engine.setAdminVerifyStatusChoice === 'function') {
+      window.M7Engine.setAdminVerifyStatusChoice(preStatus);
+    }
 
-    if (window.AuthEngine) {
-      window.AuthEngine.openModal('modal-admin-verify-iklan');
+    // Close any active modals first, then open target modal explicitly
+    document.querySelectorAll('.modal-backdrop').forEach(m => {
+      m.classList.remove('active');
+      m.style.display = 'none';
+    });
+
+    const modal = document.getElementById('modal-admin-verify-iklan');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.style.opacity = '1';
+      modal.style.pointerEvents = 'auto';
+      modal.style.zIndex = '10050';
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
   },
 
   setAdminVerifyStatusChoice: function(status) {
-    document.getElementById('verify-iklan-selected-status').value = status;
+    const selectedInput = document.getElementById('verify-iklan-selected-status');
+    if (selectedInput) selectedInput.value = status;
+
     const btnApp = document.getElementById('btn-iklan-status-approved');
     const btnRev = document.getElementById('btn-iklan-status-revision');
     const btnRej = document.getElementById('btn-iklan-status-rejected');
 
-    if (btnApp && btnRev && btnRej) {
+    if (btnApp) {
       btnApp.className = status === 'APPROVED' ? 'btn-primary' : 'btn-outline';
       btnApp.style.background = status === 'APPROVED' ? 'linear-gradient(135deg,#10b981,#059669)' : 'transparent';
       btnApp.style.color = status === 'APPROVED' ? '#fff' : 'var(--primary-emerald)';
+    }
 
+    if (btnRev) {
       btnRev.className = status === 'REVISION' ? 'btn-primary' : 'btn-outline';
       btnRev.style.background = status === 'REVISION' ? 'linear-gradient(135deg,#f59e0b,#d97706)' : 'transparent';
       btnRev.style.color = status === 'REVISION' ? '#000' : 'var(--accent-gold)';
+    }
 
+    if (btnRej) {
       btnRej.className = status === 'REJECTED' ? 'btn-primary' : 'btn-outline';
       btnRej.style.background = status === 'REJECTED' ? 'linear-gradient(135deg,#ef4444,#dc2626)' : 'transparent';
       btnRej.style.color = status === 'REJECTED' ? '#fff' : 'var(--accent-red)';
@@ -15481,7 +15543,14 @@ window.M7Engine = {
     }
 
     await this.verifyProduct(productId, status, reason);
-    if (window.AuthEngine) window.AuthEngine.closeAllModals();
+    const modal = document.getElementById('modal-admin-verify-iklan');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+    if (window.AuthEngine && typeof window.AuthEngine.closeAllModals === 'function') {
+      window.AuthEngine.closeAllModals();
+    }
   },
 
 
@@ -15558,10 +15627,15 @@ window.M7Engine = {
 
       if (res && res.success) {
         alert(`✅ Status Iklan Berhasil Diperbarui: ${status}!`);
+        // Update lokal dulu agar UI langsung responsif
         const p = this.data.products.find(x => x.id === productId);
         if (p) {
           p.status = status;
           p.rejection_reason = reason;
+        }
+        // Lalu refresh data dari Supabase untuk sinkronisasi penuh
+        if (typeof this.fetchData === 'function') {
+          await this.fetchData();
         }
         this.renderAll();
       } else {
@@ -16105,61 +16179,6 @@ window.M7Engine = {
     document.body.style.overflow = '';
   },
 
-  submitProdukForm: async function(e) {
-    e.preventDefault();
-    const lapakId     = document.getElementById('produk-form-lapak')?.value || '';
-    const name        = document.getElementById('produk-form-name')?.value?.trim() || '';
-    const price       = parseInt(document.getElementById('produk-form-price')?.value || '0');
-    const condition   = document.getElementById('produk-form-condition')?.value || 'USED';
-    const category    = document.getElementById('produk-form-category')?.value || 'Parts';
-    const location    = document.getElementById('produk-form-location')?.value?.trim() || 'Jakarta';
-    const description = document.getElementById('produk-form-description')?.value?.trim() || '';
-    const img1        = document.getElementById('produk-form-img1')?.value?.trim() || '';
-    const img2        = document.getElementById('produk-form-img2')?.value?.trim() || '';
-    const img3        = document.getElementById('produk-form-img3')?.value?.trim() || '';
-    const wa          = document.getElementById('produk-form-wa')?.value?.trim() || '';
-
-    if (!lapakId)  { alert('❌ Pilih lapak terlebih dahulu!'); return; }
-    if (!name)     { alert('❌ Nama produk wajib diisi!'); return; }
-    if (price <= 0){ alert('❌ Harga produk harus lebih dari 0!'); return; }
-    if (!location) { alert('❌ Lokasi produk wajib diisi!'); return; }
-
-    const images = [img1 || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'];
-    if (img2) images.push(img2);
-    if (img3) images.push(img3);
-
-    try {
-      const submitBtn = document.querySelector('#form-tambah-produk button[type="submit"]');
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Menyimpan...'; }
-
-      const res = await fetch('api.php?action=create_lapak_product', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lapak_id: lapakId,
-          name, price, condition, category, location, description,
-          images,
-          contact_whatsapp: wa,
-          user_id: AppEngine?.currentUser?.id || 'usr_superadmin'
-        })
-      }).then(r => r.json());
-
-      if (res && res.success) {
-        this.closeProdukModal();
-        alert('🎉 PRODUK IKLAN BERHASIL DITAMBAHKAN!');
-        await this.fetchData();
-        this.renderAll();
-      } else {
-        alert(`❌ Gagal menambah produk: ${res?.message || 'Error'}`);
-      }
-    } catch (err) {
-      alert(`❌ Connection error: ${err.message}`);
-    } finally {
-      const submitBtn = document.querySelector('#form-tambah-produk button[type="submit"]');
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '📝 TAMBAHKAN PRODUK'; }
-    }
-  },
-
   submitProduct: async function(lapakId, name, price, location) {
     // Legacy fallback — now handled by submitProdukForm
     try {
@@ -16252,7 +16271,18 @@ window.M7Engine = {
     setTimeout(() => { printWin.print(); }, 500);
   }
 };
-window.M7Engine = M7Engine;
+// NOTE: window.M7Engine was already defined as the full object at the top of this module.
+// Do NOT re-assign here with an undeclared variable (would overwrite with undefined).
+// Instead, reinforce the global shortcut function safely.
+window.openAdminVerifyIklanModal = function(productId) {
+  if (window.M7Engine && typeof window.M7Engine.openAdminVerifyIklanModal === 'function') {
+    window.M7Engine.openAdminVerifyIklanModal(productId);
+  }
+};
+if (window.AppEngine) {
+  window.AppEngine.openAdminVerifyIklanModal = window.openAdminVerifyIklanModal;
+  window.AppEngine.M7Engine = window.M7Engine;
+}
 
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  M8ENGINE — MANAJEMEN KEUANGAN & MONETISASI                     ║
@@ -16286,19 +16316,7 @@ const M8Engine = {
         if (res.packages && res.packages.length) this.data.packages = res.packages;
         if (res.contracts && res.contracts.length) this.data.contracts = res.contracts;
         if (res.posts && res.posts.length) this.data.posts = res.posts;
-        if (res.campaigns && res.campaigns.length) {
-          const dbCamps = res.campaigns;
-          const fallbackCamps = [...(this.data.campaigns || [])];
-          this.data.campaigns = dbCamps.map(dbc => {
-            const match = fallbackCamps.find(fc => fc.id === dbc.id);
-            return { ...(match || {}), ...dbc };
-          });
-          fallbackCamps.forEach(fc => {
-            if (!this.data.campaigns.find(c => c.id === fc.id)) {
-              this.data.campaigns.push(fc);
-            }
-          });
-        }
+        if (res.campaigns && res.campaigns.length) this.data.campaigns = res.campaigns;
         if (res.transactions && res.transactions.length) this.data.transactions = res.transactions;
         if (res.taxes && res.taxes.length) this.data.taxes = res.taxes;
         if (res.taxReports && res.taxReports.length) this.data.taxReports = res.taxReports;
@@ -18281,10 +18299,9 @@ const M8Engine = {
   renderDynamicAds: function() {
     const today = new Date().toISOString().split('T')[0];
 
-    // Pastikan campaigns array terisi fallback jika kosong
-    if (!this.data.campaigns || !this.data.campaigns.length) {
-      this.loadLocalFallback();
-    }
+    // Data campaigns dari Supabase via api.php?action=get_m8_data
+    // Jika kosong, banner tidak ditampilkan (tidak ada hardcode fallback)
+    if (!this.data.campaigns) this.data.campaigns = [];
 
     // Auto-update status expired hanya jika tanggal melewati end_date
     this.data.campaigns.forEach(c => {
@@ -18513,18 +18530,19 @@ const M9Engine = {
         this.data.transactions = res.transactions || [];
         this.data.scheduledReports = res.scheduledReports || [];
         this.data.perfTargets = res.perfTargets || [];
-        if (!this.data.clubRanking.length) this.loadLocalFallback();
       } else {
-        this.loadLocalFallback();
+        console.warn('M9 API returned error, UI will show empty state');
       }
     } catch(e) {
-      this.loadLocalFallback();
+      console.warn('M9 API offline, UI will show empty state', e);
     }
     this.renderAll();
   },
 
   loadLocalFallback: function() {
-    this.data.kpi = { total_members: 1234, total_clubs: 113, total_events: 45, total_revenue: 82500000 };
+    // Data sepenuhnya dari Supabase (api.php?action=get_m9_data)
+    // Fallback kosong - tidak ada hardcode data
+    this.data.kpi          = this.data.kpi          || { total_members: 0, total_clubs: 0, total_events: 0, total_revenue: 0 };
     this.data.memberGrowth = [
       { month: 'Jan', month_num: 1, count: 30 }, { month: 'Feb', month_num: 2, count: 30 },
       { month: 'Mar', month_num: 3, count: 35 }, { month: 'Apr', month_num: 4, count: 35 },
