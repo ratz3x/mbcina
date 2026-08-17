@@ -1,0 +1,10 @@
+# Vercel Ignore Rules for MB INA Portal
+/scratch
+/backups
+*.zip
+*.log
+.git
+.gitignore
+*.sql
+api.php
+

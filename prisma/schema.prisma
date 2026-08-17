@@ -1,0 +1,180 @@
+// Prisma Schema for MB INA (Mercedes-Benz Club Indonesia) Platform - INCLUDING PRESIDEN, SEKRETARIS_PUSAT, BENDAHARA_PUSAT
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  PRESIDEN
+  SEKRETARIS_PUSAT
+  BENDAHARA_PUSAT
+  ADMIN_ORGANISASI
+  PENGURUS_PUSAT
+  PENGURUS_KLUB
+  MEMBER
+  CALON_MEMBER
+  GUEST
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  SUSPENDED
+}
+
+enum Gender {
+  PRIA
+  WANITA
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  SUSPEND
+  RESET_PASSWORD
+}
+
+model Province {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  region    String
+  clubs     Club[]
+  users     User[]
+  createdAt DateTime @default(now())
+
+  @@map("provinces")
+}
+
+model Tier {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  name         String
+  level        Int
+  icon         String
+  color        String
+  fee          Float
+  benefits     Json
+  requirements Json
+  features     Json
+  users        User[]
+  createdAt    DateTime @default(now())
+
+  @@map("tiers")
+}
+
+model User {
+  id                String       @id @default(cuid())
+  username          String       @unique
+  name              String
+  email             String       @unique
+  phone             String       @unique
+  password          String
+  role              Role         @default(CALON_MEMBER)
+  status            UserStatus   @default(PENDING)
+  tierId            String?
+  tier              Tier?        @relation(fields: [tierId], references: [id])
+  provinceId        String?
+  province          Province?    @relation(fields: [provinceId], references: [id])
+  clubId            String?
+  club              Club?        @relation(fields: [clubId], references: [id])
+  city              String?
+  birthDate         DateTime?
+  gender            Gender?
+  domicile          String?
+  occupation        String?
+  hobbies           String?
+  vehicleModel      String?
+  licensePlate      String?
+  points            Int          @default(0)
+  totalEvents       Int          @default(0)
+  joinDate          DateTime     @default(now())
+  memberId          String?      @unique
+  isSystemArchitect Boolean      @default(false)
+  isProtected       Boolean      @default(false)
+  notes             String?
+  documents         Json?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  AuditLog          AuditLog[]
+
+  @@map("users")
+}
+
+model Club {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  name         String
+  alias        String?
+  provinceId   String?
+  province     Province? @relation(fields: [provinceId], references: [id])
+  city         String?
+  address      String?
+  foundedYear  Int?
+  type         String?
+  description  String?
+  contactPerson String?
+  contactPhone String?
+  status       String    @default("ACTIVE")
+  logo         String?
+  memberCount  Int       @default(0)
+  members      User[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("clubs")
+}
+
+model Event {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  location        String
+  eventDate       DateTime
+  imageUrl        String?
+  registeredCount Int      @default(0)
+  maxAttendees    Int      @default(100)
+  status          String   @default("UPCOMING")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("events")
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id])
+  action    AuditAction
+  module    String
+  details   Json?
+  ipAddress String
+  userAgent String
+  timestamp DateTime    @default(now())
+
+  @@map("audit_logs")
+}
+
+model SystemSetting {
+  id              String   @id @default("default")
+  defaultTheme    String   @default("LIGHT")
+  language        String   @default("ID")
+  timezone        String   @default("Asia/Jakarta")
+  maintenanceMode Boolean  @default(false)
+  paymentGateway  Json
+  emailTemplates  Json
+  updatedAt       DateTime @updatedAt
+
+  @@map("system_settings")
+}

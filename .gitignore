@@ -1,0 +1,7 @@
+.vercel
+.env*
+*.zip
+*.sql
+/scratch
+/backups
+
