@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_075500">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_080000">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -7452,6 +7452,97 @@
     </div>
   </div>
 
+  <!-- ============================================ -->
+  <!-- MODAL: DONASI MEMBER MB INA                  -->
+  <!-- ============================================ -->
+  <div id="modal-member-donation" class="modal-backdrop">
+    <div class="modal-container" style="max-width:620px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color:var(--accent-gold);">💰 FORM DONASI - MB INA</h3>
+        <button class="modal-close-btn" onclick="if(window.AuthEngine)window.AuthEngine.closeAllModals();else{var m=document.getElementById('modal-member-donation');if(m){m.classList.remove('active');m.style.display='none';}document.body.style.overflow='';}">✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- CAMPAIGN SUMMARY CARD -->
+        <div class="glass-card" style="padding:16px; margin-bottom:20px; border-left:4px solid var(--accent-gold);">
+          <div style="font-size:0.75rem; color:var(--text-muted);">PROGRAM DONASI</div>
+          <h4 id="member-don-camp-title" style="font-size:1.05rem; color:var(--accent-gold); margin:2px 0 8px;">Donasi Bakti Sosial Yogyakarta 2026</h4>
+          
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px;">
+            <span>Target: <strong id="member-don-camp-target">Rp 20.000.000</strong></span>
+            <span>Terkumpul: <strong id="member-don-camp-collected" style="color:var(--primary-emerald);">Rp 12.500.000</strong></span>
+          </div>
+          <div style="background:rgba(255,255,255,0.1); border-radius:6px; height:8px; overflow:hidden; margin-bottom:6px;">
+            <div id="member-don-camp-bar" style="width:62.5%; height:100%; background:linear-gradient(90deg, var(--accent-gold), #10b981);"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);">
+            <span id="member-don-camp-days">Sisa: 8 hari</span>
+            <span id="member-don-camp-donors">Donatur: 23 orang</span>
+          </div>
+        </div>
+
+        <form id="member-donation-form" onsubmit="event.preventDefault(); AppEngine.submitMemberDonation(event); return false;">
+          <input type="hidden" id="member-don-camp-id" value="camp_yogya_2026">
+
+          <!-- IDENTITAS DONATUR -->
+          <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap *</label>
+              <input type="text" id="member-don-name" class="form-input" required placeholder="Ketik nama anda...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Member ID (Opsional)</label>
+              <input type="text" id="member-don-id" class="form-input" placeholder="Misal: MBINA-001...">
+              <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:4px;">* Isi untuk akumulasi poin Tier</small>
+            </div>
+          </div>
+
+          <!-- NOMINAL INPUT -->
+          <div style="margin-bottom:16px;">
+            <div class="form-group">
+              <label class="form-label">Nominal Donasi (Rp) *</label>
+              <input type="number" id="member-don-custom-amount" class="form-input" required min="10000" placeholder="Ketik nominal donasi anda..." style="font-weight:900; font-size:1.1rem; color:var(--accent-gold);">
+            </div>
+          </div>
+
+          <!-- METODE PEMBAYARAN -->
+          <div style="margin-bottom:16px;">
+            <label class="form-label" style="font-weight:700; color:var(--accent-gold);">─── METODE PEMBAYARAN ───</label>
+            <div class="form-group">
+              <select id="member-don-method" class="form-input" style="font-weight:700;" onchange="AppEngine.onDonationMethodChange()">
+                <option value="TRANSFER">🏦 Bank Transfer — Bank Mandiri (123-00-1234567-8 a.n. MB Club Indonesia)</option>
+                <option value="QRIS">📱 Instant QRIS — Scan Barcode MB INA</option>
+                <option value="VA">💳 Virtual Account Auto Confirm</option>
+                <option value="CASH">💵 Tunai / Cash via Sekretariat</option>
+              </select>
+            </div>
+            <div class="glass-card" style="padding:12px; font-size:0.82rem; background:rgba(15,23,42,0.8); border:1px solid var(--chrome-border);">
+              Bank: <strong>Bank Mandiri</strong> | No. Rekening: <strong style="color:var(--accent-gold); font-family:monospace;">123-00-1234567-8</strong> | a.n. <strong>MB Club Indonesia</strong>
+            </div>
+          </div>
+
+          <!-- UPLOAD BUKTI TRANSFER -->
+          <div style="margin-bottom:20px;">
+            <label class="form-label" style="font-weight:700; color:var(--accent-gold);">─── UPLOAD BUKTI TRANSFER ───</label>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="file" id="member-don-file" accept="image/*,.pdf" style="display:none;" onchange="AppEngine.handleDonationProofUpload(event)">
+              <button type="button" class="btn-outline" style="font-size:0.82rem; padding:8px 16px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="document.getElementById('member-don-file').click()">
+                📁 Pilih & Upload Bukti Transfer (JPG/PNG/PDF)
+              </button>
+              <span id="member-don-file-name" style="font-size:0.8rem; color:var(--primary-emerald); font-weight:700;"></span>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button type="button" class="btn-outline" onclick="if(window.AuthEngine)window.AuthEngine.closeAllModals();else{var m=document.getElementById('modal-member-donation');if(m){m.classList.remove('active');m.style.display='none';}document.body.style.overflow='';}">Batal</button>
+            <button type="submit" class="btn-primary" style="padding:10px 24px; font-weight:800; background:linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color:#000;">
+              💝 DONASI SEKARANG
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- ============================================ -->
   <!-- MODAL: PILIH KLUB MANDIRI OLEH MEMBER        -->
@@ -9369,8 +9460,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_075500"></script>
-  <script src="js/app.js?v=20260819_075500"></script>
+  <script src="js/auth.js?v=20260819_080000"></script>
+  <script src="js/app.js?v=20260819_080000"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
@@ -9441,95 +9532,7 @@
       }
     }, 100);
   </script>
-  <!-- 1. MODAL MEMBER DONASI (TAMPILAN MEMBER - DONASI) -->
-  <div id="modal-member-donation" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
-    <div class="modal-container" style="max-width:620px;">
-      <div class="modal-header">
-        <h3 class="modal-title" style="color:var(--accent-gold);">💰 FORM DONASI - MB INA</h3>
-        <button class="modal-close-btn" onclick="if(window.AuthEngine)window.AuthEngine.closeAllModals();else{var m=document.getElementById('modal-member-donation');if(m){m.classList.remove('active');m.style.display='none';}document.body.style.overflow='';}">✕</button>
-      </div>
-      <div class="modal-body">
-        
-        <!-- CAMPAIGN SUMMARY CARD -->
-        <div class="glass-card" style="padding:16px; margin-bottom:20px; border-left:4px solid var(--accent-gold);">
-          <div style="font-size:0.75rem; color:var(--text-muted);">PROGRAM DONASI</div>
-          <h4 id="member-don-camp-title" style="font-size:1.05rem; color:var(--accent-gold); margin:2px 0 8px;">Donasi Bakti Sosial Yogyakarta 2026</h4>
-          
-          <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px;">
-            <span>Target: <strong id="member-don-camp-target">Rp 20.000.000</strong></span>
-            <span>Terkumpul: <strong id="member-don-camp-collected" style="color:var(--primary-emerald);">Rp 12.500.000</strong></span>
-          </div>
-          <div style="background:rgba(255,255,255,0.1); border-radius:6px; height:8px; overflow:hidden; margin-bottom:6px;">
-            <div id="member-don-camp-bar" style="width:62.5%; height:100%; background:linear-gradient(90deg, var(--accent-gold), #10b981);"></div>
-          </div>
-          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);">
-            <span id="member-don-camp-days">Sisa: 8 hari</span>
-            <span id="member-don-camp-donors">Donatur: 23 orang</span>
-          </div>
-        </div>
 
-        <form id="member-donation-form" onsubmit="event.preventDefault(); AppEngine.submitMemberDonation(event); return false;">
-          <input type="hidden" id="member-don-camp-id" value="camp_yogya_2026">
-
-          <!-- IDENTITAS DONATUR -->
-          <div style="margin-bottom:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-            <div class="form-group">
-              <label class="form-label">Nama Lengkap *</label>
-              <input type="text" id="member-don-name" class="form-input" required placeholder="Ketik nama anda...">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Member ID (Opsional)</label>
-              <input type="text" id="member-don-id" class="form-input" placeholder="Misal: MBINA-001...">
-              <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:4px;">* Isi untuk akumulasi poin Tier</small>
-            </div>
-          </div>
-
-          <!-- NOMINAL INPUT -->
-          <div style="margin-bottom:16px;">
-            <div class="form-group">
-              <label class="form-label">Nominal Donasi (Rp) *</label>
-              <input type="number" id="member-don-custom-amount" class="form-input" required min="10000" placeholder="Ketik nominal donasi anda..." style="font-weight:900; font-size:1.1rem; color:var(--accent-gold);">
-            </div>
-          </div>
-
-          <!-- METODE PEMBAYARAN -->
-          <div style="margin-bottom:16px;">
-            <label class="form-label" style="font-weight:700; color:var(--accent-gold);">─── METODE PEMBAYARAN ───</label>
-            <div class="form-group">
-              <select id="member-don-method" class="form-input" style="font-weight:700;" onchange="AppEngine.onDonationMethodChange()">
-                <option value="TRANSFER">🏦 Bank Transfer — Bank Mandiri (123-00-1234567-8 a.n. MB Club Indonesia)</option>
-                <option value="QRIS">📱 Instant QRIS — Scan Barcode MB INA</option>
-                <option value="VA">💳 Virtual Account Auto Confirm</option>
-                <option value="CASH">💵 Tunai / Cash via Sekretariat</option>
-              </select>
-            </div>
-            <div class="glass-card" style="padding:12px; font-size:0.82rem; background:rgba(15,23,42,0.8); border:1px solid var(--chrome-border);">
-              Bank: <strong>Bank Mandiri</strong> | No. Rekening: <strong style="color:var(--accent-gold); font-family:monospace;">123-00-1234567-8</strong> | a.n. <strong>MB Club Indonesia</strong>
-            </div>
-          </div>
-
-          <!-- UPLOAD BUKTI TRANSFER -->
-          <div style="margin-bottom:20px;">
-            <label class="form-label" style="font-weight:700; color:var(--accent-gold);">─── UPLOAD BUKTI TRANSFER ───</label>
-            <div style="display:flex; gap:10px; align-items:center;">
-              <input type="file" id="member-don-file" accept="image/*,.pdf" style="display:none;" onchange="AppEngine.handleDonationProofUpload(event)">
-              <button type="button" class="btn-outline" style="font-size:0.82rem; padding:8px 16px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="document.getElementById('member-don-file').click()">
-                📁 Pilih & Upload Bukti Transfer (JPG/PNG/PDF)
-              </button>
-              <span id="member-don-file-name" style="font-size:0.8rem; color:var(--primary-emerald); font-weight:700;"></span>
-            </div>
-          </div>
-
-          <div style="display:flex; justify-content:flex-end; gap:12px;">
-            <button type="button" class="btn-outline" onclick="if(window.AuthEngine)window.AuthEngine.closeAllModals();else{var m=document.getElementById('modal-member-donation');if(m){m.classList.remove('active');m.style.display='none';}document.body.style.overflow='';}">Batal</button>
-            <button type="submit" class="btn-primary" style="padding:10px 24px; font-weight:800; background:linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color:#000;">
-              💝 DONASI SEKARANG
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
   <!-- 2. MODAL VERIFIKASI DONASI (TAMPILAN ADMIN) -->
   <div id="modal-donation-verify" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
