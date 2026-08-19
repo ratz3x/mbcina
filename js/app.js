@@ -16881,15 +16881,70 @@ window.M7Engine = {
 
     const currentUser = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
     const userId = currentUser.id || 'usr_m3_001';
+    const compName = (currentUser.name || '').toLowerCase();
 
-    // Show products owned by current user (or show sample products if none)
-    let myProducts = (this.data.products || []).filter(p => {
+    const fallbackProducts = [
+      {
+        id: 'prod_fdr_1',
+        name: 'FDR Ultimate Performance Tire 245/45 R18 (Mercedes E-Class)',
+        seller_name: 'FDR Tyre Indonesia',
+        price: 1850000,
+        status: 'APPROVED',
+        created_at: '16/08/2026',
+        rejection_reason: 'Iklan tayang di marketplace & katalog sponsor'
+      },
+      {
+        id: 'prod_fdr_2',
+        name: 'FDR Sport Z-Rated Touring Tire 225/50 R17 (Mercedes C-Class)',
+        seller_name: 'FDR Tyre Indonesia',
+        price: 1450000,
+        status: 'APPROVED',
+        created_at: '15/08/2026',
+        rejection_reason: 'Iklan tayang di marketplace & katalog sponsor'
+      },
+      {
+        id: 'prod_shell_1',
+        name: 'Pelumas Mesin Shell Helix Ultra 5W-40 Fully Synthetic (4 Liter)',
+        seller_name: 'Shell Indonesia',
+        price: 450000,
+        status: 'APPROVED',
+        created_at: '16/08/2026',
+        rejection_reason: 'Iklan tayang di marketplace'
+      },
+      {
+        id: 'prod_shell_2',
+        name: 'Filter Oli Original Mercedes-Benz M271 / M274 Engine (W212 / W204)',
+        seller_name: 'Shell Indonesia',
+        price: 175000,
+        status: 'APPROVED',
+        created_at: '15/08/2026',
+        rejection_reason: 'Iklan tayang di marketplace'
+      }
+    ];
+
+    const sourceList = (this.data && Array.isArray(this.data.products) && this.data.products.length > 0)
+      ? this.data.products
+      : fallbackProducts;
+
+    let myProducts = sourceList.filter(p => {
       const lapak = (this.data.lapak || []).find(l => l.id === p.lapak_id);
-      return (p.user_id === userId || (lapak && lapak.user_id === userId) || p.seller_name === currentUser.name);
+      const seller = (p.seller_name || '').toLowerCase();
+      return (
+        p.user_id === userId ||
+        (lapak && lapak.user_id === userId) ||
+        (compName && seller.includes(compName)) ||
+        (compName && (p.name || '').toLowerCase().includes(compName))
+      );
     });
 
     if (myProducts.length === 0) {
-      myProducts = (this.data.products || []).slice(0, 4); // Fallback for preview
+      if (compName.includes('fdr')) {
+        myProducts = fallbackProducts.filter(p => p.seller_name.includes('FDR'));
+      } else if (compName.includes('shell')) {
+        myProducts = fallbackProducts.filter(p => p.seller_name.includes('Shell'));
+      } else {
+        myProducts = sourceList.slice(0, 3);
+      }
     }
 
     if (myProducts.length === 0) {
