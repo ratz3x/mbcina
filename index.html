@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_134500">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_135200">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -9287,8 +9287,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_134500"></script>
-  <script src="js/app.js?v=20260819_134500"></script>
+  <script src="js/auth.js?v=20260819_135200"></script>
+  <script src="js/app.js?v=20260819_135200"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
@@ -9696,14 +9696,14 @@
     </div>
   </div>
 
-  <!-- 6. MODAL IKLAN SAYA (MEMBER POV) -->
-  <div id="modal-my-iklan-list" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
-    <div class="modal-container" style="max-width:860px;">
-      <div class="modal-header" style="border-bottom:2px solid var(--accent-gold);">
-        <h3 class="modal-title" style="color:var(--accent-gold); font-weight:900; display:flex; align-items:center; gap:8px;">
+  <!-- 6. MODAL IKLAN SAYA (MEMBER & SPONSOR POV) -->
+  <div id="modal-my-iklan-list" class="modal-overlay" style="display:none; position:fixed; inset:0; z-index:999999; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:16px;">
+    <div class="modal-container glass-panel" style="max-width:860px; width:100%; border:1px solid var(--accent-gold); border-radius:16px; max-height:90vh; overflow-y:auto;">
+      <div class="modal-header" style="border-bottom:2px solid var(--accent-gold); padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+        <h3 class="modal-title" style="color:var(--accent-gold); font-weight:900; font-size:1.15rem; margin:0; display:flex; align-items:center; gap:8px;">
           📋 IKLAN & LAPAK SAYA
         </h3>
-        <button class="modal-close-btn" onclick="AuthEngine.closeAllModals()">✕</button>
+        <button type="button" class="modal-close-btn" onclick="document.getElementById('modal-my-iklan-list').style.display='none'; document.getElementById('modal-my-iklan-list').classList.remove('active'); document.body.style.overflow='';" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
       </div>
       <div class="modal-body" style="padding:20px;">
         

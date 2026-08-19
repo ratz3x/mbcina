@@ -16940,8 +16940,14 @@ window.M7Engine = {
 
   openMyIklanModal: function() {
     this.renderMyLapakIklan();
-    if (window.AuthEngine) {
-      window.AuthEngine.openModal('modal-my-iklan-list');
+    const modal = document.getElementById('modal-my-iklan-list');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.style.opacity = '1';
+      modal.style.visibility = 'visible';
+      modal.style.pointerEvents = 'auto';
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
   },
 
@@ -21663,10 +21669,11 @@ window.SponsorPortalEngine = {
     const modal = document.getElementById('modal-my-iklan-list');
     if (modal) {
       modal.style.display = 'flex';
+      modal.style.opacity = '1';
+      modal.style.visibility = 'visible';
+      modal.style.pointerEvents = 'auto';
       modal.classList.add('active');
-    }
-    if (window.AuthEngine && typeof window.AuthEngine.openModal === 'function') {
-      window.AuthEngine.openModal('modal-my-iklan-list');
+      document.body.style.overflow = 'hidden';
     }
   },
 
