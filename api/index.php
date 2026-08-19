@@ -3502,27 +3502,50 @@ try {
                 }
             }
 
-            // Check if user with same phone or email already exists
+            // Check if user with same phone, email, or username already exists
             $checkStmt = $sPdo->prepare("SELECT id, name, email, phone, username, member_id, role, status, club FROM users WHERE phone = :phone OR email = :email OR username = :username LIMIT 1");
             $checkStmt->execute([':phone' => $phone, ':email' => $email, ':username' => $username]);
             $existingUser = $checkStmt->fetch();
 
-            $seqCount = (int)$sPdo->query("SELECT COUNT(*) FROM users")->fetchColumn() + 1;
-            $seqFormatted = sprintf('%06d', $seqCount);
+            // Find highest numerical sequence in existing member_ids across all users
+            $maxSeq = 0;
+            $allMembersStmt = $sPdo->query("SELECT member_id FROM users WHERE member_id IS NOT NULL");
+            while ($row = $allMembersStmt->fetch(PDO::FETCH_ASSOC)) {
+                if (!empty($row['member_id']) && preg_match('/MBINA-[A-Za-z0-9]+-\d{4}-(\d+)/', $row['member_id'], $m)) {
+                    $num = (int)$m[1];
+                    if ($num > $maxSeq) {
+                        $maxSeq = $num;
+                    }
+                }
+            }
+            $nextSeq = max($maxSeq + 1, (int)$sPdo->query("SELECT COUNT(*) FROM users")->fetchColumn() + 1);
             $year = date('Y');
-            $generatedMemberId = "MBINA-{$provCode}-{$year}-{$seqFormatted}";
+            $generatedMemberId = sprintf("MBINA-%s-%s-%06d", $provCode, $year, $nextSeq);
+
+            // Double check collision in DB loop
+            while (true) {
+                $existsStmt = $sPdo->prepare("SELECT 1 FROM users WHERE member_id = :mid LIMIT 1");
+                $existsStmt->execute([':mid' => $generatedMemberId]);
+                if (!$existsStmt->fetch()) {
+                    break;
+                }
+                $nextSeq++;
+                $generatedMemberId = sprintf("MBINA-%s-%s-%06d", $provCode, $year, $nextSeq);
+            }
 
             if ($existingUser) {
-                // If existing member_id is missing or incorrect province, update to valid member_id
-                $finalMemberId = !empty($existingUser['member_id']) && str_starts_with($existingUser['member_id'], 'MBINA-') 
+                // If existing member_id is missing or invalid, generate new one
+                $finalMemberId = (!empty($existingUser['member_id']) && str_starts_with($existingUser['member_id'], 'MBINA-')) 
                     ? $existingUser['member_id'] 
                     : $generatedMemberId;
 
                 // Update existing user registration
-                $updateStmt = $sPdo->prepare("UPDATE users SET name = :name, username = :username, password = :password, birth_date = :birth_date, gender = :gender::gender_enum, province_id = :province_id, province = :province, city = :city, occupation = :occupation, role = :role::role_enum, member_id = :member_id, status = 'PENDING', updated_at = NOW() WHERE id = :id");
+                $updateStmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, password = :password, birth_date = :birth_date, gender = :gender::gender_enum, province_id = :province_id, province = :province, city = :city, occupation = :occupation, role = :role::role_enum, member_id = :member_id, status = 'PENDING', updated_at = NOW() WHERE id = :id");
                 $updateStmt->execute([
                     ':id' => $existingUser['id'],
                     ':name' => $name,
+                    ':email' => $email,
+                    ':phone' => $phone,
                     ':username' => $username,
                     ':password' => $passHash,
                     ':birth_date' => $birthDate,
@@ -3600,7 +3623,17 @@ try {
             }
         } catch (PDOException $e) {
             if ($e->getCode() == '23505') {
-                echo json_encode(['success' => false, 'message' => 'Nomor WhatsApp / Email / Username sudah terdaftar di sistem. Silakan login atau gunakan data lain!']);
+                $errDetail = $e->getMessage();
+                if (stripos($errDetail, 'email') !== false) {
+                    $msg = "Email ($email) sudah terdaftar di sistem. Silakan login atau gunakan email lain!";
+                } elseif (stripos($errDetail, 'phone') !== false) {
+                    $msg = "Nomor WhatsApp ($phone) sudah terdaftar di sistem. Silakan login atau gunakan nomor lain!";
+                } elseif (stripos($errDetail, 'username') !== false) {
+                    $msg = "Username ($username) sudah digunakan. Silakan gunakan username lain!";
+                } else {
+                    $msg = 'Nomor WhatsApp / Email / Username sudah terdaftar di sistem. Silakan login atau gunakan data lain!';
+                }
+                echo json_encode(['success' => false, 'message' => $msg]);
             } else {
                 echo json_encode(['success' => false, 'message' => 'Gagal menyimpan ke Supabase: ' . $e->getMessage()]);
             }
