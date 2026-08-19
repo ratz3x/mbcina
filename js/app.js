@@ -1194,7 +1194,28 @@ const AppEngine = {
     modal.classList.add('active');
   },
 
-  openMemberLapakModal(catFilter = 'ALL', subtab = 'katalog') {
+  goToDashboardFromLapak() {
+    const lapakModal = document.getElementById('modal-member-lapak');
+    if (lapakModal) lapakModal.style.display = 'none';
+
+    const isSponsor = this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR') || this._lapakOpenedFromSponsor;
+    if (isSponsor) {
+      if (typeof this.openPortalSponsor === 'function') {
+        this.openPortalSponsor();
+      } else {
+        document.querySelectorAll('.view-container').forEach(v => v.style.display = 'none');
+        const spView = document.getElementById('view-sponsor-dashboard');
+        if (spView) spView.style.display = 'block';
+      }
+    } else {
+      this.goToMemberDashboard();
+    }
+  },
+
+  openMemberLapakModal(catFilter = 'ALL', subtab = 'katalog', fromSponsor = false) {
+    const isSponsor = fromSponsor || this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR');
+    this._lapakOpenedFromSponsor = isSponsor;
+
     let modal = document.getElementById('modal-member-lapak');
     if (!modal) {
       modal = document.createElement('div');
@@ -1209,10 +1230,10 @@ const AppEngine = {
               <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">Pasar eksklusif member & sponsor Mercedes-Benz Club Indonesia — Jual beli kendaraan, sparepart, merchandise & iklan resmi</p>
             </div>
             <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-              <button class="btn-outline" style="padding:10px 18px; font-size:0.88rem; font-weight:800; border-color:var(--accent-gold); color:var(--accent-gold); display:flex; align-items:center; gap:6px;" onclick="AppEngine.goToMemberDashboard()">
-                🏠 Dashboard Member
+              <button id="lapak-header-dashboard-return-btn" class="btn-outline" style="padding:10px 18px; font-size:0.88rem; font-weight:800; border-color:var(--accent-gold); color:var(--accent-gold); display:flex; align-items:center; gap:6px;" onclick="AppEngine.goToDashboardFromLapak()">
+                ${isSponsor ? '🏠 Dashboard Sponsor' : '🏠 Dashboard Member'}
               </button>
-              <button class="btn-outline" style="padding:10px 20px; font-size:0.88rem; border-color:rgba(239,68,68,0.5); color:#f87171;" onclick="document.getElementById('modal-member-lapak').style.display='none'">✕ Tutup Katalog</button>
+              <button class="btn-outline" style="padding:10px 20px; font-size:0.88rem; border-color:rgba(239,68,68,0.5); color:#f87171;" onclick="AppEngine.goToDashboardFromLapak()">✕ Tutup Katalog</button>
             </div>
           </div>
 
@@ -1330,6 +1351,11 @@ const AppEngine = {
     const u = this.currentUser || {};
     const phoneInput = document.getElementById('ml-form-phone');
     if (phoneInput && u.phone) phoneInput.value = u.phone;
+
+    const returnBtn = document.getElementById('lapak-header-dashboard-return-btn');
+    if (returnBtn) {
+      returnBtn.innerHTML = isSponsor ? '🏠 Dashboard Sponsor' : '🏠 Dashboard Member';
+    }
 
     this._renderMemberLapakProducts();
 
@@ -2450,13 +2476,46 @@ const AppEngine = {
     this.openKtaModal(u.id || u.username);
   },
 
-  navigateToForum() {
-    this.openMemberForumModal();
+  navigateToForum(fromSponsor = false) {
+    this.openMemberForumModal(fromSponsor);
+  },
+
+  goToDashboardFromForum() {
+    const forumModal = document.getElementById('modal-member-forum');
+    if (forumModal) forumModal.style.display = 'none';
+
+    const isSponsor = this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR') || this._forumOpenedFromSponsor;
+    if (isSponsor) {
+      if (typeof this.openPortalSponsor === 'function') {
+        this.openPortalSponsor();
+      } else {
+        document.querySelectorAll('.view-container').forEach(v => v.style.display = 'none');
+        const spView = document.getElementById('view-sponsor-dashboard');
+        if (spView) spView.style.display = 'block';
+      }
+    } else {
+      this.goToMemberDashboard();
+    }
   },
 
   goToMemberDashboard() {
     const forumModal = document.getElementById('modal-member-forum');
     if (forumModal) forumModal.style.display = 'none';
+
+    const lapakModal = document.getElementById('modal-member-lapak');
+    if (lapakModal) lapakModal.style.display = 'none';
+
+    const isSponsor = this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR');
+    if (isSponsor) {
+      if (typeof this.openPortalSponsor === 'function') {
+        this.openPortalSponsor();
+      } else {
+        document.querySelectorAll('.view-container').forEach(v => v.style.display = 'none');
+        const spView = document.getElementById('view-sponsor-dashboard');
+        if (spView) spView.style.display = 'block';
+      }
+      return;
+    }
 
     document.querySelectorAll('.view-container').forEach(v => v.style.display = 'none');
     const memberView = document.getElementById('view-member-dashboard');
@@ -2466,7 +2525,10 @@ const AppEngine = {
     }
   },
 
-  openMemberForumModal() {
+  openMemberForumModal(fromSponsor = false) {
+    const isSponsor = fromSponsor || this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR');
+    this._forumOpenedFromSponsor = isSponsor;
+
     let modal = document.getElementById('modal-member-forum');
     if (!modal) {
       modal = document.createElement('div');
@@ -2481,11 +2543,11 @@ const AppEngine = {
               <p style="font-size:0.85rem; color:var(--text-muted); margin:0;">Pusat komunikasi, kolaborasi thread, broadcast pengumuman, dan sistem moderasi terstruktur MB INA</p>
             </div>
             <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-              <button class="btn-outline" style="padding:10px 18px; font-size:0.88rem; font-weight:800; border-color:var(--accent-gold); color:var(--accent-gold); display:flex; align-items:center; gap:6px;" onclick="AppEngine.goToMemberDashboard()">
-                🏠 Dashboard Member
+              <button id="forum-header-dashboard-return-btn" class="btn-outline" style="padding:10px 18px; font-size:0.88rem; font-weight:800; border-color:var(--accent-gold); color:var(--accent-gold); display:flex; align-items:center; gap:6px;" onclick="AppEngine.goToDashboardFromForum()">
+                ${isSponsor ? '🏠 Dashboard Sponsor' : '🏠 Dashboard Member'}
               </button>
               <button class="btn-primary" style="padding:10px 20px; font-weight:800; font-size:0.88rem;" onclick="AppEngine.openM5CreateThreadModal()">📝 + Buat Thread Baru</button>
-              <button class="btn-outline" style="padding:10px 20px; font-size:0.88rem; border-color:rgba(239,68,68,0.5); color:#f87171;" onclick="document.getElementById('modal-member-forum').style.display='none'">✕ Tutup Forum</button>
+              <button class="btn-outline" style="padding:10px 20px; font-size:0.88rem; border-color:rgba(239,68,68,0.5); color:#f87171;" onclick="AppEngine.goToDashboardFromForum()">✕ Tutup Forum</button>
             </div>
           </div>
 
@@ -2635,6 +2697,10 @@ const AppEngine = {
     if (window.M8Engine) {
       window.M8Engine.renderSingleRotatorSlot('ad-slot-rotator-forum');
       window.M8Engine.renderSingleRotatorSlot('ad-slot-rotator-forum-sidebar');
+    }
+    const returnBtn = document.getElementById('forum-header-dashboard-return-btn');
+    if (returnBtn) {
+      returnBtn.innerHTML = isSponsor ? '🏠 Dashboard Sponsor' : '🏠 Dashboard Member';
     }
     modal.style.display = 'block';
     this._renderFullForumThreads();

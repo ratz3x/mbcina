@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_124800">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_133000">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -6735,7 +6735,7 @@
               <p id="spnd-card-forum-meta" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px;">💬 18 replies &nbsp;•&nbsp; 👁️ 412 views &nbsp;•&nbsp; Diposting oleh FDR Tyre Indonesia</p>
             </div>
             <div style="display:flex; gap:8px;">
-              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="if(window.AppEngine && typeof window.AppEngine.navigateToForum==='function'){window.AppEngine.navigateToForum();}else if(window.AppEngine && typeof window.AppEngine.openMemberForumModal==='function'){window.AppEngine.openMemberForumModal();}">🔍 Buka Forum</button>
+              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="if(window.AppEngine && typeof window.AppEngine.openMemberForumModal==='function'){window.AppEngine.openMemberForumModal(true);}else if(window.AppEngine && typeof window.AppEngine.navigateToForum==='function'){window.AppEngine.navigateToForum(true);}">🔍 Buka Forum</button>
               <button class="btn-primary" style="font-size:0.75rem; padding:7px 12px; flex:1; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none;" onclick="SponsorPortalEngine.openNewThreadModal()">📝 Tulis Thread</button>
             </div>
           </div>
@@ -9286,8 +9286,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_124800"></script>
-  <script src="js/app.js?v=20260819_124800"></script>
+  <script src="js/auth.js?v=20260819_133000"></script>
+  <script src="js/app.js?v=20260819_133000"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
