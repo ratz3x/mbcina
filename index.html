@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_074500">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_075500">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -496,10 +496,6 @@
 
     /* ─── 7.3.1 DONASI SEKARANG (MEMBER MODAL) ─── */
     window.openMemberDonationModal = function(campaignId) {
-      if (window.M7Engine && typeof window.M7Engine.openMemberDonationModal === 'function') {
-        window.M7Engine.openMemberDonationModal(campaignId);
-        return;
-      }
       var camp = null;
       var list = (window.AppEngine && window.AppEngine.donationData && window.AppEngine.donationData.campaigns)
         || (window.M7Engine && window.M7Engine.donationData && window.M7Engine.donationData.campaigns)
@@ -531,8 +527,21 @@
         var daysEl = document.getElementById('member-don-camp-days'); if (daysEl) daysEl.innerText = 'Sisa: ' + (camp.daysLeft !== undefined ? camp.daysLeft + ' hari' : '-');
         var donEl = document.getElementById('member-don-camp-donors'); if (donEl) donEl.innerText = 'Donatur: ' + (camp.donor_count || camp.donors_count || camp.donors || 0) + ' orang';
         
+        var u = (window.AppEngine && window.AppEngine.currentUser) || (window.AuthEngine && window.AuthEngine.currentUser) || {};
+        var nameEl = document.getElementById('member-don-name');
+        var memberIdEl = document.getElementById('member-don-id');
+        if (nameEl && u.name) nameEl.value = u.name;
+        if (memberIdEl && (u.member_id || u.id)) memberIdEl.value = u.member_id || u.id;
+
+        if (window.AuthEngine && typeof window.AuthEngine.closeAllModals === 'function') {
+          window.AuthEngine.closeAllModals();
+        }
         modal.style.setProperty('display', 'flex', 'important');
         modal.classList.add('active');
+        modal.style.opacity = '1';
+        modal.style.pointerEvents = 'auto';
+        modal.style.zIndex = '99999';
+        document.body.style.overflow = 'hidden';
       } else {
         alert('💝 DONASI SEKARANG\n\nSilakan hubungi admin untuk melakukan donasi pada campaign ini.');
       }
@@ -9360,8 +9369,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_074500"></script>
-  <script src="js/app.js?v=20260819_074500"></script>
+  <script src="js/auth.js?v=20260819_075500"></script>
+  <script src="js/app.js?v=20260819_075500"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache

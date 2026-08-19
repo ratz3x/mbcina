@@ -628,18 +628,25 @@ const AppEngine = {
 
   // ── MODAL DONASI MEMBER (APPENGINE EXPORT) ──
   openMemberDonationModal(campaignId = 'camp_yogya_2026') {
+    if (typeof window.openMemberDonationModal === 'function') {
+      window.openMemberDonationModal(campaignId);
+      return;
+    }
     if (window.M7Engine && typeof window.M7Engine.openMemberDonationModal === 'function') {
       window.M7Engine.openMemberDonationModal(campaignId);
-    } else if (typeof window.openMemberDonationModal === 'function') {
-      window.openMemberDonationModal(campaignId);
-    } else if (window.AuthEngine && typeof window.AuthEngine.openModal === 'function') {
-      window.AuthEngine.openModal('modal-member-donation');
-    } else {
-      const modal = document.getElementById('modal-member-donation');
-      if (modal) {
-        modal.style.setProperty('display', 'flex', 'important');
-        modal.classList.add('active');
+      return;
+    }
+    const modal = document.getElementById('modal-member-donation');
+    if (modal) {
+      if (window.AuthEngine && typeof window.AuthEngine.closeAllModals === 'function') {
+        window.AuthEngine.closeAllModals();
       }
+      modal.style.setProperty('display', 'flex', 'important');
+      modal.classList.add('active');
+      modal.style.opacity = '1';
+      modal.style.pointerEvents = 'auto';
+      modal.style.zIndex = '99999';
+      document.body.style.overflow = 'hidden';
     }
   },
 
@@ -16030,13 +16037,16 @@ const M6Engine = {
     if (nameEl && u.name) nameEl.value = u.name;
     if (idEl && (u.member_id || u.id)) idEl.value = u.member_id || u.id;
 
-    if (window.AuthEngine && typeof window.AuthEngine.openModal === 'function') {
-      window.AuthEngine.openModal('modal-member-donation');
+    if (window.AuthEngine && typeof window.AuthEngine.closeAllModals === 'function') {
+      window.AuthEngine.closeAllModals();
     }
     const modal = document.getElementById('modal-member-donation');
     if (modal) {
       modal.style.setProperty('display', 'flex', 'important');
       modal.classList.add('active');
+      modal.style.opacity = '1';
+      modal.style.pointerEvents = 'auto';
+      modal.style.zIndex = '99999';
       document.body.style.overflow = 'hidden';
     }
   },
@@ -20362,9 +20372,10 @@ const M9Engine = {
     var w = 600, h = 180, padL = 30, padR = 10, padT = 10, padB = 30;
     var chartW = w - padL - padR, chartH = h - padT - padB;
     var pts = months.map(function(m, i) {
-      var x = padL + (i / (months.length - 1)) * chartW;
+      var denom = months.length > 1 ? (months.length - 1) : 1;
+      var x = months.length > 1 ? (padL + (i / denom) * chartW) : (padL + chartW / 2);
       var y = padT + chartH - (parseInt(m.count||0) / maxVal) * chartH;
-      return { x: x, y: y, label: m.month || ('M'+(i+1)), val: m.count };
+      return { x: isNaN(x) ? padL : x, y: isNaN(y) ? (padT + chartH) : y, label: m.month || ('M'+(i+1)), val: m.count };
     });
     var polyline = pts.map(function(p){ return p.x + ',' + p.y; }).join(' ');
     var areaBase = padT + chartH;
