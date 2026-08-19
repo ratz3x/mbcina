@@ -1581,6 +1581,8 @@ try {
         while ((int)$sPdo->prepare("SELECT COUNT(*) FROM users WHERE member_id = :mid")
                ->execute([':mid' => $memberId]) && false) { $seq++; $memberId = sprintf('MBINA-%s-%d-%06d', $regionCode, $year, $seq); }
 
+        $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
+        $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
         $photoUrl = trim($input['photo_url'] ?? '');
         $id = 'usr_m3_' . uniqid();
         $role = ($status === 'ACTIVE') ? 'MEMBER' : 'CALON_MEMBER';
@@ -1588,8 +1590,8 @@ try {
 
         try {
             $stmt = $sPdo->prepare("
-                INSERT INTO users (id, username, name, email, phone, role, tier, status, club, province, city, member_id, gender, birth_date, admin_notes, photo_url, password, is_active, verified_at)
-                VALUES (:id, :username, :name, :email, :phone, :role, :tier, :status, :club, :province, :city, :member_id, :gender::gender_enum, :bdate, :notes, :photo_url, '$2y$10$1234567890123456789012', true, CURRENT_TIMESTAMP)
+                INSERT INTO users (id, username, name, email, phone, role, tier, status, club, province, city, member_id, gender, birth_date, vehicle_model, license_plate, admin_notes, photo_url, password, is_active, verified_at)
+                VALUES (:id, :username, :name, :email, :phone, :role, :tier, :status, :club, :province, :city, :member_id, :gender::gender_enum, :bdate, :vehicle, :plate, :notes, :photo_url, '$2y$10$1234567890123456789012', true, CURRENT_TIMESTAMP)
             ");
             $stmt->execute([
                 ':id' => $id,
@@ -1606,6 +1608,8 @@ try {
                 ':member_id' => $memberId,
                 ':gender' => $genderEnum,
                 ':bdate' => $birthDate,
+                ':vehicle' => $vehicleModel,
+                ':plate' => $licensePlate,
                 ':notes' => $adminNotes,
                 ':photo_url' => $photoUrl
             ]);
@@ -1635,6 +1639,8 @@ try {
         $city = trim($input['city'] ?? '');
         $tier = trim($input['tier'] ?? 'BRONZE');
         $status = trim($input['status'] ?? 'ACTIVE');
+        $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
+        $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
         $adminNotes = trim($input['admin_notes'] ?? '');
         $photoUrl = trim($input['photo_url'] ?? '');
 
@@ -1646,7 +1652,8 @@ try {
         try {
             $stmt = $sPdo->prepare("
                 UPDATE users SET name = :name, email = :email, phone = :phone, club = :club, 
-                                 province = :prov, city = :city, tier = :tier, status = :status, 
+                                 province = :prov, city = :city, tier = :tier, status = :status,
+                                 vehicle_model = :vehicle, license_plate = :plate,
                                  admin_notes = :notes, photo_url = :photo_url, avatar_url = :avatar_url WHERE id = :id OR username = :id OR member_id = :id OR email = :id
             ");
             $stmt->execute([
@@ -1658,6 +1665,8 @@ try {
                 ':city' => $city,
                 ':tier' => $tier,
                 ':status' => $status,
+                ':vehicle' => $vehicleModel,
+                ':plate' => $licensePlate,
                 ':notes' => $adminNotes,
                 ':photo_url' => $photoUrl,
                 ':avatar_url' => $photoUrl,
@@ -3581,7 +3590,9 @@ try {
             } else {
                 // Insert new member
                 $userId = 'usr_' . uniqid();
-                $insertStmt = $sPdo->prepare("INSERT INTO users (id, name, email, phone, username, password, birth_date, gender, province_id, province, city, occupation, role, status, member_id, tier) VALUES (:id, :name, :email, :phone, :username, :password, :birth_date, :gender::gender_enum, :province_id, :province, :city, :occupation, :role::role_enum, :status::user_status_enum, :member_id, 'BRONZE')");
+                $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
+                $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
+                $insertStmt = $sPdo->prepare("INSERT INTO users (id, name, email, phone, username, password, birth_date, gender, province_id, province, city, occupation, vehicle_model, license_plate, role, status, member_id, tier) VALUES (:id, :name, :email, :phone, :username, :password, :birth_date, :gender::gender_enum, :province_id, :province, :city, :occupation, :vehicle, :plate, :role::role_enum, :status::user_status_enum, :member_id, 'BRONZE')");
                 $insertStmt->execute([
                     ':id' => $userId,
                     ':name' => $name,
@@ -3595,6 +3606,8 @@ try {
                     ':province' => $provName,
                     ':city' => $city,
                     ':occupation' => $occupation,
+                    ':vehicle' => $vehicleModel,
+                    ':plate' => $licensePlate,
                     ':role' => $cleanRole,
                     ':status' => 'PENDING',
                     ':member_id' => $generatedMemberId
@@ -3614,6 +3627,8 @@ try {
                         'province_id' => $resolvedProvId,
                         'province' => $provName,
                         'city' => $city,
+                        'vehicle_model' => $vehicleModel,
+                        'license_plate' => $licensePlate,
                         'club' => null,
                         'tier' => 'BRONZE',
                         'role' => $cleanRole,
@@ -3653,6 +3668,8 @@ try {
         $city = trim($input['city'] ?? '');
         $provinceId = $input['provinceId'] ?? 'prov_jkt';
         $club = trim($input['club'] ?? '');
+        $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
+        $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
         $photoUrl = trim($input['photo_url'] ?? $input['avatar_url'] ?? '');
 
         if (empty($userId) || empty($name) || empty($email) || empty($phone) || empty($username)) {
@@ -3663,7 +3680,7 @@ try {
         $allowedRoles = ['SUPER_ADMIN','PRESIDEN','SEKRETARIS_PUSAT','BENDAHARA_PUSAT','ADMIN_ORGANISASI','PENGURUS_PUSAT','PENGURUS_KLUB','MEMBER','CALON_MEMBER','GUEST'];
 
         try {
-            $stmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, role = :role::role_enum, status = :status::user_status_enum, city = :city, province_id = :province_id, club = COALESCE(NULLIF(:club, ''), club), photo_url = COALESCE(NULLIF(:photo_url, ''), photo_url), avatar_url = COALESCE(NULLIF(:photo_url, ''), avatar_url), updated_at = NOW() WHERE id = :id OR username = :id OR member_id = :id");
+            $stmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, role = :role::role_enum, status = :status::user_status_enum, city = :city, province_id = :province_id, club = COALESCE(NULLIF(:club, ''), club), vehicle_model = COALESCE(NULLIF(:vehicle, ''), vehicle_model), license_plate = COALESCE(NULLIF(:plate, ''), license_plate), photo_url = COALESCE(NULLIF(:photo_url, ''), photo_url), avatar_url = COALESCE(NULLIF(:photo_url, ''), avatar_url), updated_at = NOW() WHERE id = :id OR username = :id OR member_id = :id");
             $stmt->execute([
                 ':name' => $name,
                 ':email' => $email,
@@ -3674,6 +3691,8 @@ try {
                 ':city' => $city,
                 ':province_id' => $provinceId,
                 ':club' => $club,
+                ':vehicle' => $vehicleModel,
+                ':plate' => $licensePlate,
                 ':photo_url' => $photoUrl,
                 ':id' => $userId
             ]);

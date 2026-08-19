@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_091800">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_094000">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -1884,6 +1884,19 @@
                       <option value="ACTIVE">🟢 ACTIVE</option>
                       <option value="PENDING">⏳ PENDING</option>
                     </select>
+                  </div>
+                </div>
+                <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:12px; margin-bottom:16px; margin-top:16px;">
+                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">─── Data Kendaraan Mercedes-Benz ───</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+                  <div class="form-group">
+                    <label class="form-label">Model Kendaraan</label>
+                    <input type="text" id="m3-add-vehicle" class="form-input" placeholder="contoh: W124 300E / W211 / C200 / G-Class">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Plat Nomor Kendaraan</label>
+                    <input type="text" id="m3-add-plate" class="form-input" placeholder="contoh: B 1234 MB / BH 1979 ZK" style="font-family:monospace; text-transform:uppercase;">
                   </div>
                 </div>
 
@@ -6103,6 +6116,16 @@
             <input id="m3-edit-club" class="form-input" placeholder="Nama klub">
           </div>
         </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px;">
+          <div>
+            <label class="form-label">Model Kendaraan</label>
+            <input id="m3-edit-vehicle" class="form-input" placeholder="contoh: W124 300E / W211 / C200 / G-Class">
+          </div>
+          <div>
+            <label class="form-label">Plat Nomor</label>
+            <input id="m3-edit-plate" class="form-input" placeholder="contoh: B 1234 MB / BH 1979 ZK" style="font-family:monospace; text-transform:uppercase;">
+          </div>
+        </div>
         <div style="margin-bottom:20px;">
           <label class="form-label">Catatan Admin</label>
           <textarea id="m3-edit-notes" class="form-input" rows="2" placeholder="Catatan internal admin..."></textarea>
@@ -7410,6 +7433,17 @@
                 <input type="text" id="reg-city" class="form-input" placeholder="Jakarta Selatan" required>
               </div>
             </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;">
+              <div class="form-group">
+                <label class="form-label">Model Kendaraan (Opsional)</label>
+                <input type="text" id="reg-vehicle" class="form-input" placeholder="contoh: W124 / W211 / C200 / G-Class">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Plat Nomor (Opsional)</label>
+                <input type="text" id="reg-plate" class="form-input" placeholder="contoh: B 1234 MB" style="font-family:monospace; text-transform:uppercase;">
+              </div>
+            </div>
           </div>
 
           <!-- STEP 4: PILIHAN ROLE KEANGGOTAAN -->
@@ -8320,11 +8354,23 @@
           </div>
 
           <!-- ROW 5: PROVINSI -->
-          <div class="form-group" style="margin-bottom:20px;">
+          <div class="form-group" style="margin-bottom:14px;">
             <label class="form-label" style="font-size:0.8rem; font-weight:700;">Provinsi *</label>
             <select id="edit-user-province" class="form-input" style="background:#0b1120;">
               <!-- Populated dynamically -->
             </select>
+          </div>
+
+          <!-- ROW 6: MODEL KENDARAAN & PLAT NOMOR -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700;">Model Kendaraan Mercedes-Benz</label>
+              <input type="text" id="edit-user-vehicle" class="form-input" placeholder="contoh: W124 / W211 / C200 / G-Class">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.8rem; font-weight:700;">Plat Nomor</label>
+              <input type="text" id="edit-user-plate" class="form-input" placeholder="contoh: B 1234 MB" style="font-family:monospace; text-transform:uppercase;">
+            </div>
           </div>
 
           <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid var(--chrome-border); padding-top:14px;">
@@ -9460,8 +9506,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_091800"></script>
-  <script src="js/app.js?v=20260819_091800"></script>
+  <script src="js/auth.js?v=20260819_094000"></script>
+  <script src="js/app.js?v=20260819_094000"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache

@@ -360,12 +360,16 @@ const AuthEngine = {
       const provEl = document.getElementById('reg-province') || document.getElementById('reg-province-select');
       const cityEl = document.getElementById('reg-city');
       const occEl = document.getElementById('reg-occupation');
+      const vehicleEl = document.getElementById('reg-vehicle');
+      const plateEl = document.getElementById('reg-plate');
 
       const birthDate = bdateEl ? bdateEl.value : '';
       const gender = genderEl ? genderEl.value : 'PRIA';
       const provinceId = provEl ? provEl.value.trim() : 'DKI Jakarta';
       const city = cityEl ? cityEl.value.trim() : '';
       const occupation = occEl ? occEl.value.trim() : '';
+      const vehicle_model = vehicleEl ? vehicleEl.value.trim() : '';
+      const license_plate = plateEl ? plateEl.value.trim() : '';
 
       if (birthDate && this.calculateAge(birthDate) < 17) {
         this.showWizardError('Pendaftaran keanggotaan MB INA mensyaratkan usia minimal 17 tahun!');
@@ -381,6 +385,8 @@ const AuthEngine = {
       this.registrationData.provinceId = provinceId || 'DKI Jakarta';
       this.registrationData.city = city;
       this.registrationData.occupation = occupation;
+      this.registrationData.vehicle_model = vehicle_model;
+      this.registrationData.license_plate = license_plate;
 
     } else if (step === 4) {
       // Step 4: Role Selection (default MEMBER)

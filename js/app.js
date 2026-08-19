@@ -5855,6 +5855,12 @@ const AppEngine = {
     document.getElementById('edit-user-role').value = u.role || 'MEMBER';
     document.getElementById('edit-user-status').value = u.status || 'ACTIVE';
     document.getElementById('edit-user-city').value = u.city || 'Jakarta';
+    if (document.getElementById('edit-user-vehicle')) {
+      document.getElementById('edit-user-vehicle').value = u.vehicle_model || u.vehicle || '';
+    }
+    if (document.getElementById('edit-user-plate')) {
+      document.getElementById('edit-user-plate').value = u.license_plate || u.plate || '';
+    }
     if (u.provinceId || u.province_id) {
       document.getElementById('edit-user-province').value = u.provinceId || u.province_id;
     }
@@ -5873,6 +5879,8 @@ const AppEngine = {
     const status = document.getElementById('edit-user-status').value;
     const city = document.getElementById('edit-user-city').value.trim();
     const provinceId = document.getElementById('edit-user-province').value;
+    const vehicle_model = document.getElementById('edit-user-vehicle')?.value.trim() || '';
+    const license_plate = document.getElementById('edit-user-plate')?.value.trim() || '';
 
     if (!userId || !name || !email || !phone || !username) {
       alert('Lengkapi seluruh bidang wajib pengeditan (*)!');
@@ -5890,6 +5898,8 @@ const AppEngine = {
       u.city = city;
       u.provinceId = provinceId;
       u.province_id = provinceId;
+      u.vehicle_model = vehicle_model;
+      u.license_plate = license_plate;
     }
 
     // Update juga di m3Data.members jika ada
@@ -5905,6 +5915,8 @@ const AppEngine = {
         m3u.city = city;
         m3u.provinceId = provinceId;
         m3u.province_id = provinceId;
+        m3u.vehicle_model = vehicle_model;
+        m3u.license_plate = license_plate;
       }
     }
 
@@ -5919,6 +5931,8 @@ const AppEngine = {
       this.currentUser.city = city;
       this.currentUser.provinceId = provinceId;
       this.currentUser.province_id = provinceId;
+      this.currentUser.vehicle_model = vehicle_model;
+      this.currentUser.license_plate = license_plate;
       localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
       if (typeof this.populateMemberPortalData === 'function') {
         this.populateMemberPortalData();
@@ -5932,7 +5946,7 @@ const AppEngine = {
       const res = await fetch('api.php?action=update_user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, name, email, phone, username, role, status, city, provinceId })
+        body: JSON.stringify({ userId, name, email, phone, username, role, status, city, provinceId, vehicle_model, license_plate })
       });
       const data = await res.json();
       if (data.success) {
@@ -7963,6 +7977,8 @@ const AppEngine = {
     const club = document.getElementById('m3-add-club').value;
     const tier = document.getElementById('m3-add-tier').value;
     const status = document.getElementById('m3-add-status').value;
+    const vehicle_model = document.getElementById('m3-add-vehicle')?.value.trim() || '';
+    const license_plate = document.getElementById('m3-add-plate')?.value.trim() || '';
     const admin_notes = document.getElementById('m3-add-notes').value.trim();
     const photo_url = document.getElementById('m3-add-photo-url')?.value.trim() || '';
 
@@ -7970,7 +7986,7 @@ const AppEngine = {
       const res = await fetch('api.php?action=create_m3_member', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, username, email, phone, birth_date, gender, province, city, club, tier, status, admin_notes, photo_url })
+        body: JSON.stringify({ name, username, email, phone, birth_date, gender, province, city, club, tier, status, vehicle_model, license_plate, admin_notes, photo_url })
       });
       const data = await res.json();
       if (data.success) {
@@ -8017,6 +8033,12 @@ const AppEngine = {
     document.getElementById('m3-edit-status').value = m.status || 'ACTIVE';
     document.getElementById('m3-edit-province').value = m.province || '';
     document.getElementById('m3-edit-city').value = m.city || '';
+    if (document.getElementById('m3-edit-vehicle')) {
+      document.getElementById('m3-edit-vehicle').value = m.vehicle_model || m.vehicle || '';
+    }
+    if (document.getElementById('m3-edit-plate')) {
+      document.getElementById('m3-edit-plate').value = m.license_plate || m.plate || '';
+    }
     document.getElementById('m3-edit-notes').value = m.admin_notes || '';
 
     const photo = m.photo_url || m.avatar_url || 'assets/mb_badge.jpg';
@@ -8038,6 +8060,8 @@ const AppEngine = {
     const status = document.getElementById('m3-edit-status').value;
     const province = document.getElementById('m3-edit-province').value.trim();
     const city = document.getElementById('m3-edit-city').value.trim();
+    const vehicle_model = document.getElementById('m3-edit-vehicle')?.value.trim() || '';
+    const license_plate = document.getElementById('m3-edit-plate')?.value.trim() || '';
     const admin_notes = document.getElementById('m3-edit-notes').value.trim();
     const photo_url = document.getElementById('m3-edit-photo-url')?.value.trim() || '';
 
@@ -8045,7 +8069,7 @@ const AppEngine = {
       const res = await fetch('api.php?action=update_m3_member', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name, email, phone, club, tier, status, province, city, admin_notes, photo_url })
+        body: JSON.stringify({ id, name, email, phone, club, tier, status, province, city, vehicle_model, license_plate, admin_notes, photo_url })
       });
       const data = await res.json();
       if (data.success) {
