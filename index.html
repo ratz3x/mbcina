@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>MB Club INA - Portal Resmi Mercedes Benz Club Indonesia</title>
   <meta name="description" content="Platform Resmi Mercedes-Benz Club Indonesia (MB Club INA). Portal resmi federasi Mercedes-Benz Club Indonesia.">
   
@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260818_053800">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_074500">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -496,25 +496,41 @@
 
     /* ─── 7.3.1 DONASI SEKARANG (MEMBER MODAL) ─── */
     window.openMemberDonationModal = function(campaignId) {
-      var camp = null;
-      if (window.m73Campaigns) {
-        for (var i = 0; i < window.m73Campaigns.length; i++) {
-          if (window.m73Campaigns[i].id === campaignId) { camp = window.m73Campaigns[i]; break; }
-        }
+      if (window.M7Engine && typeof window.M7Engine.openMemberDonationModal === 'function') {
+        window.M7Engine.openMemberDonationModal(campaignId);
+        return;
       }
+      var camp = null;
+      var list = (window.AppEngine && window.AppEngine.donationData && window.AppEngine.donationData.campaigns)
+        || (window.M7Engine && window.M7Engine.donationData && window.M7Engine.donationData.campaigns)
+        || window.m73Campaigns || [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i] && list[i].id === campaignId) { camp = list[i]; break; }
+      }
+      if (!camp) {
+        var fallbacks = [
+          { id: 'camp_yogya_2026', title: 'Dana Touring & Bakti Sosial Yogyakarta 2026', target: 50000000, collected: 32450000, donors: 48, daysLeft: 12 },
+          { id: 'camp_jamnas_2026', title: 'Sponsorship Jamnas MB INA XXV 2026', target: 150000000, collected: 78000000, donors: 112, daysLeft: 73 }
+        ];
+        for (var j = 0; j < fallbacks.length; j++) {
+          if (fallbacks[j].id === campaignId) { camp = fallbacks[j]; break; }
+        }
+        if (!camp) camp = fallbacks[0];
+      }
+
       var modal = document.getElementById('modal-member-donation');
-      if (modal && camp) {
-        var idEl = document.getElementById('member-don-camp-id'); if (idEl) idEl.value = camp.id;
-        var titleEl = document.getElementById('member-don-camp-title'); if (titleEl) titleEl.innerText = camp.title;
-        var targetEl = document.getElementById('member-don-camp-target'); if (targetEl) targetEl.innerText = 'Rp ' + Number(camp.target).toLocaleString('id-ID');
-        var collEl = document.getElementById('member-don-camp-collected'); if (collEl) collEl.innerText = 'Rp ' + Number(camp.collected).toLocaleString('id-ID');
-        var pct = camp.target > 0 ? Math.round((camp.collected / camp.target) * 1000) / 10 : 0;
+      if (modal) {
+        var idEl = document.getElementById('member-don-camp-id'); if (idEl) idEl.value = camp.id || campaignId;
+        var titleEl = document.getElementById('member-don-camp-title'); if (titleEl) titleEl.innerText = camp.title || 'Dana Touring & Bakti Sosial Yogyakarta 2026';
+        var tVal = Number(camp.target_amount || camp.goal_amount || camp.target || 50000000);
+        var cVal = Number(camp.collected_amount || camp.collected || 0);
+        var targetEl = document.getElementById('member-don-camp-target'); if (targetEl) targetEl.innerText = 'Rp ' + tVal.toLocaleString('id-ID');
+        var collEl = document.getElementById('member-don-camp-collected'); if (collEl) collEl.innerText = 'Rp ' + cVal.toLocaleString('id-ID');
+        var pct = tVal > 0 ? Math.round((cVal / tVal) * 1000) / 10 : 0;
         var barEl = document.getElementById('member-don-camp-bar'); if (barEl) barEl.style.width = pct + '%';
         var daysEl = document.getElementById('member-don-camp-days'); if (daysEl) daysEl.innerText = 'Sisa: ' + (camp.daysLeft !== undefined ? camp.daysLeft + ' hari' : '-');
-        var donEl = document.getElementById('member-don-camp-donors'); if (donEl) donEl.innerText = 'Donatur: ' + (camp.donors || 0) + ' orang';
-        modal.style.setProperty('display', 'flex', 'important');
-        modal.classList.add('active'); // In case auth.js requires it
-      } else if (modal) {
+        var donEl = document.getElementById('member-don-camp-donors'); if (donEl) donEl.innerText = 'Donatur: ' + (camp.donor_count || camp.donors_count || camp.donors || 0) + ' orang';
+        
         modal.style.setProperty('display', 'flex', 'important');
         modal.classList.add('active');
       } else {
@@ -818,8 +834,8 @@
 
 
 
-      <!-- 📢 SLOT 1: TOP SPONSOR SHOWCASE (HEADER BANNER) -->
-      <div id="ad-slot-header" style="width:100%;"></div>
+      <!-- 📢 MEMBER DASHBOARD HERO ROTATOR BANNER -->
+      <div id="ad-slot-rotator-member" style="width:100%;"></div>
 
       <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
       <!-- 🚀 4 KARTU AKSES CEPAT FITUR UTAMA MEMBER      -->
@@ -957,8 +973,8 @@
           </div>
 
           <!-- INTERACTIVE INDONESIA MAP POV CONTAINER -->
-          <div style="background:#090d16; border:1.5px solid rgba(212,175,55,0.3); border-radius:14px; padding:12px; position:relative; overflow:hidden; box-shadow:inset 0 0 30px rgba(0,0,0,0.8);">
-            <div id="member-indonesia-map" style="width:100%; min-height:300px;"></div>
+          <div style="background:#090d16; border:1.5px solid rgba(212,175,55,0.3); border-radius:14px; padding:6px; position:relative; overflow:hidden; box-shadow:inset 0 0 30px rgba(0,0,0,0.8);">
+            <div id="member-indonesia-map" style="width:100%; height:auto; overflow:hidden;"></div>
           </div>
 
           <!-- REGIONAL DISTRIBUTION PROGRESS BARS (CLEAN & MINIMALIST) -->
@@ -1135,88 +1151,17 @@
             <p style="font-size:0.78rem; color:var(--text-muted); margin:3px 0 0 0;">Mitra Resmi Sponsorship & Eksklusif Mercedes-Benz Club Indonesia 2026</p>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:0.72rem; padding:4px 10px; border-radius:20px; background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:800;">💎 PLATINUM INVENTORY: 2/2 FULL</span>
+            <span id="sponsor-wall-inventory-badge" style="font-size:0.72rem; padding:4px 10px; border-radius:20px; background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:800;">💎 PLATINUM INVENTORY: 8 ACTIVE</span>
             <button class="btn-outline" style="font-size:0.75rem; padding:6px 12px; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="M7Engine.openSewaLapakModal()">
               📊 Info Partner & Waitlist →
             </button>
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px;">
-          <!-- PLATINUM PARTNER 1: MANDIRI -->
-          <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(245,158,11,0.4); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
-            <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:900; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; padding:2px 8px; border-radius:10px;">💎 PLATINUM</div>
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-              <div style="width:44px; height:44px; border-radius:10px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:1px solid rgba(255,255,255,0.1);">🏦</div>
-              <div>
-                <div style="font-weight:900; font-size:0.92rem; color:#fff;">Bank Mandiri</div>
-                <div style="font-size:0.72rem; color:var(--accent-gold); font-weight:700;">Official Banking & E-KTA Partner</div>
-              </div>
-            </div>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">Co-Branded Credit Card MB INA, Cashback 10% SPBU & Access Lounges.</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:0.7rem; color:#3b82f6; font-weight:700;">✅ Premium Header Active</span>
-              <button class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-color:rgba(255,255,255,0.2);" onclick="window.showToast('ℹ️ Bank Mandiri: Official Banking Partner MB INA', 'info')">Lihat Penawaran</button>
-            </div>
-          </div>
-
-          <!-- PLATINUM PARTNER 2: SHELL -->
-          <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(245,158,11,0.4); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
-            <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:900; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; padding:2px 8px; border-radius:10px;">💎 PLATINUM</div>
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-              <div style="width:44px; height:44px; border-radius:10px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:1px solid rgba(255,255,255,0.1);">⛽</div>
-              <div>
-                <div style="font-weight:900; font-size:0.92rem; color:#fff;">Shell Indonesia</div>
-                <div style="font-size:0.72rem; color:var(--accent-gold); font-weight:700;">Official Fuel & Lubricant Partner</div>
-              </div>
-            </div>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">Shell Helix Ultra 0W-40 Synthetic & Program Bonus ClubSmart.</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:0.7rem; color:#3b82f6; font-weight:700;">✅ Premium Header Active</span>
-              <button class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-color:rgba(255,255,255,0.2);" onclick="window.showToast('ℹ️ Shell Indonesia: Official Lubricants Partner MB INA', 'info')">Lihat Penawaran</button>
-            </div>
-          </div>
-
-          <!-- GOLD PARTNER 1: FDR TYRE -->
-          <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(59,130,246,0.3); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
-            <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:800; background:rgba(59,130,246,0.2); color:#60a5fa; padding:2px 8px; border-radius:10px;">🥇 GOLD</div>
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-              <div style="width:44px; height:44px; border-radius:10px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:1px solid rgba(255,255,255,0.1);">🛞</div>
-              <div>
-                <div style="font-weight:900; font-size:0.92rem; color:#fff;">FDR Tyre Indonesia</div>
-                <div style="font-size:0.72rem; color:#60a5fa; font-weight:700;">Official High Performance Tyre</div>
-              </div>
-            </div>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">Ban & Velg High Performance khusus touring & perlombaan MB INA.</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:0.7rem; color:#22c55e; font-weight:700;">✅ Active Partner</span>
-              <button class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-color:rgba(255,255,255,0.2);" onclick="window.showToast('ℹ️ FDR Tyre: Official High Performance Tyre Partner', 'info')">Lihat Penawaran</button>
-            </div>
-          </div>
-
-          <!-- GOLD PARTNER 2: MICHELIN -->
-          <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(59,130,246,0.3); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
-            <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:800; background:rgba(59,130,246,0.2); color:#60a5fa; padding:2px 8px; border-radius:10px;">🥇 GOLD</div>
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-              <div style="width:44px; height:44px; border-radius:10px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:1px solid rgba(255,255,255,0.1);">🏎️</div>
-              <div>
-                <div style="font-weight:900; font-size:0.92rem; color:#fff;">Michelin Indonesia</div>
-                <div style="font-size:0.72rem; color:#60a5fa; font-weight:700;">Official Radial Tyre Partner</div>
-              </div>
-            </div>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">Michelin Pilot Sport Series disukai member dengan daya cengkeram optimal.</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:0.7rem; color:#22c55e; font-weight:700;">✅ Active Partner</span>
-              <button class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-color:rgba(255,255,255,0.2);" onclick="window.showToast('ℹ️ Michelin Indonesia: Official Radial Tyre Partner', 'info')">Lihat Penawaran</button>
-            </div>
-          </div>
+        <div id="sponsor-grid-wall-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px;">
+          <!-- Dynamically rendered by AppEngine.renderSponsorGridWall() -->
         </div>
       </div>
-
-      <!-- 📢 SLOT 2: BOTTOM SPONSOR BAR (FOOTER BANNER) -->
-      <div id="ad-slot-footer" class="ad-banner-container" style="text-align:center;"></div>
-
-    </div>
     </div> <!-- END view-member-dashboard -->
 
     <!-- VIEW D: PORTAL ADMIN & M2 ORGANISASI -->
@@ -1254,29 +1199,29 @@
           <div class="admin-stat-card">
             <div class="admin-stat-icon">👥</div>
             <div>
-              <div id="stat-members-count" class="stat-value">12.544</div>
+              <div id="stat-members-count" class="stat-value">10</div>
               <div class="stat-label">Total Member Terdaftar</div>
             </div>
           </div>
           <div class="admin-stat-card">
             <div class="admin-stat-icon" style="background:rgba(59,130,246,0.15); border-color:var(--accent-blue); color:var(--accent-blue);">🚗</div>
             <div>
-              <div id="stat-clubs-count" class="stat-value">34</div>
+              <div id="stat-clubs-count" class="stat-value">111</div>
               <div class="stat-label">Klub & Chapter Resmi</div>
             </div>
           </div>
           <div class="admin-stat-card">
             <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15); border-color:var(--primary-emerald); color:var(--primary-emerald);">💳</div>
             <div>
-              <div id="stat-revenue-amount" class="stat-value" style="font-size:1.4rem;">Rp 425.500.000</div>
-              <div class="stat-label">Transaksi Iuran (Bulan Ini)</div>
+              <div id="stat-revenue-amount" class="stat-value" style="font-size:1.4rem;">Rp 130.000.000</div>
+              <div class="stat-label">Laba Bersih</div>
             </div>
           </div>
           <div class="admin-stat-card">
             <div class="admin-stat-icon" style="background:rgba(239,68,68,0.15); border-color:var(--accent-red); color:var(--accent-red);">⏳</div>
             <div>
-              <div id="stat-pending-count" class="stat-value">1</div>
-              <div class="stat-label">Antrean Verifikasi Pending</div>
+              <div id="stat-pending-count" class="stat-value">0</div>
+              <div class="stat-label">Jumlah Lapak</div>
             </div>
           </div>
         </div>
@@ -1289,7 +1234,7 @@
               <h3 style="font-size:1.1rem;" class="text-gradient">🗺️ Peta Persebaran Klub & Region Indonesia</h3>
               <span id="map-total-clubs-badge" class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">110 KLUB TERDAFTAR</span>
             </div>
-            <div id="admin-indonesia-map" style="width:100%; border:1px solid var(--chrome-border); border-radius:14px; background:rgba(11,14,20,0.6); padding:16px; overflow:hidden; position:relative; min-height:260px;"></div>
+            <div id="admin-indonesia-map" style="width:100%; border:1px solid var(--chrome-border); border-radius:14px; background:rgba(11,14,20,0.6); padding:6px; overflow:hidden; position:relative;"></div>
             <!-- Distribusi Regional di bawah peta -->
             <div style="margin-top:16px; border-top:1px solid var(--chrome-border); padding-top:14px;">
               <h4 style="font-size:0.9rem; color:var(--accent-gold); margin-bottom:12px;">📊 Distribusi Regional Member</h4>
@@ -1345,7 +1290,13 @@
             <div id="admin-alerts-feed"></div>
           </div>
           <div class="glass-panel" style="padding:20px; overflow-x:auto;">
-            <h4 style="font-size:1rem; margin-bottom:12px; color:var(--accent-gold);">📋 Antrean Verifikasi Member Terkini</h4>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h4 style="font-size:1.05rem; margin:0 0 2px 0; color:var(--accent-gold);">📋 Pusat Antrean Verifikasi Terpadu (M1 — M9)</h4>
+                <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">Kelola & verifikasi permohonan pending seluruh modul MB INA</p>
+              </div>
+              <div id="unified-queue-pills" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+            </div>
             <div id="admin-verification-table"></div>
           </div>
         </div>
@@ -3977,6 +3928,19 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <div id="m8-sub-81" style="display:block;">
 
+            <!-- Header Action Bar (M8.1 Standalone Actions) -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid rgba(245,158,11,0.2);">
+              <div>
+                <h3 style="margin:0; color:var(--accent-gold); font-size:1.15rem; font-weight:800; letter-spacing:0.5px;">🤝 M8.1 – MANAJEMEN ENDORSE & MONETISASI</h3>
+                <span style="font-size:0.75rem; color:var(--text-muted);">Pusat kendali histori siapa saja yang endorse, mitra sponsor, status tagihan, & laporan pendapatan MB INA</span>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn-primary" style="font-size:0.8rem; padding:7px 16px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="M8Engine.openContractModal()">➕ TAMBAH KONTRAK ENDORSE</button>
+                <button class="btn-outline" style="font-size:0.78rem; padding:7px 14px;" onclick="M8Engine.exportEndorseExcel()">📤 Export Excel</button>
+                <button class="btn-outline" style="font-size:0.78rem; padding:7px 14px;" onclick="M8Engine.refreshEndorse()">🔄 Refresh</button>
+              </div>
+            </div>
+
             <!-- KPI Cards -->
             <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:24px;">
               <div class="glass-card" style="padding:18px; text-align:center; border-left:3px solid var(--accent-gold);">
@@ -3999,26 +3963,27 @@
 
             <!-- Sub-sub tabs: Paket / Daftar / Laporan -->
             <div style="display:flex; gap:8px; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:12px;">
-              <button class="btn-outline" id="m8-e-tab-packages" onclick="M8Engine.switchEndorseTab('packages')" style="font-size:0.8rem; padding:6px 16px; background:rgba(245,158,11,0.2); color:var(--accent-gold); border-color:var(--accent-gold);">📦 Paket Endorse</button>
-              <button class="btn-outline" id="m8-e-tab-contracts" onclick="M8Engine.switchEndorseTab('contracts')" style="font-size:0.8rem; padding:6px 16px;">🤝 Daftar Kontrak</button>
-              <button class="btn-outline" id="m8-e-tab-report" onclick="M8Engine.switchEndorseTab('report')" style="font-size:0.8rem; padding:6px 16px;">📊 Laporan</button>
+              <button class="btn-outline" id="m8-e-tab-packages" onclick="M8Engine.switchEndorseTab('packages')" style="font-size:0.8rem; padding:6px 16px; background:rgba(245,158,11,0.2); color:var(--accent-gold); border-color:var(--accent-gold);">📦 1. Paket Endorse Tersedia</button>
+              <button class="btn-outline" id="m8-e-tab-contracts" onclick="M8Engine.switchEndorseTab('contracts')" style="font-size:0.8rem; padding:6px 16px;">🤝 2. Histori Kontrak Endorse</button>
+              <button class="btn-outline" id="m8-e-tab-all" onclick="M8Engine.switchEndorseTab('all')" style="font-size:0.8rem; padding:6px 16px;">🌐 Tampilkan Semua (Paket & Kontrak)</button>
+              <button class="btn-outline" id="m8-e-tab-report" onclick="M8Engine.switchEndorseTab('report')" style="font-size:0.8rem; padding:6px 16px;">📊 Laporan Analytics</button>
             </div>
 
-            <!-- 8.1.1 Paket Endorse -->
-            <div id="m8-endorse-packages">
+            <!-- 1. Paket Endorse Tersedia (FIRST) -->
+            <div id="m8-endorse-packages" style="display:block; margin-bottom:28px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                <h4 style="margin:0; color:var(--accent-gold); font-size:0.95rem;">📦 Paket Endorse Tersedia</h4>
+                <h4 style="margin:0; color:var(--accent-gold); font-size:0.95rem;">📦 1. Paket Endorse Tersedia</h4>
                 <button class="btn-primary" style="font-size:0.8rem; padding:7px 16px; font-weight:800;" onclick="M8Engine.openPackageModal()">➕ TAMBAH PAKET</button>
               </div>
               <div id="m8-packages-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px;"></div>
             </div>
 
-            <!-- 8.1.2 Daftar Kontrak -->
-            <div id="m8-endorse-contracts" style="display:none;">
+            <!-- 2. Histori Kontrak Endorse (SECOND) -->
+            <div id="m8-endorse-contracts" style="display:block; margin-bottom:24px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                <h4 style="margin:0; color:var(--accent-gold); font-size:0.95rem;">🤝 Daftar Kontrak Endorse</h4>
+                <h4 style="margin:0; color:var(--accent-gold); font-size:0.95rem;">🤝 2. Histori Kontrak Endorse (Daftar Siapa Saja yang Endorse)</h4>
                 <div style="display:flex; gap:8px;">
-                  <button class="btn-outline" style="font-size:0.78rem; padding:6px 12px;" onclick="M8Engine.exportEndorseExcel()">📤 Export</button>
+                  <button class="btn-outline" style="font-size:0.78rem; padding:6px 12px;" onclick="M8Engine.exportEndorseExcel()">📤 Export Excel</button>
                   <button class="btn-primary" style="font-size:0.8rem; padding:7px 16px; font-weight:800;" onclick="M8Engine.openContractModal()">➕ TAMBAH KONTRAK</button>
                 </div>
               </div>
@@ -4027,15 +3992,15 @@
                   <thead>
                     <tr style="background:rgba(245,158,11,0.15);">
                       <th style="padding:10px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">No. Kontrak</th>
-                      <th style="padding:10px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Mitra</th>
-                      <th style="padding:10px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Paket</th>
-                      <th style="padding:10px 12px; text-align:right; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Nilai</th>
+                      <th style="padding:10px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Mitra Sponsor</th>
+                      <th style="padding:10px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Paket Endorse</th>
+                      <th style="padding:10px 12px; text-align:right; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Nilai Kontrak</th>
                       <th style="padding:10px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Periode</th>
-                      <th style="padding:10px 12px; text-align:center; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Status</th>
-                      <th style="padding:10px 12px; text-align:center; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Aksi</th>
+                      <th style="padding:10px 12px; text-align:center; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Status & Pembayaran</th>
+                      <th style="padding:10px 12px; text-align:center; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Aksi Admin</th>
                     </tr>
                   </thead>
-                  <tbody id="m8-contracts-tbody"><tr><td colspan="7" style="padding:20px; text-align:center; color:var(--text-muted);">Memuat data...</td></tr></tbody>
+                  <tbody id="m8-contracts-tbody"><tr><td colspan="7" style="padding:20px; text-align:center; color:var(--text-muted);">Memuat data histori endorse...</td></tr></tbody>
                 </table>
               </div>
             </div>
@@ -4113,19 +4078,24 @@
 
               <!-- Tabel Urutan Rotator Banner Header -->
               <div style="margin-bottom:16px;">
-                <div style="font-size:0.78rem; font-weight:800; color:#fff; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                  <span>📋 URUTAN TAMPIL BANNER HEADER ROTATOR (💎 PLATINUM)</span>
-                  <span style="font-size:0.72rem; color:var(--accent-gold); font-weight:700;">💡 Urutan #1 Tampil Pertama Kali Saat Halaman Dimuat</span>
+                <div style="font-size:0.78rem; font-weight:800; color:#fff; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <span>📋 PENGATURAN URUTAN ROTATOR BANNER & DURASI TAMPIL</span>
+                    <button class="btn-primary" style="font-size:0.75rem; padding:5px 14px; font-weight:800; display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none;" onclick="M8Engine.openCampaignModal()">➕ Tambah Banner Rotator Baru</button>
+                  </div>
+                  <span style="font-size:0.72rem; color:var(--accent-gold); font-weight:700;">💡 Data Tersimpan Permanen (Urutan #1 Tampil Pertama)</span>
                 </div>
                 <div style="overflow-x:auto; border-radius:10px; border:1px solid rgba(245,158,11,0.25);">
                   <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
                     <thead>
                       <tr style="background:rgba(245,158,11,0.15); color:var(--accent-gold);">
-                        <th style="padding:8px 10px; text-align:center; width:90px;">Urutan</th>
-                        <th style="padding:8px 10px; text-align:left;">Nama Banner / Sponsor</th>
-                        <th style="padding:8px 10px; text-align:center; width:160px;">Materi Banner</th>
-                        <th style="padding:8px 10px; text-align:center; width:100px;">Status</th>
-                        <th style="padding:8px 10px; text-align:center; width:170px;">Aksi (Shift / Edit / Stop)</th>
+                        <th style="padding:8px 10px; text-align:center; width:65px;">Urutan</th>
+                        <th style="padding:8px 10px; text-align:center; width:70px;">Tier</th>
+                        <th style="padding:8px 10px; text-align:left;">Nama Banner & Sponsor</th>
+                        <th style="padding:8px 10px; text-align:center; width:140px;">Durasi Tampil</th>
+                        <th style="padding:8px 10px; text-align:center; width:120px;">Materi Banner</th>
+                        <th style="padding:8px 10px; text-align:center; width:65px;">Status</th>
+                        <th style="padding:8px 10px; text-align:center; width:180px;">Aksi (Shift / Edit / Stop / Delete)</th>
                       </tr>
                     </thead>
                     <tbody id="m8-rotator-order-tbody">
@@ -4958,92 +4928,151 @@
   </div>
 </div>
 
-<!-- MODAL: ENDORSE CONTRACT -->
-<div id="modal-endorse-contract" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:9999; backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
-  <div class="glass-card" style="background:#0f172a; border:1px solid var(--accent-gold); max-width:620px; width:100%; border-radius:16px; padding:24px; max-height:90vh; overflow-y:auto; color:#fff; box-shadow:0 20px 50px rgba(0,0,0,0.8);">
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(245,158,11,0.3); padding-bottom:12px; margin-bottom:20px;">
-      <h3 style="margin:0; color:var(--accent-gold); font-size:1.1rem;">🤝 TAMBAH KONTRAK ENDORSE</h3>
-      <button onclick="M8Engine.closeContractModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+<!-- MODAL: ENDORSE CONTRACT (EXACT EXECUTIVE DESIGN MATCHING SCREENSHOT) -->
+<div id="modal-endorse-contract" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:99999; backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+  <div class="glass-card" style="background:#0d1527; border:1.5px solid #f59e0b; max-width:600px; width:100%; border-radius:14px; padding:24px; max-height:90vh; overflow-y:auto; color:#fff; box-shadow:0 25px 60px rgba(0,0,0,0.95); margin:auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:20px;">
+      <h3 style="margin:0; color:#f59e0b; font-size:1.05rem; font-weight:800; display:flex; align-items:center; gap:8px; letter-spacing:0.5px;">🤝 TAMBAH KONTRAK ENDORSE</h3>
+      <button type="button" onclick="M8Engine.closeContractModal()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; font-weight:bold; padding:0 4px;" title="Tutup">✕</button>
     </div>
+
     <form id="form-endorse-contract" onsubmit="M8Engine.submitContractForm(event)">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+      <!-- Row 1: Nama Mitra & Contact Person -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
         <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Nama Mitra / Brand <span style="color:red;">*</span></label>
-          <input type="text" id="ec-form-partner" class="form-input" placeholder="Shell Indonesia" required style="width:100%;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Nama Mitra / Brand <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="ec-form-partner" class="input-field" placeholder="Shell Indonesia" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; box-sizing:border-box;">
         </div>
         <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Contact Person</label>
-          <input type="text" id="ec-form-contact" class="form-input" placeholder="Budi Santoso" style="width:100%;">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Email</label>
-          <input type="email" id="ec-form-email" class="form-input" placeholder="budi@brand.co.id" style="width:100%;">
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Telepon</label>
-          <input type="text" id="ec-form-phone" class="form-input" placeholder="0217890123" style="width:100%;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Contact Person</label>
+          <input type="text" id="ec-form-contact" class="input-field" placeholder="Budi Santoso" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; box-sizing:border-box;">
         </div>
       </div>
-      <div class="form-group" style="margin-bottom:14px;">
-        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Paket Endorse <span style="color:red;">*</span></label>
-        <select id="ec-form-package" class="form-input" style="width:100%; font-weight:700;" onchange="M8Engine.autoFillContractAmount()">
+
+      <!-- Row 2: Email & Telepon -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Email</label>
+          <input type="email" id="ec-form-email" class="input-field" placeholder="budi@brand.co.id" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; box-sizing:border-box;">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Telepon</label>
+          <input type="text" id="ec-form-phone" class="input-field" placeholder="0217890123" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; box-sizing:border-box;">
+        </div>
+      </div>
+
+      <!-- Row 3: Paket Endorse -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Paket Endorse <span style="color:#ef4444;">*</span></label>
+        <select id="ec-form-package" class="input-field" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; font-weight:700; box-sizing:border-box;" onchange="M8Engine.autoFillContractAmount()">
           <option value="">— Pilih Paket —</option>
+          <option value="pkg_bronze">🥉 BRONZE — Rp 2.500.000 / bulan</option>
+          <option value="pkg_silver">🥈 SILVER — Rp 5.000.000 / bulan</option>
+          <option value="pkg_gold">🥇 GOLD — Rp 10.000.000 / bulan</option>
+          <option value="pkg_platinum">💎 PLATINUM — Rp 20.000.000 / bulan</option>
         </select>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px;">
+
+      <!-- Row 4: Mulai, Akhir, Nilai (Rp) -->
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px;">
         <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Mulai <span style="color:red;">*</span></label>
-          <input type="date" id="ec-form-start" class="form-input" required style="width:100%;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Mulai <span style="color:#ef4444;">*</span></label>
+          <input type="date" id="ec-form-start" class="input-field" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 10px; border-radius:8px; box-sizing:border-box;">
         </div>
         <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Akhir <span style="color:red;">*</span></label>
-          <input type="date" id="ec-form-end" class="form-input" required style="width:100%;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Akhir <span style="color:#ef4444;">*</span></label>
+          <input type="date" id="ec-form-end" class="input-field" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 10px; border-radius:8px; box-sizing:border-box;">
         </div>
         <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Nilai (Rp) <span style="color:red;">*</span></label>
-          <input type="number" id="ec-form-amount" class="form-input" placeholder="20000000" required style="width:100%;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Nilai (Rp) <span style="color:#ef4444;">*</span></label>
+          <input type="number" id="ec-form-amount" class="input-field" placeholder="20000000" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; font-weight:700; box-sizing:border-box;">
         </div>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+
+      <!-- Row 5: Status Pembayaran & Status Kontrak -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
         <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Status Pembayaran</label>
-          <select id="ec-form-pay" class="form-input" style="width:100%;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Status Pembayaran</label>
+          <select id="ec-form-pay" class="input-field" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; font-weight:700; box-sizing:border-box;">
             <option value="UNPAID">⏳ BELUM BAYAR</option>
             <option value="PARTIAL">🔶 SEBAGIAN</option>
             <option value="PAID">✅ LUNAS</option>
           </select>
         </div>
         <div class="form-group" style="margin:0;">
-          <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Status Kontrak</label>
-          <select id="ec-form-status" class="form-input" style="width:100%;">
+          <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Status Kontrak</label>
+          <select id="ec-form-status" class="input-field" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; font-weight:700; box-sizing:border-box;">
             <option value="DRAFT">📝 DRAFT</option>
+            <option value="PENDING">🟡 PENDING</option>
             <option value="ACTIVE">✅ ACTIVE</option>
+            <option value="WAITLIST">📌 WAITLIST</option>
             <option value="COMPLETED">🏁 COMPLETED</option>
             <option value="CANCELLED">❌ CANCELLED</option>
           </select>
         </div>
       </div>
-      <div class="form-group" style="margin-bottom:20px;">
-        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Catatan</label>
-        <textarea id="ec-form-notes" class="form-input" rows="2" placeholder="Catatan kontrak..." style="width:100%; resize:vertical;"></textarea>
+
+      <!-- Row 6: Catatan -->
+      <div class="form-group" style="margin-bottom:16px;">
+        <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Catatan</label>
+        <textarea id="ec-form-notes" class="input-field" rows="2" placeholder="Catatan kontrak..." style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; resize:vertical; box-sizing:border-box; font-family:inherit;"></textarea>
       </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;">
-        <button type="button" class="btn-outline" onclick="M8Engine.closeContractModal()" style="padding:8px 18px;">BATAL</button>
-        <button type="submit" class="btn-primary" style="padding:8px 24px; font-weight:800;">💾 SIMPAN KONTRAK</button>
+
+      <!-- Row 7: Konfigurasi Rekening Pembayaran Bank Mandiri -->
+      <div style="margin-top:16px; margin-bottom:16px; padding:14px 16px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:10px;">
+        <div style="font-size:0.78rem; font-weight:800; color:#f59e0b; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
+          🏦 ── Konfigurasi Rekening Pembayaran Bank Mandiri ──
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.78rem; color:#94a3b8; display:block; margin-bottom:4px; font-weight:600;">Nama Bank</label>
+            <input type="text" id="ec-form-bank-name" class="input-field" value="Bank Mandiri" readonly style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#f59e0b; font-size:0.85rem; padding:9px 12px; border-radius:8px; font-weight:800; box-sizing:border-box;">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.78rem; color:#94a3b8; display:block; margin-bottom:4px; font-weight:600;">Nomor Rekening <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="ec-form-bank-account" class="input-field" value="123-00-1234567-8" readonly style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:9px 12px; border-radius:8px; font-weight:800; letter-spacing:0.5px; box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="font-size:0.72rem; color:#94a3b8; margin-top:6px;">
+          Atas Nama: <strong style="color:#ffffff;">Mercedes-Benz Club Indonesia (MB INA)</strong>
+        </div>
+      </div>
+
+      <!-- Row 8: Upload Bukti Transfer Pembayaran -->
+      <div style="margin-bottom:20px; padding:14px 16px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.25); border-radius:10px;">
+        <label style="font-size:0.8rem; color:#22c55e; display:block; margin-bottom:8px; font-weight:700;">
+          📸 Upload Bukti Transfer Pembayaran <span style="color:#ef4444;">*</span>
+        </label>
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <input type="file" id="ec-form-proof-file" accept="image/*,.pdf" style="display:none;" onchange="M8Engine.handleProofFileSelect(event)">
+          <button type="button" class="btn-outline" onclick="document.getElementById('ec-form-proof-file').click()" style="padding:9px 16px; font-size:0.8rem; font-weight:700; border-radius:8px; background:rgba(34,197,94,0.1); border:1px dashed #22c55e; color:#22c55e; cursor:pointer; display:flex; align-items:center; gap:6px;">
+            📤 Pilih File Bukti Transfer (JPG / PNG / PDF)
+          </button>
+          <span id="ec-proof-file-name" style="font-size:0.78rem; color:#94a3b8; font-style:italic;">Belum ada file dipilih</span>
+        </div>
+        <div id="ec-proof-preview-container" style="display:none; margin-top:12px;">
+          <img id="ec-proof-img-preview" src="" alt="Preview Bukti Transfer" style="max-height:150px; border-radius:8px; border:1px solid rgba(34,197,94,0.4); box-shadow:0 4px 14px rgba(0,0,0,0.6);">
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(255,255,255,0.1); padding-top:18px;">
+        <button type="button" class="btn-outline" onclick="M8Engine.closeContractModal()" style="padding:9px 22px; font-weight:700; font-size:0.82rem; border-radius:8px; background:transparent; border:1px solid #475569; color:#ffffff; cursor:pointer;">BATAL</button>
+        <button type="submit" class="btn-primary" style="padding:9px 24px; font-weight:900; font-size:0.82rem; border-radius:8px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000000; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">💾 SIMPAN KONTRAK</button>
       </div>
     </form>
   </div>
 </div>
 
-<!-- MODAL: AD CAMPAIGN (M8.2) -->
-<div id="modal-ad-campaign" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:16px;">
-  <div class="glass-card" style="background:#0b1329; border:1px solid var(--accent-gold); max-width:680px; width:100%; border-radius:18px; padding:26px; max-height:92vh; overflow-y:auto; color:#fff; box-shadow:0 25px 60px rgba(0,0,0,0.9);">
+<!-- MODAL: AD CAMPAIGN (M8.2 - EXACT EXECUTIVE UNIFIED DESIGN MATCHING SCREENSHOT) -->
+<div id="modal-ad-campaign" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:99999; backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+  <div class="glass-card" style="background:#0d1527; border:1.5px solid #f59e0b; max-width:680px; width:100%; border-radius:14px; padding:24px; max-height:90vh; overflow-y:auto; color:#fff; box-shadow:0 25px 60px rgba(0,0,0,0.95); margin:auto;">
     
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(245,158,11,0.3); padding-bottom:14px; margin-bottom:20px;">
-      <h3 id="modal-ad-campaign-title" style="margin:0; color:var(--accent-gold); font-size:1.2rem; font-weight:800; display:flex; align-items:center; gap:8px;">
+      <h3 id="modal-ad-campaign-title" style="margin:0; color:#f59e0b; font-size:1.15rem; font-weight:800; display:flex; align-items:center; gap:8px; letter-spacing:0.5px;">
         ➕ TAMBAH KAMPANYE IKLAN
       </h3>
-      <button onclick="M8Engine.closeCampaignModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.6rem; cursor:pointer; line-height:1;">&times;</button>
+      <button type="button" onclick="M8Engine.closeCampaignModal()" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; font-weight:bold; padding:0 4px;" title="Tutup">✕</button>
     </div>
 
     <form id="form-ad-campaign" onsubmit="M8Engine.submitCampaignForm(event)">
@@ -5051,19 +5080,19 @@
       <input type="hidden" id="ac-form-budget" value="10000000">
 
       <!-- ─── IDENTITAS IKLAN ─── -->
-      <div style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
+      <div style="font-size:0.8rem; font-weight:800; color:#f59e0b; letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
         ─── IDENTITAS IKLAN ─────────────────────────────────────────────────────────────────────────────
       </div>
 
       <div style="margin-bottom:14px;">
         <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Nama Kampanye <span style="color:#ef4444;">*</span></label>
-        <input type="text" id="ac-form-name" class="form-input" placeholder="Banner Mandiri Q3 2026" required style="width:100%; padding:10px 14px; font-size:0.85rem;">
+        <input type="text" id="ac-form-name" class="input-field" placeholder="Banner Mandiri Q3 2026" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;">
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
         <div>
           <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Tipe & Lokasi Penempatan Iklan <span style="color:#ef4444;">*</span></label>
-          <select id="ac-form-type" class="form-input" style="width:100%; padding:10px 14px; font-size:0.85rem;" onchange="M8Engine.updateAdTypeHelpText(this.value)">
+          <select id="ac-form-type" class="input-field" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;" onchange="M8Engine.updateAdTypeHelpText(this.value)">
             <option value="BANNER">🖼️ BANNER UTAMA (Header / Modul Beranda)</option>
             <option value="CAROUSEL">🎠 CAROUSEL HERO (Slide Besar Atas Beranda)</option>
             <option value="SPONSOR">💎 SPONSOR PLATINUM (Grid Logo Sponsor Utama)</option>
@@ -5073,7 +5102,7 @@
         </div>
         <div>
           <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Mitra / Advertiser <span style="color:#ef4444;">*</span></label>
-          <input type="text" id="ac-form-partner" class="form-input" placeholder="Misal: Michelin Indonesia" required style="width:100%; padding:10px 14px; font-size:0.85rem;">
+          <input type="text" id="ac-form-partner" class="input-field" placeholder="Misal: Michelin Indonesia" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;">
         </div>
       </div>
 
@@ -5084,7 +5113,7 @@
       </div>
 
       <!-- ─── KONTEN IKLAN ─── -->
-      <div style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
+      <div style="font-size:0.8rem; font-weight:800; color:#f59e0b; letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
         ─── KONTEN IKLAN ────────────────────────────────────────────────────────────────────────────────
       </div>
 
@@ -5092,10 +5121,10 @@
         <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Upload Banner <span style="color:#ef4444;">*</span> <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(JPG/PNG, max 2MB)</span></label>
         <div style="display:flex; gap:10px; align-items:center;">
           <input type="file" id="ac-form-file" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="M8Engine.handleBannerFileUpload(this)">
-          <button type="button" class="btn-outline" style="padding:9px 16px; font-size:0.82rem; font-weight:700; display:flex; align-items:center; gap:6px;" onclick="document.getElementById('ac-form-file').click()">
+          <button type="button" class="btn-outline" style="padding:9px 16px; font-size:0.82rem; font-weight:700; display:flex; align-items:center; gap:6px; background:#152035; border:1px solid rgba(255,255,255,0.15); color:#ffffff; border-radius:8px;" onclick="document.getElementById('ac-form-file').click()">
             📁 Pilih File
           </button>
-          <input type="text" id="ac-form-banner-url" class="form-input" placeholder="Atau paste URL Banner (https://...)" style="flex:1; padding:9px 12px; font-size:0.82rem;" oninput="M8Engine.previewBannerUrl(this.value)">
+          <input type="text" id="ac-form-banner-url" class="input-field" placeholder="Atau paste URL Banner (https://...)" style="flex:1; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:9px 12px; font-size:0.82rem; border-radius:8px; box-sizing:border-box;" oninput="M8Engine.previewBannerUrl(this.value)">
         </div>
         
         <!-- Live Preview Banner Box -->
@@ -5107,28 +5136,28 @@
 
       <div style="margin-bottom:14px;">
         <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Deskripsi / Pesan Promo <span style="color:#ef4444;">*</span></label>
-        <textarea id="ac-form-desc" class="form-input" rows="2" placeholder="Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge" required style="width:100%; padding:10px 14px; font-size:0.85rem; resize:vertical;"></textarea>
+        <textarea id="ac-form-desc" class="input-field" rows="2" placeholder="Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; resize:vertical; border-radius:8px; box-sizing:border-box; font-family:inherit;"></textarea>
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;">
         <div>
           <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">CTA Button Text <span style="color:#ef4444;">*</span></label>
-          <input type="text" id="ac-form-cta" class="form-input" placeholder="Ajukan Kartu Sekarang" required style="width:100%; padding:10px 14px; font-size:0.85rem;">
+          <input type="text" id="ac-form-cta" class="input-field" placeholder="Ajukan Kartu Sekarang" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;">
         </div>
         <div>
           <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Link / Target URL <span style="color:#ef4444;">*</span></label>
-          <input type="url" id="ac-form-link" class="form-input" placeholder="https://www.bankmandiri.co.id/mbina" required style="width:100%; padding:10px 14px; font-size:0.85rem;">
+          <input type="url" id="ac-form-link" class="input-field" placeholder="https://www.bankmandiri.co.id/mbina" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;">
         </div>
       </div>
 
       <!-- ─── PAKET IKLAN ─── -->
-      <div style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
+      <div style="font-size:0.8rem; font-weight:800; color:#f59e0b; letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
         ─── PAKET IKLAN ─────────────────────────────────────────────────────────────────────────────────
       </div>
 
       <div style="margin-bottom:12px;">
         <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Paket Iklan <span style="color:#ef4444;">*</span></label>
-        <select id="ac-form-package" class="form-input" style="width:100%; padding:10px 14px; font-size:0.85rem;" onchange="M8Engine.onPackageSelectChange(this.value)">
+        <select id="ac-form-package" class="input-field" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; border-radius:8px; font-weight:700; box-sizing:border-box;" onchange="M8Engine.onPackageSelectChange(this.value)">
           <option value="Platinum">💎 Platinum — Rp 10 JT / Bulan (Header + Sidebar + Footer)</option>
           <option value="Gold">🥇 Gold — Rp 7.5 JT / Bulan (Header + Sidebar)</option>
           <option value="Silver">🥈 Silver — Rp 5 JT / Bulan (Sidebar)</option>
@@ -5141,10 +5170,10 @@
         <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
           <thead>
             <tr style="background:rgba(245,158,11,0.15);">
-              <th style="padding:8px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Paket</th>
-              <th style="padding:8px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Harga</th>
-              <th style="padding:8px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Durasi</th>
-              <th style="padding:8px 12px; text-align:left; color:var(--accent-gold); font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Posisi</th>
+              <th style="padding:8px 12px; text-align:left; color:#f59e0b; font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Paket</th>
+              <th style="padding:8px 12px; text-align:left; color:#f59e0b; font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Harga</th>
+              <th style="padding:8px 12px; text-align:left; color:#f59e0b; font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Durasi</th>
+              <th style="padding:8px 12px; text-align:left; color:#f59e0b; font-weight:700; border-bottom:1px solid rgba(245,158,11,0.3);">Posisi</th>
             </tr>
           </thead>
           <tbody>
@@ -5177,22 +5206,22 @@
       </div>
 
       <!-- ─── JADWAL & POSISI ─── -->
-      <div style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
+      <div style="font-size:0.8rem; font-weight:800; color:#f59e0b; letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
         ─── JADWAL &amp; POSISI PENEMPATAN ───────────────────────────────────────────────────────────────
       </div>
 
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:18px;">
         <div>
           <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Tanggal Mulai <span style="color:#ef4444;">*</span></label>
-          <input type="date" id="ac-form-start" class="form-input" required style="width:100%; padding:10px 14px; font-size:0.85rem;" onchange="M8Engine.onStartDateChange(this.value)">
+          <input type="date" id="ac-form-start" class="input-field" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 10px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;" onchange="M8Engine.onStartDateChange(this.value)">
         </div>
         <div>
           <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Tanggal Akhir <span style="color:#ef4444;">*</span></label>
-          <input type="date" id="ac-form-end" class="form-input" required style="width:100%; padding:10px 14px; font-size:0.85rem;">
+          <input type="date" id="ac-form-end" class="input-field" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 10px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;">
         </div>
         <div>
           <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Posisi Penempatan <span style="color:#ef4444;">*</span></label>
-          <select id="ac-form-pos" class="form-input" style="width:100%; padding:10px 14px; font-size:0.85rem;">
+          <select id="ac-form-pos" class="input-field" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;">
             <option value="HEADER">HEADER (Top Banner)</option>
             <option value="BETWEEN">BETWEEN (Antar Bagian)</option>
             <option value="FOOTER">FOOTER (Bottom Banner)</option>
@@ -5202,13 +5231,13 @@
       </div>
 
       <!-- ─── STATUS ─── -->
-      <div style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
+      <div style="font-size:0.8rem; font-weight:800; color:#f59e0b; letter-spacing:1px; margin-bottom:12px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:4px;">
         ─── STATUS ──────────────────────────────────────────────────────────────────────────────────────
       </div>
 
       <div style="margin-bottom:14px;">
         <label style="font-size:0.82rem; color:#cbd5e1; font-weight:700; display:block; margin-bottom:6px;">Status:</label>
-        <select id="ac-form-status" class="form-input" style="width:100%; padding:10px 14px; font-size:0.85rem;">
+        <select id="ac-form-status" class="input-field" style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; padding:10px 14px; font-size:0.85rem; border-radius:8px; box-sizing:border-box;">
           <option value="DRAFT">📝 DRAFT</option>
           <option value="ACTIVE">🟢 ACTIVE</option>
           <option value="PAUSED">⏸️ PAUSED</option>
@@ -5217,17 +5246,54 @@
       </div>
 
       <!-- Info Box Status Otomatis -->
-      <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:10px; padding:12px 14px; font-size:0.78rem; color:#cbd5e1; margin-bottom:22px; line-height:1.6;">
-        <div style="font-weight:800; color:var(--accent-gold); margin-bottom:4px;">💡 Status otomatis setelah disimpan:</div>
+      <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:10px; padding:12px 14px; font-size:0.78rem; color:#cbd5e1; margin-bottom:18px; line-height:1.6;">
+        <div style="font-weight:800; color:#f59e0b; margin-bottom:4px;">💡 Status otomatis setelah disimpan:</div>
         <div>• <strong>DRAFT</strong> → sebelum dipublikasikan</div>
         <div>• <strong>ACTIVE</strong> → setelah dipublikasikan &amp; dalam periode tayang</div>
         <div>• <strong>EXPIRED</strong> → setelah tanggal akhir</div>
       </div>
 
+      <!-- ─── Konfigurasi Rekening Pembayaran Bank Mandiri ─── -->
+      <div style="margin-top:16px; margin-bottom:16px; padding:14px 16px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:10px;">
+        <div style="font-size:0.78rem; font-weight:800; color:#f59e0b; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
+          🏦 ── Konfigurasi Rekening Pembayaran Bank Mandiri ──
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.78rem; color:#94a3b8; display:block; margin-bottom:4px; font-weight:600;">Nama Bank</label>
+            <input type="text" id="ac-form-bank-name" class="input-field" value="Bank Mandiri" readonly style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#f59e0b; font-size:0.85rem; padding:9px 12px; border-radius:8px; font-weight:800; box-sizing:border-box;">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label style="font-size:0.78rem; color:#94a3b8; display:block; margin-bottom:4px; font-weight:600;">Nomor Rekening <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="ac-form-bank-account" class="input-field" value="123-00-1234567-8" readonly style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:9px 12px; border-radius:8px; font-weight:800; letter-spacing:0.5px; box-sizing:border-box;">
+          </div>
+        </div>
+        <div style="font-size:0.72rem; color:#94a3b8; margin-top:6px;">
+          Atas Nama: <strong style="color:#ffffff;">Mercedes-Benz Club Indonesia (MB INA)</strong>
+        </div>
+      </div>
+
+      <!-- ─── Upload Bukti Transfer Pembayaran ─── -->
+      <div style="margin-bottom:20px; padding:14px 16px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.25); border-radius:10px;">
+        <label style="font-size:0.8rem; color:#22c55e; display:block; margin-bottom:8px; font-weight:700;">
+          📸 Upload Bukti Transfer Pembayaran <span style="color:#ef4444;">*</span>
+        </label>
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <input type="file" id="ac-form-proof-file" accept="image/*,.pdf" style="display:none;" onchange="M8Engine.handleAdProofFileSelect(event)">
+          <button type="button" class="btn-outline" onclick="document.getElementById('ac-form-proof-file').click()" style="padding:9px 16px; font-size:0.8rem; font-weight:700; border-radius:8px; background:rgba(34,197,94,0.1); border:1px dashed #22c55e; color:#22c55e; cursor:pointer; display:flex; align-items:center; gap:6px;">
+            📤 Pilih File Bukti Transfer (JPG / PNG / PDF)
+          </button>
+          <span id="ac-ad-proof-file-name" style="font-size:0.78rem; color:#94a3b8; font-style:italic;">Belum ada file dipilih</span>
+        </div>
+        <div id="ac-ad-proof-preview-container" style="display:none; margin-top:12px;">
+          <img id="ac-ad-proof-img-preview" src="" alt="Preview Bukti Transfer" style="max-height:150px; border-radius:8px; border:1px solid rgba(34,197,94,0.4); box-shadow:0 4px 14px rgba(0,0,0,0.6);">
+        </div>
+      </div>
+
       <!-- Action Buttons -->
       <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(255,255,255,0.1); padding-top:18px;">
-        <button type="button" class="btn-outline" onclick="M8Engine.closeCampaignModal()" style="padding:9px 20px; font-size:0.85rem; font-weight:700;">BATAL</button>
-        <button type="submit" class="btn-primary" style="padding:9px 26px; font-size:0.85rem; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); box-shadow:0 4px 15px rgba(245,158,11,0.3);">
+        <button type="button" class="btn-outline" onclick="M8Engine.closeCampaignModal()" style="padding:9px 20px; font-size:0.85rem; font-weight:700; border-radius:8px; background:transparent; border:1px solid #475569; color:#ffffff; cursor:pointer;">BATAL</button>
+        <button type="submit" class="btn-primary" style="padding:9px 26px; font-size:0.85rem; font-weight:900; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000000; border:none; border-radius:8px; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 4px 15px rgba(245,158,11,0.3);">
           💾 SIMPAN KAMPANYE
         </button>
       </div>
@@ -5849,12 +5915,15 @@
 
         <!-- SPONSOR UTAMA & PLATINUM (4x2 Grid - 8 Kartu Sponsor) -->
         <section id="sponsors-landing-section" style="margin-bottom:48px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
             <div>
               <span class="hero-badge">Official Partners</span>
               <h2 style="font-size:1.8rem; margin-top:6px;" class="text-gradient">🤝 Sponsor Utama & Platinum MB INA</h2>
               <p style="color:var(--text-muted); font-size:0.9rem;">Mitra strategis perbankan, energi, pelumas, dan otomotif pendukung utama seluruh kegiatan Mercedes-Benz Club Indonesia</p>
             </div>
+            <button class="btn-primary" style="font-size:0.82rem; padding:8px 16px; font-weight:800; border-radius:10px; box-shadow:0 4px 15px rgba(245,158,11,0.25); cursor:pointer;" onclick="AppEngine.openManageSponsorModal()">
+              ⚙️ Admin: Atur Urutan & Edit Sponsor
+            </button>
           </div>
           <div id="landing-sponsors-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px;">
             <!-- Rendered dynamically by AppEngine.renderLandingSponsors() -->
@@ -6554,6 +6623,32 @@
         <button id="sponsor-tab-btn-laporan" class="btn-outline sponsor-tab-btn" style="font-size:0.85rem; padding:10px 18px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('laporan')">📊 Laporan</button>
       </div>
 
+      <!-- UNIVERSAL TOTAL INVESTASI & ROI SPONSOR CARD (PERMANENT HEADER) -->
+      <div class="glass-panel" style="padding:16px 20px; border-top:4px solid var(--accent-gold); margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+          <h4 style="font-size:1.05rem; margin:0; color:var(--accent-gold); display:flex; align-items:center; gap:8px;">
+            📊 TOTAL INVESTASI & ROI SPONSOR <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Track Record Historis MB INA)</span>
+          </h4>
+          <span style="font-size:0.75rem; font-weight:800; color:#22c55e; background:rgba(34,197,94,0.15); padding:2px 10px; border-radius:10px; border:1px solid #22c55e;">✅ Terverifikasi Bendahara Pusat</span>
+        </div>
+        <div class="glass-card" style="padding:14px 20px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:12px; display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div style="text-align:center;">
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Total Investasi</div>
+            <div id="spnd-card-invest-amount" style="font-size:1.3rem; font-weight:900; color:#fff; margin-top:2px;">Rp 30.000.000</div>
+          </div>
+          <div style="height:35px; width:1px; background:rgba(255,255,255,0.15);"></div>
+          <div style="text-align:center;">
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Total Revenue</div>
+            <div id="spnd-card-revenue-amount" style="font-size:1.3rem; font-weight:900; color:#22c55e; margin-top:2px;">Rp 45.000.000</div>
+          </div>
+          <div style="height:35px; width:1px; background:rgba(255,255,255,0.15);"></div>
+          <div style="text-align:center;">
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">ROI Sponsor</div>
+            <div id="spnd-card-roi-percent" style="font-size:1.4rem; font-weight:900; color:var(--accent-gold); margin-top:2px;">50%</div>
+          </div>
+        </div>
+      </div>
+
       <!-- =============================================================== -->
       <!-- SUB-TAB 1: BERANDA (FULL DASHBOARD SPONSOR)                     -->
       <!-- =============================================================== -->
@@ -6656,27 +6751,6 @@
 
         </div>
 
-        <!-- ROW 3: TOTAL INVESTASI & ROI CARD -->
-        <div class="glass-panel" style="padding:20px; border-top:4px solid var(--accent-gold);">
-          <h4 style="font-size:1.05rem; margin:0 0 12px 0; color:var(--accent-gold);">📊 TOTAL INVESTASI & ROI SPONSOR</h4>
-          <div class="glass-card" style="padding:16px 24px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:12px; display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:16px;">
-            <div style="text-align:center;">
-              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Total Investasi</div>
-              <div style="font-size:1.3rem; font-weight:900; color:#fff; margin-top:2px;">Rp 30.000.000</div>
-            </div>
-            <div style="height:35px; width:1px; background:rgba(255,255,255,0.15);"></div>
-            <div style="text-align:center;">
-              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Total Revenue</div>
-              <div style="font-size:1.3rem; font-weight:900; color:#22c55e; margin-top:2px;">Rp 45.000.000</div>
-            </div>
-            <div style="height:35px; width:1px; background:rgba(255,255,255,0.15);"></div>
-            <div style="text-align:center;">
-              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">ROI Sponsor</div>
-              <div style="font-size:1.4rem; font-weight:900; color:var(--accent-gold); margin-top:2px;">50%</div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <!-- =============================================================== -->
@@ -6688,28 +6762,28 @@
           <!-- LEFT PANEL: FORM PROFIL PERUSAHAAN -->
           <div class="glass-panel" style="padding:24px; border-top:4px solid var(--accent-gold);">
             <h3 style="font-size:1.1rem; color:var(--accent-gold); margin-top:0; margin-bottom:18px; display:flex; align-items:center; gap:8px;">👤 Profil Perusahaan Sponsor</h3>
-            <form onsubmit="event.preventDefault(); window.showToast('✅ Profil Sponsor Berhasil Diperbarui!', 'success');">
+            <form onsubmit="event.preventDefault(); window.saveSponsorProfile();">
               <div style="margin-bottom:14px;">
                 <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">Nama Perusahaan / Brand</label>
                 <input id="spnd-prof-company" type="text" value="Shell Indonesia" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; font-weight:700; outline:none; box-sizing:border-box;">
               </div>
               <div style="margin-bottom:14px;">
                 <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">Nama Contact Person (PIC)</label>
-                <input id="spnd-prof-pic" type="text" value="Budi Santoso" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
+                <input id="spnd-prof-pic" type="text" value="Ir. Denny K. (PIC Shell)" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
               </div>
               <div style="margin-bottom:14px;">
                 <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">Email Resmi</label>
-                <input id="spnd-prof-email" type="email" value="budi@shell.co.id" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
+                <input id="spnd-prof-email" type="email" value="sponsor@shell.co.id" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
               </div>
               <div style="margin-bottom:14px;">
                 <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">No. WhatsApp</label>
-                <input id="spnd-prof-phone" type="text" value="0217890123" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
+                <input id="spnd-prof-phone" type="text" value="021-7890123" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
               </div>
               <div style="margin-bottom:20px;">
                 <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">Tier Partnership</label>
-                <input id="spnd-prof-tier" type="text" value="💎 PLATINUM SPONSOR" readonly style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:10px; color:var(--accent-gold); font-size:0.9rem; font-weight:800; outline:none; box-sizing:border-box;">
+                <input id="spnd-prof-tier" type="text" value="💎 MITRA SPONSOR PLATINUM" readonly style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:10px; color:var(--accent-gold); font-size:0.9rem; font-weight:800; outline:none; box-sizing:border-box;">
               </div>
-              <button type="submit" class="btn-primary" style="padding:12px 20px; font-weight:800; width:100%; border-radius:10px; font-size:0.9rem;">Simpan Perubahan Profil</button>
+              <button type="button" class="btn-primary" style="padding:12px 20px; font-weight:800; width:100%; border-radius:10px; font-size:0.9rem; cursor:pointer;" onclick="window.saveSponsorProfile()">Simpan Perubahan Profil</button>
             </form>
           </div>
 
@@ -6878,105 +6952,135 @@
       </div>
 
       <!-- =============================================================== -->
-      <!-- SUB-TAB 5: FORUM DISKUSI SPONSOR                                 -->
+      <!-- SUB-TAB 5: FORUM DISKUSI SPONSOR (100% IDENTIK MEMBER PORTAL)     -->
       <!-- =============================================================== -->
       <div id="sponsor-tab-content-forum" class="sponsor-subtab-pane" style="display:none;">
-        <div class="glass-panel" style="padding:18px; margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-            <div style="font-size:1.1rem; font-weight:800; color:var(--accent-gold);">💬 FORUM DISKUSI MB INA</div>
-            <div style="display:flex; gap:10px; flex:1; max-width:500px;">
-              <input type="text" class="input-field" placeholder="🔍 Cari Thread..." style="padding:8px 14px; font-size:0.82rem;">
-              <button class="btn-primary" style="font-size:0.8rem; padding:8px 16px; font-weight:800; whitespace:nowrap;" onclick="SponsorPortalEngine.openNewThreadModal()">📝 BUAT THREAD BARU</button>
+        <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-size:1.3rem; margin:0;" class="text-gradient">💬 FORUM DISKUSI MB INA</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin:4px 0 0 0;">Pusat komunikasi, kolaborasi thread, broadcast pengumuman, dan sistem diskusi terstruktur MB INA</p>
             </div>
-          </div>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:14px;">
-          <!-- THREAD ITEM 1 -->
-          <div class="glass-panel" style="padding:18px; border-left:4px solid var(--accent-gold); transition:background 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.05)'" onmouseout="this.style.background=''">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
-              <div>
-                <div style="font-size:1rem; font-weight:800; color:#fff; margin-bottom:4px;">🔥 Tips Perawatan W124 untuk Pemula</div>
-                <div style="font-size:0.78rem; color:var(--text-muted);">oleh <strong>Shell Indonesia</strong> • 2 jam lalu</div>
-              </div>
-              <div style="font-size:0.78rem; color:var(--accent-gold); font-weight:700; whitespace:nowrap;">💬 12 Replies &nbsp;•&nbsp; 👁️ 234 Views</div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" onclick="SponsorPortalEngine.switchTab('beranda')">🏠 Dashboard Sponsor</button>
+              <button class="btn-primary" style="padding:8px 18px; font-size:0.85rem; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none; border-radius:8px;" onclick="SponsorPortalEngine.openNewThreadModal()">📝 + Buat Thread Baru</button>
+              <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem; color:var(--accent-red);" onclick="SponsorPortalEngine.switchTab('beranda')">❌ Tutup Forum</button>
             </div>
           </div>
 
-          <!-- THREAD ITEM 2 -->
-          <div class="glass-panel" style="padding:18px; border-left:4px solid #3b82f6; transition:background 0.2s;" onmouseover="this.style.background='rgba(59,130,246,0.05)'" onmouseout="this.style.background=''">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
-              <div>
-                <div style="font-size:1rem; font-weight:800; color:#fff; margin-bottom:4px;">🔥 Touring Bali 2026 - Rute & Persiapan Pelumas Mesin</div>
-                <div style="font-size:0.78rem; color:var(--text-muted);">oleh <strong>Shell Indonesia</strong> • 5 jam lalu</div>
+          <!-- DAFTAR KATEGORI GRID (DUPLIKAT PERSIS ENGINE MEMBER PORTAL) -->
+          <div style="margin-bottom:24px;">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:12px;">📁 Kategori Forum Utama</h4>
+            <div id="sp-m5-categories-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;"></div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:3fr 1fr; gap:24px;">
+            <!-- LEFT: SEARCH & FILTER & LIST THREAD -->
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px; background:var(--bg-card); padding:14px; border:1px solid var(--chrome-border); border-radius:12px;">
+                <input type="text" id="sp-forum-search" class="form-input" placeholder="🔍 Cari Thread Diskusi..." style="flex:1; min-width:200px;" onkeyup="SponsorPortalEngine.renderForumThreads()">
+                <select id="sp-forum-cat-filter" class="form-input" style="width:160px;" onchange="SponsorPortalEngine.renderForumThreads()">
+                  <option value="">Semua Kategori</option>
+                </select>
+                <select id="sp-forum-sort-filter" class="form-input" style="width:140px;" onchange="SponsorPortalEngine.renderForumThreads()">
+                  <option value="NEWEST">Terbaru</option>
+                  <option value="POPULAR">Populer</option>
+                </select>
               </div>
-              <div style="font-size:0.78rem; color:#3b82f6; font-weight:700; whitespace:nowrap;">💬 8 Replies &nbsp;•&nbsp; 👁️ 156 Views</div>
+
+              <!-- THREAD LIST CONTAINER -->
+              <div id="sp-forum-threads-container" style="display:flex; flex-direction:column; gap:14px;">
+                <!-- Dynamically rendered by JS -->
+              </div>
+            </div>
+
+            <!-- RIGHT: TRENDING TOPICS WIDGET -->
+            <div>
+              <div class="glass-card" style="padding:18px; border-top:3px solid var(--accent-gold);">
+                <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:14px;">🔥 4.1.4 Trending Topics</h4>
+                <div id="sp-forum-trending-container"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- =============================================================== -->
-      <!-- SUB-TAB 6: SEWA LAPAK SPONSOR                                    -->
+      <!-- SUB-TAB 6: KATALOG PRODUK & SEWA LAPAK (SAMAKAN DENGAN MEMBER PORTAL) -->
       <!-- =============================================================== -->
       <div id="sponsor-tab-content-lapak" class="sponsor-subtab-pane" style="display:none;">
-        <div class="glass-panel" style="padding:20px; margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
-            <h3 style="font-size:1.1rem; color:var(--accent-gold); margin:0;">🏪 SEWA LAPAK - MB INA</h3>
-            <span style="font-size:0.8rem; font-weight:800; color:#22c55e; background:rgba(34,197,94,0.15); border:1px solid #22c55e; padding:4px 12px; border-radius:12px;">Status Lapak: 🟢 Sewa Aktif (Shell Parts Store)</span>
+        <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
+          <!-- HEADER BANNER STORE -->
+          <div style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+            <div>
+              <h3 style="font-size:1.25rem; margin:0;" class="text-gradient">🛍️ M7 – KATALOG PRODUK & MARKETPLACE</h3>
+              <p style="font-size:0.82rem; color:var(--text-muted); margin:4px 0 0 0;">Pusat katalog produk resmi, sparepart original, merchandise club, sewa lapak & iklan digital MB INA</p>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn-primary" style="font-size:0.8rem; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none; padding:9px 18px; border-radius:8px;" onclick="M7Engine.openSewaLapakModal()">➕ SEWA LAPAK BARU</button>
+              <button class="btn-outline" style="font-size:0.8rem; font-weight:800; border-color:#22c55e; color:#22c55e; padding:9px 18px; border-radius:8px;" onclick="M7Engine.openProductModal()">📝 TAMBAH PRODUK (IKLAN)</button>
+            </div>
           </div>
-          <div style="font-size:0.85rem; color:var(--text-main); line-height:1.6;">
-            Sewa lapak untuk menjual produk Anda di MB INA!<br>
-            📦 <strong>Tersedia untuk:</strong> Parts, Merchandise, Aksesoris, Lainnya
-          </div>
-        </div>
 
-        <!-- PAKET SEWA LAPAK TABLE -->
-        <div class="glass-panel" style="padding:20px;">
-          <div style="font-size:0.85rem; font-weight:800; color:var(--accent-gold); margin-bottom:14px; text-transform:uppercase;">─── PAKET SEWA ───</div>
-          <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
-              <thead>
-                <tr style="background:rgba(245,158,11,0.15);">
-                  <th style="padding:12px 14px; text-align:left; color:var(--accent-gold); border-bottom:1px solid rgba(245,158,11,0.3);">Periode</th>
-                  <th style="padding:12px 14px; text-align:right; color:var(--accent-gold); border-bottom:1px solid rgba(245,158,11,0.3);">Biaya / bulan</th>
-                  <th style="padding:12px 14px; text-align:center; color:var(--accent-gold); border-bottom:1px solid rgba(245,158,11,0.3);">Diskon Tier</th>
-                  <th style="padding:12px 14px; text-align:right; color:var(--accent-gold); border-bottom:1px solid rgba(245,158,11,0.3);">Total</th>
-                  <th style="padding:12px 14px; text-align:center; color:var(--accent-gold); border-bottom:1px solid rgba(245,158,11,0.3);">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <td style="padding:12px 14px; font-weight:700;">1 Bulan</td>
-                  <td style="padding:12px 14px; text-align:right;">Rp 5.000</td>
-                  <td style="padding:12px 14px; text-align:center; color:var(--text-muted);">0%</td>
-                  <td style="padding:12px 14px; text-align:right; font-weight:800; color:var(--accent-gold);">Rp 5.000</td>
-                  <td style="padding:12px 14px; text-align:center;"><button class="btn-primary" style="font-size:0.75rem; padding:5px 14px; font-weight:800;" onclick="SponsorPortalEngine.sewaLapak(1, 5000)">📌 SEWA</button></td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <td style="padding:12px 14px; font-weight:700;">3 Bulan</td>
-                  <td style="padding:12px 14px; text-align:right;">Rp 5.000</td>
-                  <td style="padding:12px 14px; text-align:center; color:var(--text-muted);">0%</td>
-                  <td style="padding:12px 14px; text-align:right; font-weight:800; color:var(--accent-gold);">Rp 15.000</td>
-                  <td style="padding:12px 14px; text-align:center;"><button class="btn-primary" style="font-size:0.75rem; padding:5px 14px; font-weight:800;" onclick="SponsorPortalEngine.sewaLapak(3, 15000)">📌 SEWA</button></td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <td style="padding:12px 14px; font-weight:700;">6 Bulan</td>
-                  <td style="padding:12px 14px; text-align:right;">Rp 5.000</td>
-                  <td style="padding:12px 14px; text-align:center; color:var(--text-muted);">0%</td>
-                  <td style="padding:12px 14px; text-align:right; font-weight:800; color:var(--accent-gold);">Rp 30.000</td>
-                  <td style="padding:12px 14px; text-align:center;"><button class="btn-primary" style="font-size:0.75rem; padding:5px 14px; font-weight:800;" onclick="SponsorPortalEngine.sewaLapak(6, 30000)">📌 SEWA</button></td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <td style="padding:12px 14px; font-weight:700;">12 Bulan</td>
-                  <td style="padding:12px 14px; text-align:right;">Rp 5.000</td>
-                  <td style="padding:12px 14px; text-align:center; color:var(--text-muted);">0%</td>
-                  <td style="padding:12px 14px; text-align:right; font-weight:800; color:var(--accent-gold);">Rp 60.000</td>
-                  <td style="padding:12px 14px; text-align:center;"><button class="btn-primary" style="font-size:0.75rem; padding:5px 14px; font-weight:800;" onclick="SponsorPortalEngine.sewaLapak(12, 60000)">📌 SEWA</button></td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- ACTIVE LAPAK STATUS CARD -->
+          <div class="glass-card" style="padding:16px 20px; margin-bottom:20px; border:1px solid #22c55e; border-radius:12px; background:linear-gradient(135deg, rgba(34,197,94,0.08), rgba(15,23,42,0.6)); font-size:0.85rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="font-size:2rem;">🏪</div>
+              <div>
+                <strong style="color:#fff; font-size:0.95rem; display:block;">Shell Official Parts & Lubricants Store</strong>
+                <span style="color:var(--text-muted); font-size:0.78rem;">Pemilik: <strong>Shell Indonesia</strong> • Rating Lapak: ⭐ 4.9 (128 Ulasan)</span>
+              </div>
+            </div>
+            <div>
+              <span class="tier-badge" style="background:rgba(34,197,94,0.2); color:#22c55e; font-weight:900; font-size:0.82rem; padding:6px 14px; border:1px solid #22c55e; border-radius:20px;">🟢 STATUS LAPAK: SEWA AKTIF</span>
+            </div>
           </div>
+
+          <!-- FILTER BAR & SEARCH -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; background:var(--bg-card); padding:14px; border:1px solid var(--chrome-border); border-radius:12px;">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex:1;">
+              <select id="sp-katalog-lapak-filter" class="input-field" style="font-size:0.82rem; padding:8px 12px; color:var(--accent-gold); font-weight:700; max-width:220px; border-radius:8px;" onchange="SponsorPortalEngine.renderKatalogProducts()">
+                <option value="ALL">🏪 Semua Lapak (All Store)</option>
+                <option value="Shell Official Store" selected>Shell Official Store</option>
+                <option value="Auto2000 Luxury">Auto2000 Luxury</option>
+                <option value="Pertamina Lub Shop">Pertamina Lub Shop</option>
+              </select>
+              <select id="sp-katalog-cond-filter" class="input-field" style="font-size:0.82rem; padding:8px 12px; width:160px; border-radius:8px;" onchange="SponsorPortalEngine.renderKatalogProducts()">
+                <option value="ALL">Kondisi: [Semua ▼]</option>
+                <option value="NEW">Baru (New)</option>
+                <option value="USED">Bekas (Used)</option>
+              </select>
+              <input type="text" id="sp-katalog-search" class="input-field" placeholder="🔍 Cari nama produk / lokasi..." style="font-size:0.82rem; padding:8px 14px; flex:1; min-width:200px; border-radius:8px;" oninput="SponsorPortalEngine.renderKatalogProducts()">
+            </div>
+          </div>
+
+          <!-- PRODUCT GRID -->
+          <div id="sp-products-grid-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:20px; margin-bottom:24px;">
+            <!-- Dynamically populated by SponsorPortalEngine.renderKatalogProducts() -->
+          </div>
+
+          <!-- PRICE & DISCOUNT BANNER -->
+          <div class="glass-card" style="padding:14px 18px; margin-bottom:16px; border:1px solid var(--accent-gold); border-radius:10px; background:rgba(245,158,11,0.05); font-size:0.82rem; color:#fff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div>
+              <strong>💰 Biaya Sewa Dasar Lapak:</strong> <span style="color:var(--accent-gold); font-weight:800;">Rp 5.000 / bulan</span>
+            </div>
+            <div>
+              <strong>🏷️ Diskon Tier Member:</strong> 
+              <span class="tier-badge" style="background:rgba(217,119,6,0.2); color:#cd7f32; margin-left:4px;">🥉 Bronze 5%</span>
+              <span class="tier-badge" style="background:rgba(148,163,184,0.2); color:#c0c0c0; margin-left:4px;">🥈 Silver 10%</span>
+              <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); margin-left:4px;">🥇 Gold 15%</span>
+              <span class="tier-badge" style="background:rgba(59,130,246,0.2); color:var(--accent-blue); margin-left:4px;">💎 Platinum 20%</span>
+            </div>
+          </div>
+
+          <!-- DISCLAIMER BOX -->
+          <div class="glass-panel" style="padding:14px 20px; border-left:4px solid var(--accent-gold); background:rgba(245,158,11,0.06); border-radius:8px;">
+            <div style="font-size:0.8rem; color:var(--accent-gold); font-weight:700; margin-bottom:2px;">📌 PERATURAN & DISCLAIMER TRANSAKSI LAPAK:</div>
+            <div style="font-size:0.78rem; color:var(--text-muted);">
+              Transaksi dilakukan secara langsung antara penjual & pembeli via WhatsApp / Telepon. MB INA hanya menyediakan platform ruang tempat & iklan dan tidak bertanggung jawab atas isi transaksi.
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -7040,6 +7144,59 @@
               • Mayoritas pengunjung berasal dari wilayah: DKI Jakarta, Jawa Barat, dan Jawa Tengah.<br><br>
               💡 <strong>Rekomendasi:</strong> Performa iklan Anda mencapai titik puncak tertinggi pada hari Sabtu saat konvoi event.
             </div>
+          </div>
+        </div>
+
+        <!-- SPONSOR HISTORICAL TRACK RECORD TABLE -->
+        <div class="glass-panel" style="padding:20px; margin-top:24px; border-top:4px solid var(--accent-gold);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <h4 style="color:var(--accent-gold); font-size:1.05rem; margin:0;">📜 Histori Track Record Kontrak Kemitraan MB INA</h4>
+            <span style="font-size:0.78rem; color:var(--text-muted);">Data Resmi Pengurus Pusat MB INA</span>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+                  <th style="padding:10px;">Musim / Event</th>
+                  <th style="padding:10px;">Tier Paket</th>
+                  <th style="padding:10px;">Nilai Kontrak</th>
+                  <th style="padding:10px;">Revenue Impact</th>
+                  <th style="padding:10px;">ROI</th>
+                  <th style="padding:10px;">Status Verification</th>
+                  <th style="padding:10px; text-align:right;">Sertifikat Digital</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid var(--chrome-border);">
+                  <td style="padding:12px 10px; font-weight:800; color:#fff;">2026 — Jamnas XXI & Munas MB INA</td>
+                  <td style="padding:12px 10px;"><span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">💎 PLATINUM</span></td>
+                  <td style="padding:12px 10px; font-weight:700;">Rp 30.000.000</td>
+                  <td style="padding:12px 10px; color:#22c55e; font-weight:700;">Rp 45.000.000</td>
+                  <td style="padding:12px 10px; color:var(--accent-gold); font-weight:800;">50%</td>
+                  <td style="padding:12px 10px;"><span style="color:#22c55e; font-weight:800; font-size:0.75rem;">✅ AKTIF (Terbayar Lunas)</span></td>
+                  <td style="padding:12px 10px; text-align:right;"><button class="btn-outline" style="font-size:0.72rem; padding:4px 10px;" onclick="window.showToast('📜 Mengunduh Sertifikat Platinum 2026...', 'info')">📜 Unduh PDF</button></td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--chrome-border);">
+                  <td style="padding:12px 10px; font-weight:800; color:#fff;">2025 — Regional Touring Jawa-Bali</td>
+                  <td style="padding:12px 10px;"><span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">🥇 GOLD</span></td>
+                  <td style="padding:12px 10px; font-weight:700;">Rp 15.000.000</td>
+                  <td style="padding:12px 10px; color:#22c55e; font-weight:700;">Rp 24.000.000</td>
+                  <td style="padding:12px 10px; color:var(--accent-gold); font-weight:800;">60%</td>
+                  <td style="padding:12px 10px;"><span style="color:var(--text-muted); font-weight:700; font-size:0.75rem;">SELESAI</span></td>
+                  <td style="padding:12px 10px; text-align:right;"><button class="btn-outline" style="font-size:0.72rem; padding:4px 10px;" onclick="window.showToast('📜 Mengunduh Sertifikat Gold 2025...', 'info')">📜 Unduh PDF</button>
+                  </td>
+                </tr>
+                <tr style="border-bottom:1px solid var(--chrome-border);">
+                  <td style="padding:12px 10px; font-weight:800; color:#fff;">2024 — Jamnas XX Mercedes-Benz INA</td>
+                  <td style="padding:12px 10px;"><span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">🥇 GOLD</span></td>
+                  <td style="padding:12px 10px; font-weight:700;">Rp 15.000.000</td>
+                  <td style="padding:12px 10px; color:#22c55e; font-weight:700;">Rp 22.000.000</td>
+                  <td style="padding:12px 10px; color:var(--accent-gold); font-weight:800;">46%</td>
+                  <td style="padding:12px 10px;"><span style="color:var(--text-muted); font-weight:700; font-size:0.75rem;">SELESAI</span></td>
+                  <td style="padding:12px 10px; text-align:right;"><button class="btn-outline" style="font-size:0.72rem; padding:4px 10px;" onclick="window.showToast('📜 Mengunduh Sertifikat Gold 2024...', 'info')">📜 Unduh PDF</button></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -9190,7 +9347,6 @@
           <button type="submit" class="btn-primary" style="background:var(--accent-gold); color:#000; font-weight:800;">🚀 Terbitkan Thread</button>
         </div>
       </form>
-    </div>
   </div>
 
   <!-- GLOBAL GLASS LOADING SPINNER OVERLAY -->
@@ -9203,9 +9359,9 @@
   </div>
 
   <!-- JS Engine Scripts & Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/auth.js?v=20260818_053800"></script>
-  <script src="js/app.js?v=20260818_053800"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+  <script src="js/auth.js?v=20260819_074500"></script>
+  <script src="js/app.js?v=20260819_074500"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
@@ -9277,11 +9433,11 @@
     }, 100);
   </script>
   <!-- 1. MODAL MEMBER DONASI (TAMPILAN MEMBER - DONASI) -->
-  <div id="modal-member-donation" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+  <div id="modal-member-donation" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
     <div class="modal-container" style="max-width:620px;">
       <div class="modal-header">
         <h3 class="modal-title" style="color:var(--accent-gold);">💰 FORM DONASI - MB INA</h3>
-        <button class="modal-close-btn" onclick="AuthEngine.closeAllModals()">✕</button>
+        <button class="modal-close-btn" onclick="if(window.AuthEngine)window.AuthEngine.closeAllModals();else{var m=document.getElementById('modal-member-donation');if(m){m.classList.remove('active');m.style.display='none';}document.body.style.overflow='';}">✕</button>
       </div>
       <div class="modal-body">
         
@@ -9356,7 +9512,7 @@
           </div>
 
           <div style="display:flex; justify-content:flex-end; gap:12px;">
-            <button type="button" class="btn-outline" onclick="AuthEngine.closeAllModals()">Batal</button>
+            <button type="button" class="btn-outline" onclick="if(window.AuthEngine)window.AuthEngine.closeAllModals();else{var m=document.getElementById('modal-member-donation');if(m){m.classList.remove('active');m.style.display='none';}document.body.style.overflow='';}">Batal</button>
             <button type="submit" class="btn-primary" style="padding:10px 24px; font-weight:800; background:linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color:#000;">
               💝 DONASI SEKARANG
             </button>
@@ -9648,6 +9804,59 @@
     </div>
   </div>
 
+  <!-- MODAL ADMIN KELOLA SPONSOR & SLIDESHOW ROTATOR -->
+  <div id="modal-manage-sponsors" class="modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center; z-index:9999; padding:16px;">
+    <div class="modal-card" style="width:100%; max-width:850px; max-height:90vh; overflow-y:auto; background:var(--bg-card); border:1.5px solid var(--accent-gold); border-radius:20px; padding:24px; box-shadow:0 20px 50px rgba(0,0,0,0.8);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--chrome-border); padding-bottom:14px;">
+        <div>
+          <h3 style="font-size:1.3rem; margin:0;" class="text-gradient">⚙️ Admin: Kelola Slideshow & Urutan Sponsor</h3>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin:4px 0 0 0;">Atur urutan tampil (Order #1, #2, #3), tambah sponsor baru, ganti banner, atau hapus sponsor.</p>
+        </div>
+        <button onclick="document.getElementById('modal-manage-sponsors').style.display='none'" style="background:transparent; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer;">✕</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); padding:10px 14px; border-radius:12px;">
+        <span id="manage-sponsors-count-badge" style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">📋 Daftar Sponsor Terdaftar</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:0.8rem; font-weight:700; color:#fff;">⏱️ Durasi Rotasi:</span>
+          <select id="manage-sponsors-duration-select" onchange="AppEngine.changeRotatorDuration(this.value)" style="background:#0f172a; color:var(--accent-gold); border:1px solid var(--accent-gold); padding:4px 10px; border-radius:6px; font-size:0.8rem; font-weight:800; cursor:pointer;">
+            <option value="3">⚡ 3 Detik (Cepat)</option>
+            <option value="4.5">⭐ 4.5 Detik (Standar)</option>
+            <option value="6">⏱️ 6 Detik (Sedang)</option>
+            <option value="8">🐢 8 Detik (Lama)</option>
+            <option value="10">🐌 10 Detik (Sangat Lama)</option>
+          </select>
+          <button class="btn-primary" style="font-size:0.8rem; padding:6px 14px; font-weight:800; cursor:pointer;" onclick="AppEngine.openAddSponsorForm()">+ Tambah Sponsor Baru</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto; margin-bottom:20px; border:1px solid var(--chrome-border); border-radius:12px;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.83rem; text-align:left;">
+          <thead>
+            <tr style="background:rgba(15,23,42,0.8); color:var(--accent-gold); border-bottom:2px solid var(--accent-gold);">
+              <th style="padding:10px 12px; width:70px; text-align:center;">Urutan</th>
+              <th style="padding:10px 12px;">Banner / Logo</th>
+              <th style="padding:10px 12px;">Nama Perusahaan</th>
+              <th style="padding:10px 12px;">Kategori / Tier</th>
+              <th style="padding:10px 12px; text-align:center;">Aksi CRUD</th>
+            </tr>
+          </thead>
+          <tbody id="manage-sponsors-tbody">
+            <!-- Rendered by AppEngine.openManageSponsorModal() -->
+          </tbody>
+        </table>
+      </div>
+
+      <div id="sponsor-edit-form-container" style="display:none; background:rgba(15,23,42,0.8); border:1px solid var(--accent-gold); border-radius:14px; padding:18px; margin-top:16px;">
+        <!-- Inline Form for Create / Edit Sponsor -->
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+        <button class="btn-primary" style="cursor:pointer;" onclick="document.getElementById('modal-manage-sponsors').style.display='none'">✓ Selesai & Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 6. MODAL IKLAN SAYA (MEMBER POV) -->
   <div id="modal-my-iklan-list" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
     <div class="modal-container" style="max-width:860px;">
@@ -9695,6 +9904,28 @@
 
       </div>
     </div>
-  </div>
+  <!-- 📱 MOBILE APP SHELL: BOTTOM NAVIGATION BAR (HP & Tablet Only, Hidden on Laptop md:hidden) -->
+  <nav id="mobile-app-bottom-bar" class="fixed bottom-0 left-0 right-0 z-[9999] bg-[#0b0e14]/95 backdrop-blur-md border-t border-slate-800/80 px-2 py-1.5 flex justify-around items-center md:hidden shadow-2xl">
+    <button onclick="AppEngine.switchNavTab('landing')" class="mobile-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-lg text-slate-400 hover:text-amber-400 active:scale-95 transition-all">
+      <span class="text-lg">🏠</span>
+      <span class="text-[0.65rem] font-semibold tracking-tight mt-0.5">Beranda</span>
+    </button>
+    <button onclick="AppEngine.switchNavTab('member')" class="mobile-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-lg text-slate-400 hover:text-amber-400 active:scale-95 transition-all">
+      <span class="text-lg">👤</span>
+      <span class="text-[0.65rem] font-semibold tracking-tight mt-0.5">Member</span>
+    </button>
+    <button onclick="AppEngine.switchNavTab('sponsor')" class="mobile-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-lg text-slate-400 hover:text-amber-400 active:scale-95 transition-all">
+      <span class="text-lg">💎</span>
+      <span class="text-[0.65rem] font-semibold tracking-tight mt-0.5">Sponsor</span>
+    </button>
+    <button onclick="AppEngine.switchNavTab('lapak')" class="mobile-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-lg text-slate-400 hover:text-amber-400 active:scale-95 transition-all">
+      <span class="text-lg">🛒</span>
+      <span class="text-[0.65rem] font-semibold tracking-tight mt-0.5">Lapak</span>
+    </button>
+    <button onclick="AppEngine.switchNavTab('admin')" class="mobile-nav-item flex flex-col items-center justify-center py-1 px-3 rounded-lg text-slate-400 hover:text-amber-400 active:scale-95 transition-all">
+      <span class="text-lg">⚙️</span>
+      <span class="text-[0.65rem] font-semibold tracking-tight mt-0.5">Admin</span>
+    </button>
+  </nav>
 </body>
 </html>

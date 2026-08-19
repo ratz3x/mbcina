@@ -89,7 +89,13 @@ body.light-mode select.form-input option {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--chrome-border);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* Performance Optimization: Skip layout & paint rendering for hidden views on mobile */
+.view-container:not(.active), .admin-tab-content:not(.active) {
+  content-visibility: auto;
+  contain-intrinsic-size: 400px;
 }
 
 .glass-card {
@@ -680,8 +686,10 @@ footer.app-footer {
 }
 
 .modal-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  visibility: visible !important;
 }
 
 .modal-container {
@@ -965,121 +973,6 @@ body:not(.light-mode) .form-input {
   }
 }
 
-/* ==========================================================================
-   📱 HIGH-END MOBILE RESPONSIVE MEDIA QUERIES (SMARTPHONE OPTIMIZATION)
-   ========================================================================== */
-
-@media (max-width: 768px) {
-  /* Header Adjustments */
-  .app-header {
-    padding: 10px 14px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .header-nav {
-    overflow-x: auto;
-    width: 100%;
-    padding-bottom: 4px;
-    scrollbar-width: none;
-  }
-  .header-nav::-webkit-scrollbar {
-    display: none;
-  }
-  .header-right {
-    gap: 8px;
-    margin-left: auto;
-  }
-  .brand-title {
-    font-size: 1.1rem;
-  }
-  .brand-subtitle {
-    font-size: 0.65rem;
-  }
-
-  /* Admin & Subtab Navigation Bar */
-  .admin-tab-bar, .subtab-bar-container {
-    padding: 4px;
-    gap: 6px;
-    margin-bottom: 16px;
-  }
-  .admin-tab-btn, .sub-tab-btn {
-    padding: 8px 12px;
-    font-size: 0.78rem;
-  }
-
-  /* Universal Layout Grids -> Collapse to 1 column */
-  div[style*="display: grid"],
-  div[style*="display:grid"] {
-    grid-template-columns: 1fr !important;
-    gap: 14px !important;
-  }
-
-  /* Card Paddings */
-  .glass-panel, .glass-card, .card-container {
-    padding: 14px !important;
-    border-radius: 12px !important;
-  }
-
-  /* Modal Dialogs */
-  .modal-backdrop {
-    padding: 10px !important;
-    align-items: flex-start !important;
-    overflow-y: auto !important;
-  }
-  .modal-backdrop > div, .modal-card {
-    width: 96% !important;
-    max-width: 100% !important;
-    margin: 10px auto !important;
-    padding: 16px !important;
-    max-height: 90vh !important;
-    overflow-y: auto !important;
-  }
-
-  /* Data Tables -> Horizontal Touch Scroll Container */
-  .data-table, table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Form Controls & Inputs */
-  .form-input, select.form-input, textarea.form-input {
-    font-size: 0.88rem !important;
-    padding: 10px 12px !important;
-  }
-
-  /* Pagination Bar */
-  .m3-pagination-bar {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 10px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    font-size: 13px;
-  }
-
-  .btn-primary, .btn-outline {
-    padding: 8px 12px !important;
-    font-size: 0.78rem !important;
-  }
-
-  .tier-badge {
-    font-size: 0.65rem !important;
-    padding: 2px 6px !important;
-  }
-
-  h1, .hero-title {
-    font-size: 1.4rem !important;
-  }
-  h2 { font-size: 1.2rem !important; }
-  h3 { font-size: 1.05rem !important; }
-  h4 { font-size: 0.95rem !important; }
-}
-
 /* ============================================================
    📺 YOUTUBE-STYLE APP LAYOUT SYSTEM (DISCIPLINED COLOR PALETTE)
    ============================================================ */
@@ -1229,8 +1122,123 @@ body.light-mode {
   margin-left: var(--sidebar-expanded-width);
 }
 
-/* Mobile Responsive Adjustments (< 768px) */
+/* ==========================================================================
+   📱 HIGH-END TABLET & SMARTPHONE RESPONSIVE LAYOUT ENGINE (100% OVERLAP-PROOF)
+   ========================================================================== */
+
+/* 1. TABLET RESPONSIVE ENGINE (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  header.app-header, .app-header {
+    height: 60px !important;
+    padding: 0 16px !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .brand-title {
+    font-size: 1.1rem !important;
+  }
+  .brand-subtitle {
+    font-size: 0.65rem !important;
+    letter-spacing: 1px !important;
+  }
+
+  .view-container {
+    padding: 16px !important;
+  }
+
+  div[style*="display: grid"],
+  div[style*="display:grid"] {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .modal-container {
+    width: 90vw !important;
+    max-width: 720px !important;
+  }
+}
+
+/* 2. MOBILE RESPONSIVE ENGINE (max-width: 768px) */
 @media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+
+  /* Rigid No-Wrap Mobile Header Bar */
+  header.app-header, .app-header {
+    height: 56px !important;
+    min-height: 56px !important;
+    max-height: 56px !important;
+    padding: 0 10px !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  }
+
+  .logo-container {
+    gap: 8px !important;
+  }
+
+  .logo-container img {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .brand-title {
+    font-size: 0.92rem !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+  }
+
+  .brand-subtitle {
+    display: none !important;
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .theme-toggle-btn {
+    padding: 4px 8px !important;
+    font-size: 0.72rem !important;
+    height: 32px !important;
+    white-space: nowrap !important;
+    border-radius: 8px !important;
+  }
+
+  #btn-login-nav, #btn-logout {
+    padding: 4px 10px !important;
+    font-size: 0.75rem !important;
+    height: 32px !important;
+    white-space: nowrap !important;
+    border-radius: 8px !important;
+  }
+
+  #nav-user-profile {
+    gap: 6px !important;
+  }
+
+  #nav-user-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.75rem !important;
+  }
+
+  #user-profile-dropdown {
+    top: 52px !important;
+    right: 8px !important;
+    width: 230px !important;
+  }
+
+  /* YT Sidebar Mobile Drawer */
   .yt-sidebar {
     transform: translateX(-100%);
     width: 240px !important;
@@ -1273,6 +1281,138 @@ body.light-mode {
   .yt-sidebar.mobile-open ~ .yt-sidebar-backdrop {
     display: block;
   }
+
+  body {
+    padding-bottom: 60px !important;
+  }
+
+  /* Universal Responsive Overrides for 100% Smartphone & Gadget Compatibility */
+  [style*="min-width"], [style*="min-height"] {
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  [style*="max-width:1440px"], [style*="max-width: 1440px"],
+  [style*="max-width:1200px"], [style*="max-width: 1200px"],
+  [style*="max-width:1000px"], [style*="max-width: 1000px"],
+  [style*="max-width:800px"], [style*="max-width: 800px"] {
+    max-width: 100% !important;
+  }
+
+  /* Universal Image, Video & SVG Scaling */
+  svg, img, video, canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Admin & Subtab Navigation Bar */
+  .admin-tab-bar, .subtab-bar-container {
+    padding: 4px;
+    gap: 6px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-tab-btn, .sub-tab-btn {
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .main-wrapper {
+    padding: 10px 6px !important;
+  }
+
+  .view-container {
+    padding: 10px 2px !important;
+  }
+
+  /* Universal Layout Grids -> Collapse to 1 column on mobile */
+  div[style*="display: grid"],
+  div[style*="display:grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Flex containers wrap naturally */
+  div[style*="display: flex"],
+  div[style*="display:flex"] {
+    flex-wrap: wrap;
+  }
+
+  /* Card Paddings */
+  .glass-panel, .glass-card, .card-container {
+    padding: 12px 10px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Modal Dialogs */
+  .modal-backdrop {
+    padding: 8px !important;
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+  }
+  .modal-backdrop > div, .modal-card, .modal-container {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 8px auto !important;
+    padding: 12px !important;
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+    border-radius: 14px !important;
+  }
+
+  /* Data Tables -> Horizontal Touch Scroll Container */
+  .data-table, table {
+    display: block;
+    width: 100% !important;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Form Controls & Inputs */
+  .form-input, select.form-input, textarea.form-input {
+    font-size: 0.85rem !important;
+    padding: 8px 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Pagination Bar */
+  .m3-pagination-bar {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+}
+
+/* 3. SMALL MOBILE RESPONSIVE ENGINE (max-width: 480px) */
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+  }
+
+  .btn-primary, .btn-outline {
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .tier-badge {
+    font-size: 0.62rem !important;
+    padding: 2px 5px !important;
+  }
+
+  h1, .hero-title {
+    font-size: 1.3rem !important;
+    line-height: 1.2 !important;
+  }
+  h2 { font-size: 1.15rem !important; }
+  h3 { font-size: 1.0rem !important; }
+  h4 { font-size: 0.9rem !important; }
 }
 
 
