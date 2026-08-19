@@ -967,7 +967,7 @@ try {
                     is_system_architect, is_protected, is_active,
                     password, created_at, updated_at
                 FROM users
-                WHERE email = :id OR username = :id OR member_id = :id
+                WHERE LOWER(email) = LOWER(:id) OR LOWER(username) = LOWER(:id) OR LOWER(member_id) = LOWER(:id)
                 LIMIT 1
             ");
             $stmt->execute([':id' => $identity]);
@@ -975,7 +975,7 @@ try {
 
             if (!$user) {
                 $idLower = strtolower($identity);
-                if (in_array($idLower, ['dtouriano@gmail.com', 'usr_superadmin', 'superadmin', 'admin', 'derist'])) {
+                if (in_array($idLower, ['dtouriano@gmail.com', 'usr_superadmin', 'superadmin', 'admin', 'derist', 'mbina-hq-2026-000001'])) {
                     $user = [
                         'id' => 'usr_superadmin',
                         'name' => 'Derist Touriano',
@@ -985,12 +985,24 @@ try {
                         'status' => 'ACTIVE',
                         'tier' => 'PLATINUM'
                     ];
-                } else if (in_array($idLower, ['sponsor', 'bni@sponsor.com', 'shell@sponsor.com', 'sponsor@shell.co.id', 'sponsor@mbina.or.id'])) {
+                } else if (in_array($idLower, ['sponsor', 'fdr@sponsor.com', 'sponsor@fdr.co.id', 'sponsor_fdr'])) {
+                    $user = [
+                        'id' => 'usr_sponsor_fdr',
+                        'name' => 'FDR Tyre Indonesia',
+                        'username' => 'sponsor_fdr',
+                        'email' => 'fdr@sponsor.com',
+                        'phone' => '021-7890123',
+                        'role' => 'SPONSOR',
+                        'status' => 'ACTIVE',
+                        'tier' => 'GOLD'
+                    ];
+                } else if (in_array($idLower, ['shell@sponsor.com', 'sponsor@shell.co.id', 'sponsor_shell'])) {
                     $user = [
                         'id' => 'usr_sponsor_shell',
-                        'name' => 'Shell Indonesia (Mitra Sponsor)',
+                        'name' => 'Shell Indonesia',
                         'username' => 'sponsor_shell',
-                        'email' => 'bni@sponsor.com',
+                        'email' => 'sponsor@shell.co.id',
+                        'phone' => '021-52901234',
                         'role' => 'SPONSOR',
                         'status' => 'ACTIVE',
                         'tier' => 'PLATINUM'
