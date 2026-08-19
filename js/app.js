@@ -15765,7 +15765,7 @@ const M6Engine = {
 
       if (profCompanyEl) profCompanyEl.value = prof.company;
       if (profPicEl) profPicEl.value = userObj.contact_person || prof.pic;
-      if (profEmailEl) profEmailEl.value = userEmail;
+      if (profEmailEl) profEmailEl.value = prof.email;
       if (profPhoneEl) profPhoneEl.value = userObj.contact_phone || prof.phone;
       if (profTierEl) profTierEl.value = prof.tier;
 
@@ -15815,7 +15815,15 @@ const M6Engine = {
     if (titleEl) titleEl.innerText = `Selamat Datang, ${comp}!`;
     if (badgeEl && tier) badgeEl.innerText = tier;
     if (lapakNameEl) lapakNameEl.innerText = `${comp} Official Store`;
-    if (forumMetaEl) forumMetaEl.innerText = `💬 12 replies • 👁️ 234 views • Diposting oleh ${comp}`;
+    if (forumMetaEl) forumMetaEl.innerText = `💬 18 replies • 👁️ 412 views • Diposting oleh ${comp}`;
+
+    // Close modal
+    if (window.AuthEngine && typeof window.AuthEngine.closeModal === 'function') {
+      window.AuthEngine.closeModal('modal-sponsor-profile');
+    } else {
+      const modal = document.getElementById('modal-sponsor-profile');
+      if (modal) modal.style.display = 'none';
+    }
 
     // Show toast or alert
     if (typeof window.showToast === 'function') {
@@ -21284,6 +21292,48 @@ window.SponsorPortalEngine = {
   currentTab: 'beranda',
 
   openEditProfileModal: function() {
+    const userObj = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const userEmail = (userObj.email || '').toLowerCase();
+    const companyName = (userObj.name || '').toLowerCase();
+
+    let defaultPic = 'Budi Santoso (PIC FDR)';
+    let defaultComp = 'FDR Tyre Indonesia';
+    let defaultEmail = 'fdr@sponsor.com';
+    let defaultPhone = '021-7890123';
+    let defaultTier = '🥇 MITRA SPONSOR GOLD';
+
+    if (userEmail.includes('shell') || companyName.includes('shell')) {
+      defaultComp = 'Shell Indonesia';
+      defaultPic = 'Ir. Denny K. (PIC Shell)';
+      defaultEmail = 'sponsor@shell.co.id';
+      defaultPhone = '021-52901234';
+      defaultTier = '💎 MITRA SPONSOR PLATINUM';
+    } else if (userEmail.includes('bni') || userEmail.includes('mandiri') || companyName.includes('mandiri')) {
+      defaultComp = 'Bank Mandiri';
+      defaultPic = 'Budi Santoso (PIC Bank)';
+      defaultEmail = 'mandiri@sponsor.com';
+      defaultPhone = '021-7890123';
+      defaultTier = '💎 MITRA SPONSOR PLATINUM';
+    }
+
+    const profCompanyEl = document.getElementById('spnd-prof-company');
+    const profPicEl = document.getElementById('spnd-prof-pic');
+    const profEmailEl = document.getElementById('spnd-prof-email');
+    const profPhoneEl = document.getElementById('spnd-prof-phone');
+    const profTierEl = document.getElementById('spnd-prof-tier');
+
+    if (profCompanyEl) profCompanyEl.value = userObj.name || defaultComp;
+    if (profPicEl) profPicEl.value = userObj.contact_person || defaultPic;
+    if (profEmailEl) {
+      if (userObj.email && (userObj.email.includes('fdr') || userObj.email.includes('shell') || userObj.email.includes('mandiri'))) {
+        profEmailEl.value = userObj.email;
+      } else {
+        profEmailEl.value = defaultEmail;
+      }
+    }
+    if (profPhoneEl) profPhoneEl.value = userObj.contact_phone || userObj.phone || defaultPhone;
+    if (profTierEl) profTierEl.value = defaultTier;
+
     if (window.AuthEngine && window.AuthEngine.openModal) {
       window.AuthEngine.openModal('modal-sponsor-profile');
     } else {
