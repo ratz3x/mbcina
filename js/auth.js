@@ -627,16 +627,27 @@ const AuthEngine = {
           ? AppEngine.getDefaultUserForRole('PRESIDEN') 
           : { id: 'usr_presiden', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', email: 'presiden@mbina.or.id', role: 'PRESIDEN' };
         loginMessage = 'Login Berhasil! Selamat Datang kembali, Dr. Rochady Hendra Setya Wibawa (Presiden MB INA).';
-      } else if (['sponsor', 'bni@sponsor.com', 'shell@sponsor.com', 'sponsor@shell.co.id', 'sponsor@mbina.or.id'].includes(idLower)) {
+      } else if (['sponsor', 'fdr@sponsor.com', 'sponsor@fdr.co.id', 'bni@sponsor.com', 'shell@sponsor.com', 'sponsor@shell.co.id', 'sponsor@mbina.or.id'].includes(idLower)) {
         loginSuccess = true;
-        loggedUser = {
+        const isShell = idLower.includes('shell');
+        loggedUser = isShell ? {
           id: 'usr_sponsor_shell',
-          name: 'Shell Indonesia (Mitra Sponsor)',
-          email: 'bni@sponsor.com',
+          name: 'Shell Indonesia',
+          email: 'sponsor@shell.co.id',
+          contact_person: 'Ir. Denny K. (PIC Shell)',
+          contact_phone: '021-52901234',
           role: 'SPONSOR',
           tier: 'PLATINUM'
+        } : {
+          id: 'usr_sponsor_fdr',
+          name: 'FDR Tyre Indonesia',
+          email: 'fdr@sponsor.com',
+          contact_person: 'Budi Santoso (PIC FDR)',
+          contact_phone: '021-7890123',
+          role: 'SPONSOR',
+          tier: 'GOLD'
         };
-        loginMessage = 'Login Berhasil! Selamat Datang kembali, Shell Indonesia (Portal Sponsor MB INA).';
+        loginMessage = `Login Berhasil! Selamat Datang kembali, ${loggedUser.name} (Portal Sponsor MB INA).`;
       }
     }
 

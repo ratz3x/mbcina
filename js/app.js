@@ -15704,8 +15704,8 @@ const M6Engine = {
 
       const eLower = userEmail.toLowerCase();
       const cLower = companyName.toLowerCase();
-      let matchedKey = 'shell';
-      if (eLower.includes('fdr') || cLower.includes('fdr')) matchedKey = 'fdr';
+      let matchedKey = 'fdr';
+      if (eLower.includes('shell') || cLower.includes('shell')) matchedKey = 'shell';
       else if (eLower.includes('bni') || eLower.includes('mandiri') || cLower.includes('mandiri')) matchedKey = 'mandiri';
 
       const prof = brandProfiles[matchedKey] || {
@@ -21328,15 +21328,9 @@ window.SponsorPortalEngine = {
     const profPhoneEl = document.getElementById('spnd-prof-phone');
     const profTierEl = document.getElementById('spnd-prof-tier');
 
-    if (profCompanyEl) profCompanyEl.value = userObj.name || defaultComp;
+    if (profCompanyEl) profCompanyEl.value = defaultComp;
     if (profPicEl) profPicEl.value = userObj.contact_person || defaultPic;
-    if (profEmailEl) {
-      if (userObj.email && (userObj.email.includes('fdr') || userObj.email.includes('shell') || userObj.email.includes('mandiri'))) {
-        profEmailEl.value = userObj.email;
-      } else {
-        profEmailEl.value = defaultEmail;
-      }
-    }
+    if (profEmailEl) profEmailEl.value = defaultEmail;
     if (profPhoneEl) profPhoneEl.value = userObj.contact_phone || userObj.phone || defaultPhone;
     if (profTierEl) profTierEl.value = defaultTier;
 
