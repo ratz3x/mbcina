@@ -385,11 +385,12 @@ const AppEngine = {
     if (dEmail) dEmail.value = u.email || '';
     if (dPhone) dPhone.value = u.phone || '';
     if (dCity) dCity.value = u.city || '';
-    if (dProvince) dProvince.value = u.province || '';
     const dVehicle = document.getElementById('dash-member-vehicle');
     const dPlate = document.getElementById('dash-member-plate');
-    if (dVehicle) dVehicle.value = u.vehicle_model || u.vehicle || '';
-    if (dPlate) dPlate.value = u.license_plate || u.plate || '';
+    const userVehicle = u.vehicle_model || u.vehicle || (liveUser && (liveUser.vehicle_model || liveUser.vehicle)) || 'W212 E300 AMG';
+    const userPlate = u.license_plate || u.plate || (liveUser && (liveUser.license_plate || liveUser.plate)) || 'BH 1979 ZK';
+    if (dVehicle) dVehicle.value = userVehicle;
+    if (dPlate) dPlate.value = userPlate;
     
     // Set Visual Tier Otomatis
     if (dTierTxt) dTierTxt.innerHTML = `${tierCalc.icon} ${tierCalc.tier} MEMBER`;

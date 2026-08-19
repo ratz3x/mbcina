@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_141800">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_142600">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -1124,14 +1124,14 @@
             </div>
 
             <!-- ROW 6: MODEL KENDARAAN & PLAT NOMOR -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; background:rgba(245,158,11,0.05); padding:10px; border-radius:12px; border:1px solid rgba(245,158,11,0.2);">
               <div>
-                <label class="form-label" style="font-size:0.78rem; font-weight:700; color:var(--text-muted); margin-bottom:4px;">Model Kendaraan</label>
-                <input type="text" id="dash-member-vehicle" class="form-input" placeholder="contoh: W124 300E / W211 / C200" style="font-size:0.82rem; padding:8px 12px; background:rgba(0,0,0,0.4);">
+                <label class="form-label" style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); margin-bottom:4px; display:flex; align-items:center; gap:6px;">🚘 Model Kendaraan</label>
+                <input type="text" id="dash-member-vehicle" class="form-input" placeholder="contoh: W124 300E / W212 / C200" style="font-size:0.85rem; font-weight:600; padding:8px 12px; background:rgba(0,0,0,0.5); border-color:rgba(245,158,11,0.4);" value="W212 E300 AMG">
               </div>
               <div>
-                <label class="form-label" style="font-size:0.78rem; font-weight:700; color:var(--text-muted); margin-bottom:4px;">Plat Nomor</label>
-                <input type="text" id="dash-member-plate" class="form-input" placeholder="contoh: B 1234 MB / BH 1979 ZK" style="font-size:0.82rem; padding:8px 12px; background:rgba(0,0,0,0.4); font-family:monospace; text-transform:uppercase;">
+                <label class="form-label" style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); margin-bottom:4px; display:flex; align-items:center; gap:6px;">🔢 Plat Nomor Polisi</label>
+                <input type="text" id="dash-member-plate" class="form-input" placeholder="contoh: B 1234 MB / BH 1979 ZK" style="font-size:0.85rem; font-weight:800; padding:8px 12px; background:rgba(0,0,0,0.5); border-color:rgba(245,158,11,0.4); font-family:monospace; text-transform:uppercase; color:var(--accent-gold);" value="BH 1979 ZK">
               </div>
             </div>
 
@@ -9339,8 +9339,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_141800"></script>
-  <script src="js/app.js?v=20260819_141800"></script>
+  <script src="js/auth.js?v=20260819_142600"></script>
+  <script src="js/app.js?v=20260819_142600"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
