@@ -21162,33 +21162,51 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 window.SponsorPortalEngine = {
   currentTab: 'beranda',
 
-  switchTab: function(tabName) {
-    this.currentTab = tabName;
-
-    const panes = document.querySelectorAll('.sponsor-subtab-pane');
-    panes.forEach(p => p.style.display = 'none');
-
-    const btns = document.querySelectorAll('.sponsor-tab-btn');
-    btns.forEach(b => {
-      b.classList.remove('btn-primary');
-      b.classList.add('btn-outline');
-      b.style.fontWeight = 'normal';
-    });
-
-    const targetPane = document.getElementById('sponsor-tab-content-' + tabName);
-    if (targetPane) targetPane.style.display = 'block';
-
-    const targetBtn = document.getElementById('sponsor-tab-btn-' + tabName);
-    if (targetBtn) {
-      targetBtn.classList.remove('btn-outline');
-      targetBtn.classList.add('btn-primary');
-      targetBtn.style.fontWeight = '800';
+  openEditProfileModal: function() {
+    if (window.AuthEngine && window.AuthEngine.openModal) {
+      window.AuthEngine.openModal('modal-sponsor-profile');
+    } else {
+      const m = document.getElementById('modal-sponsor-profile');
+      if (m) m.style.display = 'flex';
     }
+  },
 
-    if (tabName === 'forum') {
-      this.renderForumThreads();
+  openEndorseModal: function() {
+    if (window.AuthEngine && window.AuthEngine.openModal) {
+      window.AuthEngine.openModal('modal-sponsor-endorse');
+    } else {
+      const m = document.getElementById('modal-sponsor-endorse');
+      if (m) m.style.display = 'flex';
+    }
+  },
+
+  openIklanModal: function() {
+    if (window.AuthEngine && window.AuthEngine.openModal) {
+      window.AuthEngine.openModal('modal-sponsor-iklan');
+    } else {
+      const m = document.getElementById('modal-sponsor-iklan');
+      if (m) m.style.display = 'flex';
+    }
+  },
+
+  scrollToAnalytics: function() {
+    const el = document.getElementById('sponsor-analytics-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  },
+
+  switchTab: function(tabName) {
+    if (tabName === 'profil') {
+      this.openEditProfileModal();
+    } else if (tabName === 'endorse') {
+      this.openEndorseModal();
+    } else if (tabName === 'iklan') {
+      this.openIklanModal();
+    } else if (tabName === 'laporan') {
+      this.scrollToAnalytics();
+    } else if (tabName === 'forum') {
+      if (window.AppEngine) window.AppEngine.switchNav('nav-forum', document.getElementById('nav-forum'));
     } else if (tabName === 'lapak') {
-      this.renderKatalogProducts();
+      if (window.AppEngine) window.AppEngine.switchNav('nav-marketplace', document.getElementById('nav-marketplace'));
     }
   },
 

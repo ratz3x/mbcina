@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_122800">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_123500">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -6638,616 +6638,225 @@
     <!-- ================================================================= -->
     <div id="view-sponsor-dashboard" class="view-container" style="max-width:1440px; margin:0 auto; padding:24px; display:none;">
       
-      <!-- TOP HEADER BANNER SPONSOR -->
-      <div class="glass-panel" style="padding:20px 24px; margin-bottom:20px; background:linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.95) 100%); border-left:6px solid var(--accent-gold); border-radius:16px;">
+      <!-- 1. TOP HEADER BANNER SPONSOR -->
+      <div class="glass-panel" style="padding:22px 26px; margin-bottom:24px; background:linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(30,41,59,0.95) 100%); border-left:6px solid var(--accent-gold); border-radius:18px; box-shadow:0 12px 36px rgba(0,0,0,0.4);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
           <div>
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-              <span style="font-size:1.1rem; font-weight:800; color:var(--accent-gold);">🤝 PORTAL SPONSOR MB INA</span>
-              <span id="sponsor-portal-badge-tier" class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; font-size:0.75rem; padding:2px 10px;">💎 MITRA SPONSOR PLATINUM</span>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+              <span style="font-size:1.15rem; font-weight:800; color:var(--accent-gold);">🤝 PORTAL SPONSOR & MITRA RESMI MB INA</span>
+              <span id="sponsor-portal-badge-tier" class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; font-size:0.78rem; padding:3px 12px;">💎 MITRA SPONSOR PLATINUM</span>
             </div>
-            <h2 id="sponsor-dash-welcome-title" style="font-size:1.6rem; margin:0;" class="text-gradient">Selamat Datang, Shell Indonesia!</h2>
+            <h2 id="sponsor-dash-welcome-title" style="font-size:1.75rem; margin:0; font-weight:800;" class="text-gradient">Selamat Datang, Shell Indonesia!</h2>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin:4px 0 0 0;">Executive Brand Center & Manajemen Layanan Kemitraan Komunitas Mercedes-Benz Club Indonesia</p>
           </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <button class="btn-outline" style="font-size:0.9rem; padding:8px 12px; border-radius:10px;" title="Notifikasi" onclick="SponsorPortalEngine.showNotifications()">🔔 <span style="background:#ef4444; color:#fff; font-size:0.68rem; padding:1px 6px; border-radius:10px; font-weight:800;">3</span></button>
-            <button class="btn-outline" style="font-size:0.85rem; padding:8px 14px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('profil')">👤 Profil</button>
-            <button class="btn-outline" style="font-size:0.85rem; padding:8px 14px; border-radius:10px; color:#ef4444; border-color:rgba(239,68,68,0.4);" onclick="AuthEngine.logout()">🚪 Keluar</button>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <button class="btn-outline" style="font-size:0.85rem; padding:8px 14px; border-radius:10px;" title="Notifikasi Sponsor" onclick="SponsorPortalEngine.showNotifications()">🔔 <span style="background:#ef4444; color:#fff; font-size:0.68rem; padding:1px 6px; border-radius:10px; font-weight:800;">3</span> Notifikasi</button>
+            <button class="btn-outline" style="font-size:0.85rem; padding:8px 16px; border-radius:10px; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:700;" onclick="SponsorPortalEngine.openEditProfileModal()">👤 Profil Perusahaan</button>
+            <button class="btn-outline" style="font-size:0.85rem; padding:8px 16px; border-radius:10px; color:#ef4444; border-color:rgba(239,68,68,0.4);" onclick="AuthEngine.logout()">🚪 Keluar</button>
           </div>
         </div>
       </div>
 
-      <!-- HORIZONTAL NAVIGATION TABS PORTAL SPONSOR -->
-      <div style="display:flex; gap:8px; margin-bottom:24px; overflow-x:auto; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.08);">
-        <button id="sponsor-tab-btn-beranda" class="btn-primary sponsor-tab-btn" style="font-weight:800; font-size:0.85rem; padding:10px 18px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('beranda')">🏠 Beranda</button>
-        <button id="sponsor-tab-btn-profil" class="btn-outline sponsor-tab-btn" style="font-size:0.85rem; padding:10px 18px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('profil')">👤 Profil</button>
-        <button id="sponsor-tab-btn-endorse" class="btn-outline sponsor-tab-btn" style="font-size:0.85rem; padding:10px 18px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('endorse')">📦 Pesan Endorse</button>
-        <button id="sponsor-tab-btn-iklan" class="btn-outline sponsor-tab-btn" style="font-size:0.85rem; padding:10px 18px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('iklan')">📢 Pesan Iklan</button>
-        <button id="sponsor-tab-btn-forum" class="btn-outline sponsor-tab-btn" style="font-size:0.85rem; padding:10px 18px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('forum')">💬 Forum</button>
-        <button id="sponsor-tab-btn-lapak" class="btn-outline sponsor-tab-btn" style="font-size:0.85rem; padding:10px 18px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('lapak')">🏪 Sewa Lapak</button>
-        <button id="sponsor-tab-btn-laporan" class="btn-outline sponsor-tab-btn" style="font-size:0.85rem; padding:10px 18px; border-radius:10px;" onclick="SponsorPortalEngine.switchTab('laporan')">📊 Laporan</button>
-      </div>
-
-      <!-- UNIVERSAL TOTAL INVESTASI & ROI SPONSOR CARD (PERMANENT HEADER) -->
-      <div class="glass-panel" style="padding:16px 20px; border-top:4px solid var(--accent-gold); margin-bottom:24px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-          <h4 style="font-size:1.05rem; margin:0; color:var(--accent-gold); display:flex; align-items:center; gap:8px;">
-            📊 TOTAL INVESTASI & ROI SPONSOR <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Track Record Historis MB INA)</span>
+      <!-- 2. TOTAL INVESTASI & METRIK ROI EKSEKUTIF (FINANSIAL CARD) -->
+      <div class="glass-panel" style="padding:20px 24px; border-top:4px solid var(--accent-gold); margin-bottom:24px; border-radius:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+          <h4 style="font-size:1.1rem; margin:0; color:var(--accent-gold); display:flex; align-items:center; gap:8px;">
+            📊 RINGKASAN INVESTASI & ROI SPONSOR <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">(Track Record Finansial & Dampak Kemitraan)</span>
           </h4>
-          <span style="font-size:0.75rem; font-weight:800; color:#22c55e; background:rgba(34,197,94,0.15); padding:2px 10px; border-radius:10px; border:1px solid #22c55e;">✅ Terverifikasi Bendahara Pusat</span>
+          <span style="font-size:0.75rem; font-weight:800; color:#22c55e; background:rgba(34,197,94,0.15); padding:3px 12px; border-radius:12px; border:1px solid #22c55e;">✅ Terverifikasi Bendahara Pusat</span>
         </div>
-        <div class="glass-card" style="padding:14px 20px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:12px; display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div class="glass-card" style="padding:18px 24px; background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.25); border-radius:14px; display:flex; justify-content:space-around; align-items:center; flex-wrap:wrap; gap:16px;">
           <div style="text-align:center;">
-            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Total Investasi</div>
-            <div id="spnd-card-invest-amount" style="font-size:1.3rem; font-weight:900; color:#fff; margin-top:2px;">Rp 30.000.000</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Total Investasi Aktif</div>
+            <div id="spnd-card-invest-amount" style="font-size:1.4rem; font-weight:900; color:#fff; margin-top:3px;">Rp 30.000.000</div>
           </div>
-          <div style="height:35px; width:1px; background:rgba(255,255,255,0.15);"></div>
+          <div style="height:40px; width:1px; background:rgba(255,255,255,0.15);"></div>
           <div style="text-align:center;">
-            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Total Revenue</div>
-            <div id="spnd-card-revenue-amount" style="font-size:1.3rem; font-weight:900; color:#22c55e; margin-top:2px;">Rp 45.000.000</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Estimasi Dampak Revenue</div>
+            <div id="spnd-card-revenue-amount" style="font-size:1.4rem; font-weight:900; color:#22c55e; margin-top:3px;">Rp 45.000.000</div>
           </div>
-          <div style="height:35px; width:1px; background:rgba(255,255,255,0.15);"></div>
+          <div style="height:40px; width:1px; background:rgba(255,255,255,0.15);"></div>
           <div style="text-align:center;">
-            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">ROI Sponsor</div>
-            <div id="spnd-card-roi-percent" style="font-size:1.4rem; font-weight:900; color:var(--accent-gold); margin-top:2px;">50%</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Return on Investment (ROI)</div>
+            <div id="spnd-card-roi-percent" style="font-size:1.5rem; font-weight:900; color:var(--accent-gold); margin-top:3px;">50%</div>
           </div>
         </div>
       </div>
 
-      <!-- =============================================================== -->
-      <!-- SUB-TAB 1: BERANDA (FULL DASHBOARD SPONSOR)                     -->
-      <!-- =============================================================== -->
-      <div id="sponsor-tab-content-beranda" class="sponsor-subtab-pane">
-        
-        <!-- RINGKASAN AKTIVITAS STAT CARDS -->
-        <div style="margin-bottom:24px;">
-          <div style="font-size:0.82rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:12px; text-transform:uppercase;">─── 📊 RINGKASAN AKTIVITAS ───</div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
-            <div class="glass-panel" style="padding:18px; border-left:4px solid var(--accent-gold);">
-              <div style="font-size:1.8rem; font-weight:900; color:var(--accent-gold);">📦 2</div>
-              <div style="font-size:0.85rem; font-weight:800; color:#fff; margin-top:2px;">Endorse Aktif</div>
-            </div>
-            <div class="glass-panel" style="padding:18px; border-left:4px solid #3b82f6;">
-              <div style="font-size:1.8rem; font-weight:900; color:#3b82f6;">📢 1</div>
-              <div style="font-size:0.85rem; font-weight:800; color:#fff; margin-top:2px;">Iklan Aktif</div>
-            </div>
-            <div class="glass-panel" style="padding:18px; border-left:4px solid #22c55e;">
-              <div style="font-size:1.8rem; font-weight:900; color:#22c55e;">💬 5</div>
-              <div style="font-size:0.85rem; font-weight:800; color:#fff; margin-top:2px;">Posting Forum</div>
-            </div>
-            <div class="glass-panel" style="padding:18px; border-left:4px solid #a855f7;">
-              <div style="font-size:1.8rem; font-weight:900; color:#a855f7;">🏪 1</div>
-              <div style="font-size:0.85rem; font-weight:800; color:#fff; margin-top:2px;">Lapak Aktif</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GRID ROW 1: ENDORSE SAYA & IKLAN SAYA -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(400px, 1fr)); gap:20px; margin-bottom:24px;">
+      <!-- 3. RINGKASAN 4 LAYANAN AKTIF (GRID 2x2 ELEGAN) -->
+      <div style="margin-bottom:24px;">
+        <div style="font-size:0.85rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:14px; text-transform:uppercase;">─── 📦 STATUS 4 LAYANAN KEMITRAAN AKTIF ───</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:18px;">
           
-          <!-- CARD ENDORSE SAYA -->
-          <div class="glass-panel" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-              <h4 style="font-size:1.05rem; margin:0; color:var(--accent-gold);">📦 ENDORSE SAYA</h4>
-              <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px;" onclick="SponsorPortalEngine.switchTab('endorse')">+ Pesan Baru</button>
-            </div>
-            <div class="glass-card" style="padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span style="font-size:0.9rem; font-weight:800; color:#fff;">Paket: <strong id="spnd-card-endorse-tier" style="color:var(--accent-gold);">PLATINUM</strong></span>
+          <!-- CARD 1: ENDORSE SAYA -->
+          <div class="glass-panel" style="padding:20px; border-left:4px solid var(--accent-gold); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-size:1.05rem; margin:0; color:var(--accent-gold); font-weight:800;">📦 ENDORSE SAYA</h4>
                 <span style="font-size:0.75rem; font-weight:800; color:#22c55e; background:rgba(34,197,94,0.15); border:1px solid #22c55e; padding:3px 10px; border-radius:12px;">✅ AKTIF</span>
               </div>
-              <div id="spnd-card-endorse-desc" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;">10 Forum Posts • 5 Sosmed Posts • Banner Header • Mention Event</div>
-              <button class="btn-primary" style="font-size:0.78rem; padding:6px 14px; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.switchTab('laporan')">📊 Lihat Laporan</button>
+              <div style="margin-bottom:10px;">
+                <span style="font-size:0.92rem; font-weight:800; color:#fff;">Paket: <strong id="spnd-card-endorse-tier" style="color:var(--accent-gold);">PLATINUM</strong></span>
+              </div>
+              <p id="spnd-card-endorse-desc" style="font-size:0.78rem; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">10 Forum Posts • 5 Sosmed Posts • Banner Header • Mention Event</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="SponsorPortalEngine.openEndorseModal()">➕ Pesan Baru</button>
+              <button class="btn-primary" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="SponsorPortalEngine.scrollToAnalytics()">📊 Lihat Laporan</button>
             </div>
           </div>
 
-          <!-- CARD IKLAN SAYA -->
-          <div class="glass-panel" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-              <h4 style="font-size:1.05rem; margin:0; color:#3b82f6;">📢 IKLAN SAYA</h4>
-              <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px;" onclick="SponsorPortalEngine.switchTab('iklan')">+ Pesan Baru</button>
-            </div>
-            <div class="glass-card" style="padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span id="spnd-card-iklan-title" style="font-size:0.9rem; font-weight:800; color:#fff;">Banner Promosi Q3 2026</span>
+          <!-- CARD 2: IKLAN SAYA -->
+          <div class="glass-panel" style="padding:20px; border-left:4px solid #3b82f6; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-size:1.05rem; margin:0; color:#3b82f6; font-weight:800;">📢 IKLAN DIGITAL SAYA</h4>
                 <span style="font-size:0.75rem; font-weight:800; color:#22c55e; background:rgba(34,197,94,0.15); border:1px solid #22c55e; padding:3px 10px; border-radius:12px;">🟢 AKTIF</span>
               </div>
-              <div id="spnd-card-iklan-desc" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;">Periode: 15/08/2026 - 15/09/2026 • Posisi: Header Banner</div>
-              <button class="btn-primary" style="font-size:0.78rem; padding:6px 14px; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.switchTab('laporan')">📊 Lihat Laporan</button>
+              <div style="margin-bottom:8px;">
+                <span id="spnd-card-iklan-title" style="font-size:0.92rem; font-weight:800; color:#fff;">Banner Promosi Q3 2026</span>
+              </div>
+              <p id="spnd-card-iklan-desc" style="font-size:0.78rem; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">Periode: 15/08/2026 - 15/09/2026 • Posisi: Header Banner</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="SponsorPortalEngine.openIklanModal()">➕ Pesan Iklan</button>
+              <button class="btn-primary" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="SponsorPortalEngine.scrollToAnalytics()">📊 Lihat Laporan</button>
             </div>
           </div>
 
-        </div>
-
-        <!-- GRID ROW 2: FORUM SAYA & LAPAK SAYA -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(400px, 1fr)); gap:20px; margin-bottom:24px;">
-          
-          <!-- CARD FORUM SAYA -->
-          <div class="glass-panel" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-              <h4 style="font-size:1.05rem; margin:0; color:#22c55e;">💬 FORUM SAYA</h4>
-              <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px;" onclick="SponsorPortalEngine.openNewThreadModal()">+ Thread Baru</button>
+          <!-- CARD 3: FORUM SAYA -->
+          <div class="glass-panel" style="padding:20px; border-left:4px solid #22c55e; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-size:1.05rem; margin:0; color:#22c55e; font-weight:800;">💬 FORUM DISKUSI BRAND</h4>
+                <span style="font-size:0.75rem; font-weight:800; color:#22c55e; background:rgba(34,197,94,0.15); border:1px solid #22c55e; padding:3px 10px; border-radius:12px;">🟢 AKTIF</span>
+              </div>
+              <div style="margin-bottom:8px;">
+                <strong id="spnd-card-forum-title" style="font-size:0.88rem; color:#fff; display:block; line-height:1.4;">Thread: Tips Perawatan Otomotif Premium</strong>
+              </div>
+              <p id="spnd-card-forum-meta" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px;">💬 12 replies &nbsp;•&nbsp; 👁️ 234 views &nbsp;•&nbsp; Diposting 2 jam lalu</p>
             </div>
-            <div class="glass-card" style="padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
-              <div id="spnd-card-forum-title" style="font-size:0.88rem; font-weight:800; color:#fff; margin-bottom:6px;">Thread: Tips Perawatan Otomotif Premium</div>
-              <div id="spnd-card-forum-meta" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;">💬 12 replies &nbsp;•&nbsp; 👁️ 234 views &nbsp;•&nbsp; Diposting 2 jam lalu</div>
-              <button class="btn-primary" style="font-size:0.78rem; padding:6px 14px; width:100%; border-radius:8px; background:linear-gradient(135deg,#10b981,#059669); color:#fff;" onclick="SponsorPortalEngine.openNewThreadModal()">📝 Tulis Thread Baru</button>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="AppEngine.switchNav('nav-forum', document.getElementById('nav-forum'))">🔍 Buka Forum</button>
+              <button class="btn-primary" style="font-size:0.75rem; padding:7px 12px; flex:1; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none;" onclick="SponsorPortalEngine.openNewThreadModal()">📝 Tulis Thread</button>
             </div>
           </div>
 
-          <!-- CARD LAPAK SAYA -->
-          <div class="glass-panel" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-              <h4 style="font-size:1.05rem; margin:0; color:#a855f7;">🏪 LAPAK SAYA</h4>
-              <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px;" onclick="SponsorPortalEngine.switchTab('lapak')">Kelola Lapak</button>
-            </div>
-            <div class="glass-card" style="padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span style="font-size:0.9rem; font-weight:800; color:#fff;">Nama: <strong id="spnd-card-lapak-name">Official Store</strong></span>
+          <!-- CARD 4: LAPAK SAYA -->
+          <div class="glass-panel" style="padding:20px; border-left:4px solid #a855f7; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-size:1.05rem; margin:0; color:#a855f7; font-weight:800;">🏪 LAPAK & MARKETPLACE</h4>
                 <span id="spnd-card-lapak-status" style="font-size:0.75rem; font-weight:800; color:#22c55e; background:rgba(34,197,94,0.15); border:1px solid #22c55e; padding:3px 10px; border-radius:12px;">🟢 AKTIF</span>
               </div>
-              <div id="spnd-card-lapak-cat" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;">Kategori: Otomotif & Aksesoris Premium</div>
-              <div style="display:flex; gap:8px;">
-                <button class="btn-outline" style="font-size:0.75rem; padding:6px 12px; flex:1;" onclick="if(window.M7Engine && typeof window.M7Engine.openMyIklanModal==='function'){window.M7Engine.openMyIklanModal();}else{SponsorPortalEngine.switchTab('lapak');}">📦 Kelola Produk</button>
-                <button class="btn-primary" style="font-size:0.75rem; padding:6px 12px; flex:1;" onclick="SponsorPortalEngine.switchTab('laporan')">📊 Statistik</button>
+              <div style="margin-bottom:8px;">
+                <span style="font-size:0.92rem; font-weight:800; color:#fff;">Toko: <strong id="spnd-card-lapak-name">Shell Official Store</strong></span>
               </div>
+              <p id="spnd-card-lapak-cat" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px;">Kategori: Otomotif & Aksesoris Premium</p>
             </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- =============================================================== -->
-      <!-- SUB-TAB 2: PROFIL & NOTIFIKASI SPONSOR                           -->
-      <!-- =============================================================== -->
-      <div id="sponsor-tab-content-profil" class="sponsor-subtab-pane" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
-          <h3 style="font-size:1.15rem; color:var(--accent-gold); margin:0;">👤 PROFIL PERUSAHAAN & NOTIFIKASI SPONSOR</h3>
-          <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem; font-weight:700; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="SponsorPortalEngine.switchTab('beranda')">🏠 Dashboard Sponsor</button>
-        </div>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:24px;">
-          
-          <!-- LEFT PANEL: FORM PROFIL PERUSAHAAN -->
-          <div class="glass-panel" style="padding:24px; border-top:4px solid var(--accent-gold);">
-            <h3 style="font-size:1.1rem; color:var(--accent-gold); margin-top:0; margin-bottom:18px; display:flex; align-items:center; gap:8px;">👤 Data Profil Perusahaan</h3>
-            <form onsubmit="event.preventDefault(); window.saveSponsorProfile();">
-              <div style="margin-bottom:14px;">
-                <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">Nama Perusahaan / Brand</label>
-                <input id="spnd-prof-company" type="text" value="Shell Indonesia" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; font-weight:700; outline:none; box-sizing:border-box;">
-              </div>
-              <div style="margin-bottom:14px;">
-                <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">Nama Contact Person (PIC)</label>
-                <input id="spnd-prof-pic" type="text" value="Ir. Denny K. (PIC Shell)" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
-              </div>
-              <div style="margin-bottom:14px;">
-                <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">Email Resmi</label>
-                <input id="spnd-prof-email" type="email" value="sponsor@shell.co.id" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
-              </div>
-              <div style="margin-bottom:14px;">
-                <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">No. WhatsApp</label>
-                <input id="spnd-prof-phone" type="text" value="021-7890123" style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#ffffff; font-size:0.9rem; outline:none; box-sizing:border-box;">
-              </div>
-              <div style="margin-bottom:20px;">
-                <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted); display:block;">Tier Partnership</label>
-                <input id="spnd-prof-tier" type="text" value="💎 MITRA SPONSOR PLATINUM" readonly style="width:100%; padding:10px 14px; margin-top:6px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:10px; color:var(--accent-gold); font-size:0.9rem; font-weight:800; outline:none; box-sizing:border-box;">
-              </div>
-              <button type="button" class="btn-primary" style="padding:12px 20px; font-weight:800; width:100%; border-radius:10px; font-size:0.9rem; cursor:pointer;" onclick="window.saveSponsorProfile()">Simpan Perubahan Profil</button>
-            </form>
-          </div>
-
-          <!-- RIGHT PANEL: FEED NOTIFIKASI SPONSOR -->
-          <div class="glass-panel" style="padding:24px; border-top:4px solid #3b82f6;">
-            <h3 style="font-size:1.1rem; color:#3b82f6; margin-top:0; margin-bottom:18px; display:flex; align-items:center; gap:8px;">🔔 Feed Notifikasi Sponsor</h3>
-            <div id="spnd-feed-notif-container" style="display:flex; flex-direction:column; gap:14px;">
-              <div style="padding:14px 16px; background:rgba(34,197,94,0.08); border-left:4px solid #22c55e; border-radius:10px;">
-                <div style="font-size:0.85rem; font-weight:800; color:#22c55e;">✅ Pembayaran Kontrak Endorse Disetujui</div>
-                <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px; line-height:1.5;">Kontrak EC-2026-001 (Paket Platinum) telah terverifikasi lunas oleh Bendahara MB INA.</div>
-              </div>
-              <div style="padding:14px 16px; background:rgba(59,130,246,0.08); border-left:4px solid #3b82f6; border-radius:10px;">
-                <div id="spnd-feed-notif-iklan-title" style="font-size:0.85rem; font-weight:800; color:#3b82f6;">📢 Banner Shell Helix Ultra 0W-40 Aktif</div>
-                <div id="spnd-feed-notif-iklan-desc" style="font-size:0.78rem; color:var(--text-muted); margin-top:4px; line-height:1.5;">Banner tayang di Header Portal Member dan telah mencapai 12.450 tayangan.</div>
-              </div>
-              <div style="padding:14px 16px; background:rgba(245,158,11,0.08); border-left:4px solid #f59e0b; border-radius:10px;">
-                <div id="spnd-feed-notif-forum-title" style="font-size:0.85rem; font-weight:800; color:#f59e0b;">💬 12 Balasan Thread Forum Baru</div>
-                <div id="spnd-feed-notif-forum-desc" style="font-size:0.78rem; color:var(--text-muted); margin-top:4px; line-height:1.5;">Member MB INA memberikan respon pada artikel "Tips Perawatan Mesin W124 & W210 dengan Pelumas Sintetis".</div>
-              </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="if(window.M7Engine && typeof window.M7Engine.openMyIklanModal==='function'){window.M7Engine.openMyIklanModal();}else{AppEngine.switchNav('nav-marketplace', document.getElementById('nav-marketplace'));}">📦 Kelola Produk</button>
+              <button class="btn-primary" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="if(window.M7Engine && typeof window.M7Engine.openProductModal==='function'){window.M7Engine.openProductModal();}else{alert('Buka form produk');}">➕ Tambah Produk</button>
             </div>
           </div>
 
         </div>
       </div>
 
-      <!-- =============================================================== -->
-      <!-- SUB-TAB 3: PESAN ENDORSE                                         -->
-      <!-- =============================================================== -->
-      <div id="sponsor-tab-content-endorse" class="sponsor-subtab-pane" style="display:none;">
-        <div class="glass-panel" style="padding:16px 20px; margin-bottom:20px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div style="font-size:0.88rem; font-weight:700; color:#93c5fd;">💡 Pilih paket endorse yang sesuai dengan kebutuhan promosi brand Anda.</div>
-          <button class="btn-outline" style="padding:6px 14px; font-size:0.82rem; font-weight:700; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="SponsorPortalEngine.switchTab('beranda')">🏠 Dashboard Sponsor</button>
-        </div>
-
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px;">
-          <!-- BRONZE -->
-          <div class="glass-panel" style="padding:20px; border-top:4px solid #cd7f32; display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-              <div style="font-size:1.1rem; font-weight:900; color:#cd7f32;">🥉 BRONZE</div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:10px 0 14px 0;">Rp 2.5 JT <small style="font-size:0.75rem; color:var(--text-muted);">/ bulan</small></div>
-              <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:18px; margin:0 0 20px 0; line-height:1.8;">
-                <li>1 Artikel / Posting Forum</li>
-                <li>Laporan statistik bulanan</li>
-              </ul>
-            </div>
-            <button class="btn-primary" style="padding:10px; font-weight:800; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.pesanEndorse('BRONZE', 2500000)">📌 PESAN</button>
-          </div>
-
-          <!-- SILVER -->
-          <div class="glass-panel" style="padding:20px; border-top:4px solid #94a3b8; display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-              <div style="font-size:1.1rem; font-weight:900; color:#94a3b8;">🥈 SILVER</div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:10px 0 14px 0;">Rp 5 JT <small style="font-size:0.75rem; color:var(--text-muted);">/ bulan</small></div>
-              <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:18px; margin:0 0 20px 0; line-height:1.8;">
-                <li>3 Artikel Forum</li>
-                <li>1 Social Media Post</li>
-                <li>Laporan analitik mendalam</li>
-              </ul>
-            </div>
-            <button class="btn-primary" style="padding:10px; font-weight:800; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.pesanEndorse('SILVER', 5000000)">📌 PESAN</button>
-          </div>
-
-          <!-- GOLD -->
-          <div class="glass-panel" style="padding:20px; border-top:4px solid var(--accent-gold); display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-              <div style="font-size:1.1rem; font-weight:900; color:var(--accent-gold);">🥇 GOLD</div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:10px 0 14px 0;">Rp 10 JT <small style="font-size:0.75rem; color:var(--text-muted);">/ bulan</small></div>
-              <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:18px; margin:0 0 20px 0; line-height:1.8;">
-                <li>5 Artikel Forum</li>
-                <li>3 Social Media Post</li>
-                <li>Banner Header Tayang</li>
-                <li>Laporan performa mingguan</li>
-              </ul>
-            </div>
-            <button class="btn-primary" style="padding:10px; font-weight:800; width:100%; border-radius:8px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000;" onclick="SponsorPortalEngine.pesanEndorse('GOLD', 10000000)">📌 PESAN</button>
-          </div>
-
-          <!-- PLATINUM -->
-          <div class="glass-panel" style="padding:20px; border-top:4px solid #3b82f6; display:flex; flex-direction:column; justify-content:space-between; background:linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.98) 100%); position:relative; overflow:hidden;">
-            <div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <div style="font-size:1.1rem; font-weight:900; color:#3b82f6;">💎 PLATINUM</div>
-                <div id="spnd-pkg-platinum-badge" style="font-size:0.7rem; font-weight:800; padding:3px 8px; border-radius:12px; background:rgba(239,68,68,0.2); color:#fca5a5; border:1px solid rgba(239,68,68,0.4);">🔴 FULL (2/2)</div>
-              </div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:6px 0 6px 0;">Rp 20 JT <small style="font-size:0.75rem; color:var(--text-muted);">/ bulan</small></div>
-              <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:12px; display:flex; align-items:center; gap:4px;">
-                <span>⏳</span> Estimasi Bebas: <strong style="color:var(--accent-gold);">15 September 2026</strong>
-              </div>
-              <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:18px; margin:0 0 20px 0; line-height:1.8;">
-                <li>10 Artikel Forum</li>
-                <li>5 Social Media Post</li>
-                <li><strong style="color:#fff;">Premium Header Exposure & Priority Sponsor Rotation</strong></li>
-                <li>Mention Event Resmi MB INA</li>
-                <li>Official Platinum Partner Badge & Wall Priority</li>
-              </ul>
-            </div>
-            <button id="spnd-pkg-platinum-btn" class="btn-primary" style="padding:11px; font-weight:800; width:100%; border-radius:8px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; font-size:0.85rem;" onclick="SponsorPortalEngine.pesanEndorse('PLATINUM', 20000000, true)">📌 MASUK WAITLIST QUEUE #3</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- =============================================================== -->
-      <!-- SUB-TAB 4: PESAN IKLAN                                           -->
-      <!-- =============================================================== -->
-      <div id="sponsor-tab-content-iklan" class="sponsor-subtab-pane" style="display:none;">
-        <div class="glass-panel" style="padding:16px 20px; margin-bottom:20px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.3); border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-          <div style="font-size:0.88rem; font-weight:700; color:#86efac;">💡 Pilih paket iklan digital yang sesuai dengan target promosi Anda.</div>
-          <button class="btn-outline" style="padding:6px 14px; font-size:0.82rem; font-weight:700; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="SponsorPortalEngine.switchTab('beranda')">🏠 Dashboard Sponsor</button>
-        </div>
-
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px;">
-          <!-- BANNER -->
-          <div class="glass-panel" style="padding:20px; border-top:4px solid #3b82f6; display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-              <div style="font-size:1.1rem; font-weight:900; color:#3b82f6;">📢 BANNER</div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:10px 0 14px 0;">Rp 5 JT <small style="font-size:0.75rem; color:var(--text-muted);">/ bulan</small></div>
-              <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:18px; margin:0 0 20px 0; line-height:1.8;">
-                <li>Posisi Sidebar / Footer Banner</li>
-                <li>Durasi: 1 Bulan</li>
-                <li>Estimasi: 25.000 Impresi</li>
-              </ul>
-            </div>
-            <button class="btn-primary" style="padding:10px; font-weight:800; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.pesanIklan('BANNER', 5000000)">📌 PESAN</button>
-          </div>
-
-          <!-- SPONSORED -->
-          <div class="glass-panel" style="padding:20px; border-top:4px solid #22c55e; display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-              <div style="font-size:1.1rem; font-weight:900; color:#22c55e;">📄 SPONSORED</div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:10px 0 14px 0;">Rp 7.5 JT <small style="font-size:0.75rem; color:var(--text-muted);">/ bulan</small></div>
-              <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:18px; margin:0 0 20px 0; line-height:1.8;">
-                <li>Artikel Promosi Khusus Feed</li>
-                <li>Durasi: 1 Bulan</li>
-                <li>Interaksi direct link CTA</li>
-              </ul>
-            </div>
-            <button class="btn-primary" style="padding:10px; font-weight:800; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.pesanIklan('SPONSORED', 7500000)">📌 PESAN</button>
-          </div>
-
-          <!-- NATIVE -->
-          <div class="glass-panel" style="padding:20px; border-top:4px solid var(--accent-gold); display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-              <div style="font-size:1.1rem; font-weight:900; color:var(--accent-gold);">📰 NATIVE</div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:10px 0 14px 0;">Rp 10 JT <small style="font-size:0.75rem; color:var(--text-muted);">/ bulan</small></div>
-              <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:18px; margin:0 0 20px 0; line-height:1.8;">
-                <li>Integrasi Konten Native Feed</li>
-                <li>Durasi: 1 Bulan</li>
-                <li>Jangkauan member prioritas</li>
-              </ul>
-            </div>
-            <button class="btn-primary" style="padding:10px; font-weight:800; width:100%; border-radius:8px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000;" onclick="SponsorPortalEngine.pesanIklan('NATIVE', 10000000)">📌 PESAN</button>
-          </div>
-
-          <!-- PREMIUM -->
-          <div class="glass-panel" style="padding:20px; border-top:4px solid #a855f7; display:flex; flex-direction:column; justify-content:space-between;">
-            <div>
-              <div style="font-size:1.1rem; font-weight:900; color:#a855f7;">💎 PREMIUM</div>
-              <div style="font-size:1.4rem; font-weight:900; color:#fff; margin:10px 0 14px 0;">Rp 15 JT <small style="font-size:0.75rem; color:var(--text-muted);">/ bulan</small></div>
-              <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:18px; margin:0 0 20px 0; line-height:1.8;">
-                <li>All Access Header, Feed & App</li>
-                <li>Durasi: 1 Bulan</li>
-                <li>Garansi 50.000+ impresi</li>
-              </ul>
-            </div>
-            <button class="btn-primary" style="padding:10px; font-weight:800; width:100%; border-radius:8px; background:linear-gradient(135deg,#a855f7,#7e22ce); color:#fff;" onclick="SponsorPortalEngine.pesanIklan('PREMIUM', 15000000)">📌 PESAN</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- =============================================================== -->
-      <!-- SUB-TAB 5: FORUM DISKUSI SPONSOR (100% IDENTIK MEMBER PORTAL)     -->
-      <!-- =============================================================== -->
-      <div id="sponsor-tab-content-forum" class="sponsor-subtab-pane" style="display:none;">
-        <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-            <div>
-              <h3 style="font-size:1.3rem; margin:0;" class="text-gradient">💬 FORUM DISKUSI MB INA</h3>
-              <p style="font-size:0.85rem; color:var(--text-muted); margin:4px 0 0 0;">Pusat komunikasi, kolaborasi thread, broadcast pengumuman, dan sistem diskusi terstruktur MB INA</p>
-            </div>
-            <div style="display:flex; gap:10px;">
-              <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" onclick="SponsorPortalEngine.switchTab('beranda')">🏠 Dashboard Sponsor</button>
-              <button class="btn-primary" style="padding:8px 18px; font-size:0.85rem; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none; border-radius:8px;" onclick="SponsorPortalEngine.openNewThreadModal()">📝 + Buat Thread Baru</button>
-              <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem; color:var(--accent-red);" onclick="SponsorPortalEngine.switchTab('beranda')">❌ Tutup Forum</button>
-            </div>
-          </div>
-
-          <!-- DAFTAR KATEGORI GRID (DUPLIKAT PERSIS ENGINE MEMBER PORTAL) -->
-          <div style="margin-bottom:24px;">
-            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:12px;">📁 Kategori Forum Utama</h4>
-            <div id="sp-m5-categories-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;"></div>
-          </div>
-
-          <div style="display:grid; grid-template-columns:3fr 1fr; gap:24px;">
-            <!-- LEFT: SEARCH & FILTER & LIST THREAD -->
-            <div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px; background:var(--bg-card); padding:14px; border:1px solid var(--chrome-border); border-radius:12px;">
-                <input type="text" id="sp-forum-search" class="form-input" placeholder="🔍 Cari Thread Diskusi..." style="flex:1; min-width:200px;" onkeyup="SponsorPortalEngine.renderForumThreads()">
-                <select id="sp-forum-cat-filter" class="form-input" style="width:160px;" onchange="SponsorPortalEngine.renderForumThreads()">
-                  <option value="">Semua Kategori</option>
-                </select>
-                <select id="sp-forum-sort-filter" class="form-input" style="width:140px;" onchange="SponsorPortalEngine.renderForumThreads()">
-                  <option value="NEWEST">Terbaru</option>
-                  <option value="POPULAR">Populer</option>
-                </select>
-              </div>
-
-              <!-- THREAD LIST CONTAINER -->
-              <div id="sp-forum-threads-container" style="display:flex; flex-direction:column; gap:14px;">
-                <!-- Dynamically rendered by JS -->
-              </div>
-            </div>
-
-            <!-- RIGHT: TRENDING TOPICS WIDGET -->
-            <div>
-              <div class="glass-card" style="padding:18px; border-top:3px solid var(--accent-gold);">
-                <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:14px;">🔥 4.1.4 Trending Topics</h4>
-                <div id="sp-forum-trending-container"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- =============================================================== -->
-      <!-- SUB-TAB 6: KATALOG PRODUK & SEWA LAPAK (SAMAKAN DENGAN MEMBER PORTAL) -->
-      <!-- =============================================================== -->
-      <div id="sponsor-tab-content-lapak" class="sponsor-subtab-pane" style="display:none;">
-        <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
-          <!-- HEADER BANNER STORE -->
-          <div style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-            <div>
-              <h3 style="font-size:1.25rem; margin:0;" class="text-gradient">🛍️ M7 – KATALOG PRODUK & MARKETPLACE</h3>
-              <p style="font-size:0.82rem; color:var(--text-muted); margin:4px 0 0 0;">Pusat katalog produk resmi, sparepart original, merchandise club, sewa lapak & iklan digital MB INA</p>
-            </div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button class="btn-outline" style="font-size:0.8rem; font-weight:800; border-color:var(--accent-gold); color:var(--accent-gold); padding:9px 18px; border-radius:8px;" onclick="SponsorPortalEngine.switchTab('beranda')">🏠 Dashboard Sponsor</button>
-              <button class="btn-primary" style="font-size:0.8rem; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none; padding:9px 18px; border-radius:8px;" onclick="M7Engine.openSewaLapakModal()">➕ SEWA LAPAK BARU</button>
-              <button class="btn-outline" style="font-size:0.8rem; font-weight:800; border-color:#22c55e; color:#22c55e; padding:9px 18px; border-radius:8px;" onclick="M7Engine.openProductModal()">📝 TAMBAH PRODUK (IKLAN)</button>
-            </div>
-          </div>
-
-          <!-- ACTIVE LAPAK STATUS CARD -->
-          <div class="glass-card" style="padding:16px 20px; margin-bottom:20px; border:1px solid #22c55e; border-radius:12px; background:linear-gradient(135deg, rgba(34,197,94,0.08), rgba(15,23,42,0.6)); font-size:0.85rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="font-size:2rem;">🏪</div>
-              <div>
-                <strong style="color:#fff; font-size:0.95rem; display:block;">Shell Official Parts & Lubricants Store</strong>
-                <span style="color:var(--text-muted); font-size:0.78rem;">Pemilik: <strong>Shell Indonesia</strong> • Rating Lapak: ⭐ 4.9 (128 Ulasan)</span>
-              </div>
-            </div>
-            <div>
-              <span class="tier-badge" style="background:rgba(34,197,94,0.2); color:#22c55e; font-weight:900; font-size:0.82rem; padding:6px 14px; border:1px solid #22c55e; border-radius:20px;">🟢 STATUS LAPAK: SEWA AKTIF</span>
-            </div>
-          </div>
-
-          <!-- FILTER BAR & SEARCH -->
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; background:var(--bg-card); padding:14px; border:1px solid var(--chrome-border); border-radius:12px;">
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; flex:1;">
-              <select id="sp-katalog-lapak-filter" class="input-field" style="font-size:0.82rem; padding:8px 12px; color:var(--accent-gold); font-weight:700; max-width:220px; border-radius:8px;" onchange="SponsorPortalEngine.renderKatalogProducts()">
-                <option value="ALL">🏪 Semua Lapak (All Store)</option>
-                <option value="Shell Official Store" selected>Shell Official Store</option>
-                <option value="Auto2000 Luxury">Auto2000 Luxury</option>
-                <option value="Pertamina Lub Shop">Pertamina Lub Shop</option>
-              </select>
-              <select id="sp-katalog-cond-filter" class="input-field" style="font-size:0.82rem; padding:8px 12px; width:160px; border-radius:8px;" onchange="SponsorPortalEngine.renderKatalogProducts()">
-                <option value="ALL">Kondisi: [Semua ▼]</option>
-                <option value="NEW">Baru (New)</option>
-                <option value="USED">Bekas (Used)</option>
-              </select>
-              <input type="text" id="sp-katalog-search" class="input-field" placeholder="🔍 Cari nama produk / lokasi..." style="font-size:0.82rem; padding:8px 14px; flex:1; min-width:200px; border-radius:8px;" oninput="SponsorPortalEngine.renderKatalogProducts()">
-            </div>
-          </div>
-
-          <!-- PRODUCT GRID -->
-          <div id="sp-products-grid-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:20px; margin-bottom:24px;">
-            <!-- Dynamically populated by SponsorPortalEngine.renderKatalogProducts() -->
-          </div>
-
-          <!-- PRICE & DISCOUNT BANNER -->
-          <div class="glass-card" style="padding:14px 18px; margin-bottom:16px; border:1px solid var(--accent-gold); border-radius:10px; background:rgba(245,158,11,0.05); font-size:0.82rem; color:#fff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <div>
-              <strong>💰 Biaya Sewa Dasar Lapak:</strong> <span style="color:var(--accent-gold); font-weight:800;">Rp 5.000 / bulan</span>
-            </div>
-            <div>
-              <strong>🏷️ Diskon Tier Member:</strong> 
-              <span class="tier-badge" style="background:rgba(217,119,6,0.2); color:#cd7f32; margin-left:4px;">🥉 Bronze 5%</span>
-              <span class="tier-badge" style="background:rgba(148,163,184,0.2); color:#c0c0c0; margin-left:4px;">🥈 Silver 10%</span>
-              <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); margin-left:4px;">🥇 Gold 15%</span>
-              <span class="tier-badge" style="background:rgba(59,130,246,0.2); color:var(--accent-blue); margin-left:4px;">💎 Platinum 20%</span>
-            </div>
-          </div>
-
-          <!-- DISCLAIMER BOX -->
-          <div class="glass-panel" style="padding:14px 20px; border-left:4px solid var(--accent-gold); background:rgba(245,158,11,0.06); border-radius:8px;">
-            <div style="font-size:0.8rem; color:var(--accent-gold); font-weight:700; margin-bottom:2px;">📌 PERATURAN & DISCLAIMER TRANSAKSI LAPAK:</div>
-            <div style="font-size:0.78rem; color:var(--text-muted);">
-              Transaksi dilakukan secara langsung antara penjual & pembeli via WhatsApp / Telepon. MB INA hanya menyediakan platform ruang tempat & iklan dan tidak bertanggung jawab atas isi transaksi.
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- =============================================================== -->
-      <!-- SUB-TAB 7: LAPORAN ANALITIK & EFEKTIVITAS                        -->
-      <!-- =============================================================== -->
-      <div id="sponsor-tab-content-laporan" class="sponsor-subtab-pane" style="display:none;">
-        
-        <!-- TOP ACTIONS & EXPORT -->
+      <!-- 4. LAPORAN ANALITIK, EFEKTIVITAS & INSIGHT PENAYANGAN (LIVE METRICS) -->
+      <div id="sponsor-analytics-section" class="glass-panel" style="padding:24px; border-top:4px solid var(--accent-gold); margin-bottom:24px; border-radius:18px;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
-          <h3 style="font-size:1.1rem; color:var(--accent-gold); margin:0;">📊 LAPORAN EFEKTIVITAS & ROI SPONSOR</h3>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem; font-weight:700; border-color:var(--accent-gold); color:var(--accent-gold);" onclick="SponsorPortalEngine.switchTab('beranda')">🏠 Dashboard Sponsor</button>
-            <button class="btn-primary" style="font-weight:800; padding:10px 20px;" onclick="AppEngine.simulateExport('pdf')">📥 Download Laporan Efektifitas PDF</button>
+          <div>
+            <h3 style="font-size:1.25rem; color:var(--accent-gold); margin:0; display:flex; align-items:center; gap:8px;">
+              📊 LAPORAN EFEKTIVITAS & INSIGHT PERFORMA IKLAN
+            </h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0 0;">Data analitik penayangan iklan banner, jangkauan tayang ke member resmi MB INA se-Indonesia</p>
           </div>
+          <button class="btn-primary" style="font-weight:800; font-size:0.85rem; padding:9px 20px; border-radius:10px; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none;" onclick="AppEngine.simulateExport('pdf')">📥 Download Laporan PDF</button>
         </div>
 
-        <!-- SPONSOR STATS METRICS GRID -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-bottom:24px;">
-          <div class="glass-panel" style="padding:20px; border-top:4px solid var(--accent-gold);">
-            <div style="font-size:0.78rem; color:var(--text-muted); font-weight:700;">TOTAL IMPRESSIONS (DILIHAT)</div>
-            <div id="spnd-impressions" style="font-size:2rem; font-weight:900; color:var(--accent-gold); margin:6px 0;">12,450</div>
+        <!-- METRICS GRID -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div class="glass-card" style="padding:18px; border-top:3px solid var(--accent-gold); background:rgba(15,23,42,0.6);">
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL IMPRESSIONS</div>
+            <div id="spnd-impressions" style="font-size:1.8rem; font-weight:900; color:var(--accent-gold); margin:6px 0;">12.450</div>
             <div style="font-size:0.75rem; color:var(--primary-emerald); font-weight:700;">↑ 15% di atas target</div>
           </div>
-          <div class="glass-panel" style="padding:20px; border-top:4px solid var(--accent-blue);">
-            <div style="font-size:0.78rem; color:var(--text-muted); font-weight:700;">TOTAL CLICKS (DIKLIK)</div>
-            <div id="spnd-clicks" style="font-size:2rem; font-weight:900; color:var(--accent-blue); margin:6px 0;">1,234</div>
+          <div class="glass-card" style="padding:18px; border-top:3px solid var(--accent-blue); background:rgba(15,23,42,0.6);">
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL CLICKS</div>
+            <div id="spnd-clicks" style="font-size:1.8rem; font-weight:900; color:var(--accent-blue); margin:6px 0;">1.234</div>
             <div style="font-size:0.75rem; color:var(--primary-emerald); font-weight:700;">↑ 8% CTR tinggi</div>
           </div>
-          <div class="glass-panel" style="padding:20px; border-top:4px solid var(--primary-emerald);">
-            <div style="font-size:0.78rem; color:var(--text-muted); font-weight:700;">TOTAL REACH (JANGKAUAN)</div>
-            <div id="spnd-reach" style="font-size:2rem; font-weight:900; color:var(--primary-emerald); margin:6px 0;">8,900</div>
+          <div class="glass-card" style="padding:18px; border-top:3px solid var(--primary-emerald); background:rgba(15,23,42,0.6);">
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">TOTAL REACH (JANGKAUAN)</div>
+            <div id="spnd-reach" style="font-size:1.8rem; font-weight:900; color:var(--primary-emerald); margin:6px 0;">8.900</div>
             <div style="font-size:0.75rem; color:var(--primary-emerald); font-weight:700;">↑ 12% jangkauan member</div>
           </div>
-          <div class="glass-panel" style="padding:20px; border-top:4px solid #a855f7;">
-            <div style="font-size:0.78rem; color:var(--text-muted); font-weight:700;">ENGAGEMENT RATE</div>
-            <div id="spnd-engagement" style="font-size:2rem; font-weight:900; color:#a855f7; margin:6px 0;">9.9%</div>
+          <div class="glass-card" style="padding:18px; border-top:3px solid #a855f7; background:rgba(15,23,42,0.6);">
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700;">ENGAGEMENT RATE</div>
+            <div id="spnd-engagement" style="font-size:1.8rem; font-weight:900; color:#a855f7; margin:6px 0;">9.9%</div>
             <div style="font-size:0.75rem; color:var(--primary-emerald); font-weight:700;">⭐ Performa Terbaik</div>
           </div>
         </div>
 
-        <!-- SPONSOR DOKUMENTASI & INSIGHTS -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-          <div class="glass-panel" style="padding:20px;">
-            <h4 style="color:var(--accent-gold); font-size:1.05rem; margin-bottom:14px;">📸 Dokumentasi Penayangan Iklan Sponsor</h4>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <!-- DOKUMENTASI PENAYANGAN & INSIGHTS 2-COLUMN -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+          <div class="glass-card" style="padding:18px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
+            <h4 style="color:var(--accent-gold); font-size:0.95rem; margin-top:0; margin-bottom:12px;">📸 Dokumentasi Penayangan Iklan Sponsor</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
               <div style="border-radius:10px; overflow:hidden; border:1px solid var(--chrome-border);">
-                <img src="assets/mb_hero.jpg" style="width:100%; height:130px; object-fit:cover;">
-                <div style="padding:8px; font-size:0.78rem; color:var(--text-muted);">📷 Banner di Member Dashboard</div>
+                <img src="assets/mb_hero.jpg" style="width:100%; height:110px; object-fit:cover;">
+                <div style="padding:6px; font-size:0.72rem; color:var(--text-muted); text-align:center;">📷 Banner di Member Portal</div>
               </div>
               <div style="border-radius:10px; overflow:hidden; border:1px solid var(--chrome-border);">
-                <img src="assets/mb_founders.jpg" style="width:100%; height:130px; object-fit:cover;">
-                <div style="padding:8px; font-size:0.78rem; color:var(--text-muted);">📷 Stage Backdrop Booth Event</div>
+                <img src="assets/mb_founders.jpg" style="width:100%; height:110px; object-fit:cover;">
+                <div style="padding:6px; font-size:0.72rem; color:var(--text-muted); text-align:center;">📷 Stage Backdrop Booth Event</div>
               </div>
             </div>
           </div>
 
-          <div class="glass-panel" style="padding:20px;">
-            <h4 style="color:var(--accent-gold); font-size:1.05rem; margin-bottom:14px;">📊 Insights & Rekomendasi Efektifitas</h4>
-            <div style="font-size:0.88rem; color:var(--text-main); line-height:1.6;">
+          <div class="glass-card" style="padding:18px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:12px;">
+            <h4 style="color:var(--accent-gold); font-size:0.95rem; margin-top:0; margin-bottom:12px;">💡 Insights & Rekomendasi Efektifitas</h4>
+            <div style="font-size:0.82rem; color:var(--text-main); line-height:1.6;">
               • Banner Anda telah dilihat sebanyak <strong style="color:var(--accent-gold);">12.450 kali</strong>.<br>
               • Sebanyak <strong style="color:var(--accent-blue);">1.234 pengguna</strong> mengklik banner untuk mengunjungi situs web Anda.<br>
-              • Engagement rate <strong style="color:var(--primary-emerald);">9.9%</strong> jauh di atas rata-rata industri (6%).<br>
-              • Mayoritas pengunjung berasal dari wilayah: DKI Jakarta, Jawa Barat, dan Jawa Tengah.<br><br>
-              💡 <strong>Rekomendasi:</strong> Performa iklan Anda mencapai titik puncak tertinggi pada hari Sabtu saat konvoi event.
+              • Engagement rate <strong style="color:var(--primary-emerald);">9.9%</strong> berada di atas rata-rata industri otomotif.<br>
+              • Mayoritas interaksi berasal dari klub wilayah DKI Jakarta, Jawa Barat, dan Jawa Timur.
             </div>
           </div>
         </div>
 
-        <!-- SPONSOR HISTORICAL TRACK RECORD TABLE -->
-        <div class="glass-panel" style="padding:20px; margin-top:24px; border-top:4px solid var(--accent-gold);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
-            <h4 style="color:var(--accent-gold); font-size:1.05rem; margin:0;">📜 Histori Track Record Kontrak Kemitraan MB INA</h4>
-            <span style="font-size:0.78rem; color:var(--text-muted);">Data Resmi Pengurus Pusat MB INA</span>
-          </div>
+        <!-- HISTORI KONTRAK TABLE -->
+        <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:16px;">
+          <h4 style="color:var(--accent-gold); font-size:0.95rem; margin-top:0; margin-bottom:12px;">📜 Histori Track Record Kontrak Kemitraan MB INA</h4>
           <div style="overflow-x:auto;">
-            <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+            <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.82rem;">
               <thead>
                 <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
-                  <th style="padding:10px;">Musim / Event</th>
-                  <th style="padding:10px;">Tier Paket</th>
-                  <th style="padding:10px;">Nilai Kontrak</th>
-                  <th style="padding:10px;">Revenue Impact</th>
-                  <th style="padding:10px;">ROI</th>
-                  <th style="padding:10px;">Status Verification</th>
-                  <th style="padding:10px; text-align:right;">Sertifikat Digital</th>
+                  <th style="padding:8px 10px;">Musim / Event</th>
+                  <th style="padding:8px 10px;">Tier Paket</th>
+                  <th style="padding:8px 10px;">Nilai Kontrak</th>
+                  <th style="padding:8px 10px;">Revenue Impact</th>
+                  <th style="padding:8px 10px;">ROI</th>
+                  <th style="padding:8px 10px;">Status</th>
                 </tr>
               </thead>
               <tbody>
                 <tr style="border-bottom:1px solid var(--chrome-border);">
-                  <td style="padding:12px 10px; font-weight:800; color:#fff;">2026 — Jamnas XXI & Munas MB INA</td>
-                  <td style="padding:12px 10px;"><span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">💎 PLATINUM</span></td>
-                  <td style="padding:12px 10px; font-weight:700;">Rp 30.000.000</td>
-                  <td style="padding:12px 10px; color:#22c55e; font-weight:700;">Rp 45.000.000</td>
-                  <td style="padding:12px 10px; color:var(--accent-gold); font-weight:800;">50%</td>
-                  <td style="padding:12px 10px;"><span style="color:#22c55e; font-weight:800; font-size:0.75rem;">✅ AKTIF (Terbayar Lunas)</span></td>
-                  <td style="padding:12px 10px; text-align:right;"><button class="btn-outline" style="font-size:0.72rem; padding:4px 10px;" onclick="window.showToast('📜 Mengunduh Sertifikat Platinum 2026...', 'info')">📜 Unduh PDF</button></td>
+                  <td style="padding:10px 8px; font-weight:800; color:#fff;">2026 — Jamnas XXI & Munas MB INA</td>
+                  <td style="padding:10px 8px;"><span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.7rem;">💎 PLATINUM</span></td>
+                  <td style="padding:10px 8px; font-weight:700;">Rp 30.000.000</td>
+                  <td style="padding:10px 8px; color:#22c55e; font-weight:700;">Rp 45.000.000</td>
+                  <td style="padding:10px 8px; color:var(--accent-gold); font-weight:800;">50%</td>
+                  <td style="padding:10px 8px;"><span style="color:#22c55e; font-weight:800; font-size:0.75rem;">✅ AKTIF (Lunas)</span></td>
                 </tr>
                 <tr style="border-bottom:1px solid var(--chrome-border);">
-                  <td style="padding:12px 10px; font-weight:800; color:#fff;">2025 — Regional Touring Jawa-Bali</td>
-                  <td style="padding:12px 10px;"><span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">🥇 GOLD</span></td>
-                  <td style="padding:12px 10px; font-weight:700;">Rp 15.000.000</td>
-                  <td style="padding:12px 10px; color:#22c55e; font-weight:700;">Rp 24.000.000</td>
-                  <td style="padding:12px 10px; color:var(--accent-gold); font-weight:800;">60%</td>
-                  <td style="padding:12px 10px;"><span style="color:var(--text-muted); font-weight:700; font-size:0.75rem;">SELESAI</span></td>
-                  <td style="padding:12px 10px; text-align:right;"><button class="btn-outline" style="font-size:0.72rem; padding:4px 10px;" onclick="window.showToast('📜 Mengunduh Sertifikat Gold 2025...', 'info')">📜 Unduh PDF</button>
-                  </td>
-                </tr>
-                <tr style="border-bottom:1px solid var(--chrome-border);">
-                  <td style="padding:12px 10px; font-weight:800; color:#fff;">2024 — Jamnas XX Mercedes-Benz INA</td>
-                  <td style="padding:12px 10px;"><span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">🥇 GOLD</span></td>
-                  <td style="padding:12px 10px; font-weight:700;">Rp 15.000.000</td>
-                  <td style="padding:12px 10px; color:#22c55e; font-weight:700;">Rp 22.000.000</td>
-                  <td style="padding:12px 10px; color:var(--accent-gold); font-weight:800;">46%</td>
-                  <td style="padding:12px 10px;"><span style="color:var(--text-muted); font-weight:700; font-size:0.75rem;">SELESAI</span></td>
-                  <td style="padding:12px 10px; text-align:right;"><button class="btn-outline" style="font-size:0.72rem; padding:4px 10px;" onclick="window.showToast('📜 Mengunduh Sertifikat Gold 2024...', 'info')">📜 Unduh PDF</button></td>
+                  <td style="padding:10px 8px; font-weight:800; color:#fff;">2025 — Regional Touring Jawa-Bali</td>
+                  <td style="padding:10px 8px;"><span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.7rem;">🥇 GOLD</span></td>
+                  <td style="padding:10px 8px; font-weight:700;">Rp 15.000.000</td>
+                  <td style="padding:10px 8px; color:#22c55e; font-weight:700;">Rp 24.000.000</td>
+                  <td style="padding:10px 8px; color:var(--accent-gold); font-weight:800;">60%</td>
+                  <td style="padding:10px 8px;"><span style="color:var(--text-muted); font-weight:700; font-size:0.75rem;">SELESAI</span></td>
                 </tr>
               </tbody>
             </table>
@@ -7255,6 +6864,157 @@
         </div>
 
       </div>
+
+    </div>
+
+    <!-- MODAL SPONSOR 1: EDIT PROFIL PERUSAHAAN -->
+    <div id="modal-sponsor-profile" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
+      <div class="glass-panel" style="max-width:540px; width:90%; padding:24px; border:1px solid var(--accent-gold); border-radius:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--chrome-border); padding-bottom:10px;">
+          <h3 style="color:var(--accent-gold); margin:0; font-size:1.15rem;">👤 Profil & Kontak PIC Sponsor</h3>
+          <button type="button" onclick="AuthEngine.closeModal('modal-sponsor-profile')" style="background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">✕</button>
+        </div>
+        <form onsubmit="event.preventDefault(); window.saveSponsorProfile();">
+          <div style="margin-bottom:12px;">
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">Nama Perusahaan / Brand</label>
+            <input id="spnd-prof-company" type="text" class="input-field" value="Shell Indonesia" style="margin-top:4px; font-weight:700;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">Nama Contact Person (PIC)</label>
+            <input id="spnd-prof-pic" type="text" class="input-field" value="Ir. Denny K. (PIC Shell)" style="margin-top:4px;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">Email Resmi</label>
+            <input id="spnd-prof-email" type="email" class="input-field" value="sponsor@shell.co.id" style="margin-top:4px;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">No. WhatsApp PIC</label>
+            <input id="spnd-prof-phone" type="text" class="input-field" value="021-7890123" style="margin-top:4px;">
+          </div>
+          <div style="margin-bottom:18px;">
+            <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">Tier Partnership</label>
+            <input id="spnd-prof-tier" type="text" class="input-field" value="💎 MITRA SPONSOR PLATINUM" readonly style="margin-top:4px; color:var(--accent-gold); font-weight:800; background:rgba(245,158,11,0.1);">
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" class="btn-outline" onclick="AuthEngine.closeModal('modal-sponsor-profile')">Batal</button>
+            <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; font-weight:800;">💾 Simpan Profil</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL SPONSOR 2: PESAN PAKET ENDORSE -->
+    <div id="modal-sponsor-endorse" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; overflow-y:auto; padding:20px;">
+      <div class="glass-panel" style="max-width:900px; width:95%; padding:24px; border:1px solid var(--accent-gold); border-radius:18px; max-height:90vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--chrome-border); padding-bottom:12px;">
+          <div>
+            <h3 style="color:var(--accent-gold); margin:0; font-size:1.25rem;">📦 Pilihan Paket Endorse & Kolaborasi MB INA</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0 0;">Pilih paket endorse resmi federasi untuk menjangkau puluhan ribu pemilik Mercedes-Benz</p>
+          </div>
+          <button type="button" onclick="AuthEngine.closeModal('modal-sponsor-endorse')" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
+          <!-- BRONZE -->
+          <div class="glass-card" style="padding:18px; border-top:4px solid #cd7f32; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="font-size:1.05rem; font-weight:900; color:#cd7f32;">🥉 BRONZE</div>
+              <div style="font-size:1.25rem; font-weight:900; color:#fff; margin:8px 0;">Rp 2.5 JT <small style="font-size:0.72rem; color:var(--text-muted);">/bln</small></div>
+              <ul style="font-size:0.75rem; color:var(--text-muted); padding-left:16px; margin:0 0 16px 0; line-height:1.6;">
+                <li>1 Artikel / Posting Forum</li>
+                <li>Laporan statistik bulanan</li>
+              </ul>
+            </div>
+            <button class="btn-primary" style="padding:8px; font-size:0.8rem; font-weight:800; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.pesanEndorse('BRONZE', 2500000)">📌 PESAN</button>
+          </div>
+          <!-- SILVER -->
+          <div class="glass-card" style="padding:18px; border-top:4px solid #94a3b8; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="font-size:1.05rem; font-weight:900; color:#94a3b8;">🥈 SILVER</div>
+              <div style="font-size:1.25rem; font-weight:900; color:#fff; margin:8px 0;">Rp 5 JT <small style="font-size:0.72rem; color:var(--text-muted);">/bln</small></div>
+              <ul style="font-size:0.75rem; color:var(--text-muted); padding-left:16px; margin:0 0 16px 0; line-height:1.6;">
+                <li>3 Artikel Forum</li>
+                <li>1 Social Media Post</li>
+                <li>Laporan analitik mendalam</li>
+              </ul>
+            </div>
+            <button class="btn-primary" style="padding:8px; font-size:0.8rem; font-weight:800; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.pesanEndorse('SILVER', 5000000)">📌 PESAN</button>
+          </div>
+          <!-- GOLD -->
+          <div class="glass-card" style="padding:18px; border-top:4px solid var(--accent-gold); display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="font-size:1.05rem; font-weight:900; color:var(--accent-gold);">🥇 GOLD</div>
+              <div style="font-size:1.25rem; font-weight:900; color:#fff; margin:8px 0;">Rp 10 JT <small style="font-size:0.72rem; color:var(--text-muted);">/bln</small></div>
+              <ul style="font-size:0.75rem; color:var(--text-muted); padding-left:16px; margin:0 0 16px 0; line-height:1.6;">
+                <li>5 Artikel Forum</li>
+                <li>3 Social Media Post</li>
+                <li>Banner Header Tayang</li>
+                <li>Laporan performa mingguan</li>
+              </ul>
+            </div>
+            <button class="btn-primary" style="padding:8px; font-size:0.8rem; font-weight:800; width:100%; border-radius:8px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000;" onclick="SponsorPortalEngine.pesanEndorse('GOLD', 10000000)">📌 PESAN</button>
+          </div>
+          <!-- PLATINUM -->
+          <div class="glass-card" style="padding:18px; border-top:4px solid #3b82f6; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="font-size:1.05rem; font-weight:900; color:#3b82f6;">💎 PLATINUM</div>
+              <div style="font-size:1.25rem; font-weight:900; color:#fff; margin:8px 0;">Rp 20 JT <small style="font-size:0.72rem; color:var(--text-muted);">/bln</small></div>
+              <ul style="font-size:0.75rem; color:var(--text-muted); padding-left:16px; margin:0 0 16px 0; line-height:1.6;">
+                <li>10 Artikel Forum</li>
+                <li>5 Social Media Post</li>
+                <li>Premium Header Exposure</li>
+                <li>Mention Event Resmi MB INA</li>
+              </ul>
+            </div>
+            <button class="btn-primary" style="padding:8px; font-size:0.8rem; font-weight:800; width:100%; border-radius:8px; background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff;" onclick="SponsorPortalEngine.pesanEndorse('PLATINUM', 20000000)">📌 PESAN</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL SPONSOR 3: PESAN IKLAN DIGITAL -->
+    <div id="modal-sponsor-iklan" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; overflow-y:auto; padding:20px;">
+      <div class="glass-panel" style="max-width:850px; width:95%; padding:24px; border:1px solid #3b82f6; border-radius:18px; max-height:90vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid var(--chrome-border); padding-bottom:12px;">
+          <div>
+            <h3 style="color:#3b82f6; margin:0; font-size:1.25rem;">📢 Pilihan Slot Iklan Banner & Digital MB INA</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0 0;">Tingkatkan brand awareness dengan penempatan iklan di platform resmi MB INA</p>
+          </div>
+          <button type="button" onclick="AuthEngine.closeModal('modal-sponsor-iklan')" style="background:none; border:none; color:#fff; font-size:1.4rem; cursor:pointer;">✕</button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px;">
+          <!-- BANNER -->
+          <div class="glass-card" style="padding:18px; border-top:4px solid #3b82f6;">
+            <div style="font-size:1.05rem; font-weight:900; color:#3b82f6;">📢 BANNER DISPLAY</div>
+            <div style="font-size:1.3rem; font-weight:900; color:#fff; margin:8px 0;">Rp 5 JT <small style="font-size:0.72rem; color:var(--text-muted);">/ bulan</small></div>
+            <ul style="font-size:0.78rem; color:var(--text-muted); padding-left:16px; margin:0 0 16px 0; line-height:1.6;">
+              <li>Posisi Sidebar / Footer Portal</li>
+              <li>Durasi: 1 Bulan (25.000 Impresi)</li>
+            </ul>
+            <button class="btn-primary" style="padding:8px; font-size:0.8rem; font-weight:800; width:100%; border-radius:8px;" onclick="SponsorPortalEngine.pesanIklan('BANNER', 5000000)">📌 PESAN SLOT</button>
+          </div>
+          <!-- SPONSORED -->
+          <div class="glass-card" style="padding:18px; border-top:4px solid #22c55e;">
+            <div style="font-size:1.05rem; font-weight:900; color:#22c55e;">📄 SPONSORED POST</div>
+            <div style="font-size:1.3rem; font-weight:900; color:#fff; margin:8px 0;">Rp 7.5 JT <small style="font-size:0.72rem; color:var(--text-muted);">/ bulan</small></div>
+            <ul style="font-size:0.78rem; color:var(--text-muted); padding-left:16px; margin:0 0 16px 0; line-height:1.6;">
+              <li>Artikel Khusus di Feed Berita Member</li>
+              <li>Interaksi direct link CTA ke Website Anda</li>
+            </ul>
+            <button class="btn-primary" style="padding:8px; font-size:0.8rem; font-weight:800; width:100%; border-radius:8px; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff;" onclick="SponsorPortalEngine.pesanIklan('SPONSORED', 7500000)">📌 PESAN SLOT</button>
+          </div>
+          <!-- PREMIUM -->
+          <div class="glass-card" style="padding:18px; border-top:4px solid var(--accent-gold);">
+            <div style="font-size:1.05rem; font-weight:900; color:var(--accent-gold);">💎 PREMIUM HEADER EXPOSURE</div>
+            <div style="font-size:1.3rem; font-weight:900; color:#fff; margin:8px 0;">Rp 15 JT <small style="font-size:0.72rem; color:var(--text-muted);">/ bulan</small></div>
+            <ul style="font-size:0.78rem; color:var(--text-muted); padding-left:16px; margin:0 0 16px 0; line-height:1.6;">
+              <li>Slot Prioritas Teratas di Seluruh Portal Member</li>
+              <li>Garansi 50.000+ impresi per bulan</li>
+            </ul>
+            <button class="btn-primary" style="padding:8px; font-size:0.8rem; font-weight:800; width:100%; border-radius:8px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000;" onclick="SponsorPortalEngine.pesanIklan('PREMIUM', 15000000)">📌 PESAN SLOT</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     </div>
 
@@ -9528,8 +9288,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_122800"></script>
-  <script src="js/app.js?v=20260819_122800"></script>
+  <script src="js/auth.js?v=20260819_123500"></script>
+  <script src="js/app.js?v=20260819_123500"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
