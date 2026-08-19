@@ -960,14 +960,14 @@ try {
             $stmt = $sPdo->prepare("
                 SELECT
                     id, name, username, email, phone, role, status, tier,
-                    member_id, province, city, birth_date, gender,
+                    club, club_id, member_id, province, city, birth_date, gender,
                     occupation, vehicle_model, license_plate,
                     points, total_events, total_donation,
-                    photo_url, avatar_url, join_date,
+                    photo_url, avatar_url, admin_notes, notes, join_date,
                     is_system_architect, is_protected, is_active,
                     password, created_at, updated_at
                 FROM users
-                WHERE email = :id OR username = :id OR member_id = :id
+                WHERE LOWER(email) = LOWER(:id) OR LOWER(username) = LOWER(:id) OR LOWER(member_id) = LOWER(:id)
                 LIMIT 1
             ");
             $stmt->execute([':id' => $identity]);
@@ -975,7 +975,7 @@ try {
 
             if (!$user) {
                 $idLower = strtolower($identity);
-                if (in_array($idLower, ['dtouriano@gmail.com', 'usr_superadmin', 'superadmin', 'admin', 'derist'])) {
+                if (in_array($idLower, ['dtouriano@gmail.com', 'usr_superadmin', 'superadmin', 'admin', 'derist', 'mbina-hq-2026-000001'])) {
                     $user = [
                         'id' => 'usr_superadmin',
                         'name' => 'Derist Touriano',
@@ -985,12 +985,24 @@ try {
                         'status' => 'ACTIVE',
                         'tier' => 'PLATINUM'
                     ];
-                } else if (in_array($idLower, ['sponsor', 'bni@sponsor.com', 'shell@sponsor.com', 'sponsor@shell.co.id', 'sponsor@mbina.or.id'])) {
+                } else if (in_array($idLower, ['sponsor', 'fdr@sponsor.com', 'sponsor@fdr.co.id', 'sponsor_fdr'])) {
+                    $user = [
+                        'id' => 'usr_sponsor_fdr',
+                        'name' => 'FDR Tyre Indonesia',
+                        'username' => 'sponsor_fdr',
+                        'email' => 'fdr@sponsor.com',
+                        'phone' => '021-7890123',
+                        'role' => 'SPONSOR',
+                        'status' => 'ACTIVE',
+                        'tier' => 'GOLD'
+                    ];
+                } else if (in_array($idLower, ['shell@sponsor.com', 'sponsor@shell.co.id', 'sponsor_shell'])) {
                     $user = [
                         'id' => 'usr_sponsor_shell',
-                        'name' => 'Shell Indonesia (Mitra Sponsor)',
+                        'name' => 'Shell Indonesia',
                         'username' => 'sponsor_shell',
-                        'email' => 'bni@sponsor.com',
+                        'email' => 'sponsor@shell.co.id',
+                        'phone' => '021-52901234',
                         'role' => 'SPONSOR',
                         'status' => 'ACTIVE',
                         'tier' => 'PLATINUM'
@@ -1491,8 +1503,8 @@ try {
         try {
             ensureM3Tables($sPdo);
             $stmt = $sPdo->query("
-                SELECT id, username, name, email, phone, role, status, tier, club, province, city, 
-                       member_id, total_donation, total_events, points, gender, birth_date, 
+                SELECT id, username, name, email, phone, role, status, tier, club, club_id, province, city, 
+                       member_id, vehicle_model, license_plate, total_donation, total_events, points, gender, birth_date, 
                        admin_notes, photo_url, avatar_url, rejection_reason, verified_at, created_at 
                 FROM users 
                 ORDER BY created_at DESC
@@ -1581,6 +1593,8 @@ try {
         while ((int)$sPdo->prepare("SELECT COUNT(*) FROM users WHERE member_id = :mid")
                ->execute([':mid' => $memberId]) && false) { $seq++; $memberId = sprintf('MBINA-%s-%d-%06d', $regionCode, $year, $seq); }
 
+        $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
+        $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
         $photoUrl = trim($input['photo_url'] ?? '');
         $id = 'usr_m3_' . uniqid();
         $role = ($status === 'ACTIVE') ? 'MEMBER' : 'CALON_MEMBER';
@@ -1588,8 +1602,8 @@ try {
 
         try {
             $stmt = $sPdo->prepare("
-                INSERT INTO users (id, username, name, email, phone, role, tier, status, club, province, city, member_id, gender, birth_date, admin_notes, photo_url, password, is_active, verified_at)
-                VALUES (:id, :username, :name, :email, :phone, :role, :tier, :status, :club, :province, :city, :member_id, :gender::gender_enum, :bdate, :notes, :photo_url, '$2y$10$1234567890123456789012', true, CURRENT_TIMESTAMP)
+                INSERT INTO users (id, username, name, email, phone, role, tier, status, club, province, city, member_id, gender, birth_date, vehicle_model, license_plate, admin_notes, photo_url, password, is_active, verified_at)
+                VALUES (:id, :username, :name, :email, :phone, :role, :tier, :status, :club, :province, :city, :member_id, :gender::gender_enum, :bdate, :vehicle, :plate, :notes, :photo_url, '$2y$10$1234567890123456789012', true, CURRENT_TIMESTAMP)
             ");
             $stmt->execute([
                 ':id' => $id,
@@ -1606,6 +1620,8 @@ try {
                 ':member_id' => $memberId,
                 ':gender' => $genderEnum,
                 ':bdate' => $birthDate,
+                ':vehicle' => $vehicleModel,
+                ':plate' => $licensePlate,
                 ':notes' => $adminNotes,
                 ':photo_url' => $photoUrl
             ]);
@@ -1635,6 +1651,8 @@ try {
         $city = trim($input['city'] ?? '');
         $tier = trim($input['tier'] ?? 'BRONZE');
         $status = trim($input['status'] ?? 'ACTIVE');
+        $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
+        $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
         $adminNotes = trim($input['admin_notes'] ?? '');
         $photoUrl = trim($input['photo_url'] ?? '');
 
@@ -1643,24 +1661,51 @@ try {
             exit;
         }
 
+        // Resolve valid club_id foreign key from clubs table
+        $resolvedClubId = null;
+        if (!empty($club) && $club !== 'Belum Memilih Klub' && $club !== '-') {
+            try {
+                $cStmt = $sPdo->prepare("SELECT id FROM clubs WHERE LOWER(name) = LOWER(:c) OR LOWER(name) LIKE LOWER(:clike) OR id = :cid LIMIT 1");
+                $cStmt->execute([':c' => $club, ':clike' => '%' . trim($club) . '%', ':cid' => $club]);
+                $fc = $cStmt->fetch();
+                if ($fc) $resolvedClubId = $fc['id'];
+            } catch (Throwable $e) {}
+        }
+
         try {
             $stmt = $sPdo->prepare("
-                UPDATE users SET name = :name, email = :email, phone = :phone, club = :club, 
-                                 province = :prov, city = :city, tier = :tier, status = :status, 
-                                 admin_notes = :notes, photo_url = :photo_url, avatar_url = :avatar_url WHERE id = :id OR username = :id OR member_id = :id OR email = :id
+                UPDATE users SET 
+                    name = :name, 
+                    email = :email, 
+                    phone = :phone, 
+                    club = :club, 
+                    club_id = :club_id,
+                    province = :prov, 
+                    city = :city, 
+                    tier = :tier, 
+                    status = :status::user_status_enum,
+                    vehicle_model = :vehicle, 
+                    license_plate = :plate,
+                    admin_notes = :notes, 
+                    photo_url = CASE WHEN :photo_url != '' THEN :photo_url ELSE photo_url END, 
+                    avatar_url = CASE WHEN :photo_url != '' THEN :photo_url ELSE avatar_url END,
+                    updated_at = NOW()
+                WHERE id = :id OR username = :id OR member_id = :id OR email = :id OR LOWER(email) = LOWER(:email)
             ");
             $stmt->execute([
                 ':name' => $name,
                 ':email' => $email,
                 ':phone' => $phone,
                 ':club' => $club,
+                ':club_id' => $resolvedClubId,
                 ':prov' => $province,
                 ':city' => $city,
                 ':tier' => $tier,
-                ':status' => $status,
+                ':status' => in_array($status, ['PENDING','ACTIVE','REJECTED','SUSPENDED','HONORARY']) ? $status : 'ACTIVE',
+                ':vehicle' => $vehicleModel,
+                ':plate' => $licensePlate,
                 ':notes' => $adminNotes,
                 ':photo_url' => $photoUrl,
-                ':avatar_url' => $photoUrl,
                 ':id' => $id
             ]);
 
@@ -3581,7 +3626,9 @@ try {
             } else {
                 // Insert new member
                 $userId = 'usr_' . uniqid();
-                $insertStmt = $sPdo->prepare("INSERT INTO users (id, name, email, phone, username, password, birth_date, gender, province_id, province, city, occupation, role, status, member_id, tier) VALUES (:id, :name, :email, :phone, :username, :password, :birth_date, :gender::gender_enum, :province_id, :province, :city, :occupation, :role::role_enum, :status::user_status_enum, :member_id, 'BRONZE')");
+                $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
+                $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
+                $insertStmt = $sPdo->prepare("INSERT INTO users (id, name, email, phone, username, password, birth_date, gender, province_id, province, city, occupation, vehicle_model, license_plate, role, status, member_id, tier) VALUES (:id, :name, :email, :phone, :username, :password, :birth_date, :gender::gender_enum, :province_id, :province, :city, :occupation, :vehicle, :plate, :role::role_enum, :status::user_status_enum, :member_id, 'BRONZE')");
                 $insertStmt->execute([
                     ':id' => $userId,
                     ':name' => $name,
@@ -3595,6 +3642,8 @@ try {
                     ':province' => $provName,
                     ':city' => $city,
                     ':occupation' => $occupation,
+                    ':vehicle' => $vehicleModel,
+                    ':plate' => $licensePlate,
                     ':role' => $cleanRole,
                     ':status' => 'PENDING',
                     ':member_id' => $generatedMemberId
@@ -3614,6 +3663,8 @@ try {
                         'province_id' => $resolvedProvId,
                         'province' => $provName,
                         'city' => $city,
+                        'vehicle_model' => $vehicleModel,
+                        'license_plate' => $licensePlate,
                         'club' => null,
                         'tier' => 'BRONZE',
                         'role' => $cleanRole,
@@ -3653,6 +3704,8 @@ try {
         $city = trim($input['city'] ?? '');
         $provinceId = $input['provinceId'] ?? 'prov_jkt';
         $club = trim($input['club'] ?? '');
+        $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
+        $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
         $photoUrl = trim($input['photo_url'] ?? $input['avatar_url'] ?? '');
 
         if (empty($userId) || empty($name) || empty($email) || empty($phone) || empty($username)) {
@@ -3662,8 +3715,18 @@ try {
 
         $allowedRoles = ['SUPER_ADMIN','PRESIDEN','SEKRETARIS_PUSAT','BENDAHARA_PUSAT','ADMIN_ORGANISASI','PENGURUS_PUSAT','PENGURUS_KLUB','MEMBER','CALON_MEMBER','GUEST'];
 
+        $resolvedClubId = null;
+        if (!empty($club) && $club !== 'Belum Memilih Klub' && $club !== '-') {
+            try {
+                $cStmt = $sPdo->prepare("SELECT id FROM clubs WHERE LOWER(name) = LOWER(:c) OR LOWER(name) LIKE LOWER(:clike) OR id = :cid LIMIT 1");
+                $cStmt->execute([':c' => $club, ':clike' => '%' . trim($club) . '%', ':cid' => $club]);
+                $fc = $cStmt->fetch();
+                if ($fc) $resolvedClubId = $fc['id'];
+            } catch (Throwable $e) {}
+        }
+
         try {
-            $stmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, role = :role::role_enum, status = :status::user_status_enum, city = :city, province_id = :province_id, club = COALESCE(NULLIF(:club, ''), club), photo_url = COALESCE(NULLIF(:photo_url, ''), photo_url), avatar_url = COALESCE(NULLIF(:photo_url, ''), avatar_url), updated_at = NOW() WHERE id = :id OR username = :id OR member_id = :id");
+            $stmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, role = :role::role_enum, status = :status::user_status_enum, city = :city, province_id = :province_id, club = COALESCE(NULLIF(:club, ''), club), club_id = :club_id, vehicle_model = COALESCE(NULLIF(:vehicle, ''), vehicle_model), license_plate = COALESCE(NULLIF(:plate, ''), license_plate), photo_url = COALESCE(NULLIF(:photo_url, ''), photo_url), avatar_url = COALESCE(NULLIF(:photo_url, ''), avatar_url), updated_at = NOW() WHERE id = :id OR username = :id OR member_id = :id");
             $stmt->execute([
                 ':name' => $name,
                 ':email' => $email,
@@ -3674,6 +3737,9 @@ try {
                 ':city' => $city,
                 ':province_id' => $provinceId,
                 ':club' => $club,
+                ':club_id' => $resolvedClubId,
+                ':vehicle' => $vehicleModel,
+                ':plate' => $licensePlate,
                 ':photo_url' => $photoUrl,
                 ':id' => $userId
             ]);
@@ -4582,7 +4648,7 @@ try {
 
     case 'get_sponsor_dashboard_data':
         try {
-            $email = $_GET['email'] ?? $input['email'] ?? 'bni@sponsor.com';
+            $email = $_GET['email'] ?? $input['email'] ?? 'fdr@sponsor.com';
             
             $sponsor = $sPdo->query("SELECT * FROM sponsors WHERE contact_email = '$email' OR id = '$email' ORDER BY created_at DESC LIMIT 1")->fetch();
             if (!$sponsor) {
@@ -4771,8 +4837,8 @@ try {
                 $seq = 1;
             }
             $id = 'DON-TRX-' . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
-            $stmt = $sPdo->prepare("INSERT INTO donations (id, campaign_id, user_id, donor_name, member_id, amount, payment_method, status, payment_status, payment_proof_url, notes) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?, ?)");
-            $stmt->execute([$id, $campaignId, $userId, $donorName, $memberIdInput, $amount, $paymentMethod, $proofUrl, $notes]);
+            $stmt = $sPdo->prepare("INSERT INTO donations (id, campaign_id, user_id, amount, payment_method, status, payment_status, payment_proof_url, notes) VALUES (?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?, ?)");
+            $stmt->execute([$id, $campaignId, $userId, $amount, $paymentMethod, $proofUrl, $notes]);
 
             logAudit($userId, 'CREATE', 'DONATION', ['donation_id' => $id, 'amount' => $amount, 'method' => $paymentMethod]);
 
