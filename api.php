@@ -960,10 +960,10 @@ try {
             $stmt = $sPdo->prepare("
                 SELECT
                     id, name, username, email, phone, role, status, tier,
-                    member_id, province, city, birth_date, gender,
+                    club, club_id, member_id, province, city, birth_date, gender,
                     occupation, vehicle_model, license_plate,
                     points, total_events, total_donation,
-                    photo_url, avatar_url, join_date,
+                    photo_url, avatar_url, admin_notes, notes, join_date,
                     is_system_architect, is_protected, is_active,
                     password, created_at, updated_at
                 FROM users
@@ -1503,8 +1503,8 @@ try {
         try {
             ensureM3Tables($sPdo);
             $stmt = $sPdo->query("
-                SELECT id, username, name, email, phone, role, status, tier, club, province, city, 
-                       member_id, total_donation, total_events, points, gender, birth_date, 
+                SELECT id, username, name, email, phone, role, status, tier, club, club_id, province, city, 
+                       member_id, vehicle_model, license_plate, total_donation, total_events, points, gender, birth_date, 
                        admin_notes, photo_url, avatar_url, rejection_reason, verified_at, created_at 
                 FROM users 
                 ORDER BY created_at DESC

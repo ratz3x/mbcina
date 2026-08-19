@@ -294,13 +294,27 @@ const AppEngine = {
 
   async populateMemberPortalData() {
     const u = this.currentUser || {};
-    const memberId = u.member_id || u.memberId || this.getOfficialMemberId(u);
-    const clubName = u.club || u.club_name || 'Belum Memilih Klub';
-    const hasClub = clubName && clubName !== 'Belum Memilih Klub' && clubName !== '-' && clubName !== 'Independent Member';
-
-    // 🔍 SINKRONISASI STATUS & TIER LIVE DARI DATABASE / LIST ADMIN
+    
+    // 🔍 SINKRONISASI STATUS & DATA LIVE DARI DATABASE / LIST ADMIN
     const liveUser = (this.users || []).find(x => x.id === u.id || x.username === u.username || x.email === u.email || x.member_id === u.member_id || x.memberId === u.memberId)
       || ((this.m3Data && this.m3Data.members) ? this.m3Data.members.find(x => x.id === u.id || x.username === u.username || x.email === u.email || x.member_id === u.member_id || x.memberId === u.memberId) : null);
+
+    if (liveUser) {
+      if (liveUser.club && (!u.club || u.club === 'Belum Memilih Klub')) {
+        u.club = liveUser.club;
+        u.club_name = liveUser.club;
+      }
+      if (liveUser.photo_url && (!u.photo_url || u.photo_url.includes('mb_badge.jpg'))) {
+        u.photo_url = liveUser.photo_url;
+        u.avatar_url = liveUser.photo_url;
+      }
+      if (liveUser.vehicle_model && !u.vehicle_model) u.vehicle_model = liveUser.vehicle_model;
+      if (liveUser.license_plate && !u.license_plate) u.license_plate = liveUser.license_plate;
+    }
+
+    const memberId = u.member_id || u.memberId || this.getOfficialMemberId(u);
+    const clubName = u.club || u.club_name || (liveUser && (liveUser.club || liveUser.club_name)) || 'Belum Memilih Klub';
+    const hasClub = clubName && clubName !== 'Belum Memilih Klub' && clubName !== '-' && clubName !== 'Independent Member';
 
     const realStatus = (liveUser && liveUser.status) ? liveUser.status : (u.status || 'PENDING');
     u.status = realStatus;
