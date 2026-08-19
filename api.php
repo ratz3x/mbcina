@@ -1663,10 +1663,22 @@ try {
 
         try {
             $stmt = $sPdo->prepare("
-                UPDATE users SET name = :name, email = :email, phone = :phone, club = :club, 
-                                 province = :prov, city = :city, tier = :tier, status = :status,
-                                 vehicle_model = :vehicle, license_plate = :plate,
-                                 admin_notes = :notes, photo_url = :photo_url, avatar_url = :avatar_url WHERE id = :id OR username = :id OR member_id = :id OR email = :id
+                UPDATE users SET 
+                    name = :name, 
+                    email = :email, 
+                    phone = :phone, 
+                    club = :club, 
+                    province = :prov, 
+                    city = :city, 
+                    tier = :tier, 
+                    status = :status::user_status_enum,
+                    vehicle_model = :vehicle, 
+                    license_plate = :plate,
+                    admin_notes = :notes, 
+                    photo_url = CASE WHEN :photo_url != '' THEN :photo_url ELSE photo_url END, 
+                    avatar_url = CASE WHEN :photo_url != '' THEN :photo_url ELSE avatar_url END,
+                    updated_at = NOW()
+                WHERE id = :id OR username = :id OR member_id = :id OR email = :id OR LOWER(email) = LOWER(:email)
             ");
             $stmt->execute([
                 ':name' => $name,
@@ -1676,12 +1688,11 @@ try {
                 ':prov' => $province,
                 ':city' => $city,
                 ':tier' => $tier,
-                ':status' => $status,
+                ':status' => in_array($status, ['PENDING','ACTIVE','REJECTED','SUSPENDED','HONORARY']) ? $status : 'ACTIVE',
                 ':vehicle' => $vehicleModel,
                 ':plate' => $licensePlate,
                 ':notes' => $adminNotes,
                 ':photo_url' => $photoUrl,
-                ':avatar_url' => $photoUrl,
                 ':id' => $id
             ]);
 

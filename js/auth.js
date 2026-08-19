@@ -657,8 +657,8 @@ const AuthEngine = {
     if (loginSuccess && loggedUser) {
       try {
         const cleanUser = Object.assign({}, loggedUser);
-        if (cleanUser.photo_url && cleanUser.photo_url.length > 1000) cleanUser.photo_url = 'assets/mb_badge.jpg';
-        if (cleanUser.avatar_url && cleanUser.avatar_url.length > 1000) cleanUser.avatar_url = 'assets/mb_badge.jpg';
+        if (cleanUser.photo_url && cleanUser.photo_url.length > 1500000) cleanUser.photo_url = 'assets/mb_badge.jpg';
+        if (cleanUser.avatar_url && cleanUser.avatar_url.length > 1500000) cleanUser.avatar_url = 'assets/mb_badge.jpg';
         localStorage.setItem('mbina_session_user', JSON.stringify(cleanUser));
         localStorage.removeItem('mbina_logged_out');
       } catch (storageErr) {

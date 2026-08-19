@@ -967,6 +967,7 @@ const AppEngine = {
       ? (document.getElementById('dash-member-status')?.value || u.status || 'ACTIVE').trim()
       : (u.status || 'ACTIVE');
     const notes = (document.getElementById('dash-member-notes')?.value || '').trim();
+    const photo = (u.photo_url || u.avatar_url || document.getElementById('dash-member-photo')?.src || '').trim();
 
     if (!name || !email || !phone) {
       window.showToast('Nama Lengkap, Email, dan Nomor WhatsApp wajib diisi!', 'error');
@@ -986,12 +987,44 @@ const AppEngine = {
       this.currentUser.club_name = club;
       this.currentUser.status = status;
       this.currentUser.admin_notes = notes;
-      localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
+      if (photo && !photo.includes('mb_badge.jpg')) {
+        this.currentUser.photo_url = photo;
+        this.currentUser.avatar_url = photo;
+      }
+      try {
+        localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
+      } catch (e) {
+        console.warn('LocalStorage quota warning:', e);
+      }
     }
+
+    // Update in-memory lists so populateMemberPortalData doesn't revert to old data
+    const updateTarget = (item) => {
+      if (!item) return;
+      if (item.id === u.id || item.username === u.username || item.email === u.email || item.member_id === u.member_id) {
+        item.name = name;
+        item.email = email;
+        item.phone = phone;
+        item.city = city;
+        item.province = province;
+        item.vehicle_model = vehicle_model;
+        item.license_plate = license_plate;
+        item.tier = tier;
+        item.club = club;
+        item.club_name = club;
+        item.status = status;
+        item.admin_notes = notes;
+        if (photo && !photo.includes('mb_badge.jpg')) {
+          item.photo_url = photo;
+          item.avatar_url = photo;
+        }
+      }
+    };
+    if (Array.isArray(this.users)) this.users.forEach(updateTarget);
+    if (this.m3Data && Array.isArray(this.m3Data.members)) this.m3Data.members.forEach(updateTarget);
 
     // Sync ke Supabase Database via API
     try {
-      const u = this.currentUser || {};
       fetch('api.php?action=update_m3_member', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1008,13 +1041,15 @@ const AppEngine = {
           club: club,
           status: status,
           admin_notes: notes,
-          photo_url: u.photo_url || ''
+          photo_url: (photo && !photo.includes('mb_badge.jpg')) ? photo : ''
         })
+      }).then(r => r.json()).then(res => {
+        console.log('Member profile synced to Supabase Cloud:', res);
       }).catch(e => console.warn('Sync dashboard member profile error:', e));
     } catch (e) {}
 
-    this.populateMemberPortalData();
-    window.showToast('✅ Biodata Member & Pilihan Klub berhasil diperbarui!', 'success');
+    await this.populateMemberPortalData();
+    window.showToast('✅ Foto Profil, Pilihan Klub, & Model Kendaraan berhasil diperbarui!', 'success');
   },
 
   /* ─── MEMBER 9-MENU NAVIGATION & MODAL HANDLERS ─── */
