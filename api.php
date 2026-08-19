@@ -1661,6 +1661,17 @@ try {
             exit;
         }
 
+        // Resolve valid club_id foreign key from clubs table
+        $resolvedClubId = null;
+        if (!empty($club) && $club !== 'Belum Memilih Klub' && $club !== '-') {
+            try {
+                $cStmt = $sPdo->prepare("SELECT id FROM clubs WHERE LOWER(name) = LOWER(:c) OR LOWER(name) LIKE LOWER(:clike) OR id = :cid LIMIT 1");
+                $cStmt->execute([':c' => $club, ':clike' => '%' . trim($club) . '%', ':cid' => $club]);
+                $fc = $cStmt->fetch();
+                if ($fc) $resolvedClubId = $fc['id'];
+            } catch (Throwable $e) {}
+        }
+
         try {
             $stmt = $sPdo->prepare("
                 UPDATE users SET 
@@ -1668,6 +1679,7 @@ try {
                     email = :email, 
                     phone = :phone, 
                     club = :club, 
+                    club_id = :club_id,
                     province = :prov, 
                     city = :city, 
                     tier = :tier, 
@@ -1685,6 +1697,7 @@ try {
                 ':email' => $email,
                 ':phone' => $phone,
                 ':club' => $club,
+                ':club_id' => $resolvedClubId,
                 ':prov' => $province,
                 ':city' => $city,
                 ':tier' => $tier,
@@ -3702,8 +3715,18 @@ try {
 
         $allowedRoles = ['SUPER_ADMIN','PRESIDEN','SEKRETARIS_PUSAT','BENDAHARA_PUSAT','ADMIN_ORGANISASI','PENGURUS_PUSAT','PENGURUS_KLUB','MEMBER','CALON_MEMBER','GUEST'];
 
+        $resolvedClubId = null;
+        if (!empty($club) && $club !== 'Belum Memilih Klub' && $club !== '-') {
+            try {
+                $cStmt = $sPdo->prepare("SELECT id FROM clubs WHERE LOWER(name) = LOWER(:c) OR LOWER(name) LIKE LOWER(:clike) OR id = :cid LIMIT 1");
+                $cStmt->execute([':c' => $club, ':clike' => '%' . trim($club) . '%', ':cid' => $club]);
+                $fc = $cStmt->fetch();
+                if ($fc) $resolvedClubId = $fc['id'];
+            } catch (Throwable $e) {}
+        }
+
         try {
-            $stmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, role = :role::role_enum, status = :status::user_status_enum, city = :city, province_id = :province_id, club = COALESCE(NULLIF(:club, ''), club), vehicle_model = COALESCE(NULLIF(:vehicle, ''), vehicle_model), license_plate = COALESCE(NULLIF(:plate, ''), license_plate), photo_url = COALESCE(NULLIF(:photo_url, ''), photo_url), avatar_url = COALESCE(NULLIF(:photo_url, ''), avatar_url), updated_at = NOW() WHERE id = :id OR username = :id OR member_id = :id");
+            $stmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, role = :role::role_enum, status = :status::user_status_enum, city = :city, province_id = :province_id, club = COALESCE(NULLIF(:club, ''), club), club_id = :club_id, vehicle_model = COALESCE(NULLIF(:vehicle, ''), vehicle_model), license_plate = COALESCE(NULLIF(:plate, ''), license_plate), photo_url = COALESCE(NULLIF(:photo_url, ''), photo_url), avatar_url = COALESCE(NULLIF(:photo_url, ''), avatar_url), updated_at = NOW() WHERE id = :id OR username = :id OR member_id = :id");
             $stmt->execute([
                 ':name' => $name,
                 ':email' => $email,
@@ -3714,6 +3737,7 @@ try {
                 ':city' => $city,
                 ':province_id' => $provinceId,
                 ':club' => $club,
+                ':club_id' => $resolvedClubId,
                 ':vehicle' => $vehicleModel,
                 ':plate' => $licensePlate,
                 ':photo_url' => $photoUrl,

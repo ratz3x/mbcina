@@ -412,19 +412,55 @@ const AppEngine = {
         ? this.allClubsSelectionData
         : ((this.m2Data && this.m2Data.clubs) ? this.m2Data.clubs : []);
 
+      const cleanStr = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const targetClean = cleanStr(clubName);
+
       let opts = `<option value="Belum Memilih Klub" ${!hasClub ? 'selected' : ''}>-- Belum Memilih Klub (Independent) --</option>`;
       let matchFound = false;
+      let matchedClubValue = '';
+
       clubsList.forEach(c => {
         const cName = c.name || c.club_name || '';
-        const isSel = (cName.trim().toLowerCase() === clubName.trim().toLowerCase() || c.id === clubName) ? 'selected' : '';
-        if (isSel) matchFound = true;
-        opts += `<option value="${cName}" ${isSel}>🚗 ${cName} (${c.city || c.region || 'Indonesia'})</option>`;
+        const cClean = cleanStr(cName);
+        const isSel = hasClub && !matchFound && targetClean && (
+          cClean === targetClean ||
+          cClean.includes(targetClean) ||
+          targetClean.includes(cClean) ||
+          (c.id && c.id === clubName)
+        );
+
+        if (isSel) {
+          matchFound = true;
+          matchedClubValue = cName;
+          opts += `<option value="${cName}" selected>🚗 ${cName} (${c.city || c.region || 'Indonesia'})</option>`;
+        } else {
+          opts += `<option value="${cName}">🚗 ${cName} (${c.city || c.region || 'Indonesia'})</option>`;
+        }
       });
+
       if (hasClub && !matchFound) {
+        matchedClubValue = clubName;
         opts += `<option value="${clubName}" selected>🚗 ${clubName}</option>`;
       }
+
       dClub.innerHTML = opts;
-      dClub.value = clubName;
+      dClub.value = matchedClubValue || (hasClub ? clubName : 'Belum Memilih Klub');
+
+      // Add live onchange listener to update session instantly
+      dClub.onchange = (e) => {
+        const selVal = e.target.value;
+        if (this.currentUser) {
+          this.currentUser.club = selVal;
+          this.currentUser.club_name = selVal;
+          try { localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser)); } catch (err) {}
+        }
+        const mClubEl = document.getElementById('member-portal-club');
+        if (mClubEl) {
+          const isSelectedClub = selVal && selVal !== 'Belum Memilih Klub' && selVal !== '-';
+          mClubEl.innerText = selVal;
+          mClubEl.style.color = isSelectedClub ? 'var(--accent-gold)' : 'var(--accent-blue)';
+        }
+      };
     }
 
     // 🗺️ Render Realistic Geographical POV Map of Indonesia for Member
