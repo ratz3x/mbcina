@@ -387,8 +387,8 @@ const AppEngine = {
     if (dCity) dCity.value = u.city || '';
     const dVehicle = document.getElementById('dash-member-vehicle');
     const dPlate = document.getElementById('dash-member-plate');
-    const userVehicle = u.vehicle_model || u.vehicle || (liveUser && (liveUser.vehicle_model || liveUser.vehicle)) || 'W212 E300 AMG';
-    const userPlate = u.license_plate || u.plate || (liveUser && (liveUser.license_plate || liveUser.plate)) || 'BH 1979 ZK';
+    const userVehicle = u.vehicle_model || u.vehicle || (liveUser && (liveUser.vehicle_model || liveUser.vehicle)) || '';
+    const userPlate = u.license_plate || u.plate || (liveUser && (liveUser.license_plate || liveUser.plate)) || '';
     if (dVehicle) dVehicle.value = userVehicle;
     if (dPlate) dPlate.value = userPlate;
     
@@ -956,26 +956,38 @@ const AppEngine = {
       if (this.currentUser) {
         this.currentUser.photo_url = dataUrl;
         this.currentUser.avatar_url = dataUrl;
-        localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
+        try { localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser)); } catch (err) {}
+
+        const updatePhotoTarget = (item) => {
+          if (!item) return;
+          if (item.id === this.currentUser.id || item.username === this.currentUser.username || item.email === this.currentUser.email || item.member_id === this.currentUser.member_id) {
+            item.photo_url = dataUrl;
+            item.avatar_url = dataUrl;
+          }
+        };
+        if (Array.isArray(this.users)) this.users.forEach(updatePhotoTarget);
+        if (this.m3Data && Array.isArray(this.m3Data.members)) this.m3Data.members.forEach(updatePhotoTarget);
 
         // Sync photo directly to Supabase Backend
-        fetch('api.php?action=update_m3_member', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: this.currentUser.id || this.currentUser.username || this.currentUser.email,
-            name: this.currentUser.name,
-            email: this.currentUser.email,
-            phone: this.currentUser.phone,
-            city: this.currentUser.city,
-            province: this.currentUser.province,
-            tier: this.currentUser.tier,
-            club: this.currentUser.club || this.currentUser.club_name || '',
-            status: this.currentUser.status || 'ACTIVE',
-            admin_notes: this.currentUser.admin_notes || '',
-            photo_url: dataUrl
-          })
-        }).catch(e => console.warn('Sync photo to Supabase error:', e));
+        try {
+          await fetch('api.php?action=update_m3_member', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: this.currentUser.id || this.currentUser.username || this.currentUser.email,
+              name: this.currentUser.name,
+              email: this.currentUser.email,
+              phone: this.currentUser.phone,
+              city: this.currentUser.city,
+              province: this.currentUser.province,
+              tier: this.currentUser.tier,
+              club: this.currentUser.club || this.currentUser.club_name || '',
+              status: this.currentUser.status || 'ACTIVE',
+              admin_notes: this.currentUser.admin_notes || '',
+              photo_url: dataUrl
+            })
+          });
+        } catch (e) { console.warn('Sync photo to Supabase error:', e); }
       }
 
       window.showToast?.(`✅ Foto profil berhasil diunggah & tersimpan di Supabase! (${(result.compressedSize / 1024).toFixed(0)} KB)`, 'success');
@@ -1059,9 +1071,9 @@ const AppEngine = {
     if (Array.isArray(this.users)) this.users.forEach(updateTarget);
     if (this.m3Data && Array.isArray(this.m3Data.members)) this.m3Data.members.forEach(updateTarget);
 
-    // Sync ke Supabase Database via API
+    // Sync ke Supabase Database via API with await
     try {
-      fetch('api.php?action=update_m3_member', {
+      const response = await fetch('api.php?action=update_m3_member', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1079,13 +1091,15 @@ const AppEngine = {
           admin_notes: notes,
           photo_url: (photo && !photo.includes('mb_badge.jpg')) ? photo : ''
         })
-      }).then(r => r.json()).then(res => {
-        console.log('Member profile synced to Supabase Cloud:', res);
-      }).catch(e => console.warn('Sync dashboard member profile error:', e));
-    } catch (e) {}
+      });
+      const data = await response.json();
+      console.log('Member profile saved to Supabase Cloud:', data);
+    } catch (e) {
+      console.warn('Sync dashboard member profile error:', e);
+    }
 
     await this.populateMemberPortalData();
-    window.showToast('✅ Foto Profil, Pilihan Klub, & Model Kendaraan berhasil diperbarui!', 'success');
+    window.showToast('✅ Foto Profil, Pilihan Klub, & Model Kendaraan berhasil disimpan di Database Supabase Cloud!', 'success');
   },
 
   /* ─── MEMBER 9-MENU NAVIGATION & MODAL HANDLERS ─── */
