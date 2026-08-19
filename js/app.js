@@ -4178,11 +4178,14 @@ const AppEngine = {
     const growthData = (this.adminStats && this.adminStats.chartGrowth) ? this.adminStats.chartGrowth.weekly : { Sen: 42, Sel: 65, Rab: 58, Kam: 84, Jum: 96, Sab: 120, Ming: 110 };
     const chartContainer = document.getElementById('admin-growth-chart');
     if (chartContainer) {
-      const maxVal = Math.max(...Object.values(growthData));
+      const maxVal = Math.max(...Object.values(growthData), 1);
       chartContainer.innerHTML = Object.entries(growthData).map(([day, val]) => `
-        <div class="chart-bar-col">
-          <div class="chart-bar" style="height: ${(val / maxVal) * 100}%;" title="${val} Registrasi Baru"></div>
-          <span style="font-size:0.75rem; color:var(--text-muted);">${day}</span>
+        <div class="chart-bar-col" style="height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; flex:1;">
+          <div style="font-size:0.7rem; color:var(--accent-gold); font-weight:800; margin-bottom:4px;">${val}</div>
+          <div style="flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center;">
+            <div class="chart-bar" style="height: ${Math.max(10, Math.round((val / maxVal) * 100))}%; width:22px; background:linear-gradient(180deg, #f59e0b, #d97706); border-radius:5px 5px 0 0;" title="${day}: ${val} Registrasi Baru"></div>
+          </div>
+          <span style="font-size:0.75rem; color:var(--text-muted); margin-top:6px; font-weight:600;">${day}</span>
         </div>
       `).join('');
     }
@@ -7254,8 +7257,8 @@ const AppEngine = {
         detail: `Pendaftaran Jamnas XXI / Event Regional (${m.city || 'Indonesia'})`,
         badge: 'Tiket Pending',
         date: m.created_at || 'Terbaru',
-        actionApprove: `AppEngine.openM3VerifyModal('${m.id}', 'APPROVE')`,
-        actionReject: `AppEngine.openM3VerifyModal('${m.id}', 'REJECT')`
+        actionApprove: `AppEngine.approveM3Member('${m.id}')`,
+        actionReject: `AppEngine.rejectM3Member('${m.id}')`
       });
     });
 
@@ -7492,12 +7495,16 @@ const AppEngine = {
         body: JSON.stringify({ userId, status: 'ACTIVE', role: 'MEMBER' })
       });
       const data = await res.json();
-      alert(data.message);
+      window.showToast?.('🎉 ' + data.message, 'success') || alert(data.message);
       await this.fetchData();
-      if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
-      else if (this.activeAdminTab === 'users') this.renderUserManagement();
+      if (this.activeAdminTab === 'dashboard') {
+        this.renderAdminDashboard();
+      } else if (this.activeAdminTab === 'users') {
+        this.renderUserManagement();
+      }
+      this.renderVerificationQueue(this._activeQueueFilter || 'ALL');
     } catch (e) {
-      alert('Gagal menyetujui member!');
+      alert('Gagal menyetujui member: ' + e.message);
     }
   },
 
@@ -7511,12 +7518,61 @@ const AppEngine = {
         body: JSON.stringify({ userId, status: 'REJECTED' })
       });
       const data = await res.json();
-      alert(data.message);
+      window.showToast?.('✅ ' + data.message, 'info') || alert(data.message);
       await this.fetchData();
-      if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
-      else if (this.activeAdminTab === 'users') this.renderUserManagement();
+      if (this.activeAdminTab === 'dashboard') {
+        this.renderAdminDashboard();
+      } else if (this.activeAdminTab === 'users') {
+        this.renderUserManagement();
+      }
+      this.renderVerificationQueue(this._activeQueueFilter || 'ALL');
     } catch (e) {
-      alert('Gagal menolak permohonan!');
+      alert('Gagal menolak permohonan: ' + e.message);
+    }
+  },
+
+  async approveM3Member(id) {
+    if (!confirm('Apakah Anda yakin ingin menyetujui verifikasi pendaftaran / tiket event member ini?')) return;
+    try {
+      const res = await fetch('api.php?action=verify_m3_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, type: 'APPROVE', notes: 'Disetujui via Antrean Verifikasi Terpadu Admin' })
+      }).then(r => r.json());
+      if (res.success) {
+        window.showToast?.('🎉 ' + res.message, 'success') || alert('🎉 ' + res.message);
+        await this.fetchData();
+        await this.fetchM3Data();
+        if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+        this.renderVerificationQueue(this._activeQueueFilter || 'ALL');
+      } else {
+        alert('⚠️ ' + res.message);
+      }
+    } catch (err) {
+      alert('❌ Gagal memproses persetujuan: ' + err.message);
+    }
+  },
+
+  async rejectM3Member(id) {
+    const reason = prompt('Masukkan alasan penolakan tiket / pendaftaran member ini:', 'Data pendaftaran belum lengkap');
+    if (reason === null) return;
+    try {
+      const res = await fetch('api.php?action=verify_m3_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, type: 'REJECT', reason: reason || 'Data tidak sesuai', notes: 'Ditolak via Antrean Verifikasi Terpadu Admin' })
+      }).then(r => r.json());
+      if (res.success) {
+        window.showToast?.('✅ ' + res.message, 'info') || alert('✅ ' + res.message);
+        await this.fetchData();
+        await this.fetchM3Data();
+        if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+        this.renderVerificationQueue(this._activeQueueFilter || 'ALL');
+      } else {
+        alert('⚠️ ' + res.message);
+      }
+    } catch (err) {
+      alert('❌ Gagal memproses penolakan: ' + err.message);
     }
   },
 
