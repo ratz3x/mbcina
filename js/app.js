@@ -3437,8 +3437,9 @@ const AppEngine = {
     if (navLinkAdmin) {
       navLinkAdmin.style.display = isAdminRole ? 'inline-block' : 'none';
     }
+    const isSponsorRole = this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR');
     if (navBtnMember) {
-      navBtnMember.style.display = (this.currentRole && this.currentRole !== 'GUEST') ? 'inline-block' : 'none';
+      navBtnMember.style.display = (this.currentRole && this.currentRole !== 'GUEST' && !isSponsorRole) ? 'inline-block' : 'none';
     }
 
     const sidebar = document.getElementById('app-sidebar');
@@ -15545,6 +15546,8 @@ const M6Engine = {
   async openPortalSponsor(email = null) {
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
     const spDash = document.getElementById('view-sponsor-dashboard');
+    const navBtnMember = document.getElementById('nav-btn-member-portal');
+    if (navBtnMember) navBtnMember.style.display = 'none';
     if (spDash) {
       spDash.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -16866,6 +16869,10 @@ window.M7Engine = {
     if (window.AuthEngine) {
       window.AuthEngine.openModal('modal-my-iklan-list');
     }
+  },
+
+  openMyIklanListModal: function() {
+    this.openMyIklanModal();
   },
 
   renderMyLapakIklan: function() {
