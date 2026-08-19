@@ -344,6 +344,63 @@ const AppEngine = {
     }
     if (mTier) mTier.innerText = `${tierCalc.icon} ${tierName} MEMBER`;
 
+    // 💳 Populasikan Kartu Tanda Anggota (KTA Digital) Resmi di Kolom Kiri
+    const ktaTierBadge = document.getElementById('kta-tier-badge');
+    const ktaPhoto = document.getElementById('kta-member-photo');
+    const ktaStatus = document.getElementById('kta-status-pill');
+    const ktaName = document.getElementById('kta-member-name');
+    const ktaId = document.getElementById('kta-member-id');
+    const ktaClub = document.getElementById('kta-member-club');
+    const ktaLoc = document.getElementById('kta-member-location');
+    const ktaQr = document.getElementById('kta-qr-code');
+
+    if (ktaTierBadge) {
+      ktaTierBadge.innerHTML = `${tierCalc.icon} ${tierName}`;
+      ktaTierBadge.style.color = tierCalc.color || 'var(--accent-gold)';
+    }
+    if (ktaPhoto) {
+      const userPhoto = u.photo_url || u.avatar_url || (liveUser && (liveUser.photo_url || liveUser.avatar_url)) || 'assets/mb_badge.jpg';
+      ktaPhoto.src = userPhoto;
+      ktaPhoto.onerror = function() { this.src = 'assets/mb_badge.jpg'; };
+    }
+    if (ktaStatus) {
+      if (realStatus === 'ACTIVE') {
+        ktaStatus.innerHTML = '🟢 ACTIVE / VERIFIED';
+        ktaStatus.style.color = 'var(--primary-emerald)';
+        ktaStatus.style.background = 'rgba(16,185,129,0.15)';
+        ktaStatus.style.borderColor = 'var(--primary-emerald)';
+      } else if (realStatus === 'PENDING') {
+        ktaStatus.innerHTML = '🟡 PENDING VERIFICATION';
+        ktaStatus.style.color = 'var(--accent-gold)';
+        ktaStatus.style.background = 'rgba(234,179,8,0.15)';
+        ktaStatus.style.borderColor = 'var(--accent-gold)';
+      } else if (realStatus === 'HONORARY') {
+        ktaStatus.innerHTML = '🟣 HONORARY MEMBER';
+        ktaStatus.style.color = '#8b5cf6';
+        ktaStatus.style.background = 'rgba(139,92,246,0.15)';
+        ktaStatus.style.borderColor = '#8b5cf6';
+      } else {
+        ktaStatus.innerHTML = '🔴 INACTIVE / SUSPENDED';
+        ktaStatus.style.color = 'var(--accent-red)';
+        ktaStatus.style.background = 'rgba(239,68,68,0.15)';
+        ktaStatus.style.borderColor = 'var(--accent-red)';
+      }
+    }
+    if (ktaName) ktaName.innerText = (u.name || 'MEMBER MB INA').toUpperCase();
+    if (ktaId) ktaId.innerText = memberId;
+    if (ktaClub) {
+      ktaClub.innerText = clubName;
+      ktaClub.style.color = hasClub ? 'var(--accent-gold)' : 'var(--accent-blue)';
+    }
+    if (ktaLoc) {
+      const cityStr = u.city || (liveUser && liveUser.city) || 'Kota Jambi';
+      const provStr = u.province || (liveUser && liveUser.province) || 'Jambi';
+      ktaLoc.innerText = `${cityStr}, ${provStr}`;
+    }
+    if (ktaQr) {
+      ktaQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(memberId)}`;
+    }
+
     // 📝 Populate In-Place Biodata Member Form di Kolom Kanan
     const dPhoto = document.getElementById('dash-member-photo');
     const dId = document.getElementById('dash-member-id');
