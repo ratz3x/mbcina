@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_083500">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_091800">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -6554,27 +6554,27 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- MODAL M3: EXPORT DATA KEANGGOTAAN -->
+  <!-- MODAL M3: EXPORT DATA KEANGGOTAAN                            -->
   <!-- ============================================================ -->
-  <div id="modal-m3-export" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
-    <div class="modal-box glass-panel" style="width:min(460px,95vw); padding:0; border-radius:20px; border:1px solid var(--chrome-border); position:relative;">
-      <div style="padding:20px 24px; border-bottom:1px solid var(--chrome-border); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3);">
-        <h3 class="text-gradient" style="font-size:1.1rem;">📤 Export Data Keanggotaan</h3>
-        <button onclick="AuthEngine.closeAllModals()" style="background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer; line-height:1;">✕</button>
+  <div id="modal-m3-export" class="modal-backdrop">
+    <div class="modal-container" style="max-width:500px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color:var(--accent-gold);">📤 Export Data Keanggotaan MB INA</h3>
+        <button class="modal-close-btn" onclick="AuthEngine.closeAllModals()">✕</button>
       </div>
-      <div style="padding:24px;">
+      <div class="modal-body">
         <div style="margin-bottom:16px;">
-          <label class="form-label">Format Export</label>
-          <select id="m3-export-format" class="form-input">
+          <label class="form-label" style="font-weight:700;">Format Export *</label>
+          <select id="m3-export-format" class="form-input" style="font-weight:600;">
             <option value="excel">📊 Microsoft Excel (.xlsx)</option>
-            <option value="pdf">📄 PDF Report</option>
-            <option value="csv">📋 CSV (Raw Data)</option>
+            <option value="csv">📋 CSV Data (.csv)</option>
+            <option value="pdf">📄 Dokumen PDF Siap Cetak (.pdf)</option>
           </select>
         </div>
         <div style="margin-bottom:16px;">
-          <label class="form-label">Filter Tier</label>
+          <label class="form-label" style="font-weight:700;">Filter Tier Keanggotaan</label>
           <select id="m3-export-tier" class="form-input">
-            <option value="">Semua Tier</option>
+            <option value="">Semua Tier (Platinum, Gold, Silver, Bronze)</option>
             <option value="PLATINUM">💎 PLATINUM</option>
             <option value="GOLD">🥇 GOLD</option>
             <option value="SILVER">🥈 SILVER</option>
@@ -6582,17 +6582,17 @@
           </select>
         </div>
         <div style="margin-bottom:20px;">
-          <label class="form-label">Filter Status</label>
+          <label class="form-label" style="font-weight:700;">Filter Status Keanggotaan</label>
           <select id="m3-export-status" class="form-input">
-            <option value="">Semua Status</option>
-            <option value="ACTIVE">ACTIVE</option>
-            <option value="PENDING">PENDING</option>
-            <option value="SUSPENDED">SUSPENDED</option>
+            <option value="">Semua Status (Active, Pending, Suspended)</option>
+            <option value="ACTIVE">🟢 ACTIVE (Member Terverifikasi)</option>
+            <option value="PENDING">⏳ PENDING (Dalam Verifikasi)</option>
+            <option value="SUSPENDED">⛔ SUSPENDED</option>
           </select>
         </div>
         <div style="display:flex; gap:12px; justify-content:flex-end;">
           <button type="button" onclick="AuthEngine.closeAllModals()" class="btn-outline" style="padding:10px 20px;">Batal</button>
-          <button type="button" class="btn-primary" style="padding:10px 24px;" onclick="alert('🚧 Fitur export sedang dalam pengembangan.')">📥 Download</button>
+          <button type="button" class="btn-primary" style="padding:10px 24px; font-weight:800;" onclick="AppEngine.executeM3Export()">📥 Download Berkas</button>
         </div>
       </div>
     </div>
@@ -9460,8 +9460,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_083500"></script>
-  <script src="js/app.js?v=20260819_083500"></script>
+  <script src="js/auth.js?v=20260819_091800"></script>
+  <script src="js/app.js?v=20260819_091800"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache

@@ -8580,24 +8580,173 @@ const AppEngine = {
     AuthEngine.openModal('modal-m3-export');
   },
 
-  processM3Export(event) {
-    event.preventDefault();
-    const formatRadios = document.getElementsByName('export_format');
-    let format = 'PDF';
-    for (let r of formatRadios) {
-      if (r.checked) format = r.value;
+  executeM3Export() {
+    const format = document.getElementById('m3-export-format')?.value || 'excel';
+    const tierFilter = document.getElementById('m3-export-tier')?.value || '';
+    const statusFilter = document.getElementById('m3-export-status')?.value || '';
+
+    let members = (this.m3Data && Array.isArray(this.m3Data.members) && this.m3Data.members.length) 
+      ? this.m3Data.members 
+      : (Array.isArray(this.users) ? this.users : []);
+
+    if (tierFilter) {
+      members = members.filter(m => (m.tier || '').toUpperCase() === tierFilter.toUpperCase());
+    }
+    if (statusFilter) {
+      members = members.filter(m => (m.status || '').toUpperCase() === statusFilter.toUpperCase());
     }
 
-    const selectedFields = [];
-    document.querySelectorAll('.exp-field').forEach(cb => {
-      if (cb.checked) selectedFields.push(cb.value);
-    });
+    if (!members.length) {
+      alert('⚠️ Tidak ada data member yang sesuai dengan filter yang dipilih.');
+      return;
+    }
 
-    const startDate = document.getElementById('m3-exp-start').value;
-    const endDate = document.getElementById('m3-exp-end').value;
+    const timestamp = new Date().toISOString().split('T')[0];
+    const fileName = `Data_Member_MBINA_${timestamp}`;
 
-    alert(`📥 Berkas Export Data Member MB INA berformat ${format} berhasil dibuat! (Periode: ${startDate} s/d ${endDate}, Total Field: ${selectedFields.length})`);
-    AuthEngine.closeAllModals();
+    if (format === 'excel') {
+      if (typeof XLSX === 'undefined') {
+        alert('Library Excel (SheetJS) sedang dimuat, silakan coba sesaat lagi.');
+        return;
+      }
+      const exportData = members.map((m, idx) => ({
+        'No': idx + 1,
+        'Member ID': m.member_id || '-',
+        'Nama Lengkap': m.name || '-',
+        'Email': m.email || '-',
+        'WhatsApp / HP': m.phone || '-',
+        'Username': m.username || '-',
+        'Klub / Chapter': m.club || 'MB Club INA',
+        'Provinsi': m.province || '-',
+        'Kota': m.city || '-',
+        'Tier Keanggotaan': m.tier || 'BRONZE',
+        'Role Akun': m.role || 'MEMBER',
+        'Status': m.status || 'ACTIVE',
+        'Model Kendaraan': m.vehicle_model || '-',
+        'Plat Nomor': m.license_plate || '-',
+        'Poin Aktivitas': m.points || 0,
+        'Total Donasi': Number(m.total_donation || 0),
+        'Tanggal Bergabung': m.created_at || m.join_date || '-'
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Data Member MB INA');
+      XLSX.writeFile(wb, `${fileName}.xlsx`);
+      window.showToast?.('✅ File Excel Data Member berhasil diunduh!', 'success');
+      AuthEngine.closeAllModals();
+    } else if (format === 'csv') {
+      const headers = ['No', 'Member ID', 'Nama Lengkap', 'Email', 'WhatsApp', 'Username', 'Klub', 'Provinsi', 'Kota', 'Tier', 'Role', 'Status', 'Model Kendaraan', 'Plat Nomor', 'Poin', 'Total Donasi', 'Tanggal Bergabung'];
+      const csvRows = [headers.join(',')];
+      members.forEach((m, idx) => {
+        const row = [
+          idx + 1,
+          `"${(m.member_id || '').replace(/"/g, '""')}"`,
+          `"${(m.name || '').replace(/"/g, '""')}"`,
+          `"${(m.email || '').replace(/"/g, '""')}"`,
+          `"${(m.phone || '').replace(/"/g, '""')}"`,
+          `"${(m.username || '').replace(/"/g, '""')}"`,
+          `"${(m.club || 'MB Club INA').replace(/"/g, '""')}"`,
+          `"${(m.province || '').replace(/"/g, '""')}"`,
+          `"${(m.city || '').replace(/"/g, '""')}"`,
+          `"${(m.tier || 'BRONZE').replace(/"/g, '""')}"`,
+          `"${(m.role || 'MEMBER').replace(/"/g, '""')}"`,
+          `"${(m.status || 'ACTIVE').replace(/"/g, '""')}"`,
+          `"${(m.vehicle_model || '').replace(/"/g, '""')}"`,
+          `"${(m.license_plate || '').replace(/"/g, '""')}"`,
+          m.points || 0,
+          m.total_donation || 0,
+          `"${(m.created_at || m.join_date || '').replace(/"/g, '""')}"`
+        ];
+        csvRows.push(row.join(','));
+      });
+      const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${fileName}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      window.showToast?.('✅ File CSV Data Member berhasil diunduh!', 'success');
+      AuthEngine.closeAllModals();
+    } else if (format === 'pdf') {
+      const printWin = window.open('', '_blank');
+      if (!printWin) {
+        alert('Izinkan pop-up browser untuk mengunduh/mencetak PDF.');
+        return;
+      }
+      const tableRows = members.map((m, idx) => `
+        <tr style="border-bottom:1px solid #e2e8f0; font-size:11px;">
+          <td style="padding:6px; text-align:center;">${idx + 1}</td>
+          <td style="padding:6px; font-weight:bold; font-family:monospace;">${m.member_id || '-'}</td>
+          <td style="padding:6px; font-weight:bold;">${m.name || '-'}</td>
+          <td style="padding:6px;">${m.email || '-'}<br><small style="color:#64748b;">${m.phone || '-'}</small></td>
+          <td style="padding:6px;">${m.club || 'MB Club INA'}</td>
+          <td style="padding:6px;">${m.city || '-'}, ${m.province || '-'}</td>
+          <td style="padding:6px; text-align:center;"><span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:4px; font-weight:bold;">${m.tier || 'BRONZE'}</span></td>
+          <td style="padding:6px; text-align:center;"><span style="background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:4px; font-weight:bold;">${m.status || 'ACTIVE'}</span></td>
+        </tr>
+      `).join('');
+
+      printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${fileName}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px; color: #1e293b; }
+            h2 { color: #0f172a; margin: 0 0 4px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+            th { background: #0f172a; color: #ffffff; padding: 8px 6px; font-size: 11px; text-align: left; }
+            @media print {
+              body { padding: 0; }
+              button { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0f172a; padding-bottom:12px;">
+            <div>
+              <h2>MERCEDES-BENZ CLUB INDONESIA (MB INA)</h2>
+              <p style="margin:0; font-size:12px; color:#64748b;">Laporan Rekapitulasi Data Anggota Resmi Federasi</p>
+            </div>
+            <div style="text-align:right; font-size:11px; color:#64748b;">
+              <div>Tanggal Export: <strong>${new Date().toLocaleDateString('id-ID', { dateStyle: 'full' })}</strong></div>
+              <div>Total Anggota: <strong>${members.length} Orang</strong></div>
+            </div>
+          </div>
+          <div style="margin-top:10px; margin-bottom:10px; text-align:right;">
+            <button onclick="window.print()" style="padding:8px 16px; background:#f59e0b; color:#000; font-weight:bold; border:none; border-radius:6px; cursor:pointer;">🖨️ Cetak / Simpan PDF</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:30px; text-align:center;">No</th>
+                <th>Member ID</th>
+                <th>Nama Anggota</th>
+                <th>Kontak</th>
+                <th>Klub / Chapter</th>
+                <th>Domisili</th>
+                <th style="text-align:center;">Tier</th>
+                <th style="text-align:center;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+          <script>
+            window.onload = function() { window.print(); };
+          </script>
+        </body>
+        </html>
+      `);
+      printWin.document.close();
+      window.showToast?.('✅ Tampilan cetak PDF Data Member siap!', 'success');
+      AuthEngine.closeAllModals();
+    }
   },
 
   // ============================================
