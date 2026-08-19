@@ -887,7 +887,10 @@ const AppEngine = {
       if (res && res.success) {
         this.donationData = res;
         if (window.M7Engine) window.M7Engine.donationData = res;
+        if (Array.isArray(res.campaigns)) window.m73Campaigns = res.campaigns;
         this._renderMemberDonasiCard();
+        if (typeof this.renderDonationCampaignCards === 'function') this.renderDonationCampaignCards();
+        if (typeof window.renderAllDonationCards === 'function') window.renderAllDonationCards();
       }
     } catch (e) {
       console.warn("Donation fetch warning:", e);

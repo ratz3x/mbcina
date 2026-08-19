@@ -4696,8 +4696,8 @@ try {
             // Fetch campaigns with dynamically computed collected_amount and donor_count
             $campaigns = $sPdo->query("
                 SELECT c.*,
-                    COALESCE(SUM(CASE WHEN d.status IN ('SUCCESS','CONFIRMED') THEN d.amount ELSE 0 END), 0) AS collected_amount,
-                    COUNT(CASE WHEN d.status IN ('SUCCESS','CONFIRMED') THEN 1 END) AS donor_count
+                    COALESCE(SUM(CASE WHEN d.status != 'REJECTED' THEN d.amount ELSE 0 END), 0) AS collected_amount,
+                    COUNT(CASE WHEN d.status != 'REJECTED' THEN 1 END) AS donor_count
                 FROM donation_campaigns c
                 LEFT JOIN donations d ON d.campaign_id = c.id
                 GROUP BY c.id
@@ -4839,6 +4839,18 @@ try {
             $id = 'DON-TRX-' . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
             $stmt = $sPdo->prepare("INSERT INTO donations (id, campaign_id, user_id, amount, payment_method, status, payment_status, payment_proof_url, notes) VALUES (?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?, ?)");
             $stmt->execute([$id, $campaignId, $userId, $amount, $paymentMethod, $proofUrl, $notes]);
+
+            // Sync campaign table collected_amount
+            try {
+                $sPdo->prepare("UPDATE donation_campaigns SET collected_amount = (SELECT COALESCE(SUM(amount), 0) FROM donations WHERE campaign_id = :cid AND status != 'REJECTED'), updated_at = NOW() WHERE id = :cid")->execute([':cid' => $campaignId]);
+            } catch (Exception $eCamp) {}
+
+            // Sync user total_donation & tier
+            try {
+                if (!empty($userId) && $userId !== 'usr_superadmin') {
+                    $sPdo->prepare("UPDATE users SET total_donation = COALESCE(total_donation, 0) + :amt, points = COALESCE(points, 0) + CAST(:amt / 10000 AS integer), updated_at = NOW() WHERE id = :uid OR member_id = :mid")->execute([':amt' => $amount, ':uid' => $userId, ':mid' => $memberIdInput]);
+                }
+            } catch (Exception $eUser) {}
 
             logAudit($userId, 'CREATE', 'DONATION', ['donation_id' => $id, 'amount' => $amount, 'method' => $paymentMethod]);
 
