@@ -386,6 +386,10 @@ const AppEngine = {
     if (dPhone) dPhone.value = u.phone || '';
     if (dCity) dCity.value = u.city || '';
     if (dProvince) dProvince.value = u.province || '';
+    const dVehicle = document.getElementById('dash-member-vehicle');
+    const dPlate = document.getElementById('dash-member-plate');
+    if (dVehicle) dVehicle.value = u.vehicle_model || u.vehicle || '';
+    if (dPlate) dPlate.value = u.license_plate || u.plate || '';
     
     // Set Visual Tier Otomatis
     if (dTierTxt) dTierTxt.innerHTML = `${tierCalc.icon} ${tierCalc.tier} MEMBER`;
@@ -954,6 +958,8 @@ const AppEngine = {
     const phone = (document.getElementById('dash-member-phone')?.value || '').trim();
     const city = (document.getElementById('dash-member-city')?.value || '').trim();
     const province = (document.getElementById('dash-member-province')?.value || '').trim();
+    const vehicle_model = (document.getElementById('dash-member-vehicle')?.value || '').trim();
+    const license_plate = (document.getElementById('dash-member-plate')?.value || '').trim();
     const tier = (document.getElementById('dash-member-tier')?.value || 'BRONZE').trim();
     const club = (document.getElementById('dash-member-club')?.value || 'Belum Memilih Klub').trim();
     const status = canManageStatus 
@@ -972,6 +978,8 @@ const AppEngine = {
       this.currentUser.phone = phone;
       this.currentUser.city = city;
       this.currentUser.province = province;
+      this.currentUser.vehicle_model = vehicle_model;
+      this.currentUser.license_plate = license_plate;
       this.currentUser.tier = tier;
       this.currentUser.club = club;
       this.currentUser.club_name = club;
@@ -993,6 +1001,8 @@ const AppEngine = {
           phone: phone,
           city: city,
           province: province,
+          vehicle_model: vehicle_model,
+          license_plate: license_plate,
           tier: tier,
           club: club,
           status: status,
