@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260819_133000">
+  <link rel="stylesheet" href="css/styles.css?v=20260819_134000">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -6701,7 +6701,7 @@
               <p id="spnd-card-endorse-desc" style="font-size:0.78rem; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">5 Forum Posts • 3 Sosmed Posts • Banner Header</p>
             </div>
             <div>
-              <button class="btn-primary" style="font-size:0.82rem; padding:8px 14px; width:100%; border-radius:8px; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none;" onclick="SponsorPortalEngine.openEndorseModal()">➕ Pesan Baru</button>
+              <button class="btn-primary" style="font-size:0.82rem; padding:8px 14px; width:100%; border-radius:8px; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none;" onclick="SponsorPortalEngine.openEndorseModal()">➕ Pesan Endorse</button>
             </div>
           </div>
 
@@ -6734,9 +6734,8 @@
               </div>
               <p id="spnd-card-forum-meta" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px;">💬 18 replies &nbsp;•&nbsp; 👁️ 412 views &nbsp;•&nbsp; Diposting oleh FDR Tyre Indonesia</p>
             </div>
-            <div style="display:flex; gap:8px;">
-              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="if(window.AppEngine && typeof window.AppEngine.openMemberForumModal==='function'){window.AppEngine.openMemberForumModal(true);}else if(window.AppEngine && typeof window.AppEngine.navigateToForum==='function'){window.AppEngine.navigateToForum(true);}">🔍 Buka Forum</button>
-              <button class="btn-primary" style="font-size:0.75rem; padding:7px 12px; flex:1; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none;" onclick="SponsorPortalEngine.openNewThreadModal()">📝 Tulis Thread</button>
+            <div>
+              <button class="btn-outline" style="font-size:0.82rem; padding:8px 14px; width:100%; border-radius:8px; font-weight:700; border-color:#22c55e; color:#22c55e;" onclick="if(window.AppEngine && typeof window.AppEngine.openMemberForumModal==='function'){window.AppEngine.openMemberForumModal(true);}else if(window.AppEngine && typeof window.AppEngine.navigateToForum==='function'){window.AppEngine.navigateToForum(true);}">🔍 Buka Forum</button>
             </div>
           </div>
 
@@ -6753,7 +6752,7 @@
               <p id="spnd-card-lapak-cat" style="font-size:0.78rem; color:var(--text-muted); margin-bottom:16px;">Kategori: Ban & Velg High Performance Mercedes-Benz</p>
             </div>
             <div style="display:flex; gap:8px;">
-              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="if(window.M7Engine && typeof window.M7Engine.openMyIklanModal==='function'){window.M7Engine.openMyIklanModal();}else if(window.AppEngine && typeof window.AppEngine.navigateToLapak==='function'){window.AppEngine.navigateToLapak();}">📦 Kelola Produk</button>
+              <button class="btn-outline" style="font-size:0.75rem; padding:7px 12px; flex:1;" onclick="SponsorPortalEngine.openManageProductsModal()">📦 Kelola Produk</button>
               <button class="btn-primary" style="font-size:0.75rem; padding:7px 12px; flex:1; background:linear-gradient(135deg,#a855f7,#7e22ce); color:#fff; border:none;" onclick="if(window.M7Engine && typeof window.M7Engine.openProductModal==='function'){window.M7Engine.openProductModal();}else{alert('Buka form produk');}">➕ Tambah Produk</button>
             </div>
           </div>
@@ -6770,7 +6769,7 @@
             </h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0 0;">Data analitik penayangan iklan banner, jangkauan tayang ke member resmi MB INA se-Indonesia</p>
           </div>
-          <button class="btn-primary" style="font-weight:800; font-size:0.85rem; padding:9px 20px; border-radius:10px; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none;" onclick="AppEngine.simulateExport('pdf')">📥 Download Laporan PDF</button>
+          <button class="btn-primary" style="font-weight:800; font-size:0.85rem; padding:9px 20px; border-radius:10px; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none; cursor:pointer;" onclick="SponsorPortalEngine.downloadSponsorReportPDF()">📥 Download Laporan PDF</button>
         </div>
 
         <!-- METRICS GRID -->
@@ -9286,8 +9285,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260819_133000"></script>
-  <script src="js/app.js?v=20260819_133000"></script>
+  <script src="js/auth.js?v=20260819_134000"></script>
+  <script src="js/app.js?v=20260819_134000"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache

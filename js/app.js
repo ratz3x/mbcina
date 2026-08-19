@@ -21604,6 +21604,200 @@ window.SponsorPortalEngine = {
       else alert(`Sewa Lapak Sponsor ${periodeBulan} Bulan Berhasil Berlangganan!`);
       this.switchTab('beranda');
     }
+  },
+
+  openManageProductsModal: function() {
+    if (window.M7Engine && typeof window.M7Engine.renderMyLapakIklan === 'function') {
+      window.M7Engine.renderMyLapakIklan();
+    }
+    const modal = document.getElementById('modal-my-iklan-list');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('active');
+    }
+    if (window.AuthEngine && typeof window.AuthEngine.openModal === 'function') {
+      window.AuthEngine.openModal('modal-my-iklan-list');
+    }
+  },
+
+  downloadSponsorReportPDF: function() {
+    const u = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const compName = document.getElementById('sponsor-dash-welcome-title')?.innerText.replace('Selamat Datang, ', '').replace('!', '') || u.name || 'Mitra Sponsor MB INA';
+    const tier = document.getElementById('sponsor-portal-badge-tier')?.innerText || '💎 MITRA SPONSOR PLATINUM';
+    const invest = document.getElementById('spnd-card-invest-amount')?.innerText || 'Rp 30.000.000';
+    const revenue = document.getElementById('spnd-card-revenue-amount')?.innerText || 'Rp 45.000.000';
+    const roi = document.getElementById('spnd-card-roi-percent')?.innerText || '50%';
+    const impressions = document.getElementById('spnd-impressions')?.innerText || '12.450';
+    const clicks = document.getElementById('spnd-clicks')?.innerText || '1.234';
+    const reach = document.getElementById('spnd-reach')?.innerText || '8.900';
+    const engagement = document.getElementById('spnd-engagement')?.innerText || '9.9%';
+    const dateStr = new Date().toLocaleDateString('id-ID', { year:'numeric', month:'long', day:'numeric' });
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Laporan Efektivitas & ROI Sponsorship - ${compName}</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; color: #0f172a; padding: 30px; margin: 0; background: #fff; }
+          .header { border-bottom: 3px solid #f59e0b; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+          .logo-text { font-size: 22px; font-weight: 900; color: #0b0e14; }
+          .badge { background: #fef3c7; color: #b45309; border: 1px solid #f59e0b; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+          .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+          .kpi-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; text-align: center; }
+          .kpi-num { font-size: 22px; font-weight: 900; color: #d97706; margin-top: 4px; }
+          .table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13px; }
+          .table th { background: #0f172a; color: #fff; padding: 10px; text-align: left; }
+          .table td { border-bottom: 1px solid #e2e8f0; padding: 10px; }
+          .footer { margin-top: 40px; border-top: 1px solid #cbd5e1; padding-top: 16px; font-size: 11px; color: #64748b; text-align: center; }
+          @media print {
+            .no-print { display: none; }
+            body { padding: 15px; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="no-print" style="margin-bottom: 20px; text-align: right;">
+          <button onclick="window.print()" style="padding: 10px 20px; background: #f59e0b; color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">🖨️ Cetak / Simpan PDF</button>
+        </div>
+
+        <div class="header">
+          <div>
+            <div class="logo-text">MERCEDES-BENZ CLUB INDONESIA</div>
+            <div style="font-size: 13px; color: #64748b; margin-top: 2px;">Official Federation Brand Partnership & Analytics Report</div>
+          </div>
+          <div>
+            <span class="badge">${tier}</span>
+          </div>
+        </div>
+
+        <div style="background: #f1f5f9; padding: 16px 20px; border-radius: 12px; margin-bottom: 24px;">
+          <h2 style="margin: 0 0 6px 0; font-size: 20px; color: #0f172a;">Laporan Efektivitas & Dampak ROI Sponsorship</h2>
+          <div style="font-size: 14px; color: #334155;">
+            <strong>Nama Mitra Sponsor:</strong> ${compName} &nbsp;|&nbsp; 
+            <strong>Tanggal Cetak:</strong> ${dateStr} &nbsp;|&nbsp;
+            <strong>Status Kontrak:</strong> <span style="color:#16a34a; font-weight:bold;">AKTIF (Terverifikasi Bendahara Pusat)</span>
+          </div>
+        </div>
+
+        <h3 style="color: #0f172a; border-left: 4px solid #f59e0b; padding-left: 8px; margin-bottom: 12px;">📊 Metrik Penayangan Iklan & Jangkauan Member</h3>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div style="font-size: 11px; color: #64748b; font-weight: bold;">TOTAL IMPRESSIONS</div>
+            <div class="kpi-num">${impressions}</div>
+            <div style="font-size: 10px; color: #16a34a; font-weight: bold; margin-top: 2px;">↑ 15% di atas target</div>
+          </div>
+          <div class="kpi-card">
+            <div style="font-size: 11px; color: #64748b; font-weight: bold;">TOTAL CLICKS (CTR)</div>
+            <div class="kpi-num" style="color: #2563eb;">${clicks}</div>
+            <div style="font-size: 10px; color: #16a34a; font-weight: bold; margin-top: 2px;">↑ 8% CTR tinggi</div>
+          </div>
+          <div class="kpi-card">
+            <div style="font-size: 11px; color: #64748b; font-weight: bold;">TOTAL REACH</div>
+            <div class="kpi-num" style="color: #16a34a;">${reach}</div>
+            <div style="font-size: 10px; color: #16a34a; font-weight: bold; margin-top: 2px;">↑ 12% jangkauan member</div>
+          </div>
+          <div class="kpi-card">
+            <div style="font-size: 11px; color: #64748b; font-weight: bold;">ENGAGEMENT RATE</div>
+            <div class="kpi-num" style="color: #7c3aed;">${engagement}</div>
+            <div style="font-size: 10px; color: #16a34a; font-weight: bold; margin-top: 2px;">⭐ Performa Terbaik</div>
+          </div>
+        </div>
+
+        <h3 style="color: #0f172a; border-left: 4px solid #f59e0b; padding-left: 8px; margin-bottom: 12px; margin-top: 28px;">💰 Ringkasan Finansial & Estimasi Dampak ROI</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Indikator Finansial</th>
+              <th>Nilai / Persentase</th>
+              <th>Keterangan Verifikasi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Total Investasi Sponsorship</strong></td>
+              <td style="font-weight: bold; color: #0f172a;">${invest}</td>
+              <td>Lunas terverifikasi di kas Pengurus Pusat MB INA</td>
+            </tr>
+            <tr>
+              <td><strong>Estimasi Dampak Revenue Penjualan</strong></td>
+              <td style="font-weight: bold; color: #16a34a;">${revenue}</td>
+              <td>Berdasarkan konversi transaksi & interaksi marketplace member</td>
+            </tr>
+            <tr>
+              <td><strong>Return on Investment (ROI)</strong></td>
+              <td style="font-weight: bold; color: #d97706;">${roi}</td>
+              <td>Melampaui benchmark rata-rata kemitraan federasi otomotif</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 style="color: #0f172a; border-left: 4px solid #f59e0b; padding-left: 8px; margin-bottom: 12px; margin-top: 28px;">📜 Histori Penayangan & Layanan Aktif</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Layanan / Penempatan</th>
+              <th>Periode Penayangan</th>
+              <th>Status</th>
+              <th>Performa / Catatan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>Banner Promosi Sponsor (Header & Feed Portal)</strong></td>
+              <td>1 Bulan (Aktif)</td>
+              <td><span style="color:#16a34a; font-weight:bold;">🟢 TAYANG</span></td>
+              <td>Ditayangkan di rotasi teratas Portal Resmi MB INA</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>Posting Artikel & Thread Brand di Forum Resmi</strong></td>
+              <td>Aktif</td>
+              <td><span style="color:#16a34a; font-weight:bold;">🟢 TAYANG</span></td>
+              <td>Mendapatkan interaksi diskusi aktif dari member klub</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>Official Store di Katalog Lapak & Marketplace</strong></td>
+              <td>1 Tahun (Aktif)</td>
+              <td><span style="color:#16a34a; font-weight:bold;">🟢 TAYANG</span></td>
+              <td>Produk terverifikasi tayang untuk seluruh member MB INA</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-top: 40px; display: flex; justify-content: space-between;">
+          <div style="text-align: center; width: 220px;">
+            <div style="font-size: 12px; color: #64748b;">Perwakilan Mitra Sponsor</div>
+            <div style="height: 60px;"></div>
+            <div style="font-weight: bold; border-top: 1px solid #0f172a; padding-top: 4px;">${compName}</div>
+          </div>
+          <div style="text-align: center; width: 220px;">
+            <div style="font-size: 12px; color: #64748b;">Pengurus Pusat MB INA</div>
+            <div style="height: 60px;"></div>
+            <div style="font-weight: bold; border-top: 1px solid #0f172a; padding-top: 4px;">Divisi Kemitraan & Sponsorship</div>
+          </div>
+        </div>
+
+        <div class="footer">
+          Laporan ini diterbitkan secara resmi oleh Sistem Terintegrasi Mercedes-Benz Club Indonesia (MB INA Portal Cloud).
+        </div>
+      </body>
+      </html>
+    `;
+
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.write(htmlContent);
+      printWin.document.close();
+      if (window.showToast) {
+        window.showToast('📥 Menyiapkan Laporan Sponsorship & ROI PDF...', 'info');
+      }
+    } else {
+      alert('Popup diblokir oleh browser. Izinkan popup untuk mengunduh laporan PDF.');
+    }
   }
 };
 
