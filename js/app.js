@@ -21663,10 +21663,41 @@ window.SponsorPortalEngine = {
   },
 
   openManageProductsModal: function() {
-    if (window.M7Engine && typeof window.M7Engine.renderMyLapakIklan === 'function') {
-      window.M7Engine.renderMyLapakIklan();
+    const userObj = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const compName = userObj.name || 'FDR Tyre Indonesia';
+    const storeNameEl = document.getElementById('spnd-modal-store-name');
+    if (storeNameEl) storeNameEl.innerText = `${compName} Official Store`;
+
+    const tbody = document.getElementById('sponsor-manage-products-tbody') || document.getElementById('my-iklan-tbody');
+    if (tbody) {
+      const isShell = compName.toLowerCase().includes('shell');
+      const fallbackProducts = isShell ? [
+        { id: 'p_sh_1', name: 'Shell Helix Ultra 0W-40 Fully Synthetic (4L)', price: 650000, status: 'APPROVED', date: '16/08/2026', note: 'Iklan tayang di marketplace & katalog sponsor' },
+        { id: 'p_sh_2', name: 'Shell Spirax S6 AXME Differential Oil 75W-90', price: 280000, status: 'APPROVED', date: '15/08/2026', note: 'Iklan tayang di marketplace & katalog sponsor' }
+      ] : [
+        { id: 'p_fdr_1', name: 'FDR Ultimate Performance Tire 245/45 R18 (Mercedes E-Class)', price: 1850000, status: 'APPROVED', date: '16/08/2026', note: 'Iklan tayang di marketplace & katalog sponsor' },
+        { id: 'p_fdr_2', name: 'FDR Sport Z-Rated Touring Tire 225/50 R17 (Mercedes C-Class)', price: 1450000, status: 'APPROVED', date: '15/08/2026', note: 'Iklan tayang di marketplace & katalog sponsor' }
+      ];
+
+      tbody.innerHTML = fallbackProducts.map((p, idx) => `
+        <tr style="border-bottom:1px solid var(--chrome-border);">
+          <td style="padding:10px 8px; font-weight:700; text-align:center;">${idx + 1}</td>
+          <td style="padding:10px 8px; font-weight:800; color:#fff;">${p.name}</td>
+          <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald);">Rp ${new Intl.NumberFormat('id-ID').format(p.price)}</td>
+          <td style="padding:10px 8px; text-align:center;"><span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-size:0.75rem; font-weight:800;">✅ APPROVED</span></td>
+          <td style="padding:10px 8px; font-size:0.78rem; color:var(--text-muted);">${p.date}</td>
+          <td style="padding:10px 8px; font-size:0.78rem; color:var(--text-muted);">${p.note}</td>
+          <td style="padding:10px 8px; text-align:center;">
+            <div style="display:flex; gap:4px; justify-content:center;">
+              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-gold); border-color:var(--accent-gold);" onclick="if(window.M7Engine && window.M7Engine.openProductModal){window.M7Engine.openProductModal('${p.id}');}else{alert('Form edit produk');}">✏️ Edit</button>
+              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="if(confirm('Hapus produk ini?')){this.closest('tr').remove();}">🗑️</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
     }
-    const modal = document.getElementById('modal-my-iklan-list');
+
+    const modal = document.getElementById('modal-sponsor-manage-products') || document.getElementById('modal-my-iklan-list');
     if (modal) {
       modal.style.display = 'flex';
       modal.style.opacity = '1';
