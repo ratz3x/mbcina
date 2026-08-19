@@ -4601,7 +4601,7 @@ try {
 
     case 'get_sponsor_dashboard_data':
         try {
-            $email = $_GET['email'] ?? $input['email'] ?? 'bni@sponsor.com';
+            $email = $_GET['email'] ?? $input['email'] ?? 'fdr@sponsor.com';
             
             $sponsor = $sPdo->query("SELECT * FROM sponsors WHERE contact_email = '$email' OR id = '$email' ORDER BY created_at DESC LIMIT 1")->fetch();
             if (!$sponsor) {
