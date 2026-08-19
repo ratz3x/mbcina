@@ -399,6 +399,7 @@ const AppEngine = {
     if (dEmail) dEmail.value = u.email || '';
     if (dPhone) dPhone.value = u.phone || '';
     if (dCity) dCity.value = u.city || '';
+    if (dProvince) dProvince.value = u.province || '';
     const dVehicle = document.getElementById('dash-member-vehicle');
     const dPlate = document.getElementById('dash-member-plate');
     const userVehicle = u.vehicle_model || u.vehicle || (liveUser && (liveUser.vehicle_model || liveUser.vehicle)) || '';

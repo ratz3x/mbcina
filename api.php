@@ -4837,8 +4837,8 @@ try {
                 $seq = 1;
             }
             $id = 'DON-TRX-' . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
-            $stmt = $sPdo->prepare("INSERT INTO donations (id, campaign_id, user_id, donor_name, member_id, amount, payment_method, status, payment_status, payment_proof_url, notes) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?, ?)");
-            $stmt->execute([$id, $campaignId, $userId, $donorName, $memberIdInput, $amount, $paymentMethod, $proofUrl, $notes]);
+            $stmt = $sPdo->prepare("INSERT INTO donations (id, campaign_id, user_id, amount, payment_method, status, payment_status, payment_proof_url, notes) VALUES (?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?, ?)");
+            $stmt->execute([$id, $campaignId, $userId, $amount, $paymentMethod, $proofUrl, $notes]);
 
             logAudit($userId, 'CREATE', 'DONATION', ['donation_id' => $id, 'amount' => $amount, 'method' => $paymentMethod]);
 
