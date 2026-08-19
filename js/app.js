@@ -48,12 +48,12 @@ const AppEngine = {
   },
   m5Data: {
     categories: [
-      { id: 'cat_001', name: 'Touring & Roadtrip', icon: '🚗', thread_count: 14, post_count: 58, description: 'Diskusi rute touring, jadwal gathering, jamnas, dan persiapan konvoi nasional.' },
-      { id: 'cat_002', name: 'Restorasi & Klasik', icon: '🛠️', thread_count: 9, post_count: 32, description: 'Tips restorasi Benz klasik (W115, W123, W124, W126) dan info part original.' },
-      { id: 'cat_003', name: 'Modifikasi & Performance', icon: '⚡', thread_count: 12, post_count: 45, description: 'Tuning AMG, remap ECU, upgrade velg, exhaust, dan suspensi balap.' },
-      { id: 'cat_004', name: 'W204 & W212 Club', icon: '🏎️', thread_count: 18, post_count: 76, description: 'Komunitas pengguna C-Class & E-Class modern, perawatan mesin M271/M274.' },
-      { id: 'cat_005', name: 'Bengkel Rekomendasi', icon: '⭐', thread_count: 8, post_count: 27, description: 'Review bengkel spesialis Mercedes-Benz terpercaya se-Nusantara.' },
-      { id: 'cat_006', name: 'Jual Beli & Sparepart', icon: '🛍️', thread_count: 22, post_count: 94, description: 'Lapak parts OEM, copotan original, velg langka, dan aksesoris Benz.' }
+      { id: 'cat_umum', name: 'Umum', icon: '🚗', thread_count: 4, post_count: 4, description: 'Diskusi umum seputar Mercedes-Benz' },
+      { id: 'cat_teknis', name: 'Teknis', icon: '🔧', thread_count: 2, post_count: 4, description: 'Perawatan, modifikasi, dan tips teknis' },
+      { id: 'cat_komunitas', name: 'Komunitas', icon: '🏍️', thread_count: 1, post_count: 2, description: 'Kegiatan klub dan komunitas' },
+      { id: 'cat_galeri', name: 'Galeri', icon: '📸', thread_count: 3, post_count: 3, description: 'Foto dan video member' },
+      { id: 'cat_market', name: 'Marketplace', icon: '🛒', thread_count: 1, post_count: 1, description: 'Jual beli parts dan aksesoris' },
+      { id: 'cat_announcement', name: 'Pengumuman', icon: '📢', thread_count: 2, post_count: 5, description: 'Pengumuman resmi federasi MB INA' }
     ],
     threads: [
       { id: 'th_001', title: 'Persiapan Touring Jambore Nasional Medan 2026', content: 'Halo rekan-rekan MB INA se-Indonesia! Menjelang pelaksanaan Jamnas 2026 di Medan, berikut panduan briefing konvoi, titik kumpul rest area, dan perlengkapan P3K yang wajib dibawa setiap peserta.', category_id: 'cat_001', category_name: 'Touring & Roadtrip', category_icon: '🚗', author_name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG.', author_username: 'presiden_mbina', replies_count: 28, views_count: 840, is_pinned: true, tags: '#JAMNAS2026 #TOURINGMEDAN', created_at: '2026-08-10 10:30:00' },
@@ -10474,18 +10474,29 @@ const AppEngine = {
     const grid = document.getElementById(targetGridId || 'm5-categories-grid');
     if (!grid) return;
 
-    grid.innerHTML = this.m5Data.categories.map(c => `
-      <div class="glass-card" style="padding:16px; cursor:pointer; transition:transform 0.2s;" onclick="AppEngine.filterCategoryM5('${c.id}')" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+    const bgMap = {
+      'cat_umum': 'rgba(59,130,246,0.15)',
+      'cat_teknis': 'rgba(245,158,11,0.15)',
+      'cat_komunitas': 'rgba(139,92,246,0.15)',
+      'cat_galeri': 'rgba(236,72,153,0.15)',
+      'cat_market': 'rgba(16,185,129,0.15)',
+      'cat_announcement': 'rgba(239,68,68,0.15)'
+    };
+
+    grid.innerHTML = this.m5Data.categories.map(c => {
+      const iconBg = bgMap[c.id] || 'rgba(245,158,11,0.15)';
+      return `
+      <div class="glass-card" style="padding:16px; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;" onclick="AppEngine.filterCategoryM5('${c.id}')" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='var(--accent-gold)';" onmouseout="this.style.transform='none'; this.style.borderColor='var(--chrome-border)';">
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-          <div style="font-size:1.8rem; width:44px; height:44px; border-radius:10px; background:rgba(245,158,11,0.15); display:flex; align-items:center; justify-content:center;">${c.icon}</div>
-          <div>
-            <h5 style="font-size:0.95rem; line-height:1.2;">${c.name}</h5>
+          <div style="font-size:1.8rem; width:46px; height:46px; border-radius:12px; background:${iconBg}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${c.icon}</div>
+          <div style="min-width:0;">
+            <h5 style="font-size:0.98rem; font-weight:800; line-height:1.2; margin:0 0 2px 0;">${c.name}</h5>
             <span style="font-size:0.75rem; color:var(--text-muted);">${c.thread_count || 0} Threads • ${c.post_count || 0} Posts</span>
           </div>
         </div>
-        <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.4;">${c.description}</p>
-      </div>
-    `).join('');
+        <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.4; margin:0;">${c.description}</p>
+      </div>`;
+    }).join('');
 
     const sel = document.getElementById('m5-category-filter');
     if (sel && sel.options.length <= 1) {
