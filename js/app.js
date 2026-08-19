@@ -20294,6 +20294,7 @@ const M9Engine = {
     perfTargets: []
   },
   currentSubTab: '9_1_dashboard',
+  financialUnlocked: false,
 
   init: function() {
     this.fetchData();
@@ -20394,6 +20395,27 @@ const M9Engine = {
   },
 
   switchSubtab: function(tab) {
+    if (tab === '9_5_financial' && !this.financialUnlocked) {
+      var pwd = prompt('🔒 Masukkan Password Khusus untuk Membuka Laporan Keuangan MB INA:');
+      if (pwd === null) {
+        return; // User canceled
+      }
+      if (pwd !== '@20252027') {
+        if (window.showToast) {
+          window.showToast('⛔ Password salah! Akses tab Keuangan ditolak.', 'error');
+        } else {
+          alert('⛔ Password salah! Akses tab Keuangan ditolak.');
+        }
+        return;
+      }
+      this.financialUnlocked = true;
+      if (window.showToast) {
+        window.showToast('🔓 Akses Laporan Keuangan Berhasil Dibuka!', 'success');
+      }
+      var btn = document.getElementById('m9-subtab-btn-95');
+      if (btn) btn.innerHTML = '💰 Keuangan 🔓';
+    }
+
     this.currentSubTab = tab;
     var tabMap = { '9_1_dashboard':'91','9_2_member':'92','9_3_club':'93','9_4_event':'94','9_5_financial':'95','9_6_forum':'96','9_7_sponsor':'97','9_8_export':'98' };
     var subMap = { '9_1_dashboard':'m9-sub-91','9_2_member':'m9-sub-92','9_3_club':'m9-sub-93','9_4_event':'m9-sub-94','9_5_financial':'m9-sub-95','9_6_forum':'m9-sub-96','9_7_sponsor':'m9-sub-97','9_8_export':'m9-sub-98' };
@@ -20403,6 +20425,10 @@ const M9Engine = {
     Object.values(tabMap).forEach(function(n) { var btn = document.getElementById('m9-subtab-btn-' + n); if(btn) btn.classList.remove('active'); });
     var activeBtn = document.getElementById('m9-subtab-btn-' + tabMap[tab]);
     if(activeBtn) activeBtn.classList.add('active');
+
+    if (tab === '9_5_financial') {
+      this.renderFinancialReport();
+    }
   },
 
   // ─── 9.1 DASHBOARD ──────────────────────────────────────────────────
