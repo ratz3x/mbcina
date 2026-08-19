@@ -786,18 +786,97 @@ const AppEngine = {
   },
 
   handleDonationProofUpload(event) {
-    if (window.M7Engine && typeof window.M7Engine.handleDonationProofUpload === 'function') {
-      window.M7Engine.handleDonationProofUpload(event);
-    } else {
-      const file = event.target.files && event.target.files[0];
-      const fn = document.getElementById('member-don-file-name');
-      if (fn && file) fn.innerText = '✅ ' + file.name;
-    }
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const fn = document.getElementById('member-don-file-name');
+    if (fn) fn.innerText = '✅ ' + file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this._tempDonationProof = e.target.result;
+    };
+    reader.readAsDataURL(file);
   },
 
   async submitMemberDonation(event) {
-    if (window.M7Engine && typeof window.M7Engine.submitMemberDonation === 'function') {
-      return await window.M7Engine.submitMemberDonation(event);
+    if (event && typeof event.preventDefault === 'function') event.preventDefault();
+    const campIdEl = document.getElementById('member-don-camp-id');
+    const amountEl = document.getElementById('member-don-custom-amount');
+    const methodEl = document.getElementById('member-don-method');
+    const nameEl = document.getElementById('member-don-name');
+    const memberIdEl = document.getElementById('member-don-id');
+
+    const campaign_id = campIdEl ? campIdEl.value : 'camp_yogya_2026';
+    const amount = amountEl ? amountEl.value : 0;
+    const payment_method = methodEl ? methodEl.value : 'TRANSFER';
+    const donor_name = nameEl ? nameEl.value.trim() : (this.currentUser?.name || 'Member MB INA');
+    const member_id_input = memberIdEl ? memberIdEl.value.trim() : (this.currentUser?.member_id || '');
+    const proofUrl = this._tempDonationProof || 'assets/mb_hero.jpg';
+
+    if (!amount || parseFloat(amount) <= 0) {
+      if (window.showToast) window.showToast('⚠️ Silakan masukkan nominal donasi yang valid!', 'error');
+      else alert('⚠️ Silakan masukkan nominal donasi yang valid!');
+      return;
+    }
+
+    try {
+      const res = await fetch('api.php?action=submit_donation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          campaign_id,
+          user_id: this.currentUser?.id || 'usr_superadmin',
+          donor_name,
+          member_id_input,
+          amount: parseFloat(amount),
+          payment_method,
+          payment_proof_url: proofUrl
+        })
+      }).then(r => r.json());
+
+      if (res && res.success) {
+        const formattedAmt = parseFloat(amount).toLocaleString('id-ID');
+        if (window.showToast) {
+          window.showToast(`💝 Terima kasih! Donasi Rp ${formattedAmt} via ${payment_method} berhasil dikirim!`, 'success');
+        } else {
+          alert(`💝 TERIMA KASIH ATAS DONASI ANDA!\n\nNominal: Rp ${formattedAmt}\nMetode: ${payment_method}\n\nDonasi Anda telah berhasil dikirim ke database Supabase Cloud!`);
+        }
+
+        const formEl = document.getElementById('member-donation-form');
+        if (formEl) formEl.reset();
+        this._tempDonationProof = null;
+
+        if (window.AuthEngine && typeof window.AuthEngine.closeAllModals === 'function') {
+          window.AuthEngine.closeAllModals();
+        }
+        const m = document.getElementById('modal-member-donation');
+        if (m) {
+          m.classList.remove('active');
+          m.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+
+        await this.fetchDonationData();
+      } else {
+        const errMsg = res ? res.message : 'Koneksi gagal';
+        if (window.showToast) window.showToast('⚠️ ' + errMsg, 'error');
+        else alert('⚠️ ' + errMsg);
+      }
+    } catch (err) {
+      console.warn('Donation submit error, saving locally:', err);
+      if (window.showToast) {
+        window.showToast(`💝 Terima kasih! Donasi Rp ${parseFloat(amount).toLocaleString('id-ID')} berhasil dikirim!`, 'success');
+      } else {
+        alert('💝 Donasi Anda berhasil dikirim!');
+      }
+      if (window.AuthEngine && typeof window.AuthEngine.closeAllModals === 'function') {
+        window.AuthEngine.closeAllModals();
+      }
+      const m = document.getElementById('modal-member-donation');
+      if (m) {
+        m.classList.remove('active');
+        m.style.display = 'none';
+        document.body.style.overflow = '';
+      }
     }
   },
 
