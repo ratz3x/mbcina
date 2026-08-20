@@ -17262,242 +17262,29 @@ window.getGlobalUnifiedProducts = function() {
       price: 650000,
       condition: 'NEW',
       location: 'Jakarta Pusat',
-      lapak_name: 'Shell Indonesia (Official Store Sponsor)',
-      seller_name: 'PT Shell Indonesia',
-      contact_whatsapp: '021-52901234',
-      views: 520,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=600'],
-      description: 'Oli mesin performa tinggi sertifikasi resmi Mercedes-Benz MB-Approval 229.5.'
-    },
-    // 2. BURSA MEMBER MB INA (RATIH KUSUMASTUTI & ANGGOTA)
-    {
-      id: 'p_w124_300e',
-      name: 'W124 300E 1991 Manual Classic',
-      category: 'Mobil / Unit',
-      price: 98000000,
-      condition: 'USED',
-      location: 'Jakarta Selatan',
-      lapak_name: 'Garasi FayFay',
-      seller_name: 'Ratih Kusumastuti',
-      contact_whatsapp: '08545585568',
-      views: 189,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600'],
-      description: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original, siap pakai luar kota.'
-    },
-    {
-      id: 'p_transmisi_7226',
-      name: 'Transmisi Otomatis 722.6 (5G-Tronic) W210 E240 Copotan',
-      category: 'Parts',
-      price: 7500000,
-      condition: 'USED',
-      location: 'Jakarta Selatan',
-      lapak_name: 'Garasi FayFay',
-      seller_name: 'Ratih Kusumastuti',
-      contact_whatsapp: '08545585568',
-      views: 74,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=600'],
-      description: 'Transmisi matic 722.6 smooth mulus copotan sehat, bergaransi.'
-    },
-    {
-      id: 'p_blok_mesin_w124',
-      name: 'Blok Mesin W124 Copotan',
-      category: 'Parts',
-      price: 25000000,
-      condition: 'USED',
-      location: 'Jakarta Selatan',
-      lapak_name: 'Garasi FayFay',
-      seller_name: 'Ratih Kusumastuti',
-      contact_whatsapp: '08545585568',
-      views: 120,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600'],
-      description: 'Blok mesin W124 Boxer 300E M103 copotan original kondisi kompresi padat.'
-    },
-    {
-      id: 'p_karpet_3d',
-      name: 'Karpet Moulded 3D MB INA Bespoke Hitam W205 C-Class',
-      category: 'Aksesoris',
-      price: 1250000,
-      condition: 'NEW',
-      location: 'Jakarta Selatan',
-      lapak_name: 'Andi Parts Store',
-      seller_name: 'Andi Pratama',
-      contact_whatsapp: '081111222333',
-      views: 88,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600'],
-      description: 'Karpet interior presisi 3D anti air dengan logo bordir MB INA.'
-    },
-    {
-      id: 'p_velg_amg_18',
-      name: 'Velg AMG 18" Monoblock Staggered Original',
-      category: 'Parts',
-      price: 15000000,
-      condition: 'USED',
-      location: 'Jakarta Selatan',
-      lapak_name: 'Andi Parts Store',
-      seller_name: 'Andi Pratama',
-      contact_whatsapp: '081234567890',
-      views: 142,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'],
-      description: 'Velg original AMG Germany R18 lebar 8.5/9.5 et31/35 mulus.'
-    },
-    {
-      id: 'p_filter_kn',
-      name: 'Filter Udara K&N High Flow W204 C250 CGI Turbo',
-      category: 'Parts',
-      price: 850000,
-      condition: 'USED',
-      location: 'Bandung, Jawa Barat',
-      lapak_name: 'Budi Aksesoris',
-      seller_name: 'Budi Santoso',
-      contact_whatsapp: '083344556679',
-      views: 56,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600'],
-      description: 'Replacement filter K&N USA aliran udara optimal untuk mesin CGI Turbo.'
-    },
-    {
-      id: 'p_angel_eyes_w211',
-      name: 'Lampu Angel Eyes LED W211 E-Class Sepasang',
-      category: 'Aksesoris',
-      price: 2750000,
-      condition: 'USED',
-      location: 'Surabaya, Jawa Timur',
-      lapak_name: 'Siti Merchandise',
-      seller_name: 'Siti Rahayu',
-      contact_whatsapp: '082234455668',
-      views: 92,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600'],
-      description: 'Headlamp projector Angel Eyes LED crystal white look modern W211.'
-    },
-    {
-      id: 'p_velg_ronale_17',
-      name: 'Velg Ronale Mercedes 17" W203 C-Class Bekas Mulus',
-      category: 'Parts',
-      price: 3200000,
-      condition: 'USED',
-      location: 'Depok, Jawa Barat',
-      lapak_name: 'Andi Parts Store',
-      seller_name: 'Andi Pratama',
-      contact_whatsapp: '081334455667',
-      views: 65,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'],
-      description: 'Set velg 4 pcs R17 OEM Ronal Mercedes mulus tanpa retak/peang.'
-    },
-    {
-      id: 'p_stir_wood_w124',
-      name: 'Set Stir Wood Trim Woodgrain W124 Boxer',
-      category: 'Aksesoris',
-      price: 4500000,
-      condition: 'USED',
-      location: 'Jakarta Selatan',
-      lapak_name: 'Andi Parts Store',
-      seller_name: 'Andi Pratama',
-      contact_whatsapp: '081234567890',
-      views: 78,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600'],
-      description: 'Stir kemudi kombinasi kayu Zebrano & kulit asli MB-Tex W124 original.'
-    },
-    {
-      id: 'p_kaos_polo',
-      name: 'Kaos Polo MB INA Official 2026',
-      category: 'Merchandise',
-      price: 150000,
-      condition: 'NEW',
-      location: 'Surabaya',
-      lapak_name: 'Siti Merchandise',
-      seller_name: 'Siti Rahayu',
-      contact_whatsapp: '081987654321',
-      views: 210,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600'],
-      description: 'Kaos polo katun combed 30s resmi MB INA bordir logo benang emas.'
-    },
-    {
-      id: 'p_bushing_arm_w211',
-      name: 'Bushing Arm W211 Lemforder',
-      category: 'Parts',
-      price: 250000,
-      condition: 'NEW',
-      location: 'Jakarta Selatan',
-      lapak_name: 'Andi Parts Store',
-      seller_name: 'Andi Pratama',
-      contact_whatsapp: '081234567890',
-      views: 65,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=600'],
-      description: 'Bushing arm depan set Lemforder original Germany W211 baru gress.'
-    },
-    {
-      id: 'p_gantungan_kunci',
-      name: 'Gantungan Kunci Kulit Genuine MB INA',
-      category: 'Merchandise',
-      price: 45000,
-      condition: 'NEW',
-      location: 'Surabaya',
-      lapak_name: 'Siti Merchandise',
-      seller_name: 'Siti Rahayu',
-      contact_whatsapp: '081987654321',
-      views: 130,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600'],
-      description: 'Gantungan kunci kulit asli dengan emboss logo resmi bintang tiga titik MB INA.'
-    },
-    {
-      id: 'p_emblem_grille',
-      name: 'Emblem Grille Bintang Mercedes-Benz Chrome',
-      category: 'Aksesoris',
-      price: 120000,
-      condition: 'NEW',
-      location: 'Bandung',
-      lapak_name: 'Budi Aksesoris',
-      seller_name: 'Budi Santoso',
-      contact_whatsapp: '083344556679',
-      views: 45,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600'],
-      description: 'Emblem grill bintang chrome mengkilap cocok untuk W202, W203, W210, W211.'
-    }
-  ];
+// ─────────────────────────────────────────────────────────────────────
+// GLOBAL UNIFIED MARKETPLACE PRODUCT REPOSITORY (SINGLE SOURCE OF TRUTH)
+// ─────────────────────────────────────────────────────────────────────
+window.getGlobalUnifiedProducts = function() {
+  const dbProducts = (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) ? window.M7Engine.data.products : [];
+  const memberAds = (window.AppEngine && Array.isArray(window.AppEngine._memberAdsList)) ? window.AppEngine._memberAdsList : [];
 
   const merged = [];
   const seen = new Set();
 
-  [...dbProducts, ...memberAds, ...defaultMasterProducts].forEach(p => {
+  [...dbProducts, ...memberAds].forEach(p => {
     const rawName = (p.name || p.title || '').trim();
     if (!rawName) return;
-    const titleKey = rawName.toLowerCase();
-    if (!seen.has(titleKey)) {
-      seen.add(titleKey);
+    const uniqueKey = (p.id || rawName).toLowerCase();
+    if (!seen.has(uniqueKey)) {
+      seen.add(uniqueKey);
       merged.push({
         ...p,
         name: rawName,
         title: rawName,
-        status: p.status || 'APPROVED',
+        status: (p.status || 'APPROVED').toUpperCase(),
         is_published: (p.is_published !== false && p.is_published !== 0),
-        lapak_name: p.lapak_name || p.store || 'Lapak MB INA',
+        lapak_name: p.lapak_name || p.store || 'Lapak Resmi MB INA',
         seller_name: p.seller_name || p.seller || 'Member MB INA',
         contact_whatsapp: p.contact_whatsapp || p.phone || '081234567890'
       });
@@ -18510,9 +18297,15 @@ window.M7Engine = {
       }).then(r => r.json());
 
       if (res && res.success) {
-        alert("✅ Iklan produk berhasil dihapus!");
-        this.data.products = this.data.products.filter(x => x.id !== productId);
+        alert("✅ Iklan produk berhasil dihapus secara permanen dari database!");
+        if (window.AppEngine && Array.isArray(window.AppEngine._memberAdsList)) {
+          window.AppEngine._memberAdsList = window.AppEngine._memberAdsList.filter(x => x.id !== productId);
+        }
+        await this.fetchData();
         this.renderAll();
+        if (typeof window.AppEngine?._renderMemberLapakProducts === 'function') {
+          window.AppEngine._renderMemberLapakProducts();
+        }
       } else {
         alert(`❌ Gagal menghapus produk: ${res?.message || 'Error'}`);
       }
