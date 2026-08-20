@@ -1632,20 +1632,22 @@ const AppEngine = {
     if (!grid) return;
 
     const u = this.currentUser || {};
+    const sellerName = u.name || 'Ratih Kusumastuti';
+    const sellerPhone = u.phone || '08545585568';
 
     let defaultProds = [
-      { id: 'p1', name: 'W124 300E 1991 Manual Classic', category: 'KENDARAAN', price: 98000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: 'Ratih K.', phone: '081298765432', img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', desc: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original.' },
-      { id: 'p2', name: 'Velg AMG Monoblock 18 Inch Staggered', category: 'SPAREPART', price: 16500000, condition: 'BEKAS', location: 'Bandung', seller: 'Budi S.', phone: '081345678901', img: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400', desc: 'Original AMG Made in Germany, et31/35, ban Michelin PS4 85%.' },
+      { id: 'p1', name: 'W124 300E 1991 Manual Classic', category: 'KENDARAAN', price: 98000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: 'Ratih Kusumastuti', phone: '08545585568', img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', desc: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original.' },
+      { id: 'p2', name: 'Velg AMG Monoblock 18 Inch Staggered', category: 'SPAREPART', price: 16500000, condition: 'BEKAS', location: 'Bandung', seller: 'Budi Santoso', phone: '081987654321', img: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400', desc: 'Original AMG Made in Germany, et31/35, ban Michelin PS4 85%.' },
       { id: 'p3', name: 'Jaket Original MB INA Leather Edition', category: 'MERCHANDISE', price: 1250000, condition: 'BARU', location: 'Yogyakarta', seller: 'Official MB INA Store', phone: '081122334455', img: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400', desc: 'Jaket kulit resmi edisi khusus member dengan bordir badge MB INA.' },
       { id: 'p4', name: 'Jasa Restorasi Interior & Wood Panel W124/W210', category: 'SERVICE', price: 4500000, condition: 'BARU', location: 'Tangerang', seller: 'Auto Classic Workshop', phone: '081567890123', img: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=400', desc: 'Restorasi kayu Zebrano & Walnut, perbaikan jok kulit MB-Tex original.' },
-      { id: 'p5', name: 'W202 C230 Kompressor 1998 Silver', category: 'KENDARAAN', price: 85000000, condition: 'BEKAS', location: 'Surabaya', seller: 'Denny K.', phone: '081789012345', img: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=400', desc: 'Mesin supercharged sehat, ac dingin, siap luar kota.' }
+      { id: 'p5', name: 'W202 C230 Kompressor 1998 Silver', category: 'KENDARAAN', price: 85000000, condition: 'BEKAS', location: 'Surabaya', seller: 'Denny Kurniawan', phone: '081789012345', img: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=400', desc: 'Mesin supercharged sehat, ac dingin, siap luar kota.' }
     ];
 
     if (!this._memberAdsList || !this._memberAdsList.length) {
       this._memberAdsList = [
-        { id: 'ad_my_001', name: 'Blok Mesin Copotan', category: 'SPAREPART', price: 25000000, condition: 'BEKAS', location: 'Jakarta', seller: u.name || 'Derist Touriano', phone: u.phone || '081298765432', img: 'https://images.unsplash.com/photo-1597771262359-7947c40632e3?w=400', desc: 'Blok mesin copotan kondisi sehat', status: 'PENDING' },
-        { id: 'ad_my_002', name: 'Transmisi Otomatis 722.6 (5G-Tronic) W210 E240 Copotan', category: 'SPAREPART', price: 7500000, condition: 'BEKAS', location: 'Jakarta', seller: u.name || 'Derist Touriano', phone: u.phone || '081298765432', img: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400', desc: 'Transmisi matic 722.6 smooth mulus', status: 'APPROVED' },
-        { id: 'ad_my_003', name: 'Blok Mesin W124 Copotan', category: 'SPAREPART', price: 25000000, condition: 'BEKAS', location: 'Jakarta', seller: u.name || 'Derist Touriano', phone: u.phone || '081298765432', img: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=400', desc: 'Blok mesin W124 300E copotan ori', status: 'APPROVED' }
+        { id: 'ad_my_001', name: 'Transmisi Otomatis 722.6 (5G-Tronic) W210 E240 Copotan', category: 'SPAREPART', price: 7500000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400', desc: 'Transmisi matic 722.6 smooth mulus, siap pasang', status: 'APPROVED' },
+        { id: 'ad_my_002', name: 'Blok Mesin W124 Copotan', category: 'SPAREPART', price: 25000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=400', desc: 'Blok mesin W124 300E copotan ori sehat kompresi padat', status: 'APPROVED' },
+        { id: 'ad_my_003', name: 'W124 300E 1991 Manual Classic', category: 'KENDARAAN', price: 98000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', desc: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original.', status: 'APPROVED' }
       ];
     }
 
@@ -1657,7 +1659,7 @@ const AppEngine = {
           let imgs = [];
           try { imgs = typeof a.images === 'string' ? JSON.parse(a.images) : (a.images || []); } catch(e){}
           const imgUrl = a.img || imgs[0] || (typeof a.images === 'string' ? a.images : null) || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';
-          return { ...a, img: imgUrl };
+          return { ...a, img: imgUrl, seller: a.seller || sellerName, phone: a.phone || sellerPhone };
         });
     }
 
@@ -1677,20 +1679,21 @@ const AppEngine = {
             condition: p.condition || 'BEKAS',
             location: p.location || 'Jakarta',
             seller: p.seller_name || p.seller || 'Member MB INA',
-            phone: p.contact_whatsapp || p.phone || '081298765432',
+            phone: p.contact_whatsapp || p.phone || '08545585568',
             img: imgUrl,
             desc: p.description || ''
           };
         });
     }
 
-    const existingIds = new Set();
+    const existingKeys = new Set();
     let prods = [];
 
+    // approvedAds takes precedence over database and default mock items
     [...approvedAds, ...approvedDbProducts, ...defaultProds].forEach(p => {
-      const key = p.id || p.name;
-      if (!existingIds.has(key)) {
-        existingIds.add(key);
+      const normalizedTitle = (p.name || '').toLowerCase().trim();
+      if (!existingKeys.has(normalizedTitle)) {
+        existingKeys.add(normalizedTitle);
         prods.push(p);
       }
     });
@@ -1734,12 +1737,14 @@ const AppEngine = {
     if (!container) return;
     const u = this.currentUser || {};
     const userId = u.id || '';
+    const sellerName = u.name || 'Ratih Kusumastuti';
+    const sellerPhone = u.phone || '08545585568';
 
     if (!this._memberAdsList || !this._memberAdsList.length) {
       this._memberAdsList = [
-        { id: 'ad_my_001', name: 'Blok Mesin Copotan', category: 'SPAREPART', price: 25000000, condition: 'BEKAS', location: 'Jakarta', seller: u.name || 'Derist Touriano', phone: u.phone || '081298765432', img: 'https://images.unsplash.com/photo-1597771262359-7947c40632e3?w=400', desc: 'Blok mesin copotan kondisi sehat', status: 'PENDING' },
-        { id: 'ad_my_002', name: 'Transmisi Otomatis 722.6 (5G-Tronic) W210 E240 Copotan', category: 'SPAREPART', price: 7500000, condition: 'BEKAS', location: 'Jakarta', seller: u.name || 'Derist Touriano', phone: u.phone || '081298765432', img: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400', desc: 'Transmisi matic 722.6 smooth mulus', status: 'APPROVED' },
-        { id: 'ad_my_003', name: 'Blok Mesin W124 Copotan', category: 'SPAREPART', price: 25000000, condition: 'BEKAS', location: 'Jakarta', seller: u.name || 'Derist Touriano', phone: u.phone || '081298765432', img: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=400', desc: 'Blok mesin W124 300E copotan ori', status: 'APPROVED' }
+        { id: 'ad_my_001', name: 'Transmisi Otomatis 722.6 (5G-Tronic) W210 E240 Copotan', category: 'SPAREPART', price: 7500000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400', desc: 'Transmisi matic 722.6 smooth mulus, siap pasang', status: 'APPROVED' },
+        { id: 'ad_my_002', name: 'Blok Mesin W124 Copotan', category: 'SPAREPART', price: 25000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=400', desc: 'Blok mesin W124 300E copotan ori sehat kompresi padat', status: 'APPROVED' },
+        { id: 'ad_my_003', name: 'W124 300E 1991 Manual Classic', category: 'KENDARAAN', price: 98000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', desc: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original.', status: 'APPROVED' }
       ];
     }
 
