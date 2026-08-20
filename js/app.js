@@ -18725,6 +18725,7 @@ const M8Engine = {
         rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#eab308; font-weight:800; background:rgba(234,179,8,0.15); padding:2px 6px; border-radius:4px; border:1px solid #eab308;">📌 WAITLIST Queue #3 (Slot Bebas 15 Sep 2026)</div>`;
       }
 
+      const sponsorId = c.sponsor_id || c.member_id || M8Engine.deriveSponsorId(c.partner_name, idx + 1);
       return `
         <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.05)'" onmouseout="this.style.background=''">
           <td style="padding:10px 12px; font-weight:700; color:var(--accent-gold); font-size:0.8rem;">
@@ -18732,7 +18733,8 @@ const M8Engine = {
             ${rotatorBadge}
           </td>
           <td style="padding:10px 12px; font-size:0.82rem;">
-            <div style="font-weight:700; color:#fff;">${c.partner_name}</div>
+            <div style="font-weight:800; color:#fff; font-size:0.88rem;">${c.partner_name}</div>
+            <div style="font-family:monospace; font-size:0.75rem; font-weight:800; color:var(--accent-gold); margin:2px 0;">🏷️ ${sponsorId}</div>
             <div style="font-size:0.75rem; color:var(--text-muted);">${c.contact_person || ''} ${c.contact_phone ? '• ' + c.contact_phone : ''}</div>
           </td>
           <td style="padding:10px 12px; font-size:0.82rem;">${c.package_name ? (pkgMap[c.package_id] || c.package_name) : (pkgMap[c.package_id] || c.package_id)}</td>
@@ -19864,6 +19866,7 @@ const M8Engine = {
       const ec = this.data.contracts.find(c => c.id === ecId);
       if (ec) {
         if (document.getElementById('ec-form-partner')) document.getElementById('ec-form-partner').value  = ec.partner_name;
+        if (document.getElementById('ec-form-sponsor-id')) document.getElementById('ec-form-sponsor-id').value = ec.sponsor_id || this.deriveSponsorId(ec.partner_name, 1);
         if (document.getElementById('ec-form-contact')) document.getElementById('ec-form-contact').value  = ec.contact_person || '';
         if (document.getElementById('ec-form-email'))   document.getElementById('ec-form-email').value    = ec.contact_email || '';
         if (document.getElementById('ec-form-phone'))   document.getElementById('ec-form-phone').value    = ec.contact_phone || '';
@@ -19877,6 +19880,7 @@ const M8Engine = {
       }
     } else if (prefillData) {
       if (document.getElementById('ec-form-partner')) document.getElementById('ec-form-partner').value  = prefillData.partner_name || 'Shell Indonesia';
+      if (document.getElementById('ec-form-sponsor-id')) document.getElementById('ec-form-sponsor-id').value = prefillData.sponsor_id || this.deriveSponsorId(prefillData.partner_name || 'Shell Indonesia', (this.data.contracts || []).length + 1);
       if (document.getElementById('ec-form-contact')) document.getElementById('ec-form-contact').value  = prefillData.contact_person || 'Budi Santoso';
       if (document.getElementById('ec-form-email'))   document.getElementById('ec-form-email').value    = prefillData.contact_email || 'budi@brand.co.id';
       if (document.getElementById('ec-form-phone'))   document.getElementById('ec-form-phone').value    = prefillData.contact_phone || '0217890123';
@@ -19891,13 +19895,32 @@ const M8Engine = {
       document.getElementById('form-endorse-contract')?.reset();
       if (document.getElementById('ec-form-start')) document.getElementById('ec-form-start').value = today;
       if (document.getElementById('ec-form-end'))   document.getElementById('ec-form-end').value   = nextMonth;
-      if (document.getElementById('ec-form-partner')) document.getElementById('ec-form-partner').value  = 'Shell Indonesia';
+      if (document.getElementById('ec-form-partner')) document.getElementById('ec-form-partner').value  = 'FDR Tyre Indonesia';
+      if (document.getElementById('ec-form-sponsor-id')) document.getElementById('ec-form-sponsor-id').value = this.deriveSponsorId('FDR Tyre Indonesia', (this.data.contracts || []).length + 1);
       if (document.getElementById('ec-form-contact')) document.getElementById('ec-form-contact').value  = 'Budi Santoso';
-      if (document.getElementById('ec-form-email'))   document.getElementById('ec-form-email').value    = 'budi@brand.co.id';
+      if (document.getElementById('ec-form-email'))   document.getElementById('ec-form-email').value    = 'fdr@sponsor.com';
       if (document.getElementById('ec-form-phone'))   document.getElementById('ec-form-phone').value    = '0217890123';
     }
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+  },
+
+  deriveSponsorId: function(partnerName, seqNum = 1) {
+    if (!partnerName || !partnerName.trim()) return `SPN-MBINA-2026-001`;
+    const clean = partnerName.trim().replace(/^(pt|cv)\s+/i, '');
+    const brand = clean.split(' ')[0].replace(/[^a-zA-Z]/g, '');
+    let code = brand.substring(0, 3).toUpperCase();
+    if (code.length < 3) code = 'SPN';
+    const year = new Date().getFullYear();
+    const seq = String(seqNum || 1).padStart(3, '0');
+    return `SPN-${code}-${year}-${seq}`;
+  },
+
+  autoGenerateSponsorId: function(partnerName) {
+    const inputEl = document.getElementById('ec-form-sponsor-id');
+    if (!inputEl) return;
+    const count = (this.data.contracts || []).length + 1;
+    inputEl.value = this.deriveSponsorId(partnerName, count);
   },
 
   autoFillContractAmount: function() {
@@ -19939,9 +19962,10 @@ const M8Engine = {
 
   submitContractForm: async function(e) {
     if (e) e.preventDefault();
-    const partnerName  = document.getElementById('ec-form-partner')?.value?.trim() || 'Shell Indonesia';
+    const partnerName  = document.getElementById('ec-form-partner')?.value?.trim() || 'FDR Tyre Indonesia';
+    const sponsorIdInput = document.getElementById('ec-form-sponsor-id')?.value?.trim() || this.deriveSponsorId(partnerName, (this.data.contracts || []).length + 1);
     const contactPerson= document.getElementById('ec-form-contact')?.value?.trim() || 'Budi Santoso';
-    const email        = document.getElementById('ec-form-email')?.value?.trim() || 'budi@brand.co.id';
+    const email        = document.getElementById('ec-form-email')?.value?.trim() || 'sponsor@brand.co.id';
     const phone        = document.getElementById('ec-form-phone')?.value?.trim() || '0217890123';
     const pkgId        = document.getElementById('ec-form-package')?.value || 'pkg_bronze';
     const startDate    = document.getElementById('ec-form-start')?.value || new Date().toISOString().split('T')[0];
@@ -19963,6 +19987,8 @@ const M8Engine = {
     const newContract = {
       id: 'ec_' + Date.now(),
       contract_number: nextEcNum,
+      sponsor_id: sponsorIdInput,
+      member_id: sponsorIdInput,
       partner_name: partnerName,
       contact_person: contactPerson,
       contact_email: email,
@@ -19979,6 +20005,24 @@ const M8Engine = {
 
     if (!Array.isArray(this.data.contracts)) this.data.contracts = [];
     this.data.contracts.unshift(newContract);
+
+    // Auto-register to Users database as a SPONSOR member so they can login and appear in M3 table
+    try {
+      fetch('api.php?action=create_m3_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: partnerName,
+          email: email,
+          phone: phone,
+          role: 'SPONSOR',
+          club: 'HQ MB INA',
+          member_id: sponsorIdInput,
+          status: 'ACTIVE',
+          tier: (pkgId === 'pkg_platinum' ? 'PLATINUM' : (pkgId === 'pkg_gold' ? 'GOLD' : (pkgId === 'pkg_silver' ? 'SILVER' : 'BRONZE')))
+        })
+      }).catch(e => console.warn('Sync sponsor member error:', e));
+    } catch(e) {}
 
     // Push into M6Engine.sampleSponsors so it appears in M6 Queue
     if (window.M6Engine && Array.isArray(window.M6Engine.sampleSponsors)) {
@@ -20006,9 +20050,9 @@ const M8Engine = {
     this.renderAll();
 
     if (window.showToast) {
-      window.showToast(`✅ Kontrak Endorse ${partnerName} (${newContract.contract_number}) Berhasil Disimpan!`, 'success');
+      window.showToast(`✅ Kontrak Sponsor ${partnerName} [${sponsorIdInput}] (${newContract.contract_number}) Berhasil Disimpan!`, 'success');
     } else {
-      alert(`✅ Kontrak ${newContract.contract_number} Berhasil Disimpan!`);
+      alert(`✅ Kontrak ${newContract.contract_number} [${sponsorIdInput}] Berhasil Disimpan!`);
     }
 
     if (window.AppEngine && typeof window.AppEngine.renderVerificationQueue === 'function') {

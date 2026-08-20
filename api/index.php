@@ -1570,34 +1570,50 @@ try {
             'balikpapan' => 'BPP', 'samarinda' => 'SMD', 'pontianak' => 'PTK', 'banjarmasin' => 'BJM',
             'makassar' => 'MKS', 'manado' => 'MND', 'palu' => 'PLU', 'jayapura' => 'JPR',
         ];
-        $hqRoles = ['SUPER_ADMIN','PRESIDEN','SEKRETARIS_PUSAT','BENDAHARA_PUSAT','ADMIN_ORGANISASI','PENGURUS_PUSAT'];
-        $regionCode = 'INA';
-        if (in_array(strtoupper($role ?? ''), $hqRoles)) {
-            $regionCode = 'HQ';
-        } else {
-            $cityKey = strtolower(trim($city));
-            if (isset($cityCodeMap[$cityKey])) {
-                $regionCode = $cityCodeMap[$cityKey];
-            } elseif (strlen($cityKey) >= 3) {
-                $regionCode = strtoupper(substr(preg_replace('/[^a-z]/', '', $cityKey), 0, 3));
-            }
-        }
+        $roleInput = strtoupper(trim($input['role'] ?? ''));
+        $explicitMemberId = strtoupper(trim($input['member_id'] ?? $input['memberId'] ?? ''));
 
-        // Nomor urut NASIONAL (bukan per chapter)
-        try {
-            $totalUsers = (int)$sPdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-        } catch (Exception $e) { $totalUsers = 0; }
-        $seq = $totalUsers + 1;
-        $memberId = sprintf('MBINA-%s-%d-%06d', $regionCode, $year, $seq);
-        // Pastikan unique
-        while ((int)$sPdo->prepare("SELECT COUNT(*) FROM users WHERE member_id = :mid")
-               ->execute([':mid' => $memberId]) && false) { $seq++; $memberId = sprintf('MBINA-%s-%d-%06d', $regionCode, $year, $seq); }
+        if (!empty($explicitMemberId)) {
+            $memberId = $explicitMemberId;
+        } elseif ($roleInput === 'SPONSOR' || strpos(strtolower($name), 'pt ') !== false || strpos(strtolower($name), 'indonesia') !== false || strpos(strtolower($name), 'sponsor') !== false) {
+            $cleanName = preg_replace('/^(pt|cv)\s+/i', '', trim($name));
+            $brandWord = preg_replace('/[^a-zA-Z]/', '', explode(' ', $cleanName)[0]);
+            $brandCode = strtoupper(substr($brandWord, 0, 3));
+            if (strlen($brandCode) < 3) $brandCode = 'SPN';
+            try {
+                $totalSponsors = (int)$sPdo->query("SELECT COUNT(*) FROM users WHERE role = 'SPONSOR' OR member_id LIKE 'SPN-%'")->fetchColumn();
+            } catch (Exception $e) { $totalSponsors = 0; }
+            $seqSpn = $totalSponsors + 1;
+            $memberId = sprintf('SPN-%s-%d-%03d', $brandCode, $year, $seqSpn);
+        } else {
+            $hqRoles = ['SUPER_ADMIN','PRESIDEN','SEKRETARIS_PUSAT','BENDAHARA_PUSAT','ADMIN_ORGANISASI','PENGURUS_PUSAT'];
+            $regionCode = 'INA';
+            if (in_array($roleInput, $hqRoles)) {
+                $regionCode = 'HQ';
+            } else {
+                $cityKey = strtolower(trim($city));
+                if (isset($cityCodeMap[$cityKey])) {
+                    $regionCode = $cityCodeMap[$cityKey];
+                } elseif (strlen($cityKey) >= 3) {
+                    $regionCode = strtoupper(substr(preg_replace('/[^a-z]/', '', $cityKey), 0, 3));
+                }
+            }
+
+            // Nomor urut NASIONAL (bukan per chapter)
+            try {
+                $totalUsers = (int)$sPdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+            } catch (Exception $e) { $totalUsers = 0; }
+            $seq = $totalUsers + 1;
+            $memberId = sprintf('MBINA-%s-%d-%06d', $regionCode, $year, $seq);
+            while ((int)$sPdo->prepare("SELECT COUNT(*) FROM users WHERE member_id = :mid")
+                   ->execute([':mid' => $memberId]) && false) { $seq++; $memberId = sprintf('MBINA-%s-%d-%06d', $regionCode, $year, $seq); }
+        }
 
         $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
         $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
         $photoUrl = trim($input['photo_url'] ?? '');
         $id = 'usr_m3_' . uniqid();
-        $role = ($status === 'ACTIVE') ? 'MEMBER' : 'CALON_MEMBER';
+        $role = !empty($roleInput) ? $roleInput : (($status === 'ACTIVE') ? 'MEMBER' : 'CALON_MEMBER');
         $genderEnum = in_array(strtoupper($gender), ['PRIA','WANITA']) ? strtoupper($gender) : 'PRIA';
 
         try {

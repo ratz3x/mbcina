@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260820_113000">
+  <link rel="stylesheet" href="css/styles.css?v=20260820_145700">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -4971,11 +4971,15 @@
     </div>
 
     <form id="form-endorse-contract" onsubmit="M8Engine.submitContractForm(event)">
-      <!-- Row 1: Nama Mitra & Contact Person -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+      <!-- Row 1: Nama Mitra, Kode Sponsor & Contact Person -->
+      <div style="display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:14px; margin-bottom:16px;">
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Nama Mitra / Brand <span style="color:#ef4444;">*</span></label>
-          <input type="text" id="ec-form-partner" class="input-field" placeholder="Shell Indonesia" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; box-sizing:border-box;">
+          <input type="text" id="ec-form-partner" class="input-field" placeholder="FDR Tyre Indonesia" required style="width:100%; background:#152035; border:1px solid rgba(255,255,255,0.12); color:#ffffff; font-size:0.85rem; padding:10px 14px; border-radius:8px; box-sizing:border-box;" onkeyup="M8Engine.autoGenerateSponsorId(this.value)">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label style="font-size:0.8rem; color:var(--accent-gold); display:block; margin-bottom:6px; font-weight:700;">🏷️ Kode ID Sponsor</label>
+          <input type="text" id="ec-form-sponsor-id" class="input-field" placeholder="SPN-FDR-2026-002" style="width:100%; background:#0b1120; border:1px solid var(--accent-gold); color:var(--accent-gold); font-size:0.85rem; font-family:monospace; font-weight:800; padding:10px 14px; border-radius:8px; box-sizing:border-box;">
         </div>
         <div class="form-group" style="margin:0;">
           <label style="font-size:0.8rem; color:#94a3b8; display:block; margin-bottom:6px; font-weight:600;">Contact Person</label>
@@ -9339,8 +9343,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260820_113000"></script>
-  <script src="js/app.js?v=20260820_113000"></script>
+  <script src="js/auth.js?v=20260820_145700"></script>
+  <script src="js/app.js?v=20260820_145700"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
