@@ -17682,39 +17682,140 @@ window.M7Engine = {
 
     tbody.innerHTML = myProducts.map((p, idx) => {
       const statusStr = (p.status || 'PENDING').toUpperCase();
-      let statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.75rem; font-weight:800;">⏳ PENDING</span>`;
+      let statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.75rem; font-weight:800;">● ⏳ MENUNGGU VERIFIKASI</span>`;
       if (statusStr === 'APPROVED') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-size:0.75rem; font-weight:800;">✅ APPROVED</span>`;
+        statusBadge = `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-size:0.75rem; font-weight:800;">● ✅ DISETUJUI</span>`;
       } else if (statusStr === 'REJECTED') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); font-size:0.75rem; font-weight:800;">❌ REJECTED</span>`;
+        statusBadge = `<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); font-size:0.75rem; font-weight:800;">● ❌ DITOLAK</span>`;
       } else if (statusStr === 'REVISION') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.25); color:#3b82f6; border:1px solid #3b82f6; font-size:0.75rem; font-weight:800;">📝 REVISION</span>`;
+        statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.25); color:#3b82f6; border:1px solid #3b82f6; font-size:0.75rem; font-weight:800;">● 📝 REVISI</span>`;
+      }
+
+      const isPublished = (p.is_published !== false && p.is_published !== 0);
+      const publishBadge = (statusStr === 'APPROVED')
+        ? (isPublished
+            ? `<div style="margin-top:4px;"><span style="font-size:0.7rem; color:var(--primary-emerald); font-weight:700; background:rgba(16,185,129,0.15); padding:2px 8px; border-radius:10px; border:1px solid var(--primary-emerald);">🌐 Tayang di Katalog</span></div>`
+            : `<div style="margin-top:4px;"><span style="font-size:0.7rem; color:var(--text-muted); font-weight:700; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:10px; border:1px solid var(--chrome-border);">⏸️ Belum Tayang</span></div>`)
+        : '';
+
+      let imgUrl = 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600';
+      if (p.images) {
+        try {
+          const parsed = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
+          if (Array.isArray(parsed) && parsed[0]) imgUrl = parsed[0];
+          else if (typeof parsed === 'string') imgUrl = parsed;
+        } catch (e) {
+          if (typeof p.images === 'string') imgUrl = p.images;
+        }
       }
 
       const priceFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price || 0);
-      const note = p.rejection_reason || (statusStr === 'PENDING' ? 'Dalam antrean verifikasi admin' : (statusStr === 'APPROVED' ? 'Iklan tayang di marketplace' : '-'));
+      const note = p.rejection_reason || (statusStr === 'PENDING' ? 'Dalam antrean verifikasi admin' : (statusStr === 'APPROVED' ? 'Iklan siap/tayang di katalog marketplace' : '-'));
 
-      const perbaikiBtn = (statusStr === 'REJECTED' || statusStr === 'REVISION')
-        ? `<button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-gold); border-color:var(--accent-gold);" onclick="M7Engine.openProductModal('${p.lapak_id}')">📝 Perbaiki</button>`
-        : '';
+      // Publish / Unpublish Action Button
+      let publishBtn = '';
+      if (statusStr === 'APPROVED') {
+        if (isPublished) {
+          publishBtn = `
+            <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-gold); border-color:var(--accent-gold); display:flex; align-items:center; gap:4px;" onclick="M7Engine.viewProductInCatalog('${p.id}')">
+              👁️ Lihat
+            </button>
+            <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--text-muted); border-color:var(--chrome-border);" title="Sembunyikan dari katalog publik" onclick="M7Engine.togglePublishProduct('${p.id}', false)">
+              ⏸️ Unpublish
+            </button>
+          `;
+        } else {
+          publishBtn = `
+            <button class="btn-primary" style="padding:4px 10px; font-size:0.75rem; background:linear-gradient(135deg,#10B981,#059669); color:#fff; border:none; font-weight:800;" onclick="M7Engine.togglePublishProduct('${p.id}', true)">
+              🚀 Publish ke Katalog
+            </button>
+          `;
+        }
+      } else if (statusStr === 'PENDING') {
+        publishBtn = `
+          <button class="btn-primary" style="padding:4px 10px; font-size:0.75rem; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none; font-weight:800;" onclick="M7Engine.togglePublishProduct('${p.id}', true)" title="Langsung setujui dan terbitkan">
+            🚀 Publish Sekarang
+          </button>
+        `;
+      }
 
       return `
         <tr style="border-bottom:1px solid var(--chrome-border);">
           <td style="padding:10px 8px; font-weight:700; text-align:center;">${idx + 1}</td>
-          <td style="padding:10px 8px; font-weight:800; color:#fff;">${p.name}</td>
+          <td style="padding:10px 8px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <img src="${imgUrl}" style="width:48px; height:48px; object-fit:cover; border-radius:8px; border:1px solid var(--chrome-border); flex-shrink:0;" onerror="this.src='https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'">
+              <div>
+                <div style="font-weight:800; color:#fff; font-size:0.88rem;">${p.name}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Kategori: <strong style="color:var(--accent-gold);">${p.category || 'Parts'}</strong> • Kondisi: <strong>${p.condition || 'USED'}</strong></div>
+              </div>
+            </div>
+          </td>
           <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald);">${priceFormatted}</td>
-          <td style="padding:10px 8px; text-align:center;">${statusBadge}</td>
+          <td style="padding:10px 8px; text-align:center;">
+            ${statusBadge}
+            ${publishBadge}
+          </td>
           <td style="padding:10px 8px; font-size:0.78rem; color:var(--text-muted);">${p.created_at || '16/08/2026'}</td>
           <td style="padding:10px 8px; font-size:0.78rem; color:var(--text-muted);">${note}</td>
           <td style="padding:10px 8px; text-align:center;">
-            <div style="display:flex; gap:4px; justify-content:center;">
-              ${perbaikiBtn}
-              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M7Engine.deleteProduct('${p.id}')">🗑️</button>
+            <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+              ${publishBtn}
+              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:#60a5fa; border-color:#60a5fa;" onclick="M7Engine.openProductModal('${p.id}')">✏️ Edit Iklan & Foto</button>
+              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M7Engine.deleteProduct('${p.id}')">🗑️ Hapus</button>
             </div>
           </td>
         </tr>
       `;
     }).join('');
+  },
+
+  togglePublishProduct: async function(productId, isPublished) {
+    try {
+      const res = await fetch('api.php?action=toggle_publish_lapak_product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId, is_published: isPublished })
+      }).then(r => r.json());
+
+      if (res && res.success) {
+        alert(res.message);
+        await this.fetchData();
+        this.renderMyLapakIklan();
+        this.renderProductsGrid();
+        if (window.AppEngine && typeof window.AppEngine.openManageProductsModal === 'function') {
+          window.AppEngine.openManageProductsModal();
+        }
+      } else {
+        alert(`❌ Gagal mengubah status publikasi: ${res?.message || 'Error'}`);
+      }
+    } catch (err) {
+      alert(`❌ Connection error: ${err.message}`);
+    }
+  },
+
+  viewProductInCatalog: function(productId) {
+    const myIklanModal = document.getElementById('modal-my-iklan-list');
+    if (myIklanModal) myIklanModal.style.display = 'none';
+    const sponsorManageModal = document.getElementById('modal-sponsor-manage-products');
+    if (sponsorManageModal) sponsorManageModal.style.display = 'none';
+    document.body.style.overflow = '';
+
+    if (window.AppEngine && typeof window.AppEngine.switchTab === 'function') {
+      window.AppEngine.switchTab('m7');
+    }
+    if (typeof this.switchSubtab === 'function') {
+      this.switchSubtab('7_2_catalog');
+    }
+    this.selectedLapakId = 'ALL';
+    const searchInput = document.getElementById('m7-search-product');
+    if (searchInput) searchInput.value = '';
+    this.renderProductsGrid();
+
+    setTimeout(() => {
+      const grid = document.getElementById('m7-products-grid');
+      if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 250);
   },
 
   renderProductsGrid: function() {
@@ -17724,10 +17825,11 @@ window.M7Engine = {
     const condFilter = document.getElementById('m7-filter-product-cond')?.value || 'ALL';
     const search = (document.getElementById('m7-search-product')?.value || '').toLowerCase();
 
-    // In Public Marketplace Grid, ONLY display APPROVED items
-    let prods = this.data.products.filter(p => {
+    // In Public Marketplace Grid, display APPROVED and published items
+    let prods = (this.data.products || []).filter(p => {
       const isApproved = (p.status === 'APPROVED' || !p.status);
-      if (!isApproved) return false;
+      const isPublished = (p.is_published !== false && p.is_published !== 0);
+      if (!isApproved && !isPublished) return false;
       if (this.selectedLapakId !== 'ALL' && p.lapak_id !== this.selectedLapakId) return false;
       if (condFilter !== 'ALL' && p.condition !== condFilter) return false;
       if (search && !p.name.toLowerCase().includes(search) && !(p.location || '').toLowerCase().includes(search)) return false;
@@ -17995,19 +18097,29 @@ window.M7Engine = {
 
   submitProdukForm: async function(e) {
     if (e) e.preventDefault();
-    const lapakId     = document.getElementById('produk-form-lapak')?.value || '';
+    const lapakId     = document.getElementById('produk-form-lapak')?.value || 'MEMBER_MARKETPLACE';
     const name        = document.getElementById('produk-form-name')?.value?.trim() || '';
     const price       = parseInt(document.getElementById('produk-form-price')?.value || '0');
     const condition   = document.getElementById('produk-form-condition')?.value || 'USED';
     const category    = document.getElementById('produk-form-category')?.value || 'Parts';
     const location    = document.getElementById('produk-form-location')?.value?.trim() || 'Jakarta';
     const description = document.getElementById('produk-form-description')?.value?.trim() || '';
-    const img1        = document.getElementById('produk-form-img1')?.value?.trim() || '';
-    const img2        = document.getElementById('produk-form-img2')?.value?.trim() || '';
-    const img3        = document.getElementById('produk-form-img3')?.value?.trim() || '';
-    const wa          = document.getElementById('produk-form-wa')?.value?.trim() || '';
+    const wa          = document.getElementById('produk-form-wa')?.value?.trim() || '081234567890';
 
-    if (!lapakId)  { alert('❌ Pilih lapak terlebih dahulu!'); return; }
+    // Safely get image values from inputs or previews
+    const getImg = (idx) => {
+      const inp = document.getElementById(`produk-form-img${idx}`)?.value?.trim();
+      if (inp) return inp;
+      const preview = document.getElementById(`produk-preview-img-${idx}`)?.src;
+      if (preview && (preview.startsWith('data:image') || preview.startsWith('http'))) return preview;
+      return '';
+    };
+
+    const img1 = getImg(1);
+    const img2 = getImg(2);
+    const img3 = getImg(3);
+
+    if (!lapakId)  { alert('❌ Pilih lapak / toko terlebih dahulu!'); return; }
     if (!name)     { alert('❌ Nama produk wajib diisi!'); return; }
     if (price <= 0){ alert('❌ Harga produk harus lebih dari 0!'); return; }
     if (!location) { alert('❌ Lokasi produk wajib diisi!'); return; }
@@ -18017,35 +18129,43 @@ window.M7Engine = {
     if (img3) images.push(img3);
 
     const currentUser = AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
-    const memberName = currentUser.name || 'Andi Pratama';
+    const memberName = currentUser.name || 'Member MB INA';
 
     try {
       const submitBtn = document.querySelector('#form-tambah-produk button[type="submit"]');
-      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Menyimpan...'; }
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Menyimpan & Menerbitkan...'; }
+
+      const payload = {
+        product_id: this._editingProductId || null,
+        lapak_id: lapakId,
+        name, price, condition, category, location, description,
+        images,
+        contact_whatsapp: wa,
+        user_id: currentUser?.id || 'usr_superadmin',
+        seller_name: memberName
+      };
 
       const res = await fetch('api.php?action=create_lapak_product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lapak_id: lapakId,
-          name, price, condition, category, location, description,
-          images,
-          contact_whatsapp: wa,
-          user_id: currentUser?.id || 'usr_superadmin'
-        })
+        body: JSON.stringify(payload)
       }).then(r => r.json());
 
       if (res && res.success) {
+        this._editingProductId = null;
         this.closeProdukModal();
         await this.fetchData();
         this.renderAll();
+        this.renderMyLapakIklan();
 
-        // Show success popup (menunggu verifikasi 1x24 jam)
-        const nameSpan = document.getElementById('iklan-success-member-name');
-        if (nameSpan) nameSpan.innerText = memberName;
-        if (window.AuthEngine) window.AuthEngine.openModal('modal-iklan-submitted-success');
+        alert(`🎉 ${res.message}`);
+
+        // If returned from sponsor dashboard or my iklan, update it
+        if (window.AppEngine && typeof window.AppEngine.openManageProductsModal === 'function' && this._returnToSponsorManage) {
+          window.AppEngine.openManageProductsModal();
+        }
       } else {
-        alert(`❌ Gagal menambah produk: ${res?.message || 'Error'}`);
+        alert(`❌ Gagal menyimpan produk: ${res?.message || 'Error'}`);
       }
     } catch (err) {
       alert(`❌ Connection error: ${err.message}`);
@@ -18625,6 +18745,7 @@ window.M7Engine = {
     }
 
     if (editProduct) {
+      this._editingProductId = editProduct.id;
       if (modalTitle) modalTitle.innerHTML = '✏️ EDIT PRODUK / IKLAN MARKETPLACE';
       if (submitBtn) submitBtn.innerHTML = '💾 SIMPAN PERUBAHAN PRODUK';
 
@@ -18640,7 +18761,28 @@ window.M7Engine = {
       const descEl = document.getElementById('produk-form-description');
       if (descEl) descEl.value = editProduct.description || '';
       if (waEl) waEl.value = editProduct.contact_whatsapp || user.phone || '081234567890';
+
+      // Load existing product images
+      if (editProduct.images) {
+        try {
+          const imgs = typeof editProduct.images === 'string' ? JSON.parse(editProduct.images) : editProduct.images;
+          if (Array.isArray(imgs)) {
+            imgs.forEach((im, idx) => {
+              const fotoIdx = idx + 1;
+              if (fotoIdx <= 3 && im) {
+                const urlInp = document.getElementById(`produk-form-img${fotoIdx}`);
+                const cont = document.getElementById(`produk-preview-container-${fotoIdx}`);
+                const imEl = document.getElementById(`produk-preview-img-${fotoIdx}`);
+                if (urlInp) urlInp.value = im;
+                if (imEl) imEl.src = im;
+                if (cont) cont.style.display = 'block';
+              }
+            });
+          }
+        } catch (e) {}
+      }
     } else {
+      this._editingProductId = null;
       if (modalTitle) modalTitle.innerHTML = '📝 TAMBAH PRODUK / IKLAN MARKETPLACE';
       if (submitBtn) submitBtn.innerHTML = '📝 TAMBAHKAN PRODUK';
     }
@@ -18653,38 +18795,40 @@ window.M7Engine = {
     if (!inputEl.files || !inputEl.files[0]) return;
     const file = inputEl.files[0];
 
-    // Show preview immediately using FileReader
+    // Show preview and store Base64 value immediately so it is never lost
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async (e) => {
       const container = document.getElementById(`produk-preview-container-${fotoIndex}`);
       const img = document.getElementById(`produk-preview-img-${fotoIndex}`);
+      const urlInput = document.getElementById(`produk-form-img${fotoIndex}`);
+      
       if (container && img) {
         img.src = e.target.result;
         container.style.display = 'block';
       }
+      if (urlInput) {
+        urlInput.value = e.target.result;
+      }
+
+      // Upload to server endpoint
+      try {
+        const formData = new FormData();
+        formData.append('photo_file', file);
+
+        const res = await fetch('api.php?action=upload_image', {
+          method: 'POST',
+          body: formData
+        }).then(r => r.json());
+
+        if (res && res.success && res.url) {
+          if (urlInput) urlInput.value = res.url;
+          window.showToast?.(`✅ Foto ${fotoIndex} berhasil diunggah!`, 'success');
+        }
+      } catch (err) {
+        console.warn('Upload image API error (Base64 fallback active):', err);
+      }
     };
     reader.readAsDataURL(file);
-
-    // Upload image to server api.php?action=upload_image
-    try {
-      const formData = new FormData();
-      formData.append('photo_file', file);
-
-      const res = await fetch('api.php?action=upload_image', {
-        method: 'POST',
-        body: formData
-      }).then(r => r.json());
-
-      if (res && res.success && res.url) {
-        const urlInput = document.getElementById(`produk-form-img${fotoIndex}`);
-        if (urlInput) urlInput.value = res.url;
-        window.showToast?.(`✅ Foto ${fotoIndex} berhasil diunggah ke server!`, 'success');
-      } else {
-        window.showToast?.(`⚠️ Preview lokal aktif. (${res?.message || 'Server offline'})`, 'warning');
-      }
-    } catch (err) {
-      console.warn('Upload image API error:', err);
-    }
   },
 
   updateFotoPreviewFromUrl: function(fotoIndex) {

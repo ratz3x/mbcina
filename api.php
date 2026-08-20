@@ -347,6 +347,9 @@ function ensureM7Tables($sPdo) {
             ALTER TABLE lapak_products ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
             ALTER TABLE lapak_products ADD COLUMN IF NOT EXISTS category VARCHAR(50);
             ALTER TABLE lapak_products ADD COLUMN IF NOT EXISTS contact_whatsapp VARCHAR(50);
+            ALTER TABLE lapak_products ADD COLUMN IF NOT EXISTS user_id VARCHAR(36);
+            ALTER TABLE lapak_products ADD COLUMN IF NOT EXISTS seller_name VARCHAR(255);
+            ALTER TABLE lapak_products ADD COLUMN IF NOT EXISTS is_published BOOLEAN DEFAULT TRUE;
 
             CREATE TABLE IF NOT EXISTS lapak_reviews (
                 id VARCHAR(36) PRIMARY KEY,
@@ -5209,7 +5212,18 @@ try {
         try {
             ensureM7Tables($sPdo);
             $lapak = $sPdo->query("SELECT l.*, COALESCE(u.name, u.username, 'Member MB INA') AS pemilik, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id, COALESCE(u.tier, 'GOLD') AS tier FROM lapak l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC")->fetchAll() ?: [];
-            $products = $sPdo->query("SELECT p.*, l.name as lapak_name, COALESCE(NULLIF(p.contact_whatsapp, ''), l.contact_whatsapp, '081234567890') as lapak_wa, COALESCE(u.name, 'Member MB INA') as seller_name, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') as member_id FROM lapak_products p LEFT JOIN lapak l ON p.lapak_id = l.id LEFT JOIN users u ON l.user_id = u.id ORDER BY p.created_at DESC")->fetchAll() ?: [];
+            $products = $sPdo->query("
+                SELECT 
+                    p.*, 
+                    COALESCE(l.name, 'Bursa Jual Beli MB INA') AS lapak_name, 
+                    COALESCE(NULLIF(p.contact_whatsapp, ''), l.contact_whatsapp, '081234567890') AS lapak_wa, 
+                    COALESCE(NULLIF(p.seller_name, ''), u.name, 'Member MB INA') AS seller_name, 
+                    COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id 
+                FROM lapak_products p 
+                LEFT JOIN lapak l ON p.lapak_id = l.id 
+                LEFT JOIN users u ON (p.user_id = u.id OR l.user_id = u.id) 
+                ORDER BY p.created_at DESC
+            ")->fetchAll() ?: [];
             $reviews = $sPdo->query("SELECT r.*, COALESCE(u.name, u.username, 'Member MB INA') AS user_name, COALESCE(u.member_id, 'MBINA-HQ-2026-000001') AS member_id FROM lapak_reviews r LEFT JOIN users u ON r.user_id = u.id ORDER BY r.created_at DESC")->fetchAll() ?: [];
             $sewaLogs = $sPdo->query("SELECT s.*, l.name as lapak_name, l.lapak_code, COALESCE(u.name, 'Admin') as creator_name FROM lapak_sewa_logs s LEFT JOIN lapak l ON s.lapak_id = l.id LEFT JOIN users u ON s.created_by = u.id ORDER BY s.created_at DESC")->fetchAll() ?: [];
             $categories = $sPdo->query("SELECT * FROM product_categories ORDER BY display_order ASC")->fetchAll() ?: [];
@@ -5510,7 +5524,8 @@ try {
     case 'create_lapak_product':
         try {
             ensureM7Tables($sPdo);
-            $lapakId         = trim($input['lapak_id'] ?? '');
+            $prodId          = !empty($input['product_id']) ? trim($input['product_id']) : ('prod_' . uniqid());
+            $lapakId         = trim($input['lapak_id'] ?? 'MEMBER_MARKETPLACE');
             $name            = trim($input['name'] ?? '');
             $description     = trim($input['description'] ?? '');
             $price           = intval($input['price'] ?? 0);
@@ -5520,28 +5535,61 @@ try {
             $contactWhatsapp = trim($input['contact_whatsapp'] ?? '081234567890');
             $images          = is_array($input['images'] ?? null) ? json_encode($input['images']) : json_encode([$input['images'] ?? 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600']);
             $userId          = $input['user_id'] ?? 'usr_superadmin';
+            $sellerName      = trim($input['seller_name'] ?? '');
 
             if (empty($name) || $price <= 0) {
                 echo json_encode(['success' => false, 'message' => 'Nama produk dan harga wajib diisi!']);
                 exit;
             }
 
-            if (empty($lapakId)) {
-                $stmtLapak = $sPdo->prepare("SELECT id FROM lapak WHERE user_id = ? LIMIT 1");
-                $stmtLapak->execute([$userId]);
-                $lapakId = $stmtLapak->fetchColumn();
-                if (!$lapakId) {
-                    $lapakId = $sPdo->query("SELECT id FROM lapak LIMIT 1")->fetchColumn() ?: 'lapak_001';
-                }
+            if (empty($sellerName) && $userId) {
+                $sellerName = $sPdo->query("SELECT name FROM users WHERE id = '$userId'")->fetchColumn() ?: 'Member MB INA';
             }
 
-            $prodId = 'prod_' . uniqid();
-            $stmt = $sPdo->prepare("INSERT INTO lapak_products (id, lapak_id, name, description, price, condition, location, images, views, status, category, contact_whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'PENDING', ?, ?)");
-            $stmt->execute([$prodId, $lapakId, $name, $description, $price, $condition, $location, $images, $category, $contactWhatsapp]);
+            // Check if updating existing product
+            $stmtCheck = $sPdo->prepare("SELECT id FROM lapak_products WHERE id = ?");
+            $stmtCheck->execute([$prodId]);
+            $existingId = $stmtCheck->fetchColumn();
 
-            logAudit($userId, 'CREATE', 'E_COMMERCE_PRODUCT', ['product_id' => $prodId, 'name' => $name, 'price' => $price]);
+            if ($existingId) {
+                $stmt = $sPdo->prepare("
+                    UPDATE lapak_products 
+                    SET lapak_id = ?, name = ?, description = ?, price = ?, condition = ?, location = ?, images = ?, category = ?, contact_whatsapp = ?, user_id = ?, seller_name = ?, is_published = TRUE, status = 'APPROVED', updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ");
+                $stmt->execute([$lapakId, $name, $description, $price, $condition, $location, $images, $category, $contactWhatsapp, $userId, $sellerName, $prodId]);
+                logAudit($userId, 'UPDATE', 'E_COMMERCE_PRODUCT', ['product_id' => $prodId, 'name' => $name, 'price' => $price]);
+                echo json_encode(['success' => true, 'message' => 'Iklan produk & foto berhasil diperbarui dan aktif di katalog!', 'product_id' => $prodId, 'status' => 'APPROVED']);
+            } else {
+                $stmt = $sPdo->prepare("
+                    INSERT INTO lapak_products (id, lapak_id, name, description, price, condition, location, images, views, status, is_published, category, contact_whatsapp, user_id, seller_name)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'APPROVED', TRUE, ?, ?, ?, ?)
+                ");
+                $stmt->execute([$prodId, $lapakId, $name, $description, $price, $condition, $location, $images, $category, $contactWhatsapp, $userId, $sellerName]);
+                logAudit($userId, 'CREATE', 'E_COMMERCE_PRODUCT', ['product_id' => $prodId, 'name' => $name, 'price' => $price]);
+                echo json_encode(['success' => true, 'message' => 'Iklan produk & foto berhasil disimpan dan DITERBITKAN ke Katalog Marketplace!', 'product_id' => $prodId, 'status' => 'APPROVED']);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
 
-            echo json_encode(['success' => true, 'message' => 'Iklan produk berhasil dikirim! Status: MENUNGGU VERIFIKASI ADMIN (PENDING).', 'product_id' => $prodId, 'status' => 'PENDING']);
+    case 'toggle_publish_lapak_product':
+        try {
+            ensureM7Tables($sPdo);
+            $productId   = $input['product_id'] ?? '';
+            $isPublished = !empty($input['is_published']) ? true : false;
+            $userId      = $input['user_id'] ?? 'usr_superadmin';
+
+            $sPdo->prepare("UPDATE lapak_products SET is_published = ?, status = CASE WHEN ? = 1 THEN 'APPROVED' ELSE status END, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+                 ->execute([$isPublished ? 1 : 0, $isPublished ? 1 : 0, $productId]);
+
+            logAudit($userId, 'PUBLISH', 'E_COMMERCE_PRODUCT', ['product_id' => $productId, 'is_published' => $isPublished]);
+            echo json_encode([
+                'success' => true,
+                'is_published' => $isPublished,
+                'message' => $isPublished ? '🎉 Iklan berhasil DITERBITKAN dan tayang di Katalog Marketplace!' : '⏸️ Iklan telah di-unpublish dari katalog publik.'
+            ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
