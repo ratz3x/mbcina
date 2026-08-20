@@ -1631,101 +1631,67 @@ const AppEngine = {
     const grid = document.getElementById('ml-products-grid');
     if (!grid) return;
 
-    const u = this.currentUser || {};
-    const sellerName = u.name || 'Ratih Kusumastuti';
-    const sellerPhone = u.phone || '08545585568';
-
-    let defaultProds = [
-      { id: 'p1', name: 'W124 300E 1991 Manual Classic', category: 'KENDARAAN', price: 98000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: 'Ratih Kusumastuti', phone: '08545585568', img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', desc: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original.' },
-      { id: 'p2', name: 'Velg AMG Monoblock 18 Inch Staggered', category: 'SPAREPART', price: 16500000, condition: 'BEKAS', location: 'Bandung', seller: 'Budi Santoso', phone: '081987654321', img: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400', desc: 'Original AMG Made in Germany, et31/35, ban Michelin PS4 85%.' },
-      { id: 'p3', name: 'Jaket Original MB INA Leather Edition', category: 'MERCHANDISE', price: 1250000, condition: 'BARU', location: 'Yogyakarta', seller: 'Official MB INA Store', phone: '081122334455', img: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400', desc: 'Jaket kulit resmi edisi khusus member dengan bordir badge MB INA.' },
-      { id: 'p4', name: 'Jasa Restorasi Interior & Wood Panel W124/W210', category: 'SERVICE', price: 4500000, condition: 'BARU', location: 'Tangerang', seller: 'Auto Classic Workshop', phone: '081567890123', img: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=400', desc: 'Restorasi kayu Zebrano & Walnut, perbaikan jok kulit MB-Tex original.' },
-      { id: 'p5', name: 'W202 C230 Kompressor 1998 Silver', category: 'KENDARAAN', price: 85000000, condition: 'BEKAS', location: 'Surabaya', seller: 'Denny Kurniawan', phone: '081789012345', img: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=400', desc: 'Mesin supercharged sehat, ac dingin, siap luar kota.' }
-    ];
-
-    if (!this._memberAdsList || !this._memberAdsList.length) {
-      this._memberAdsList = [
-        { id: 'ad_my_001', name: 'Transmisi Otomatis 722.6 (5G-Tronic) W210 E240 Copotan', category: 'SPAREPART', price: 7500000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400', desc: 'Transmisi matic 722.6 smooth mulus, siap pasang', status: 'APPROVED' },
-        { id: 'ad_my_002', name: 'Blok Mesin W124 Copotan', category: 'SPAREPART', price: 25000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=400', desc: 'Blok mesin W124 300E copotan ori sehat kompresi padat', status: 'APPROVED' },
-        { id: 'ad_my_003', name: 'W124 300E 1991 Manual Classic', category: 'KENDARAAN', price: 98000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', desc: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original.', status: 'APPROVED' }
-      ];
-    }
-
-    let approvedAds = [];
-    if (this._memberAdsList && this._memberAdsList.length) {
-      approvedAds = this._memberAdsList
-        .filter(a => a.status === 'APPROVED' || a.status === 'ACTIVE' || a.status === 'active' || a.status === 'DISETUJUI')
-        .map(a => {
-          let imgs = [];
-          try { imgs = typeof a.images === 'string' ? JSON.parse(a.images) : (a.images || []); } catch(e){}
-          const imgUrl = a.img || imgs[0] || (typeof a.images === 'string' ? a.images : null) || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';
-          return { ...a, img: imgUrl, seller: a.seller || sellerName, phone: a.phone || sellerPhone };
-        });
-    }
-
-    let approvedDbProducts = [];
-    if (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) {
-      approvedDbProducts = window.M7Engine.data.products
-        .filter(p => !p.status || p.status === 'APPROVED' || p.status === 'active' || p.status === 'ACTIVE' || p.status === 'DISETUJUI')
-        .map(p => {
-          let imgs = [];
-          try { imgs = typeof p.images === 'string' ? JSON.parse(p.images) : (p.images || []); } catch(e){}
-          const imgUrl = p.img || imgs[0] || (typeof p.images === 'string' ? p.images : null) || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';
-          return {
-            id: p.id,
-            name: p.name || p.title,
-            category: p.category || 'SPAREPART',
-            price: p.price,
-            condition: p.condition || 'BEKAS',
-            location: p.location || 'Jakarta',
-            seller: p.seller_name || p.seller || 'Member MB INA',
-            phone: p.contact_whatsapp || p.phone || '08545585568',
-            img: imgUrl,
-            desc: p.description || ''
-          };
-        });
-    }
-
-    const existingKeys = new Set();
-    let prods = [];
-
-    // approvedAds takes precedence over database and default mock items
-    [...approvedAds, ...approvedDbProducts, ...defaultProds].forEach(p => {
-      const normalizedTitle = (p.name || '').toLowerCase().trim();
-      if (!existingKeys.has(normalizedTitle)) {
-        existingKeys.add(normalizedTitle);
-        prods.push(p);
-      }
-    });
+    const allProds = (typeof window.getGlobalUnifiedProducts === 'function')
+      ? window.getGlobalUnifiedProducts()
+      : [];
 
     const search = (document.getElementById('ml-search-input')?.value || '').toLowerCase();
     const cat = document.getElementById('ml-category-select')?.value || 'ALL';
 
-    const filtered = prods.filter(p => {
-      const matchSearch = !search || p.name.toLowerCase().includes(search) || p.location.toLowerCase().includes(search) || p.seller.toLowerCase().includes(search);
+    const filtered = allProds.filter(p => {
+      const isApproved = (p.status === 'APPROVED' || !p.status);
+      const isPublished = (p.is_published !== false && p.is_published !== 0);
+      if (!isApproved && !isPublished) return false;
+
+      const pName = (p.name || p.title || '').toLowerCase();
+      const pLoc = (p.location || '').toLowerCase();
+      const pSeller = (p.seller_name || p.seller || '').toLowerCase();
+      const pStore = (p.lapak_name || '').toLowerCase();
+
+      const matchSearch = !search || pName.includes(search) || pLoc.includes(search) || pSeller.includes(search) || pStore.includes(search);
       const matchCat = cat === 'ALL' || p.category === cat;
       return matchSearch && matchCat;
     });
 
     const fmtRp = v => 'Rp ' + Number(v).toLocaleString('id-ID');
 
-    grid.innerHTML = filtered.length ? filtered.map(p => `
+    grid.innerHTML = filtered.length ? filtered.map(p => {
+      let imgUrl = 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';
+      if (p.images) {
+        try {
+          const parsed = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
+          if (Array.isArray(parsed) && parsed[0]) imgUrl = parsed[0];
+          else if (typeof parsed === 'string') imgUrl = parsed;
+        } catch(e){ if (typeof p.images === 'string') imgUrl = p.images; }
+      } else if (p.img) {
+        imgUrl = p.img;
+      }
+
+      const seller = p.seller_name || p.seller || 'Member MB INA';
+      const store = p.lapak_name || 'Lapak MB INA';
+      const phone = (p.contact_whatsapp || p.phone || '081234567890').replace(/[^0-9]/g,'');
+      const cond = p.condition === 'NEW' ? 'BARU' : 'BEKAS';
+
+      return `
       <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(59,130,246,0.2); border-radius:12px; overflow:hidden; display:flex; flex-direction:column;">
         <div style="height:140px; background:#000; overflow:hidden; position:relative;">
-          <img src="${p.img}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';">
-          <span style="position:absolute; top:8px; right:8px; font-size:0.65rem; background:rgba(0,0,0,0.75); color:${p.condition==='BARU'?'#10b981':'#f59e0b'}; border:1px solid ${p.condition==='BARU'?'#10b981':'#f59e0b'}; padding:2px 6px; border-radius:4px; font-weight:800;">${p.condition}</span>
+          <img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';">
+          <span style="position:absolute; top:8px; right:8px; font-size:0.65rem; background:rgba(0,0,0,0.75); color:${cond==='BARU'?'#10b981':'#f59e0b'}; border:1px solid ${cond==='BARU'?'#10b981':'#f59e0b'}; padding:2px 6px; border-radius:4px; font-weight:800;">${cond}</span>
+          <span style="position:absolute; top:8px; left:8px; font-size:0.65rem; background:rgba(16,185,129,0.85); color:#fff; padding:2px 6px; border-radius:4px; font-weight:800;">APPROVED</span>
         </div>
         <div style="padding:12px 14px; flex:1; display:flex; flex-direction:column;">
-          <div style="font-size:0.88rem; font-weight:800; color:#fff; margin-bottom:4px; line-height:1.3; height:2.4em; overflow:hidden;">${p.name}</div>
+          <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700; margin-bottom:2px;">🏪 ${store}</div>
+          <div style="font-size:0.88rem; font-weight:800; color:#fff; margin-bottom:4px; line-height:1.3; height:2.4em; overflow:hidden;">${p.name || p.title}</div>
           <div style="font-size:1.05rem; font-weight:900; color:var(--accent-gold); margin-bottom:6px;">${fmtRp(p.price)}</div>
-          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">📍 ${p.location} &nbsp;·&nbsp; 👤 ${p.seller}</div>
-          <a href="https://wa.me/${p.phone.replace(/[^0-9]/g,'')}?text=Halo%20${encodeURIComponent(p.seller)},%20saya%20tertarik%20dengan%20iklan%20${encodeURIComponent(p.name)}%20di%20Lapak%20MB%20INA" target="_blank" style="margin-top:auto; text-decoration:none;">
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">📍 ${p.location || 'Indonesia'} &nbsp;·&nbsp; 👤 ${seller}</div>
+          <a href="https://wa.me/${phone}?text=Halo%20${encodeURIComponent(seller)},%20saya%20tertarik%20dengan%20iklan%20${encodeURIComponent(p.name || p.title)}%20di%20Lapak%20MB%20INA" target="_blank" style="margin-top:auto; text-decoration:none;">
             <button style="width:100%; padding:8px; font-size:0.78rem; font-weight:800; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; border-radius:7px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
               💬 Hubungi via WA
             </button>
           </a>
         </div>
-      </div>`).join('') : `<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted);">Tidak ada produk atau iklan yang cocok.</div>`;
+      </div>`;
+    }).join('') : `<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted);">Tidak ada produk atau iklan yang cocok.</div>`;
   },
 
   _filterMemberLapakProducts() {
@@ -17265,6 +17231,283 @@ window.saveSponsorProfile = function() {
 };
 
 // ─────────────────────────────────────────────────────────────────────
+// GLOBAL UNIFIED MARKETPLACE PRODUCT REPOSITORY (SINGLE SOURCE OF TRUTH)
+// ─────────────────────────────────────────────────────────────────────
+window.getGlobalUnifiedProducts = function() {
+  const dbProducts = (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) ? window.M7Engine.data.products : [];
+  const memberAds = (window.AppEngine && Array.isArray(window.AppEngine._memberAdsList)) ? window.AppEngine._memberAdsList : [];
+
+  const defaultMasterProducts = [
+    // 1. MITRA SPONSOR RESMI MB INA
+    {
+      id: 'prod_fdr_1',
+      name: 'FDR Ultimate Performance Tire 245/45 R18 (Mercedes E-Class)',
+      category: 'Parts',
+      price: 1850000,
+      condition: 'NEW',
+      location: 'Jakarta Selatan',
+      lapak_name: 'FDR Tyre Indonesia (Official Store Sponsor)',
+      seller_name: 'PT Suryaraya Rubberindo Industries (FDR)',
+      contact_whatsapp: '081234567890',
+      views: 342,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600'],
+      description: 'Ban performa tinggi FDR untuk Mercedes-Benz E-Class W211/W212/W213 dengan cengkeraman maksimal.'
+    },
+    {
+      id: 'prod_shell_1',
+      name: 'Pelumas Mesin Shell Helix Ultra 0W-40 Fully Synthetic (4L)',
+      category: 'Parts',
+      price: 650000,
+      condition: 'NEW',
+      location: 'Jakarta Pusat',
+      lapak_name: 'Shell Indonesia (Official Store Sponsor)',
+      seller_name: 'PT Shell Indonesia',
+      contact_whatsapp: '021-52901234',
+      views: 520,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=600'],
+      description: 'Oli mesin performa tinggi sertifikasi resmi Mercedes-Benz MB-Approval 229.5.'
+    },
+    // 2. BURSA MEMBER MB INA (RATIH KUSUMASTUTI & ANGGOTA)
+    {
+      id: 'p_w124_300e',
+      name: 'W124 300E 1991 Manual Classic',
+      category: 'Mobil / Unit',
+      price: 98000000,
+      condition: 'USED',
+      location: 'Jakarta Selatan',
+      lapak_name: 'Garasi FayFay',
+      seller_name: 'Ratih Kusumastuti',
+      contact_whatsapp: '08545585568',
+      views: 189,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600'],
+      description: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original, siap pakai luar kota.'
+    },
+    {
+      id: 'p_transmisi_7226',
+      name: 'Transmisi Otomatis 722.6 (5G-Tronic) W210 E240 Copotan',
+      category: 'Parts',
+      price: 7500000,
+      condition: 'USED',
+      location: 'Jakarta Selatan',
+      lapak_name: 'Garasi FayFay',
+      seller_name: 'Ratih Kusumastuti',
+      contact_whatsapp: '08545585568',
+      views: 74,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=600'],
+      description: 'Transmisi matic 722.6 smooth mulus copotan sehat, bergaransi.'
+    },
+    {
+      id: 'p_blok_mesin_w124',
+      name: 'Blok Mesin W124 Copotan',
+      category: 'Parts',
+      price: 25000000,
+      condition: 'USED',
+      location: 'Jakarta Selatan',
+      lapak_name: 'Garasi FayFay',
+      seller_name: 'Ratih Kusumastuti',
+      contact_whatsapp: '08545585568',
+      views: 120,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600'],
+      description: 'Blok mesin W124 Boxer 300E M103 copotan original kondisi kompresi padat.'
+    },
+    {
+      id: 'p_karpet_3d',
+      name: 'Karpet Moulded 3D MB INA Bespoke Hitam W205 C-Class',
+      category: 'Aksesoris',
+      price: 1250000,
+      condition: 'NEW',
+      location: 'Jakarta Selatan',
+      lapak_name: 'Andi Parts Store',
+      seller_name: 'Andi Pratama',
+      contact_whatsapp: '081111222333',
+      views: 88,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600'],
+      description: 'Karpet interior presisi 3D anti air dengan logo bordir MB INA.'
+    },
+    {
+      id: 'p_velg_amg_18',
+      name: 'Velg AMG 18" Monoblock Staggered Original',
+      category: 'Parts',
+      price: 15000000,
+      condition: 'USED',
+      location: 'Jakarta Selatan',
+      lapak_name: 'Andi Parts Store',
+      seller_name: 'Andi Pratama',
+      contact_whatsapp: '081234567890',
+      views: 142,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'],
+      description: 'Velg original AMG Germany R18 lebar 8.5/9.5 et31/35 mulus.'
+    },
+    {
+      id: 'p_filter_kn',
+      name: 'Filter Udara K&N High Flow W204 C250 CGI Turbo',
+      category: 'Parts',
+      price: 850000,
+      condition: 'USED',
+      location: 'Bandung, Jawa Barat',
+      lapak_name: 'Budi Aksesoris',
+      seller_name: 'Budi Santoso',
+      contact_whatsapp: '083344556679',
+      views: 56,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=600'],
+      description: 'Replacement filter K&N USA aliran udara optimal untuk mesin CGI Turbo.'
+    },
+    {
+      id: 'p_angel_eyes_w211',
+      name: 'Lampu Angel Eyes LED W211 E-Class Sepasang',
+      category: 'Aksesoris',
+      price: 2750000,
+      condition: 'USED',
+      location: 'Surabaya, Jawa Timur',
+      lapak_name: 'Siti Merchandise',
+      seller_name: 'Siti Rahayu',
+      contact_whatsapp: '082234455668',
+      views: 92,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600'],
+      description: 'Headlamp projector Angel Eyes LED crystal white look modern W211.'
+    },
+    {
+      id: 'p_velg_ronale_17',
+      name: 'Velg Ronale Mercedes 17" W203 C-Class Bekas Mulus',
+      category: 'Parts',
+      price: 3200000,
+      condition: 'USED',
+      location: 'Depok, Jawa Barat',
+      lapak_name: 'Andi Parts Store',
+      seller_name: 'Andi Pratama',
+      contact_whatsapp: '081334455667',
+      views: 65,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'],
+      description: 'Set velg 4 pcs R17 OEM Ronal Mercedes mulus tanpa retak/peang.'
+    },
+    {
+      id: 'p_stir_wood_w124',
+      name: 'Set Stir Wood Trim Woodgrain W124 Boxer',
+      category: 'Aksesoris',
+      price: 4500000,
+      condition: 'USED',
+      location: 'Jakarta Selatan',
+      lapak_name: 'Andi Parts Store',
+      seller_name: 'Andi Pratama',
+      contact_whatsapp: '081234567890',
+      views: 78,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600'],
+      description: 'Stir kemudi kombinasi kayu Zebrano & kulit asli MB-Tex W124 original.'
+    },
+    {
+      id: 'p_kaos_polo',
+      name: 'Kaos Polo MB INA Official 2026',
+      category: 'Merchandise',
+      price: 150000,
+      condition: 'NEW',
+      location: 'Surabaya',
+      lapak_name: 'Siti Merchandise',
+      seller_name: 'Siti Rahayu',
+      contact_whatsapp: '081987654321',
+      views: 210,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600'],
+      description: 'Kaos polo katun combed 30s resmi MB INA bordir logo benang emas.'
+    },
+    {
+      id: 'p_bushing_arm_w211',
+      name: 'Bushing Arm W211 Lemforder',
+      category: 'Parts',
+      price: 250000,
+      condition: 'NEW',
+      location: 'Jakarta Selatan',
+      lapak_name: 'Andi Parts Store',
+      seller_name: 'Andi Pratama',
+      contact_whatsapp: '081234567890',
+      views: 65,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=600'],
+      description: 'Bushing arm depan set Lemforder original Germany W211 baru gress.'
+    },
+    {
+      id: 'p_gantungan_kunci',
+      name: 'Gantungan Kunci Kulit Genuine MB INA',
+      category: 'Merchandise',
+      price: 45000,
+      condition: 'NEW',
+      location: 'Surabaya',
+      lapak_name: 'Siti Merchandise',
+      seller_name: 'Siti Rahayu',
+      contact_whatsapp: '081987654321',
+      views: 130,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600'],
+      description: 'Gantungan kunci kulit asli dengan emboss logo resmi bintang tiga titik MB INA.'
+    },
+    {
+      id: 'p_emblem_grille',
+      name: 'Emblem Grille Bintang Mercedes-Benz Chrome',
+      category: 'Aksesoris',
+      price: 120000,
+      condition: 'NEW',
+      location: 'Bandung',
+      lapak_name: 'Budi Aksesoris',
+      seller_name: 'Budi Santoso',
+      contact_whatsapp: '083344556679',
+      views: 45,
+      status: 'APPROVED',
+      is_published: true,
+      images: ['https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600'],
+      description: 'Emblem grill bintang chrome mengkilap cocok untuk W202, W203, W210, W211.'
+    }
+  ];
+
+  const merged = [];
+  const seen = new Set();
+
+  [...dbProducts, ...memberAds, ...defaultMasterProducts].forEach(p => {
+    const rawName = (p.name || p.title || '').trim();
+    if (!rawName) return;
+    const titleKey = rawName.toLowerCase();
+    if (!seen.has(titleKey)) {
+      seen.add(titleKey);
+      merged.push({
+        ...p,
+        name: rawName,
+        title: rawName,
+        status: p.status || 'APPROVED',
+        is_published: (p.is_published !== false && p.is_published !== 0),
+        lapak_name: p.lapak_name || p.store || 'Lapak MB INA',
+        seller_name: p.seller_name || p.seller || 'Member MB INA',
+        contact_whatsapp: p.contact_whatsapp || p.phone || '081234567890'
+      });
+    }
+  });
+
+  return merged;
+};
+
+// ─────────────────────────────────────────────────────────────────────
 // MODUL M7: MANAJEMEN E-COMMERCE (TOKO / LAPAK & MARKETPLACE) ENGINE
 // ─────────────────────────────────────────────────────────────────────
 window.M7Engine = {
@@ -17830,14 +18073,24 @@ window.M7Engine = {
     const condFilter = document.getElementById('m7-filter-product-cond')?.value || 'ALL';
     const search = (document.getElementById('m7-search-product')?.value || '').toLowerCase();
 
-    // In Public Marketplace Grid, display APPROVED and published items
-    let prods = (this.data.products || []).filter(p => {
+    const allProds = (typeof window.getGlobalUnifiedProducts === 'function')
+      ? window.getGlobalUnifiedProducts()
+      : [];
+
+    let prods = allProds.filter(p => {
       const isApproved = (p.status === 'APPROVED' || !p.status);
       const isPublished = (p.is_published !== false && p.is_published !== 0);
       if (!isApproved && !isPublished) return false;
-      if (this.selectedLapakId !== 'ALL' && p.lapak_id !== this.selectedLapakId) return false;
-      if (condFilter !== 'ALL' && p.condition !== condFilter) return false;
-      if (search && !p.name.toLowerCase().includes(search) && !(p.location || '').toLowerCase().includes(search)) return false;
+
+      const pCond = p.condition === 'NEW' ? 'NEW' : 'USED';
+      if (condFilter !== 'ALL' && pCond !== condFilter) return false;
+
+      const pName = (p.name || p.title || '').toLowerCase();
+      const pLoc = (p.location || '').toLowerCase();
+      const pStore = (p.lapak_name || '').toLowerCase();
+      const pSeller = (p.seller_name || p.seller || '').toLowerCase();
+
+      if (search && !pName.includes(search) && !pLoc.includes(search) && !pStore.includes(search) && !pSeller.includes(search)) return false;
       return true;
     });
 
@@ -17847,35 +18100,42 @@ window.M7Engine = {
     }
 
     grid.innerHTML = prods.map(p => {
-      let imgs = ['https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'];
-      try {
-        if (p.images) imgs = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
-      } catch (e) {}
+      let imgUrl = 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600';
+      if (p.images) {
+        try {
+          const parsed = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
+          if (Array.isArray(parsed) && parsed[0]) imgUrl = parsed[0];
+          else if (typeof parsed === 'string') imgUrl = parsed;
+        } catch (e) { if (typeof p.images === 'string') imgUrl = p.images; }
+      } else if (p.img) {
+        imgUrl = p.img;
+      }
 
-      const lapak = this.data.lapak.find(l => l.id === p.lapak_id) || { name: 'Lapak MB INA', contact_whatsapp: '081234567890' };
+      const storeName = p.lapak_name || p.store || 'Lapak Resmi MB INA';
+      const sellerName = p.seller_name || p.seller || 'Member MB INA';
       const statusBadge = `<span style="font-size:0.7rem; padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.2); color:var(--primary-emerald); font-weight:700;">APPROVED</span>`;
-
-      const priceFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price);
+      const priceFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price || 0);
       const condBadge = p.condition === 'NEW' ? 'BARU' : 'BEKAS';
+      const phone = (p.contact_whatsapp || p.phone || '081234567890').replace(/[^0-9]/g,'');
 
       return `
         <div class="glass-card" style="padding:16px; border:1px solid var(--chrome-border); border-radius:14px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;">
           <div style="position:relative; margin-bottom:12px;">
-            <img src="${imgs[0]}" style="width:100%; height:160px; object-fit:cover; border-radius:10px;">
+            <img src="${imgUrl}" style="width:100%; height:160px; object-fit:cover; border-radius:10px;" onerror="this.src='https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600';">
             <div style="position:absolute; top:8px; left:8px;">${statusBadge}</div>
             <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.7); color:#fff; font-size:0.7rem; padding:3px 8px; border-radius:4px; font-weight:700;">${condBadge}</div>
           </div>
           <div>
-            <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">🏪 ${lapak.name}</div>
-            <h5 style="font-size:0.95rem; color:#fff; margin:4px 0 6px 0; font-weight:800; line-height:1.3;">${p.name}</h5>
+            <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">🏪 ${storeName}</div>
+            <h5 style="font-size:0.95rem; color:#fff; margin:4px 0 6px 0; font-weight:800; line-height:1.3;">${p.name || p.title}</h5>
             <div style="font-size:1.1rem; font-weight:900; color:var(--accent-gold); margin-bottom:6px;">${priceFormatted}</div>
             <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px; display:flex; justify-content:space-between;">
               <span>📍 ${p.location || 'Indonesia'}</span>
-              <span>👁️ ${p.views || 0} views</span>
+              <span>👤 ${sellerName}</span>
             </div>
           </div>
           <div style="display:flex; gap:6px; margin-top:auto; padding-top:10px; border-top:1px dashed var(--chrome-border);">
-            <a href="https://wa.me/${(p.contact_whatsapp || lapak.contact_whatsapp || '081234567890').replace(/[^0-9]/g,'')}?text=Halo%20${encodeURIComponent(lapak.name)},%20saya%20tertarik%20dengan%20produk%20'${encodeURIComponent(p.name)}'%20di%20Portal%20MB%20INA" target="_blank" class="btn-primary" style="flex:1; text-align:center; font-size:0.78rem; padding:7px 10px; background:#25D366; color:#fff; text-decoration:none; font-weight:800;">📞 HUBUNGI WA</a>
+            <a href="https://wa.me/${phone}?text=Halo%20${encodeURIComponent(storeName)},%20saya%20tertarik%20dengan%20produk%20'${encodeURIComponent(p.name || p.title)}'%20di%20Portal%20MB%20INA" target="_blank" class="btn-primary" style="flex:1; text-align:center; font-size:0.78rem; padding:7px 10px; background:#25D366; color:#fff; text-decoration:none; font-weight:800; border-radius:6px;">📞 HUBUNGI WA</a>
             <button class="btn-outline" style="padding:6px 10px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M7Engine.deleteProduct('${p.id}')">🗑️</button>
           </div>
         </div>
@@ -17889,8 +18149,11 @@ window.M7Engine = {
     if (!tbody) return;
 
     const statusFilter = document.getElementById('m7-filter-verify-status')?.value || 'ALL';
+    const allProds = (typeof window.getGlobalUnifiedProducts === 'function')
+      ? window.getGlobalUnifiedProducts()
+      : [];
 
-    let prods = this.data.products.filter(p => {
+    let prods = allProds.filter(p => {
       const pStatus = (p.status || 'APPROVED').toUpperCase();
       if (statusFilter !== 'ALL' && pStatus !== statusFilter) return false;
       return true;
@@ -17902,9 +18165,9 @@ window.M7Engine = {
     }
 
     tbody.innerHTML = prods.map((p, idx) => {
-      const lapak = this.data.lapak.find(l => l.id === p.lapak_id) || { name: 'Lapak MB INA', user_id: 'usr_superadmin' };
-      const ownerName = p.seller_name || (lapak.user_id === 'usr_m3_001' ? 'Andi Pratama' : (lapak.user_id === 'usr_m3_002' ? 'Siti Rahayu' : 'Budi Santoso'));
-      const memberId = p.member_id || (lapak.user_id === 'usr_m3_001' ? 'MBINA-JKT-2026-000005' : 'MBINA-HQ-2026-000001');
+      const storeName = p.lapak_name || p.store || 'Lapak MB INA';
+      const ownerName = p.seller_name || p.seller || 'Member MB INA';
+      const memberId = p.member_id || 'MBINA-JKT-2026-000005';
 
       const pStatus = (p.status || 'APPROVED').toUpperCase();
       let statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">⏳ PENDING</span>`;
