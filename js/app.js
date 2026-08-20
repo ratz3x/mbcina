@@ -18519,6 +18519,21 @@ window.M7Engine = {
   },
 
   openProductModal: function(lapakIdParam = null) {
+    // Sembunyikan modal kelola produk sponsor jika sedang terbuka agar tidak tumpang tindih
+    const sponsorManageModal = document.getElementById('modal-sponsor-manage-products');
+    if (sponsorManageModal && (sponsorManageModal.style.display === 'flex' || sponsorManageModal.style.display === 'block' || sponsorManageModal.classList.contains('active'))) {
+      this._returnToSponsorManage = true;
+      sponsorManageModal.style.display = 'none';
+      sponsorManageModal.classList.remove('active');
+    }
+
+    const myIklanModal = document.getElementById('modal-my-iklan-list');
+    if (myIklanModal && (myIklanModal.style.display === 'flex' || myIklanModal.style.display === 'block' || myIklanModal.classList.contains('active'))) {
+      this._returnToMyIklan = true;
+      myIklanModal.style.display = 'none';
+      myIklanModal.classList.remove('active');
+    }
+
     const modal = document.getElementById('modal-tambah-produk');
     if (!modal) return;
 
@@ -18615,6 +18630,24 @@ window.M7Engine = {
     const modal = document.getElementById('modal-tambah-produk');
     if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
+
+    if (this._returnToSponsorManage) {
+      this._returnToSponsorManage = false;
+      const sponsorManageModal = document.getElementById('modal-sponsor-manage-products');
+      if (sponsorManageModal) {
+        sponsorManageModal.style.display = 'flex';
+        sponsorManageModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    } else if (this._returnToMyIklan) {
+      this._returnToMyIklan = false;
+      const myIklanModal = document.getElementById('modal-my-iklan-list');
+      if (myIklanModal) {
+        myIklanModal.style.display = 'flex';
+        myIklanModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
   },
 
   submitProduct: async function(lapakId, name, price, location) {
