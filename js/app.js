@@ -3448,7 +3448,10 @@ const AppEngine = {
   async fetchM2Data() {
     this.showLoader('Memuat Data Organisasi, Klub & Keanggotaan (Supabase Cloud)...');
     try {
-      const res = await fetch('api.php?action=get_app_init_data').then(r => r.json());
+      const resp = await fetch('api.php?action=get_app_init_data');
+      const text = await resp.text();
+      let res = null;
+      try { res = JSON.parse(text); } catch (jsonErr) { res = null; }
       if (res && res.success) {
         if (res.organization) this.m2Data.organization = res.organization;
         if (res.founders && res.founders.length) this.m2Data.founders = res.founders;
