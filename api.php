@@ -55,7 +55,7 @@ function getSupabasePDO() {
     $errors = [];
     foreach ($connectionAttempts as $attempt) {
         try {
-            $dsn = "pgsql:host={$attempt['host']};port={$attempt['port']};dbname=$supabaseDb;sslmode=require";
+            $dsn = "pgsql:host={$attempt['host']};port={$attempt['port']};dbname=$supabaseDb;sslmode=require;connect_timeout=3";
             $pdo = new PDO($dsn, $attempt['user'], $supabasePass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -99,6 +99,9 @@ function logAudit($userId, $action, $module, $details) {
 
 function ensureM3Tables($sPdo) {
     if (!$sPdo) return;
+    static $ensured = false;
+    if ($ensured) return;
+    $ensured = true;
     try {
         $sPdo->exec("
             CREATE TABLE IF NOT EXISTS users (
@@ -295,6 +298,9 @@ function ensureM5Tables($sPdo) {
 
 function ensureM7Tables($sPdo) {
     if (!$sPdo) return;
+    static $ensured = false;
+    if ($ensured) return;
+    $ensured = true;
     try {
         $sPdo->exec("
             CREATE TABLE IF NOT EXISTS lapak (
@@ -465,6 +471,9 @@ function ensureM7Tables($sPdo) {
 
 function ensureM8Tables($sPdo) {
     if (!$sPdo) return;
+    static $ensured = false;
+    if ($ensured) return;
+    $ensured = true;
     try {
         $sPdo->exec("
             CREATE TABLE IF NOT EXISTS endorse_packages (
@@ -733,6 +742,9 @@ function ensureM8Tables($sPdo) {
 
 function ensureM9Tables($pdo) {
     if (!$pdo) return;
+    static $ensured = false;
+    if ($ensured) return;
+    $ensured = true;
     try {
         $pdo->exec("
             CREATE TABLE IF NOT EXISTS report_snapshots (
