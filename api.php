@@ -916,6 +916,12 @@ try {
                         }
                     }
                     $m['memberId'] = $m['member_id'];
+                    if (isset($m['photo_url']) && strlen($m['photo_url']) > 5000 && str_starts_with($m['photo_url'], 'data:image')) {
+                        $m['photo_url'] = 'assets/mb_badge.jpg';
+                    }
+                    if (isset($m['avatar_url']) && strlen($m['avatar_url']) > 5000 && str_starts_with($m['avatar_url'], 'data:image')) {
+                        $m['avatar_url'] = 'assets/mb_badge.jpg';
+                    }
                 }
             }
 
