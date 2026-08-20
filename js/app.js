@@ -17237,38 +17237,6 @@ window.getGlobalUnifiedProducts = function() {
   const dbProducts = (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) ? window.M7Engine.data.products : [];
   const memberAds = (window.AppEngine && Array.isArray(window.AppEngine._memberAdsList)) ? window.AppEngine._memberAdsList : [];
 
-  const defaultMasterProducts = [
-    // 1. MITRA SPONSOR RESMI MB INA
-    {
-      id: 'prod_fdr_1',
-      name: 'FDR Ultimate Performance Tire 245/45 R18 (Mercedes E-Class)',
-      category: 'Parts',
-      price: 1850000,
-      condition: 'NEW',
-      location: 'Jakarta Selatan',
-      lapak_name: 'FDR Tyre Indonesia (Official Store Sponsor)',
-      seller_name: 'PT Suryaraya Rubberindo Industries (FDR)',
-      contact_whatsapp: '081234567890',
-      views: 342,
-      status: 'APPROVED',
-      is_published: true,
-      images: ['https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600'],
-      description: 'Ban performa tinggi FDR untuk Mercedes-Benz E-Class W211/W212/W213 dengan cengkeraman maksimal.'
-    },
-    {
-      id: 'prod_shell_1',
-      name: 'Pelumas Mesin Shell Helix Ultra 0W-40 Fully Synthetic (4L)',
-      category: 'Parts',
-      price: 650000,
-      condition: 'NEW',
-      location: 'Jakarta Pusat',
-// ─────────────────────────────────────────────────────────────────────
-// GLOBAL UNIFIED MARKETPLACE PRODUCT REPOSITORY (SINGLE SOURCE OF TRUTH)
-// ─────────────────────────────────────────────────────────────────────
-window.getGlobalUnifiedProducts = function() {
-  const dbProducts = (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) ? window.M7Engine.data.products : [];
-  const memberAds = (window.AppEngine && Array.isArray(window.AppEngine._memberAdsList)) ? window.AppEngine._memberAdsList : [];
-
   const merged = [];
   const seen = new Set();
 
