@@ -1722,8 +1722,8 @@ const AppEngine = {
   _renderMemberMyLapak() {
     const container = document.getElementById('ml-my-lapak-container');
     if (!container) return;
-    const u = this.currentUser || {};
-    const userId = u.id || u.userId || '';
+    const u = this.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const userId = (u.id || u.userId || '').toLowerCase();
     const userName = (u.name || u.username || '').toLowerCase();
     const userPhone = (u.phone || '').replace(/[^0-9]/g, '');
 
@@ -1735,27 +1735,20 @@ const AppEngine = {
       ? window.M7Engine.data.lapak
       : [];
     const myLapakIds = lapaks
-      .filter(l => (userId && (l.user_id === userId || l.created_by === userId)) || (userName && l.name && l.name.toLowerCase().includes(userName)))
+      .filter(l => (userId && (String(l.user_id).toLowerCase() === userId || String(l.created_by).toLowerCase() === userId)) || (userName && l.name && l.name.toLowerCase().includes(userName)))
       .map(l => l.id);
 
     let myAds = prods.filter(p => {
-      const pUid = p.user_id || '';
+      const pUid = String(p.user_id || '').toLowerCase();
       const pSeller = (p.seller_name || p.seller || '').toLowerCase();
       const pLapak = p.lapak_id || '';
       const pPhone = (p.contact_whatsapp || p.phone || '').replace(/[^0-9]/g, '');
 
-      return (userId && pUid === userId) ||
+      return (userId && pUid && pUid === userId) ||
              (myLapakIds.length && myLapakIds.includes(pLapak)) ||
              (userName && pSeller && (pSeller === userName || pSeller.includes(userName) || userName.includes(pSeller))) ||
              (userPhone && pPhone && userPhone === pPhone);
     });
-
-    if (this._memberAdsList && this._memberAdsList.length) {
-      const existing = new Set(myAds.map(p => p.id));
-      this._memberAdsList
-        .filter(a => !existing.has(a.id))
-        .forEach(a => myAds.unshift(a));
-    }
 
     const fmtRp = v => 'Rp ' + Number(v).toLocaleString('id-ID');
 
@@ -2011,8 +2004,17 @@ const AppEngine = {
 
   async deleteMemberAd(adId) {
     if (!confirm('Apakah Anda yakin ingin menghapus iklan ini secara permanen dari database MB INA?')) return;
-    const u = this.currentUser || {};
+    const u = this.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
     try {
+      // 1. Optimistically remove from frontend arrays immediately
+      if (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) {
+        window.M7Engine.data.products = window.M7Engine.data.products.filter(x => String(x.id) !== String(adId));
+      }
+      this._memberAdsList = (this._memberAdsList || []).filter(x => String(x.id) !== String(adId));
+      this._renderMemberMyLapak();
+      this._renderMemberLapakProducts();
+
+      // 2. Delete on Supabase Backend
       const res = await fetch('api.php?action=delete_lapak_product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2021,17 +2023,18 @@ const AppEngine = {
 
       if (res && res.success) {
         window.showToast('🗑️ Iklan berhasil dihapus secara permanen dari database!', 'success');
-        if (window.M7Engine) {
-          window.M7Engine.data.products = (window.M7Engine.data.products || []).filter(x => x.id !== adId);
+        if (window.M7Engine && typeof window.M7Engine.fetchData === 'function') {
           await window.M7Engine.fetchData();
-        }
-        if (this._memberAdsList) {
-          this._memberAdsList = this._memberAdsList.filter(x => x.id !== adId);
         }
         this._renderMemberMyLapak();
         this._renderMemberLapakProducts();
       } else {
         window.showToast('❌ Gagal menghapus: ' + (res?.message || 'Error'), 'error');
+        if (window.M7Engine && typeof window.M7Engine.fetchData === 'function') {
+          await window.M7Engine.fetchData();
+        }
+        this._renderMemberMyLapak();
+        this._renderMemberLapakProducts();
       }
     } catch (err) {
       window.showToast('❌ Gagal menghapus: ' + err.message, 'error');
@@ -17310,31 +17313,19 @@ window.saveSponsorProfile = function() {
 // ─────────────────────────────────────────────────────────────────────
 window.getGlobalUnifiedProducts = function() {
   const dbProducts = (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) ? window.M7Engine.data.products : [];
-  const memberAds = (window.AppEngine && Array.isArray(window.AppEngine._memberAdsList)) ? window.AppEngine._memberAdsList : [];
-
-  const merged = [];
-  const seen = new Set();
-
-  [...dbProducts, ...memberAds].forEach(p => {
+  return dbProducts.map(p => {
     const rawName = (p.name || p.title || '').trim();
-    if (!rawName) return;
-    const uniqueKey = (p.id || rawName).toLowerCase();
-    if (!seen.has(uniqueKey)) {
-      seen.add(uniqueKey);
-      merged.push({
-        ...p,
-        name: rawName,
-        title: rawName,
-        status: (p.status || 'APPROVED').toUpperCase(),
-        is_published: (p.is_published !== false && p.is_published !== 0),
-        lapak_name: p.lapak_name || p.store || 'Lapak Resmi MB INA',
-        seller_name: p.seller_name || p.seller || 'Member MB INA',
-        contact_whatsapp: p.contact_whatsapp || p.phone || '081234567890'
-      });
-    }
+    return {
+      ...p,
+      name: rawName,
+      title: rawName,
+      status: (p.status || 'APPROVED').toUpperCase(),
+      is_published: (p.is_published !== false && p.is_published !== 0),
+      lapak_name: p.lapak_name || p.store || 'Lapak Resmi MB INA',
+      seller_name: p.seller_name || p.seller || 'Member MB INA',
+      contact_whatsapp: p.contact_whatsapp || p.phone || '081234567890'
+    };
   });
-
-  return merged;
 };
 
 // ─────────────────────────────────────────────────────────────────────

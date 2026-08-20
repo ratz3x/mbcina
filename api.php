@@ -5629,14 +5629,20 @@ try {
     case 'delete_lapak_product':
         try {
             ensureM7Tables($sPdo);
-            $productId = $input['product_id'] ?? '';
-            $userId    = $input['user_id'] ?? 'usr_superadmin';
+            $productId = trim($input['product_id'] ?? $_POST['product_id'] ?? $_GET['product_id'] ?? '');
+            $userId    = trim($input['user_id'] ?? $_POST['user_id'] ?? $_GET['user_id'] ?? 'usr_superadmin');
 
-            $sPdo->prepare("DELETE FROM lapak_products WHERE id = ?")->execute([$productId]);
+            if (empty($productId)) {
+                echo json_encode(['success' => false, 'message' => 'Product ID is required!']);
+                exit;
+            }
+
+            $stmtDel = $sPdo->prepare("DELETE FROM lapak_products WHERE id = ?");
+            $stmtDel->execute([$productId]);
 
             logAudit($userId, 'DELETE', 'E_COMMERCE_PRODUCT', ['product_id' => $productId]);
 
-            echo json_encode(['success' => true, 'message' => 'Iklan produk berhasil dihapus!']);
+            echo json_encode(['success' => true, 'product_id' => $productId, 'message' => 'Iklan produk berhasil dihapus secara permanen dari database!']);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
