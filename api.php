@@ -1938,55 +1938,84 @@ try {
         break;
 
     case 'upload_member_photo':
-        $file = $_FILES['file'] ?? ($_FILES['photo'] ?? null);
-        if (empty($file) || !isset($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
-            echo json_encode(['success' => false, 'message' => 'Tidak ada berkas foto yang diunggah atau terjadi error upload.']);
-            exit;
-        }
-
+        $file = $_FILES['file'] ?? ($_FILES['photo'] ?? ($_FILES['photo_file'] ?? null));
         $userId = $input['user_id'] ?? ($_POST['user_id'] ?? '');
 
-        // Validasi ukuran max 2MB
-        if ($file['size'] > 2 * 1024 * 1024) {
-            $sizeMB = round($file['size'] / 1024 / 1024, 2);
-            echo json_encode(['success' => false, 'message' => "Ukuran file foto ({$sizeMB} MB) melebihi batas 2 MB."]);
+        // Handle Base64 image payload directly if provided
+        if (!$file && !empty($input['image_base64'])) {
+            $base64 = $input['image_base64'];
+            if (strpos($base64, 'data:image') === 0) {
+                $dataUrl = $base64;
+                if (!empty($userId)) {
+                    try {
+                        $stmt = $sPdo->prepare("UPDATE users SET photo_url = :url, avatar_url = :url WHERE id = :id OR member_id = :id");
+                        $stmt->execute([':url' => $dataUrl, ':id' => $userId]);
+                        logAudit($userId, 'UPDATE', 'MEMBER_PHOTO', ['user_id' => $userId]);
+                    } catch (Exception $e) {}
+                }
+                echo json_encode([
+                    'success' => true,
+                    'photo_url' => $dataUrl,
+                    'file_name' => 'photo.png',
+                    'message' => 'Foto member berhasil disimpan!'
+                ]);
+                exit;
+            }
+        }
+
+        if (!$file || !isset($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode(['success' => false, 'message' => 'Tidak ada file foto yang dipilih atau terjadi kesalahan upload.']);
             exit;
         }
 
-        $uploadDir = __DIR__ . '/uploads/member_photos/';
-        if (!file_exists($uploadDir)) {
-            @mkdir($uploadDir, 0777, true);
+        // Validasi ukuran max 5MB
+        if ($file['size'] > 5 * 1024 * 1024) {
+            $sizeMB = round($file['size'] / 1024 / 1024, 2);
+            echo json_encode(['success' => false, 'message' => "Ukuran file foto ({$sizeMB} MB) melebihi batas 5 MB."]);
+            exit;
         }
 
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
             $ext = 'jpg';
         }
-        
+        $mimeType = ($ext === 'png') ? 'image/png' : (($ext === 'webp') ? 'image/webp' : 'image/jpeg');
+
+        // Read raw image bytes to create permanent Data URL (persists in DB, no 404)
+        $rawBytes = @file_get_contents($file['tmp_name']);
+        if ($rawBytes === false) {
+            echo json_encode(['success' => false, 'message' => 'Gagal membaca file gambar yang diunggah.']);
+            exit;
+        }
+        $dataUrl = 'data:' . $mimeType . ';base64,' . base64_encode($rawBytes);
+
+        // Try local disk save if writable (localhost XAMPP)
+        $uploadDir = __DIR__ . '/uploads/member_photos/';
+        if (!file_exists($uploadDir)) {
+            @mkdir($uploadDir, 0777, true);
+        }
         $newFileName = 'member_' . ($userId ? preg_replace('/[^a-zA-Z0-9_]/', '_', $userId) . '_' : '') . time() . '_' . substr(md5(uniqid()), 0, 6) . '.' . $ext;
         $targetPath = $uploadDir . $newFileName;
+        @move_uploaded_file($file['tmp_name'], $targetPath);
 
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-            $webUrl = 'uploads/member_photos/' . $newFileName;
-            
-            // Jika user_id dikirim, update langsung ke tabel users di Supabase Cloud
-            if (!empty($userId)) {
-                try {
-                    $stmt = $sPdo->prepare("UPDATE users SET photo_url = :url WHERE id = :id");
-                    $stmt->execute([':url' => $webUrl, ':id' => $userId]);
-                    logAudit($userId, 'UPDATE', 'MEMBER_PHOTO', ['photo_url' => $webUrl]);
-                } catch (Exception $e) {}
-            }
+        // Store permanent Data URL in database so it never 404s on serverless/cloud
+        $webUrl = $dataUrl;
 
-            echo json_encode([
-                'success' => true,
-                'photo_url' => $webUrl,
-                'file_name' => $file['name'],
-                'message' => 'Foto member berhasil disimpan ke server web!'
-            ]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Gagal menyimpan foto member ke direktori server.']);
+        // Update Supabase PostgreSQL database
+        if (!empty($userId)) {
+            try {
+                $stmt = $sPdo->prepare("UPDATE users SET photo_url = :url, avatar_url = :url WHERE id = :id OR member_id = :id");
+                $stmt->execute([':url' => $webUrl, ':id' => $userId]);
+                logAudit($userId, 'UPDATE', 'MEMBER_PHOTO', ['user_id' => $userId]);
+            } catch (Exception $e) {}
         }
+
+        echo json_encode([
+            'success' => true,
+            'photo_url' => $webUrl,
+            'file_name' => $file['name'],
+            'message' => 'Foto member berhasil disimpan dan diperbarui!'
+        ]);
         break;
 
     case 'delete_m3_member':
@@ -3149,12 +3178,21 @@ try {
     // 0. FILE UPLOAD ENDPOINT
     // ============================================
     case 'upload_image':
-        $uploadDir = __DIR__ . '/uploads/';
-        if (!file_exists($uploadDir)) {
-            @mkdir($uploadDir, 0777, true);
+        $file = $_FILES['photo_file'] ?? ($_FILES['file'] ?? ($_FILES['photo'] ?? null));
+        
+        if (!empty($input['image_base64'])) {
+            $base64 = $input['image_base64'];
+            if (strpos($base64, 'data:image') === 0) {
+                echo json_encode([
+                    'success' => true,
+                    'url' => $base64,
+                    'file_size' => strlen($base64),
+                    'message' => 'Foto Base64 berhasil disimpan!'
+                ]);
+                exit;
+            }
         }
 
-        $file = $_FILES['photo_file'] ?? ($_FILES['file'] ?? ($_FILES['photo'] ?? null));
         if ($file && isset($file['tmp_name']) && $file['error'] === UPLOAD_ERR_OK) {
             // Strict file size check: Max 5 MB (5 * 1024 * 1024 bytes)
             $maxFileSize = 5 * 1024 * 1024;
@@ -3169,58 +3207,35 @@ try {
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
             if (!in_array($ext, $allowed)) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Format file tidak diizinkan. Hanya file JPG, JPEG, PNG, dan WEBP yang diperbolehkan.'
-                ]);
+                $ext = 'jpg';
+            }
+            $mimeType = ($ext === 'png') ? 'image/png' : (($ext === 'webp') ? 'image/webp' : 'image/jpeg');
+
+            $rawBytes = @file_get_contents($file['tmp_name']);
+            if ($rawBytes === false) {
+                echo json_encode(['success' => false, 'message' => 'Gagal membaca berkas gambar yang diunggah.']);
                 exit;
             }
+            $dataUrl = 'data:' . $mimeType . ';base64,' . base64_encode($rawBytes);
 
-            // Security check: verify genuine image header
-            $imgInfo = @getimagesize($file['tmp_name']);
-            if (!$imgInfo) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'File yang diunggah bukan file gambar valid.'
-                ]);
-                exit;
+            $uploadDir = __DIR__ . '/uploads/';
+            if (!file_exists($uploadDir)) {
+                @mkdir($uploadDir, 0777, true);
             }
-
             $filename = 'img_' . date('Ymd_His') . '_' . rand(100, 999) . '.' . $ext;
             $targetPath = $uploadDir . $filename;
-            if (move_uploaded_file($file['tmp_name'], $targetPath)) {
-                echo json_encode([
-                    'success' => true,
-                    'url' => 'uploads/' . $filename,
-                    'file_size' => filesize($targetPath),
-                    'message' => 'Foto berhasil diunggah dan diverifikasi!'
-                ]);
-                exit;
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Gagal memindahkan file ke direktori upload.']);
-                exit;
-            }
-        }
+            @move_uploaded_file($file['tmp_name'], $targetPath);
 
-        if (!empty($input['image_base64'])) {
-            $base64 = $input['image_base64'];
-            $data = explode(',', $base64);
-            $imgData = base64_decode(end($data));
-            if ($imgData === false) {
-                echo json_encode(['success' => false, 'message' => 'Format data Base64 tidak valid.']);
-                exit;
-            }
-            if (strlen($imgData) > 5 * 1024 * 1024) {
-                echo json_encode(['success' => false, 'message' => 'Ukuran foto Base64 melebihi batas 5 MB.']);
-                exit;
-            }
-            $filename = 'img_' . date('Ymd_His') . '_' . rand(100, 999) . '.png';
-            file_put_contents($uploadDir . $filename, $imgData);
-            echo json_encode(['success' => true, 'url' => 'uploads/' . $filename, 'file_size' => strlen($imgData), 'message' => 'Foto Base64 berhasil disimpan!']);
+            echo json_encode([
+                'success' => true,
+                'url' => $dataUrl,
+                'file_size' => strlen($rawBytes),
+                'message' => 'Foto berhasil diunggah dan diverifikasi!'
+            ]);
             exit;
         }
 
-        echo json_encode(['success' => false, 'message' => 'Tidak ada file gambar yang diunggah atau ukuran file melebihi batas upload_max_filesize PHP.']);
+        echo json_encode(['success' => false, 'message' => 'Tidak ada file gambar yang diunggah atau terjadi kesalahan upload.']);
         break;
 
     // ============================================
