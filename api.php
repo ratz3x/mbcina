@@ -1657,6 +1657,103 @@ try {
         }
         break;
 
+    case 'bulk_create_m3_members':
+        $members = $input['members'] ?? [];
+        if (!is_array($members) || empty($members)) {
+            echo json_encode(['success' => false, 'message' => 'Daftar data member kosong!']);
+            exit;
+        }
+
+        $year = (int)date('Y');
+        $cityCodeMap = [
+            'jakarta selatan' => 'JKT', 'jakarta barat' => 'JKT', 'jakarta timur' => 'JKT',
+            'jakarta utara' => 'JKT', 'jakarta pusat' => 'JKT', 'jakarta' => 'JKT',
+            'tangerang' => 'TGR', 'bekasi' => 'BKS', 'depok' => 'DPK',
+            'bogor' => 'BGR', 'serang' => 'SRG', 'cilegon' => 'SRG',
+            'bandung' => 'BDG', 'kota bandung' => 'BDG', 'cimahi' => 'BDG',
+            'cirebon' => 'CRB', 'sukabumi' => 'SKB', 'karawang' => 'KRW',
+            'semarang' => 'SMG', 'yogyakarta' => 'YGY', 'solo' => 'SLO',
+            'surakarta' => 'SLO', 'purwokerto' => 'PWK', 'magelang' => 'MGL',
+            'surabaya' => 'SBY', 'malang' => 'MLG', 'sidoarjo' => 'SDA',
+            'gresik' => 'GRS', 'mojokerto' => 'MJK', 'kediri' => 'KDR', 'jember' => 'JMR',
+            'denpasar' => 'DPS', 'badung' => 'DPS', 'gianyar' => 'DPS',
+            'medan' => 'MED', 'pekanbaru' => 'PKB', 'palembang' => 'PLG',
+            'batam' => 'BTM', 'padang' => 'PDG', 'bandar lampung' => 'BLP', 'jambi' => 'JMB',
+            'balikpapan' => 'BPP', 'samarinda' => 'SMD', 'pontianak' => 'PTK', 'banjarmasin' => 'BJM',
+            'makassar' => 'MKS', 'manado' => 'MND', 'palu' => 'PLU', 'jayapura' => 'JPR',
+        ];
+
+        try {
+            $totalUsers = (int)$sPdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        } catch (Exception $e) { $totalUsers = 0; }
+
+        $insertedCount = 0;
+        $stmtInsert = $sPdo->prepare("
+            INSERT INTO users (id, username, name, email, phone, role, tier, status, club, province, city, member_id, gender, birth_date, vehicle_model, license_plate, admin_notes, password, is_active, verified_at)
+            VALUES (:id, :username, :name, :email, :phone, :role, :tier, :status, :club, :prov, :city, :mid, :gender::gender_enum, :bdate, :vmodel, :lplate, :notes, '$2y$10$1234567890123456789012', true, CURRENT_TIMESTAMP)
+        ");
+
+        foreach ($members as $m) {
+            $name = trim($m['name'] ?? '');
+            if (empty($name)) continue;
+            $email = trim($m['email'] ?? (strtolower(preg_replace('/[^a-z0-9]/', '', $name)) . rand(10, 99) . '@member.mbcina.id'));
+            $phone = trim($m['phone'] ?? ('08' . rand(1000000000, 9999999999)));
+            $username = trim($m['username'] ?? (strtolower(explode(' ', $name)[0]) . '_' . rand(100, 999)));
+            $club = trim($m['club'] ?? 'W124 MBCI Jakarta Chapter');
+            $city = trim($m['city'] ?? 'Jakarta');
+            $province = trim($m['province'] ?? 'DKI Jakarta');
+            $gender = in_array(strtoupper($m['gender'] ?? ''), ['PRIA','WANITA']) ? strtoupper($m['gender']) : 'PRIA';
+            $birthDate = !empty($m['birth_date']) ? $m['birth_date'] : null;
+            $tier = in_array(strtoupper($m['tier'] ?? ''), ['PLATINUM','GOLD','SILVER','BRONZE']) ? strtoupper($m['tier']) : 'BRONZE';
+            $status = in_array(strtoupper($m['status'] ?? ''), ['ACTIVE','PENDING']) ? strtoupper($m['status']) : 'ACTIVE';
+            $vehicleModel = trim($m['vehicle_model'] ?? $m['vehicle'] ?? 'Mercedes-Benz');
+            $licensePlate = trim($m['license_plate'] ?? $m['plate'] ?? '');
+            $adminNotes = trim($m['admin_notes'] ?? 'Import Massal Excel');
+
+            $cityKey = strtolower($city);
+            $regionCode = 'INA';
+            if (isset($cityCodeMap[$cityKey])) {
+                $regionCode = $cityCodeMap[$cityKey];
+            } elseif (strlen($cityKey) >= 3) {
+                $regionCode = strtoupper(substr(preg_replace('/[^a-z]/', '', $cityKey), 0, 3));
+            }
+
+            $totalUsers++;
+            $memberId = !empty($m['member_id']) ? trim($m['member_id']) : sprintf('MBINA-%s-%d-%06d', $regionCode, $year, $totalUsers);
+            $userId = 'usr_m3_' . uniqid();
+
+            try {
+                $stmtInsert->execute([
+                    ':id' => $userId,
+                    ':username' => $username,
+                    ':name' => $name,
+                    ':email' => $email,
+                    ':phone' => $phone,
+                    ':role' => ($status === 'ACTIVE') ? 'MEMBER' : 'CALON_MEMBER',
+                    ':tier' => $tier,
+                    ':status' => $status,
+                    ':club' => $club,
+                    ':prov' => $province,
+                    ':city' => $city,
+                    ':mid' => $memberId,
+                    ':gender' => $gender,
+                    ':bdate' => $birthDate,
+                    ':vmodel' => $vehicleModel,
+                    ':lplate' => $licensePlate,
+                    ':notes' => $adminNotes
+                ]);
+                $insertedCount++;
+            } catch (Exception $e) {}
+        }
+
+        logAudit('usr_superadmin', 'CREATE', 'MEMBER_BULK_IMPORT', ['count' => $insertedCount]);
+        echo json_encode([
+            'success' => true,
+            'inserted_count' => $insertedCount,
+            'message' => "Berhasil mendaftarkan {$insertedCount} member baru secara massal ke database Supabase Cloud!"
+        ]);
+        break;
+
     case 'update_m3_member':
         $id = $input['id'] ?? '';
         $name = trim($input['name'] ?? '');

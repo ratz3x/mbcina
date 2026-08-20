@@ -7979,6 +7979,9 @@ const AppEngine = {
       this.populateM3ClubDropdowns();
       this.updateM3AddMemberIdPreview();
     }
+    else if (subtab === 'bulk') {
+      // Bulk Register Subtab
+    }
     else if (subtab === 'sponsor') {
       this.autoFillDedicatedSponsorId(document.getElementById('m3-spn-name')?.value || 'FDR Tyre Indonesia', true);
     }
@@ -8472,6 +8475,198 @@ const AppEngine = {
       }
     } catch (err) {
       alert('❌ Terjadi kesalahan: ' + err.message);
+    }
+  },
+
+  downloadMemberExcelTemplate() {
+    if (typeof XLSX === 'undefined') {
+      alert('Library Excel sedang dimuat, silakan coba 2 detik lagi.');
+      return;
+    }
+    const sampleData = [
+      {
+        "Nama Lengkap": "Budi Santoso",
+        "Email": "budi.santoso@gmail.com",
+        "Nomor WhatsApp": "081234567890",
+        "Klub / Chapter": "W124 MBCI Jakarta Chapter",
+        "Kota": "Jakarta Selatan",
+        "Provinsi": "DKI Jakarta",
+        "Jenis Kelamin (PRIA/WANITA)": "PRIA",
+        "Model Kendaraan": "W124 300E 1991",
+        "Plat Nomor": "B 1234 MB",
+        "Tier (BRONZE/SILVER/GOLD/PLATINUM)": "GOLD"
+      },
+      {
+        "Nama Lengkap": "Dewi Kusuma",
+        "Email": "dewi.kusuma@yahoo.com",
+        "Nomor WhatsApp": "081898765432",
+        "Klub / Chapter": "W204 Club Indonesia",
+        "Kota": "Bandung",
+        "Provinsi": "Jawa Barat",
+        "Jenis Kelamin (PRIA/WANITA)": "WANITA",
+        "Model Kendaraan": "W204 C200 CGI 2012",
+        "Plat Nomor": "D 5678 MB",
+        "Tier (BRONZE/SILVER/GOLD/PLATINUM)": "SILVER"
+      },
+      {
+        "Nama Lengkap": "Hendro Wijaya",
+        "Email": "hendro.w@gmail.com",
+        "Nomor WhatsApp": "085612349988",
+        "Klub / Chapter": "Mercedes-Benz Boxer Club Indonesia (MBCI)",
+        "Kota": "Surabaya",
+        "Provinsi": "Jawa Timur",
+        "Jenis Kelamin (PRIA/WANITA)": "PRIA",
+        "Model Kendaraan": "W140 S320 1996",
+        "Plat Nomor": "L 1979 MB",
+        "Tier (BRONZE/SILVER/GOLD/PLATINUM)": "PLATINUM"
+      }
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(sampleData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Template_Member_MBINA");
+    XLSX.writeFile(wb, "Template_Bulk_Register_MBINA_2026.xlsx");
+  },
+
+  downloadMemberCsvTemplate() {
+    const csvContent = "Nama Lengkap,Email,Nomor WhatsApp,Klub / Chapter,Kota,Provinsi,Jenis Kelamin,Model Kendaraan,Plat Nomor,Tier\n" +
+      "Budi Santoso,budi.santoso@gmail.com,081234567890,W124 MBCI Jakarta Chapter,Jakarta Selatan,DKI Jakarta,PRIA,W124 300E 1991,B 1234 MB,GOLD\n" +
+      "Dewi Kusuma,dewi.kusuma@yahoo.com,081898765432,W204 Club Indonesia,Bandung,Jawa Barat,WANITA,W204 C200 CGI 2012,D 5678 MB,SILVER\n" +
+      "Hendro Wijaya,hendro.w@gmail.com,085612349988,Mercedes-Benz Boxer Club Indonesia (MBCI),Surabaya,Jawa Timur,PRIA,W140 S320 1996,L 1979 MB,PLATINUM\n";
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "Template_Bulk_Register_MBINA_2026.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
+
+  _parsedBulkMembers: [],
+
+  handleBulkMemberFileUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const badge = document.getElementById('m3-bulk-file-name-badge');
+    if (badge) badge.innerText = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB) - Membaca berkas...`;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+        if (!jsonData || jsonData.length === 0) {
+          alert('⚠️ Berkas Excel/CSV kosong atau format tidak sesuai!');
+          if (badge) badge.innerText = '';
+          return;
+        }
+
+        this._parsedBulkMembers = jsonData.map((row, idx) => {
+          const name = row['Nama Lengkap'] || row['Nama'] || row['Name'] || row['nama'] || Object.values(row)[0] || '';
+          const email = row['Email'] || row['email'] || (name ? (String(name).toLowerCase().replace(/[^a-z0-9]/gi, '') + (idx + 10) + '@member.mbcina.id') : '');
+          const phone = String(row['Nomor WhatsApp'] || row['WhatsApp'] || row['Phone'] || row['No WhatsApp'] || row['Telepon'] || '081234567890');
+          const club = row['Klub / Chapter'] || row['Klub'] || row['Club'] || row['Chapter'] || 'W124 MBCI Jakarta Chapter';
+          const city = row['Kota'] || row['City'] || 'Jakarta Selatan';
+          const prov = row['Provinsi'] || row['Province'] || 'DKI Jakarta';
+          const gender = (String(row['Jenis Kelamin'] || row['Gender'] || 'PRIA').toUpperCase().includes('WANITA') || String(row['Jenis Kelamin'] || '').toUpperCase().includes('P')) ? 'WANITA' : 'PRIA';
+          const vehicle = row['Model Kendaraan'] || row['Mobil'] || row['Vehicle'] || 'Mercedes-Benz';
+          const plate = row['Plat Nomor'] || row['Plat'] || row['Plate'] || 'B 1234 MB';
+          const tier = (String(row['Tier'] || 'BRONZE').toUpperCase().includes('PLATINUM') ? 'PLATINUM' : (String(row['Tier'] || '').toUpperCase().includes('GOLD') ? 'GOLD' : (String(row['Tier'] || '').toUpperCase().includes('SILVER') ? 'SILVER' : 'BRONZE')));
+
+          return {
+            name: String(name).trim(),
+            email: String(email).trim(),
+            phone: String(phone).trim(),
+            club: String(club).trim(),
+            city: String(city).trim(),
+            province: String(prov).trim(),
+            gender: gender,
+            vehicle_model: String(vehicle).trim(),
+            license_plate: String(plate).trim(),
+            tier: tier,
+            status: 'ACTIVE'
+          };
+        }).filter(m => m.name.length > 0);
+
+        if (badge) badge.innerText = `✅ Berhasil membaca ${this._parsedBulkMembers.length} baris data member dari ${file.name}`;
+
+        const section = document.getElementById('m3-bulk-preview-section');
+        const countSpan = document.getElementById('m3-bulk-preview-count');
+        const tbody = document.getElementById('m3-bulk-preview-tbody');
+
+        if (countSpan) countSpan.innerText = this._parsedBulkMembers.length;
+        if (tbody) {
+          tbody.innerHTML = this._parsedBulkMembers.map((m, idx) => `
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:10px 12px; color:var(--text-muted);">${idx + 1}</td>
+              <td style="padding:10px 12px; font-weight:700; color:#fff;">${m.name}</td>
+              <td style="padding:10px 12px; color:var(--text-muted);">${m.email}</td>
+              <td style="padding:10px 12px; font-family:monospace;">${m.phone}</td>
+              <td style="padding:10px 12px; color:var(--accent-gold); font-weight:600;">${m.club}</td>
+              <td style="padding:10px 12px;">${m.city}</td>
+              <td style="padding:10px 12px;"><span style="font-family:monospace; color:var(--accent-gold);">${m.license_plate}</span> (${m.vehicle_model})</td>
+              <td style="padding:10px 12px;"><span class="tier-badge">${m.tier}</span></td>
+            </tr>
+          `).join('');
+        }
+        if (section) section.style.display = 'block';
+      } catch (err) {
+        alert('❌ Gagal memproses file: ' + err.message);
+        if (badge) badge.innerText = '❌ Error membaca file';
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  },
+
+  async processBulkMemberRegistration() {
+    if (!this._parsedBulkMembers || this._parsedBulkMembers.length === 0) {
+      alert('⚠️ Silakan pilih berkas Excel/CSV data member terlebih dahulu!');
+      return;
+    }
+
+    const btn = document.getElementById('m3-bulk-process-btn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '⏳ Sedang Mendaftarkan Massal...';
+    }
+
+    try {
+      const res = await fetch('api.php?action=bulk_create_m3_members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ members: this._parsedBulkMembers })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert(`🎉 BERHASIL!\n\n${data.message}\nTotal: ${data.inserted_count || this._parsedBulkMembers.length} Member Baru Telah Didaftarkan.`);
+        this._parsedBulkMembers = [];
+        const fileInput = document.getElementById('m3-bulk-file-input');
+        if (fileInput) fileInput.value = '';
+        const badge = document.getElementById('m3-bulk-file-name-badge');
+        if (badge) badge.innerText = '';
+        const section = document.getElementById('m3-bulk-preview-section');
+        if (section) section.style.display = 'none';
+
+        await this.fetchM3Data();
+        this.switchM3Subtab('list');
+      } else {
+        alert('❌ Gagal import massal: ' + data.message);
+      }
+    } catch (err) {
+      alert('❌ Terjadi kesalahan koneksi: ' + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '⚡ Proses Registrasi Massal Sekarang';
+      }
     }
   },
 
