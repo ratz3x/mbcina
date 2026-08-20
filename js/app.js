@@ -1723,31 +1723,32 @@ const AppEngine = {
     const container = document.getElementById('ml-my-lapak-container');
     if (!container) return;
     const u = this.currentUser || {};
-    const userId = u.id || '';
-    const sellerName = u.name || 'Ratih Kusumastuti';
-    const sellerPhone = u.phone || '08545585568';
+    const userId = u.id || u.userId || '';
+    const userName = (u.name || u.username || '').toLowerCase();
+    const userPhone = (u.phone || '').replace(/[^0-9]/g, '');
 
-    if (!this._memberAdsList || !this._memberAdsList.length) {
-      this._memberAdsList = [
-        { id: 'ad_my_001', name: 'Transmisi Otomatis 722.6 (5G-Tronic) W210 E240 Copotan', category: 'SPAREPART', price: 7500000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400', desc: 'Transmisi matic 722.6 smooth mulus, siap pasang', status: 'APPROVED' },
-        { id: 'ad_my_002', name: 'Blok Mesin W124 Copotan', category: 'SPAREPART', price: 25000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=400', desc: 'Blok mesin W124 300E copotan ori sehat kompresi padat', status: 'APPROVED' },
-        { id: 'ad_my_003', name: 'W124 300E 1991 Manual Classic', category: 'KENDARAAN', price: 98000000, condition: 'BEKAS', location: 'Jakarta Selatan', seller: sellerName, phone: sellerPhone, img: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400', desc: 'Kondisi mulus terawat, pajak hidup, interior MB-Tex original.', status: 'APPROVED' }
-      ];
-    }
+    const prods = (window.M7Engine && Array.isArray(window.M7Engine.data?.products))
+      ? window.M7Engine.data.products
+      : [];
 
-    let myAds = [];
-    if (window.M7Engine && Array.isArray(window.M7Engine.data?.products)) {
-      const lapaks = window.M7Engine.data.lapak || [];
-      const myLapakIds = lapaks
-        .filter(l => l.user_id === userId || l.user_id === u.userId)
-        .map(l => l.id);
+    const lapaks = (window.M7Engine && Array.isArray(window.M7Engine.data?.lapak))
+      ? window.M7Engine.data.lapak
+      : [];
+    const myLapakIds = lapaks
+      .filter(l => (userId && (l.user_id === userId || l.created_by === userId)) || (userName && l.name && l.name.toLowerCase().includes(userName)))
+      .map(l => l.id);
 
-      myAds = window.M7Engine.data.products.filter(p => {
-        return myLapakIds.includes(p.lapak_id)
-          || p.user_id === userId
-          || (u.name && p.seller_name === u.name);
-      });
-    }
+    let myAds = prods.filter(p => {
+      const pUid = p.user_id || '';
+      const pSeller = (p.seller_name || p.seller || '').toLowerCase();
+      const pLapak = p.lapak_id || '';
+      const pPhone = (p.contact_whatsapp || p.phone || '').replace(/[^0-9]/g, '');
+
+      return (userId && pUid === userId) ||
+             (myLapakIds.length && myLapakIds.includes(pLapak)) ||
+             (userName && pSeller && (pSeller === userName || pSeller.includes(userName) || userName.includes(pSeller))) ||
+             (userPhone && pPhone && userPhone === pPhone);
+    });
 
     if (this._memberAdsList && this._memberAdsList.length) {
       const existing = new Set(myAds.map(p => p.id));
@@ -1781,7 +1782,7 @@ const AppEngine = {
       ${myAds.length ? myAds.map(a => {
         let imgs = [];
         try { imgs = typeof a.images === 'string' ? JSON.parse(a.images) : (a.images || []); } catch(e){}
-        const img = a.img || imgs[0] || (typeof a.images === 'string' ? a.images : null) || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';
+        const img = a.img || (Array.isArray(imgs) && imgs[0]) || (typeof a.images === 'string' && a.images.startsWith('http') ? a.images : 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400');
         const sc = statusColor(a.status);
         const sl = statusLabel(a.status);
         return `
@@ -1795,10 +1796,10 @@ const AppEngine = {
             </div>
           </div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn-outline" style="font-size:0.78rem; padding:6px 14px; font-weight:800; border-color:var(--accent-gold); color:var(--accent-gold); display:flex; align-items:center; gap:4px;" onclick="AppEngine.openEditMemberAdModal('${a.id}')">
+            <button class="btn-outline" style="font-size:0.78rem; padding:6px 14px; font-weight:800; border-color:var(--accent-gold); color:var(--accent-gold); display:flex; align-items:center; gap:4px; cursor:pointer;" onclick="AppEngine.openEditMemberAdModal('${a.id}')">
               ✏️ Edit Iklan & Foto
             </button>
-            <button class="btn-outline" style="font-size:0.78rem; padding:6px 12px; font-weight:800; border-color:rgba(239,68,68,0.5); color:#f87171;" onclick="AppEngine.deleteMemberAd('${a.id}')">
+            <button class="btn-outline" style="font-size:0.78rem; padding:6px 12px; font-weight:800; border-color:rgba(239,68,68,0.5); color:#f87171; cursor:pointer;" onclick="AppEngine.deleteMemberAd('${a.id}')">
               🗑️ Hapus
             </button>
           </div>
@@ -1810,15 +1811,18 @@ const AppEngine = {
   },
 
   openEditMemberAdModal(adId) {
+    const prods = (window.M7Engine && Array.isArray(window.M7Engine.data?.products))
+      ? window.M7Engine.data.products
+      : [];
     const list = this._memberAdsList || [];
-    const ad = list.find(x => x.id === adId) || {
+    const ad = prods.find(x => String(x.id) === String(adId)) || list.find(x => String(x.id) === String(adId)) || {
       id: adId,
       name: 'Iklan Member',
-      category: 'SPAREPART',
+      category: 'Parts',
       price: 1000000,
       condition: 'BEKAS',
       location: 'Jakarta',
-      phone: '081298765432',
+      phone: '08545585568',
       img: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400',
       desc: ''
     };
@@ -1846,10 +1850,11 @@ const AppEngine = {
                 <div>
                   <label class="form-label" style="font-size:0.78rem;">Kategori *</label>
                   <select id="edit-ad-category" class="form-input" style="font-size:0.82rem; padding:8px 12px;">
-                    <option value="KENDARAAN">🚗 Jual Kendaraan</option>
-                    <option value="SPAREPART">🔧 Sparepart & Aksesoris</option>
-                    <option value="MERCHANDISE">🏷️ Merchandise MB</option>
-                    <option value="SERVICE">📢 Jasa & Bengkel</option>
+                    <option value="Mobil / Unit">🚗 Jual Kendaraan</option>
+                    <option value="Parts">🔧 Sparepart & Komponen</option>
+                    <option value="Aksesoris">⭐ Aksesoris & Variasi</option>
+                    <option value="Merchandise">🏷️ Merchandise Resmi</option>
+                    <option value="Jasa & Bengkel">📢 Jasa & Bengkel</option>
                   </select>
                 </div>
                 <div>
@@ -1880,22 +1885,22 @@ const AppEngine = {
               </div>
               <div style="background:rgba(15,23,42,0.6); border:1px dashed var(--accent-gold); padding:14px; border-radius:12px; margin-bottom:16px; text-align:center;">
                 <label class="form-label" style="font-size:0.82rem; font-weight:800; color:var(--accent-gold); display:block; margin-bottom:6px;">
-                  📸 Ganti Foto Iklan (Unggah Foto Baru atau Masukkan URL Foto Asli)
+                  📸 Ganti Foto Iklan (Unggah Foto Baru dari HP/Laptop atau Masukkan Link)
                 </label>
                 <div id="edit-preview-container" style="margin-bottom:10px;">
                   <img id="edit-preview-img" src="" alt="Preview" style="max-height:140px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); object-fit:cover; margin:0 auto; display:block;">
                 </div>
                 <div style="display:flex; gap:10px; justify-content:center; margin-bottom:8px;">
-                  <button type="button" class="btn-primary" style="font-size:0.78rem; padding:6px 14px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); border:none;" onclick="document.getElementById('edit-ad-file-input').click()">
-                    📁 Upload Foto Baru
+                  <button type="button" class="btn-primary" style="font-size:0.78rem; padding:6px 14px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none; cursor:pointer;" onclick="document.getElementById('edit-ad-file-input').click()">
+                    📁 Pilih & Unggah Foto Baru
                   </button>
                   <input type="file" id="edit-ad-file-input" accept="image/*" style="display:none;" onchange="AppEngine.handleEditMemberAdPhotoUpload(this)">
                 </div>
-                <input type="text" id="edit-ad-img-url" class="form-input" placeholder="URL Foto (https://...)" style="font-size:0.78rem; padding:6px 10px; width:100%;" oninput="document.getElementById('edit-preview-img').src=this.value;">
+                <input type="text" id="edit-ad-img-url" class="form-input" placeholder="Atau paste URL Foto (https://...)" style="font-size:0.78rem; padding:6px 10px; width:100%;" oninput="document.getElementById('edit-preview-img').src=this.value;">
               </div>
               <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <button type="button" class="btn-outline" style="font-size:0.78rem; padding:6px 14px;" onclick="document.getElementById('modal-edit-member-ad').classList.remove('active')">Batal</button>
-                <button type="submit" class="btn-primary" style="font-size:0.78rem; font-weight:800; padding:6px 18px; background:linear-gradient(135deg,#10b981,#059669); border:none;">💾 Simpan Perubahan</button>
+                <button type="button" class="btn-outline" style="font-size:0.78rem; padding:6px 14px; cursor:pointer;" onclick="document.getElementById('modal-edit-member-ad').classList.remove('active')">Batal</button>
+                <button type="submit" id="edit-ad-submit-btn" class="btn-primary" style="font-size:0.78rem; font-weight:800; padding:6px 18px; background:linear-gradient(135deg,#10b981,#059669); border:none; cursor:pointer;">💾 Simpan ke Database</button>
               </div>
             </form>
           </div>
@@ -1905,16 +1910,16 @@ const AppEngine = {
 
     let imgs = [];
     try { imgs = typeof ad.images === 'string' ? JSON.parse(ad.images) : (ad.images || []); } catch(e){}
-    const currentImg = ad.img || imgs[0] || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400';
+    const currentImg = (Array.isArray(imgs) && imgs[0]) ? imgs[0] : (ad.img || (typeof ad.images === 'string' && ad.images.startsWith('http') ? ad.images : 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400'));
 
     document.getElementById('edit-ad-id').value = ad.id;
     document.getElementById('edit-ad-title').value = ad.name || ad.title || '';
-    document.getElementById('edit-ad-category').value = ad.category || 'SPAREPART';
+    document.getElementById('edit-ad-category').value = ad.category || 'Parts';
     document.getElementById('edit-ad-price').value = ad.price || 0;
-    document.getElementById('edit-ad-condition').value = ad.condition || 'BEKAS';
-    document.getElementById('edit-ad-location').value = ad.location || 'Jakarta';
-    document.getElementById('edit-ad-phone').value = ad.phone || ad.contact_whatsapp || '';
-    document.getElementById('edit-ad-desc').value = ad.desc || ad.description || '';
+    document.getElementById('edit-ad-condition').value = (ad.condition === 'NEW' || ad.condition === 'BARU') ? 'BARU' : 'BEKAS';
+    document.getElementById('edit-ad-location').value = ad.location || 'Jakarta Selatan';
+    document.getElementById('edit-ad-phone').value = ad.contact_whatsapp || ad.phone || '08545585568';
+    document.getElementById('edit-ad-desc').value = ad.description || ad.desc || '';
     document.getElementById('edit-ad-img-url').value = currentImg;
     document.getElementById('edit-preview-img').src = currentImg;
 
@@ -1926,13 +1931,27 @@ const AppEngine = {
     const file = inputEl.files[0];
     const reader = new FileReader();
     reader.onload = (e) => {
-      document.getElementById('edit-preview-img').src = e.target.result;
-      document.getElementById('edit-ad-img-url').value = e.target.result;
+      const dataUrl = e.target.result;
+      document.getElementById('edit-preview-img').src = dataUrl;
+      document.getElementById('edit-ad-img-url').value = dataUrl;
     };
     reader.readAsDataURL(file);
+
+    try {
+      const formData = new FormData();
+      formData.append('photo_file', file);
+      fetch('api.php?action=upload_image', {
+        method: 'POST',
+        body: formData
+      }).then(r => r.json()).then(res => {
+        if (res && res.success && res.url) {
+          document.getElementById('edit-ad-img-url').value = res.url;
+        }
+      }).catch(e => console.warn('Photo upload API err:', e));
+    } catch(err) {}
   },
 
-  saveEditMemberAd() {
+  async saveEditMemberAd() {
     const id = document.getElementById('edit-ad-id').value;
     const title = document.getElementById('edit-ad-title').value.trim();
     const category = document.getElementById('edit-ad-category').value;
@@ -1948,40 +1967,75 @@ const AppEngine = {
       return;
     }
 
-    if (this._memberAdsList) {
-      const item = this._memberAdsList.find(x => x.id === id);
-      if (item) {
-        item.name = title;
-        item.title = title;
-        item.category = category;
-        item.price = price;
-        item.condition = condition;
-        item.location = location;
-        item.phone = phone;
-        item.contact_whatsapp = phone;
-        item.desc = desc;
-        item.description = desc;
-        if (imgUrl) {
-          item.img = imgUrl;
-          item.images = [imgUrl];
-        }
-      }
-    }
+    const submitBtn = document.getElementById('edit-ad-submit-btn');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Menyimpan ke Database...'; }
 
-    document.getElementById('modal-edit-member-ad')?.classList.remove('active');
-    window.showToast('✅ Berhasil memperbarui data & foto iklan!', 'success');
-    this._renderMemberMyLapak();
-    this._renderMemberLapakProducts();
+    const u = this.currentUser || {};
+    try {
+      const res = await fetch('api.php?action=create_lapak_product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: id,
+          lapak_id: 'MEMBER_MARKETPLACE',
+          name: title,
+          category: category,
+          price: price,
+          condition: (condition === 'BARU' || condition === 'NEW') ? 'NEW' : 'USED',
+          location: location,
+          contact_whatsapp: phone,
+          description: desc,
+          images: [imgUrl || 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'],
+          user_id: u.id || 'usr_superadmin',
+          seller_name: u.name || 'Member MB INA'
+        })
+      }).then(r => r.json());
+
+      if (res && res.success) {
+        window.showToast('✅ Berhasil memperbarui data & foto iklan di database Supabase!', 'success');
+        if (window.M7Engine && typeof window.M7Engine.fetchData === 'function') {
+          await window.M7Engine.fetchData();
+        }
+        document.getElementById('modal-edit-member-ad')?.classList.remove('active');
+        this._renderMemberMyLapak();
+        this._renderMemberLapakProducts();
+      } else {
+        window.showToast('❌ Gagal memperbarui: ' + (res?.message || 'Error'), 'error');
+      }
+    } catch (err) {
+      window.showToast('❌ Gagal memperbarui: ' + err.message, 'error');
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '💾 Simpan ke Database'; }
+    }
   },
 
-  deleteMemberAd(adId) {
-    if (!confirm('Apakah Anda yakin ingin menghapus iklan ini?')) return;
-    if (this._memberAdsList) {
-      this._memberAdsList = this._memberAdsList.filter(x => x.id !== adId);
+  async deleteMemberAd(adId) {
+    if (!confirm('Apakah Anda yakin ingin menghapus iklan ini secara permanen dari database MB INA?')) return;
+    const u = this.currentUser || {};
+    try {
+      const res = await fetch('api.php?action=delete_lapak_product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: adId, user_id: u.id || 'usr_superadmin' })
+      }).then(r => r.json());
+
+      if (res && res.success) {
+        window.showToast('🗑️ Iklan berhasil dihapus secara permanen dari database!', 'success');
+        if (window.M7Engine) {
+          window.M7Engine.data.products = (window.M7Engine.data.products || []).filter(x => x.id !== adId);
+          await window.M7Engine.fetchData();
+        }
+        if (this._memberAdsList) {
+          this._memberAdsList = this._memberAdsList.filter(x => x.id !== adId);
+        }
+        this._renderMemberMyLapak();
+        this._renderMemberLapakProducts();
+      } else {
+        window.showToast('❌ Gagal menghapus: ' + (res?.message || 'Error'), 'error');
+      }
+    } catch (err) {
+      window.showToast('❌ Gagal menghapus: ' + err.message, 'error');
     }
-    window.showToast('🗑️ Iklan berhasil dihapus', 'success');
-    this._renderMemberMyLapak();
-    this._renderMemberLapakProducts();
   },
 
   handleMemberAdPhotoUpload(inputEl) {
@@ -1989,14 +2043,15 @@ const AppEngine = {
     const file = inputEl.files[0];
     const reader = new FileReader();
     reader.onload = (e) => {
+      const dataUrl = e.target.result;
       const container = document.getElementById('ml-preview-container-1');
       const img = document.getElementById('ml-preview-img-1');
       const urlInput = document.getElementById('ml-form-img-url');
       if (container && img) {
-        img.src = e.target.result;
+        img.src = dataUrl;
         container.style.display = 'block';
       }
-      if (urlInput) urlInput.value = e.target.result;
+      if (urlInput) urlInput.value = dataUrl;
     };
     reader.readAsDataURL(file);
 
@@ -2010,7 +2065,6 @@ const AppEngine = {
         if (res && res.success && res.url) {
           const urlInput = document.getElementById('ml-form-img-url');
           if (urlInput) urlInput.value = res.url;
-          window.showToast?.('✅ Foto berhasil diunggah ke server!', 'success');
         }
       }).catch(e => console.warn('Photo upload API err:', e));
     } catch(err) {}
@@ -17962,7 +18016,7 @@ window.M7Engine = {
           <td style="padding:10px 8px; font-weight:700; text-align:center;">${idx + 1}</td>
           <td style="padding:10px 8px; font-weight:800; color:#fff;">${p.name}</td>
           <td style="padding:10px 8px; color:var(--text-main);">
-            <div style="font-weight:700; color:var(--accent-gold);">${lapak.name}</div>
+            <div style="font-weight:700; color:var(--accent-gold);">${storeName}</div>
             <div style="font-size:0.75rem; color:var(--text-muted);">${ownerName} (${memberId})</div>
           </td>
           <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald);">${priceFormatted}</td>
