@@ -8415,10 +8415,17 @@ const AppEngine = {
       m = this.currentUser || {};
     }
 
+    if (this.currentUser && (this.currentUser.id === m.id || this.currentUser.username === m.username || this.currentUser.member_id === m.member_id || this.currentUser.email === m.email)) {
+      if (this.currentUser.club && this.currentUser.club !== 'Belum Memilih Klub') {
+        m.club = this.currentUser.club;
+        m.club_name = this.currentUser.club;
+      }
+    }
+
     const memberId = m.member_id || m.memberId || this.getOfficialMemberId(m);
     const clubName = m.club || m.club_name || 'Belum Memilih Klub';
     const provName = m.province || m.province_name || (m.province_id === 'prov_jam' ? 'Jambi' : 'DKI Jakarta');
-    const cityName = m.city || 'Kota';
+    const cityName = m.city || 'Kota Jambi';
 
     const nameEl = document.getElementById('kta-member-name');
     const idEl = document.getElementById('kta-member-id');
