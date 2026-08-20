@@ -18547,29 +18547,102 @@ window.M7Engine = {
       const img = document.getElementById(`produk-preview-img-${i}`);
       if (container) container.style.display = 'none';
       if (img) img.src = '';
+      const inputVal = document.getElementById(`produk-form-img${i}`);
+      if (inputVal) inputVal.value = '';
     }
 
-    // Populate lapak dropdown
+    const user = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const isSponsor = (user.role === 'SPONSOR') || (user.member_id && user.member_id.startsWith('SPN-'));
+    const sponsorName = user.name || 'FDR Tyre Indonesia';
+
+    // Populate lapak / store dropdown
     const lapakSel = document.getElementById('produk-form-lapak');
     if (lapakSel) {
-      lapakSel.innerHTML = '<option value="">— Pilih Lapak —</option>';
-      (this.data.lapak || []).forEach(l => {
+      lapakSel.innerHTML = '';
+
+      if (isSponsor) {
+        const optSponsor = document.createElement('option');
+        optSponsor.value = user.member_id || user.id || 'SPONSOR_STORE';
+        optSponsor.textContent = `🏢 ${sponsorName} — Official Store Sponsor MB INA`;
+        optSponsor.selected = true;
+        lapakSel.appendChild(optSponsor);
+      } else {
+        const optMember = document.createElement('option');
+        optMember.value = 'MEMBER_MARKETPLACE';
+        optMember.textContent = `👤 Bursa Jual Beli Member MB INA (Lapak Komunitas Anggota)`;
+        optMember.selected = true;
+        lapakSel.appendChild(optMember);
+      }
+
+      // Add database lapak or fallback event booths
+      const eventLapaks = (this.data && Array.isArray(this.data.lapak) && this.data.lapak.length > 0) ? this.data.lapak : [
+        { id: 'LPK-001', lapak_code: 'LPK-001', name: 'FDR Tyre Indonesia Official Store', event_name: 'Booth A-01 Jamnas' },
+        { id: 'LPK-002', lapak_code: 'LPK-002', name: 'Bintang Mercy Autoparts & Spares', event_name: 'Booth B-05 Jamnas' },
+        { id: 'LPK-003', lapak_code: 'LPK-003', name: 'Retro Benz Classic Restoration', event_name: 'Booth C-12 Jamnas' },
+        { id: 'LPK-004', lapak_code: 'LPK-004', name: 'Shell Helix & Advance Official Booth', event_name: 'Booth A-02 Jamnas' }
+      ];
+
+      eventLapaks.forEach(l => {
+        // Skip duplicate of current sponsor
+        if (isSponsor && l.name && l.name.toLowerCase().includes(sponsorName.toLowerCase())) return;
         const opt = document.createElement('option');
         opt.value = l.id;
-        opt.textContent = `${l.lapak_code} — ${l.name}`;
-        // Pre-select the target lapak
-        const targetId = lapakIdParam || (this.selectedLapakId !== 'ALL' ? this.selectedLapakId : (this.data.lapak[0]?.id || ''));
-        if (l.id === targetId) opt.selected = true;
+        opt.textContent = `🎪 ${l.lapak_code} — ${l.name} (${l.event_name || 'Bazaar Event MB INA'})`;
+        if (lapakIdParam && (l.id === lapakIdParam || l.lapak_code === lapakIdParam)) {
+          opt.selected = true;
+        }
         lapakSel.appendChild(opt);
       });
+    }
 
-      // Auto-fill WA from selected lapak
-      lapakSel.addEventListener('change', () => {
-        const sel = (this.data.lapak || []).find(l => l.id === lapakSel.value);
-        const waEl = document.getElementById('produk-form-wa');
-        if (waEl && sel) waEl.value = sel.contact_whatsapp || '';
-      });
-      lapakSel.dispatchEvent(new Event('change'));
+    // Auto-fill user defaults (WhatsApp & Location)
+    const waEl = document.getElementById('produk-form-wa');
+    if (waEl && (!waEl.value || waEl.value.trim() === '')) {
+      waEl.value = user.phone || '081234567890';
+    }
+    const locEl = document.getElementById('produk-form-location');
+    if (locEl && (!locEl.value || locEl.value.trim() === '')) {
+      locEl.value = user.city || 'Jakarta Selatan';
+    }
+
+    // Check if editing an existing product
+    const modalTitle = document.getElementById('produk-modal-main-title');
+    const submitBtn = document.querySelector('#form-tambah-produk button[type="submit"]');
+
+    let editProduct = null;
+    if (lapakIdParam) {
+      editProduct = (this.data && Array.isArray(this.data.products)) ? this.data.products.find(p => p.id === lapakIdParam) : null;
+      if (!editProduct) {
+        // Check fallback products
+        const sampleProducts = [
+          { id: 'p_fdr_1', name: 'FDR Ultimate Performance Tire 245/45 R18 (Mercedes E-Class)', price: 1850000, condition: 'NEW', category: 'Parts', location: 'Jakarta Selatan', description: 'Ban performa tinggi FDR untuk Mercedes-Benz E-Class W211/W212/W213', contact_whatsapp: '081234567890' },
+          { id: 'p_fdr_2', name: 'FDR Sport Z-Rated Touring Tire 225/50 R17 (Mercedes C-Class)', price: 1450000, condition: 'NEW', category: 'Parts', location: 'Jakarta Selatan', description: 'Ban touring nyaman dan senyap untuk Mercedes-Benz C-Class W204/W205', contact_whatsapp: '081234567890' },
+          { id: 'p_sh_1', name: 'Shell Helix Ultra 0W-40 Fully Synthetic (4L)', price: 650000, condition: 'NEW', category: 'Parts', location: 'Jakarta Pusat', description: 'Oli mesin performa tinggi dengan sertifikasi resmi Mercedes-Benz MB-Approval 229.5', contact_whatsapp: '021-52901234' },
+          { id: 'p_sh_2', name: 'Shell Spirax S6 AXME Differential Oil 75W-90', price: 280000, condition: 'NEW', category: 'Parts', location: 'Jakarta Pusat', description: 'Pelumas gardan dan transmisi heavy-duty untuk Mercedes-Benz', contact_whatsapp: '021-52901234' }
+        ];
+        editProduct = sampleProducts.find(p => p.id === lapakIdParam);
+      }
+    }
+
+    if (editProduct) {
+      if (modalTitle) modalTitle.innerHTML = '✏️ EDIT PRODUK / IKLAN MARKETPLACE';
+      if (submitBtn) submitBtn.innerHTML = '💾 SIMPAN PERUBAHAN PRODUK';
+
+      const nameEl = document.getElementById('produk-form-name');
+      if (nameEl) nameEl.value = editProduct.name || '';
+      const priceEl = document.getElementById('produk-form-price');
+      if (priceEl) priceEl.value = editProduct.price || '';
+      const condEl = document.getElementById('produk-form-condition');
+      if (condEl) condEl.value = editProduct.condition || 'NEW';
+      const catEl = document.getElementById('produk-form-category');
+      if (catEl) catEl.value = editProduct.category || 'Parts';
+      if (locEl) locEl.value = editProduct.location || user.city || 'Jakarta';
+      const descEl = document.getElementById('produk-form-description');
+      if (descEl) descEl.value = editProduct.description || '';
+      if (waEl) waEl.value = editProduct.contact_whatsapp || user.phone || '081234567890';
+    } else {
+      if (modalTitle) modalTitle.innerHTML = '📝 TAMBAH PRODUK / IKLAN MARKETPLACE';
+      if (submitBtn) submitBtn.innerHTML = '📝 TAMBAHKAN PRODUK';
     }
 
     modal.style.display = 'flex';
