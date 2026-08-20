@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260820_150800">
+  <link rel="stylesheet" href="css/styles.css?v=20260820_152000">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -1763,6 +1763,7 @@
           <div style="display:flex; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--chrome-border); padding-bottom:16px; margin-bottom:24px;">
             <button class="sub-tab-btn active" data-m3sub="list" onclick="AppEngine.switchM3Subtab('list')">3.1 Daftar Member</button>
             <button class="sub-tab-btn" data-m3sub="add" onclick="AppEngine.switchM3Subtab('add')">3.2 Tambah Member Baru</button>
+            <button class="sub-tab-btn" data-m3sub="sponsor" onclick="AppEngine.switchM3Subtab('sponsor')" style="color:var(--accent-gold); font-weight:700;">3.4 🏢 Tambah Mitra Sponsor</button>
             <button class="sub-tab-btn" data-m3sub="verify" onclick="AppEngine.switchM3Subtab('verify')">3.3 Verifikasi Member <span id="m3-verify-pill-count" class="badge-counter">0</span></button>
             <button class="sub-tab-btn" data-m3sub="tier" onclick="AppEngine.switchM3Subtab('tier')">3.5 Tier Member ⭐</button>
           </div>
@@ -1943,6 +1944,127 @@
                 <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
                   <button type="button" class="btn-outline" onclick="AppEngine.switchM3Subtab('list')">Batal</button>
                   <button type="submit" class="btn-primary">💾 Simpan & Generate Member ID</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- 3.4 TAMBAH MITRA SPONSOR (FORM DEDIKASI KHUSUS PERUSAHAAN SPONSOR) -->
+          <div id="m3sub-sponsor" class="m3-subtab-content" style="display:none;">
+            <div style="max-width:780px; margin:0 auto; background:var(--bg-card); border:1.5px solid var(--accent-gold); border-radius:16px; padding:28px; box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:20px;">
+                <div>
+                  <h4 style="font-size:1.25rem; margin:0 0 4px 0; color:var(--accent-gold); display:flex; align-items:center; gap:8px;">🏢 Form Pendaftaran Mitra Sponsor & Korporasi</h4>
+                  <p style="font-size:0.8rem; color:var(--text-muted); margin:0;">Form khusus pendaftaran Perusahaan Sponsor, Brand Partner, & Penerbitan Sponsor ID Resmi Federasi</p>
+                </div>
+                <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px;" onclick="AppEngine.switchM3Subtab('list')">← Kembali</button>
+              </div>
+
+              <form id="m3-add-sponsor-form" onsubmit="AppEngine.saveDedicatedSponsorForm(event)">
+                <!-- 1. IDENTITAS PERUSAHAAN & KODE SPONSOR -->
+                <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:10px; margin-bottom:16px;">
+                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">🏢 1. Identitas Perusahaan & Kode ID Sponsor</span>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1.4fr 1.1fr; gap:16px; margin-bottom:16px;">
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label" style="font-weight:700;">Nama Perusahaan / Brand Sponsor <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="m3-spn-name" class="form-input" placeholder="contoh: PT FDR Tyre Indonesia / Bank Mandiri" required onkeyup="AppEngine.autoFillDedicatedSponsorId(this.value)">
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                      <label class="form-label" style="color:var(--accent-gold); font-weight:700; margin:0;">🏷️ Kode ID Sponsor Resmi <span style="color:#ef4444;">*</span></label>
+                      <button type="button" onclick="AppEngine.autoFillDedicatedSponsorId(document.getElementById('m3-spn-name').value, true)" style="background:none; border:none; color:var(--accent-gold); font-size:0.75rem; cursor:pointer; font-weight:700; text-decoration:underline;">🔄 Auto-Generate</button>
+                    </div>
+                    <input type="text" id="m3-spn-id" class="form-input" placeholder="SPN-FDR-2026-002" required style="font-family:monospace; font-weight:800; color:var(--accent-gold); border:1.5px solid var(--accent-gold); background:#0b1120; text-transform:uppercase;">
+                  </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">Kategori Industri / Bisnis</label>
+                    <select id="m3-spn-category" class="form-input">
+                      <option value="Otomotif & Ban">🚗 Otomotif, Ban & Suku Cadang</option>
+                      <option value="Perbankan & Finansial">🏦 Perbankan & Layanan Finansial</option>
+                      <option value="Pelumas & Bahan Bakar">⛽ Pelumas, Oli & BBM</option>
+                      <option value="Asuransi & Proteksi">🛡️ Asuransi & Proteksi Kendaraan</option>
+                      <option value="Detailing & Bodywork">✨ Detailing, Coating & Perawatan</option>
+                      <option value="Hospitality & Lifestyle">🏨 Hospitality, Hotel & Travel</option>
+                      <option value="Lainnya">🌐 Kemitraan Strategis Lainnya</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">Kota & Lokasi Kantor Pusat</label>
+                    <input type="text" id="m3-spn-city" class="form-input" placeholder="Jakarta Pusat / Indonesia" value="Jakarta Pusat">
+                  </div>
+                </div>
+
+                <!-- 2. KONTAK PIC & AKUN LOGIN SPONSOR -->
+                <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:10px; margin-bottom:16px; margin-top:20px;">
+                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">👤 2. Kontak Resmi PIC & Akses Login Portal Sponsor</span>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1.2fr 1.2fr 1fr; gap:14px; margin-bottom:16px;">
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">Nama PIC / Kontak Utama <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="m3-spn-pic-name" class="form-input" placeholder="contoh: Budi Santoso" required>
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">Email PIC (Login Sponsor) <span style="color:#ef4444;">*</span></label>
+                    <input type="email" id="m3-spn-email" class="form-input" placeholder="fdr@sponsor.com" required>
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">No. Telepon / WhatsApp <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="m3-spn-phone" class="form-input" placeholder="021-7890123" required>
+                  </div>
+                </div>
+
+                <!-- 3. PAKET SPONSORSHIP & KONTRAK -->
+                <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:10px; margin-bottom:16px; margin-top:20px;">
+                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">💎 3. Paket Sponsorship & Nilai Kontrak</span>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1.2fr 1fr 1fr 1fr; gap:12px; margin-bottom:16px;">
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">Paket Kemitraan *</label>
+                    <select id="m3-spn-tier" class="form-input" onchange="AppEngine.onDedicatedSponsorTierChange(this.value)">
+                      <option value="PLATINUM">💎 PLATINUM — Rp 20.000.000 / bln</option>
+                      <option value="GOLD">🥇 GOLD — Rp 10.000.000 / bln</option>
+                      <option value="SILVER">🥈 SILVER — Rp 5.000.000 / bln</option>
+                      <option value="BRONZE" selected>🥉 BRONZE — Rp 2.500.000 / bln</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">Nilai Kontrak (Rp)</label>
+                    <input type="number" id="m3-spn-amount" class="form-input" value="2500000" style="font-weight:800; color:var(--primary-emerald);">
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">Status Kemitraan</label>
+                    <select id="m3-spn-status" class="form-input">
+                      <option value="ACTIVE">🟢 ACTIVE</option>
+                      <option value="PENDING">⏳ PENDING</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label">Pembayaran</label>
+                    <select id="m3-spn-pay-status" class="form-input">
+                      <option value="PAID">✅ LUNAS</option>
+                      <option value="UNPAID">⏳ BELUM LUNAS</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- 4. CATATAN KERJASAMA -->
+                <div class="form-group" style="margin-bottom:16px;">
+                  <label class="form-label">Catatan Kerjasama / Benefit Kemitraan</label>
+                  <textarea id="m3-spn-notes" class="form-input" rows="2" placeholder="Catatan kesepakatan endorsement, penempatan banner, slot event MB INA..."></textarea>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; border-top:1px solid var(--chrome-border); padding-top:16px;">
+                  <button type="button" class="btn-outline" onclick="AppEngine.switchM3Subtab('list')">Batal</button>
+                  <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#D4AF37,#b89628); color:#000; font-weight:800; padding:10px 24px; box-shadow:0 4px 15px rgba(212,175,55,0.4);">
+                    🏢 Daftarkan Mitra Sponsor & Terbitkan ID
+                  </button>
                 </div>
               </form>
             </div>
@@ -9366,8 +9488,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260820_150800"></script>
-  <script src="js/app.js?v=20260820_150800"></script>
+  <script src="js/auth.js?v=20260820_152000"></script>
+  <script src="js/app.js?v=20260820_152000"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache

@@ -7979,6 +7979,9 @@ const AppEngine = {
       this.populateM3ClubDropdowns();
       this.updateM3AddMemberIdPreview();
     }
+    else if (subtab === 'sponsor') {
+      this.autoFillDedicatedSponsorId(document.getElementById('m3-spn-name')?.value || 'FDR Tyre Indonesia', true);
+    }
   },
 
   setM3Page(page) {
@@ -8357,6 +8360,118 @@ const AppEngine = {
       }
     } catch (err) {
       alert('❌ Gagal menambah member: ' + err.message);
+    }
+  },
+
+  autoFillDedicatedSponsorId(name, force = false) {
+    const idInput = document.getElementById('m3-spn-id');
+    if (!idInput) return;
+    if (!name || !name.trim()) {
+      if (force) idInput.value = 'SPN-MBINA-2026-001';
+      return;
+    }
+    const clean = name.trim().replace(/^(pt|cv)\s+/i, '');
+    const brand = clean.split(' ')[0].replace(/[^a-zA-Z]/g, '').substring(0, 3).toUpperCase();
+    const code = brand.length < 3 ? 'SPN' : brand;
+    const year = new Date().getFullYear();
+    const totalSponsors = (this.m3Data && Array.isArray(this.m3Data.members))
+      ? this.m3Data.members.filter(m => m.role === 'SPONSOR' || (m.member_id && m.member_id.startsWith('SPN-'))).length
+      : 5;
+    const seq = String(totalSponsors + 1).padStart(3, '0');
+    idInput.value = `SPN-${code}-${year}-${seq}`;
+  },
+
+  onDedicatedSponsorTierChange(tier) {
+    const amtInput = document.getElementById('m3-spn-amount');
+    if (!amtInput) return;
+    const prices = {
+      'PLATINUM': 20000000,
+      'GOLD': 10000000,
+      'SILVER': 5000000,
+      'BRONZE': 2500000
+    };
+    amtInput.value = prices[tier] || 2500000;
+  },
+
+  async saveDedicatedSponsorForm(event) {
+    event.preventDefault();
+    const partnerName = document.getElementById('m3-spn-name')?.value?.trim();
+    const sponsorId = document.getElementById('m3-spn-id')?.value?.trim();
+    const category = document.getElementById('m3-spn-category')?.value || 'Otomotif & Ban';
+    const city = document.getElementById('m3-spn-city')?.value?.trim() || 'Jakarta Pusat';
+    const picName = document.getElementById('m3-spn-pic-name')?.value?.trim() || partnerName;
+    const email = document.getElementById('m3-spn-email')?.value?.trim();
+    const phone = document.getElementById('m3-spn-phone')?.value?.trim();
+    const tier = document.getElementById('m3-spn-tier')?.value || 'BRONZE';
+    const amount = parseInt(document.getElementById('m3-spn-amount')?.value || 2500000);
+    const status = document.getElementById('m3-spn-status')?.value || 'ACTIVE';
+    const payStatus = document.getElementById('m3-spn-pay-status')?.value || 'PAID';
+    const notes = document.getElementById('m3-spn-notes')?.value?.trim() || '';
+
+    if (!partnerName || !sponsorId || !email || !phone) {
+      alert('⚠️ Mohon lengkapi Nama Perusahaan, Kode Sponsor, Email PIC, dan No. Telepon!');
+      return;
+    }
+
+    try {
+      // 1. Simpan ke database Pengguna / Member sebagai Role SPONSOR
+      const res = await fetch('api.php?action=create_m3_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: partnerName,
+          username: 'spn_' + sponsorId.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+          email: email,
+          phone: phone,
+          role: 'SPONSOR',
+          member_id: sponsorId,
+          club: 'HQ MB INA',
+          province: 'DKI Jakarta',
+          city: city,
+          tier: tier,
+          status: status,
+          admin_notes: `[MITRA SPONSOR] Kategori: ${category} | PIC: ${picName} | Kontrak: Rp ${amount.toLocaleString('id-ID')} | Catatan: ${notes}`
+        })
+      });
+      const data = await res.json();
+
+      // 2. Simpan juga ke modul kontrak endorse M8
+      try {
+        const nextEcNum = 'EC-2026-' + String(((window.M8Engine && window.M8Engine.data && window.M8Engine.data.contracts) ? window.M8Engine.data.contracts.length : 4) + 1).padStart(3, '0');
+        await fetch('api.php?action=create_endorse_contract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: 'ec_' + Date.now(),
+            contract_number: nextEcNum,
+            sponsor_id: sponsorId,
+            member_id: sponsorId,
+            partner_name: partnerName,
+            contact_person: picName,
+            contact_email: email,
+            contact_phone: phone,
+            package_id: 'pkg_' + tier.toLowerCase(),
+            package_name: '💎 ' + tier,
+            start_date: new Date().toISOString().split('T')[0],
+            end_date: new Date(Date.now() + 365*24*60*60*1000).toISOString().split('T')[0],
+            total_amount: amount,
+            payment_status: payStatus,
+            status: status,
+            notes: notes
+          })
+        });
+      } catch (e) {}
+
+      if (data.success) {
+        alert(`🎉 MITRA SPONSOR BERHASIL DIDAFTARKAN!\n\nNama Perusahaan: ${partnerName}\nKode Sponsor Resmi: ${sponsorId}\nEmail Login: ${email}\nPaket: ${tier}`);
+        document.getElementById('m3-add-sponsor-form')?.reset();
+        await this.fetchM3Data();
+        this.switchM3Subtab('list');
+      } else {
+        alert('❌ Gagal mendaftarkan sponsor: ' + data.message);
+      }
+    } catch (err) {
+      alert('❌ Terjadi kesalahan: ' + err.message);
     }
   },
 
