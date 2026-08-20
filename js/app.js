@@ -1597,6 +1597,10 @@ const AppEngine = {
       returnBtn.innerHTML = isSponsor ? '🏠 Dashboard Sponsor' : '🏠 Dashboard Member';
     }
 
+    if (window.M7Engine && (!window.M7Engine.data || !window.M7Engine.data.products || window.M7Engine.data.products.length === 0)) {
+      window.M7Engine.fetchData().then(() => this._renderMemberLapakProducts());
+    }
+
     this._renderMemberLapakProducts();
 
     if (subtab && subtab !== 'katalog') {
@@ -1627,9 +1631,17 @@ const AppEngine = {
     if (sub === 'lapaksaya') this._renderMemberMyLapak();
   },
 
-  _renderMemberLapakProducts() {
+  async _renderMemberLapakProducts() {
     const grid = document.getElementById('ml-products-grid');
     if (!grid) return;
+
+    if (window.M7Engine && (!window.M7Engine.data?.products || window.M7Engine.data.products.length === 0)) {
+      if (!this._isFetchingLapak) {
+        this._isFetchingLapak = true;
+        await window.M7Engine.fetchData();
+        this._isFetchingLapak = false;
+      }
+    }
 
     const allProds = (typeof window.getGlobalUnifiedProducts === 'function')
       ? window.getGlobalUnifiedProducts()
@@ -1637,6 +1649,15 @@ const AppEngine = {
 
     const search = (document.getElementById('ml-search-input')?.value || '').toLowerCase();
     const cat = document.getElementById('ml-category-select')?.value || 'ALL';
+
+    const normalizeCat = (c) => {
+      const s = (c || '').toLowerCase();
+      if (s.includes('mobil') || s.includes('unit') || s.includes('kendaraan')) return 'KENDARAAN';
+      if (s.includes('part') || s.includes('aksesoris') || s.includes('sparepart')) return 'SPAREPART';
+      if (s.includes('merch')) return 'MERCHANDISE';
+      if (s.includes('servis') || s.includes('jasa') || s.includes('bengkel') || s.includes('service')) return 'SERVICE';
+      return 'SPAREPART';
+    };
 
     const filtered = allProds.filter(p => {
       const isApproved = (p.status === 'APPROVED' || !p.status);
@@ -1649,7 +1670,7 @@ const AppEngine = {
       const pStore = (p.lapak_name || '').toLowerCase();
 
       const matchSearch = !search || pName.includes(search) || pLoc.includes(search) || pSeller.includes(search) || pStore.includes(search);
-      const matchCat = cat === 'ALL' || p.category === cat;
+      const matchCat = cat === 'ALL' || normalizeCat(p.category) === cat || p.category === cat;
       return matchSearch && matchCat;
     });
 
@@ -18999,6 +19020,15 @@ window.openAdminVerifyIklanModal = function(productId) {
 if (window.AppEngine) {
   window.AppEngine.openAdminVerifyIklanModal = window.openAdminVerifyIklanModal;
   window.AppEngine.M7Engine = window.M7Engine;
+}
+
+// Auto-initialize M7Engine
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(() => { if (window.M7Engine) window.M7Engine.init(); }, 80);
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.M7Engine) window.M7Engine.init();
+  });
 }
 
 // ╔══════════════════════════════════════════════════════════════════╗
