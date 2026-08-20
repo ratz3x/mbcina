@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260820_145700">
+  <link rel="stylesheet" href="css/styles.css?v=20260820_150800">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -1830,7 +1830,7 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                   <div class="form-group">
                     <label class="form-label">Nama Lengkap *</label>
-                    <input type="text" id="m3-add-name" class="form-input" placeholder="contoh: Andi Pratama" required>
+                    <input type="text" id="m3-add-name" class="form-input" placeholder="contoh: Andi Pratama" required onkeyup="AppEngine.updateM3AddMemberIdPreview()">
                   </div>
                   <div class="form-group">
                     <label class="form-label">Username (Opsional)</label>
@@ -1865,21 +1865,44 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label">Provinsi</label>
-                    <input type="text" id="m3-add-province" class="form-input" value="DKI Jakarta">
+                    <input type="text" id="m3-add-province" class="form-input" value="DKI Jakarta" onkeyup="AppEngine.updateM3AddMemberIdPreview()">
                   </div>
                   <div class="form-group">
                     <label class="form-label">Kota</label>
-                    <input type="text" id="m3-add-city" class="form-input" value="Jakarta Selatan">
+                    <input type="text" id="m3-add-city" class="form-input" value="Jakarta Selatan" onkeyup="AppEngine.updateM3AddMemberIdPreview()">
                   </div>
                 </div>
 
                 <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:12px; margin-bottom:16px; margin-top:16px;">
-                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">─── Status Keanggotaan & Klub ───</span>
+                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">─── Status Keanggotaan, Role & Nomor Anggota ───</span>
                 </div>
+
+                <!-- ROW: ROLE & MEMBER ID INPUT -->
+                <div style="display:grid; grid-template-columns:1fr 1.5fr; gap:16px; margin-bottom:14px; background:rgba(245,158,11,0.06); padding:14px; border-radius:10px; border:1px solid rgba(245,158,11,0.25);">
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label" style="color:var(--accent-gold); font-weight:700;">Tipe / Role Anggota *</label>
+                    <select id="m3-add-role" class="form-input" onchange="AppEngine.updateM3AddMemberIdPreview(true)">
+                      <option value="MEMBER">👤 MEMBER REGULER</option>
+                      <option value="SPONSOR">🏢 SPONSOR / MITRA KORPORASI</option>
+                      <option value="PENGURUS_PUSAT">⭐ PENGURUS PUSAT (HQ)</option>
+                      <option value="PRESIDEN">👑 PRESIDEN FEDERASI</option>
+                      <option value="ADMIN_ORGANISASI">🛡️ ADMIN ORGANISASI</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="margin:0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                      <label class="form-label" style="color:var(--accent-gold); font-weight:700; margin:0;">🏷️ Nomor Anggota / Member ID Resmi *</label>
+                      <button type="button" onclick="AppEngine.updateM3AddMemberIdPreview(true)" style="background:none; border:none; color:var(--accent-gold); font-size:0.75rem; cursor:pointer; font-weight:700; text-decoration:underline;">🔄 Auto-Generate</button>
+                    </div>
+                    <input type="text" id="m3-add-member-id" class="form-input" placeholder="MBINA-JKT-2026-000014" style="font-family:monospace; font-weight:800; color:var(--accent-gold); border-color:var(--accent-gold); text-transform:uppercase; background:#0b1120;" oninput="this.dataset.manualEdited='true'">
+                    <span style="font-size:0.72rem; color:var(--text-muted); margin-top:3px; display:block;">Otomatis terbuat atau dapat diketik manual. Format: <code style="color:var(--accent-gold);">MBINA-[REG]-[THN]-[NO]</code> atau <code style="color:var(--accent-gold);">SPN-[BRAND]-[THN]-[NO]</code></span>
+                  </div>
+                </div>
+
                 <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px;">
                   <div class="form-group">
                     <label class="form-label">Klub / Chapter *</label>
-                    <select id="m3-add-club" class="form-input" required></select>
+                    <select id="m3-add-club" class="form-input" required onchange="AppEngine.updateM3AddMemberIdPreview()"></select>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Tier Member</label>
@@ -9343,8 +9366,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260820_145700"></script>
-  <script src="js/app.js?v=20260820_145700"></script>
+  <script src="js/auth.js?v=20260820_150800"></script>
+  <script src="js/app.js?v=20260820_150800"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache

@@ -7975,7 +7975,10 @@ const AppEngine = {
 
     if (subtab === 'list') this.renderM3MemberList();
     else if (subtab === 'verify') this.renderM3VerifyList();
-    else if (subtab === 'add') this.populateM3ClubDropdowns();
+    else if (subtab === 'add') {
+      this.populateM3ClubDropdowns();
+      this.updateM3AddMemberIdPreview();
+    }
   },
 
   setM3Page(page) {
@@ -8281,6 +8284,43 @@ const AppEngine = {
     }
   },
 
+  updateM3AddMemberIdPreview(force = false) {
+    const idInput = document.getElementById('m3-add-member-id');
+    if (!idInput) return;
+    if (!force && idInput.dataset.manualEdited === 'true') return;
+
+    const role = document.getElementById('m3-add-role')?.value || 'MEMBER';
+    const name = document.getElementById('m3-add-name')?.value?.trim() || '';
+    const city = document.getElementById('m3-add-city')?.value?.trim() || 'Jakarta Selatan';
+    const year = new Date().getFullYear();
+    const totalMembers = (this.m3Data && Array.isArray(this.m3Data.members)) ? this.m3Data.members.length : 14;
+    const seqNum = totalMembers + 1;
+
+    if (role === 'SPONSOR') {
+      const clean = name ? name.replace(/^(pt|cv)\s+/i, '').trim() : 'SPN';
+      const brand = clean.split(' ')[0].replace(/[^a-zA-Z]/g, '').substring(0, 3).toUpperCase() || 'SPN';
+      const code = brand.length < 3 ? 'SPN' : brand;
+      idInput.value = `SPN-${code}-${year}-${String(seqNum).padStart(3, '0')}`;
+    } else if (['SUPER_ADMIN', 'PRESIDEN', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI'].includes(role)) {
+      idInput.value = `MBINA-HQ-${year}-${String(seqNum).padStart(6, '0')}`;
+    } else {
+      let regCode = 'INA';
+      const cityLower = city.toLowerCase();
+      const cityMap = {
+        'jakarta': 'JKT', 'jakarta selatan': 'JKT', 'jakarta barat': 'JKT', 'jakarta timur': 'JKT', 'jakarta utara': 'JKT', 'jakarta pusat': 'JKT',
+        'jambi': 'JAM', 'bandung': 'BDG', 'surabaya': 'SBY', 'semarang': 'SMG', 'yogyakarta': 'YGY', 'medan': 'MED', 'bali': 'DPS', 'denpasar': 'DPS',
+        'makassar': 'MKS', 'aceh': 'ACH', 'tangerang': 'TGR', 'bekasi': 'BKS', 'bogor': 'BGR', 'palembang': 'PLG', 'padang': 'PDG', 'pekanbaru': 'PKB'
+      };
+      for (const k in cityMap) {
+        if (cityLower.includes(k)) { regCode = cityMap[k]; break; }
+      }
+      if (regCode === 'INA' && city.length >= 3) {
+        regCode = city.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, '');
+      }
+      idInput.value = `MBINA-${regCode}-${year}-${String(seqNum).padStart(6, '0')}`;
+    }
+  },
+
   async saveM3MemberFromForm(event) {
     event.preventDefault();
     const name = document.getElementById('m3-add-name').value.trim();
@@ -8291,6 +8331,8 @@ const AppEngine = {
     const gender = document.getElementById('m3-add-gender').value;
     const province = document.getElementById('m3-add-province').value.trim();
     const city = document.getElementById('m3-add-city').value.trim();
+    const role = document.getElementById('m3-add-role')?.value || 'MEMBER';
+    const member_id = document.getElementById('m3-add-member-id')?.value.trim() || '';
     const club = document.getElementById('m3-add-club').value;
     const tier = document.getElementById('m3-add-tier').value;
     const status = document.getElementById('m3-add-status').value;
@@ -8303,7 +8345,7 @@ const AppEngine = {
       const res = await fetch('api.php?action=create_m3_member', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, username, email, phone, birth_date, gender, province, city, club, tier, status, vehicle_model, license_plate, admin_notes, photo_url })
+        body: JSON.stringify({ name, username, email, phone, birth_date, gender, province, city, role, member_id, club, tier, status, vehicle_model, license_plate, admin_notes, photo_url })
       });
       const data = await res.json();
       if (data.success) {
