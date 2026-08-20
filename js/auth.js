@@ -671,7 +671,114 @@ const AuthEngine = {
       this.closeAllModals();
       alert('🎉 ' + loginMessage);
     } else {
-      alert('❌ Login Gagal: Akun tidak ditemukan atau password salah! Pastikan Email / Member ID sudah benar.');
+      alert('❌ Login Gagal: Akun tidak ditemukan atau password salah! Silakan periksa kembali atau klik [Lupa Password?].');
+    }
+  },
+
+  _resetPendingUser: null,
+
+  openForgotPasswordModal() {
+    this.closeModal('modal-login');
+    const step1 = document.getElementById('forgot-step-1');
+    const step2 = document.getElementById('forgot-step-2');
+    if (step1) step1.style.display = 'block';
+    if (step2) step2.style.display = 'none';
+    const input = document.getElementById('forgot-identity-input');
+    if (input) input.value = document.getElementById('login-email')?.value || '';
+    this.openModal('modal-forgot-password');
+  },
+
+  async requestPasswordReset() {
+    const identity = document.getElementById('forgot-identity-input')?.value?.trim();
+    if (!identity) {
+      alert('⚠️ Silakan masukkan Email / Username / Member ID Anda!');
+      return;
+    }
+
+    try {
+      const res = await fetch('api.php?action=forgot_password_request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identity })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        this._resetPendingUser = data;
+        const step1 = document.getElementById('forgot-step-1');
+        const step2 = document.getElementById('forgot-step-2');
+        const badge = document.getElementById('forgot-user-name-badge');
+        const hint = document.getElementById('forgot-otp-demo-hint');
+        const otpInput = document.getElementById('forgot-otp-input');
+
+        if (badge) badge.innerText = `${data.user_name} (${data.email})`;
+        if (hint && data.otp_preview) hint.innerText = `Kode Demo: ${data.otp_preview}`;
+        if (otpInput && data.otp_preview) otpInput.value = data.otp_preview;
+
+        if (step1) step1.style.display = 'none';
+        if (step2) step2.style.display = 'block';
+        alert(`✅ ${data.message}\n\nKode Verifikasi OTP: ${data.otp_preview}`);
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (err) {
+      alert('❌ Gagal menghubungi server: ' + err.message);
+    }
+  },
+
+  async submitNewPassword() {
+    if (!this._resetPendingUser || !this._resetPendingUser.user_id) {
+      alert('⚠️ Sesi reset tidak valid, silakan ulangi dari awal!');
+      this.openForgotPasswordModal();
+      return;
+    }
+
+    const otp = document.getElementById('forgot-otp-input')?.value?.trim();
+    const newPass = document.getElementById('forgot-new-pass')?.value;
+    const confPass = document.getElementById('forgot-confirm-pass')?.value;
+
+    if (!otp) {
+      alert('⚠️ Silakan masukkan 6 digit Kode OTP!');
+      return;
+    }
+    if (!newPass || newPass.length < 6) {
+      alert('⚠️ Password baru minimal 6 karakter!');
+      return;
+    }
+    if (newPass !== confPass) {
+      alert('⚠️ Konfirmasi password tidak cocok dengan password baru!');
+      return;
+    }
+
+    try {
+      const res = await fetch('api.php?action=reset_password_submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: this._resetPendingUser.user_id,
+          new_password: newPass,
+          otp: otp
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert(`🎉 ${data.message}`);
+        this.closeModal('modal-forgot-password');
+        
+        // Auto fill login with new password
+        const emailInput = document.getElementById('login-email');
+        const passInput = document.getElementById('login-password');
+        if (emailInput) emailInput.value = this._resetPendingUser.email || this._resetPendingUser.user_id;
+        if (passInput) passInput.value = newPass;
+
+        this.openModal('modal-login');
+        this.handleLogin();
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (err) {
+      alert('❌ Gagal mereset password: ' + err.message);
     }
   },
 

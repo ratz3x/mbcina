@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260820_153700">
+  <link rel="stylesheet" href="css/styles.css?v=20260820_175200">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -7284,7 +7284,10 @@
           </div>
 
           <div class="form-group" style="margin-bottom:20px;">
-            <label class="form-label" style="font-size:0.85rem; font-weight:700;">Password *</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label class="form-label" style="font-size:0.85rem; font-weight:700; margin:0;">Password *</label>
+              <a href="#" onclick="AuthEngine.openForgotPasswordModal()" style="font-size:0.75rem; color:var(--accent-gold); text-decoration:none; font-weight:700;">🔑 Lupa Password?</a>
+            </div>
             <input type="password" id="login-password" class="form-input" placeholder="••••••••" required style="padding:10px 14px;">
           </div>
 
@@ -7313,6 +7316,69 @@
           Belum punya akun member? 
           <a href="#" style="color:var(--accent-gold); font-weight:700; text-decoration:none;" onclick="AuthEngine.openModal('modal-register')">Daftar Member Baru (Gratis)</a>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LUPA PASSWORD / RESET PASSWORD MANDIRI -->
+  <div id="modal-forgot-password" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:10001; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+    <div class="modal-box glass-panel" style="width:min(440px,94vw); padding:28px; border-radius:20px; border:1.5px solid var(--accent-gold); box-shadow:0 15px 50px rgba(0,0,0,0.8);">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
+        <div>
+          <h4 style="font-size:1.15rem; margin:0 0 2px 0; color:var(--accent-gold); display:flex; align-items:center; gap:8px;">🔑 Reset / Lupa Password</h4>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Pulihkan akses akun Member / Sponsor MB INA</span>
+        </div>
+        <button type="button" class="modal-close-btn" style="background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer;" onclick="AuthEngine.closeModal('modal-forgot-password')">✕</button>
+      </div>
+
+      <!-- STEP 1: INPUT IDENTITY -->
+      <div id="forgot-step-1">
+        <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;">
+          Masukkan <strong>Email</strong>, <strong>Username</strong>, atau <strong>Nomor Member ID</strong> Anda yang terdaftar untuk verifikasi akun:
+        </p>
+        <div class="form-group" style="margin-bottom:18px;">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700;">Email / Username / Member ID *</label>
+          <input type="text" id="forgot-identity-input" class="form-input" placeholder="contoh: dtouriano@unaja.ac.id atau SPN-UNI-2026-005" style="padding:10px 14px;">
+        </div>
+        <button type="button" class="btn-primary" style="width:100%; padding:11px; font-weight:800;" onclick="AuthEngine.requestPasswordReset()">
+          🔍 Cari Akun & Kirim Kode OTP →
+        </button>
+      </div>
+
+      <!-- STEP 2: VERIFY OTP & INPUT NEW PASSWORD -->
+      <div id="forgot-step-2" style="display:none;">
+        <div style="background:rgba(34,197,94,0.1); border:1px solid var(--primary-emerald); padding:10px 12px; border-radius:8px; margin-bottom:16px; font-size:0.8rem;">
+          <span style="color:var(--primary-emerald); font-weight:700;">✅ Akun Teridentifikasi:</span> <span id="forgot-user-name-badge" style="color:#fff; font-weight:700;"></span><br>
+          <span style="color:var(--text-muted); font-size:0.75rem;">Kode OTP telah dikirimkan ke email terdaftar.</span>
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label class="form-label" style="font-size:0.8rem; font-weight:700;">Kode OTP (6 Digit) *</label>
+            <span id="forgot-otp-demo-hint" style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;"></span>
+          </div>
+          <input type="text" id="forgot-otp-input" class="form-input" placeholder="123456" maxlength="6" style="font-family:monospace; font-weight:800; font-size:1.1rem; text-align:center; letter-spacing:4px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700;">Password Baru *</label>
+          <input type="password" id="forgot-new-pass" class="form-input" placeholder="Minimal 6 karakter" style="padding:10px 14px;">
+        </div>
+
+        <div class="form-group" style="margin-bottom:20px;">
+          <label class="form-label" style="font-size:0.8rem; font-weight:700;">Konfirmasi Password Baru *</label>
+          <input type="password" id="forgot-confirm-pass" class="form-input" placeholder="Ulangi password baru" style="padding:10px 14px;">
+        </div>
+
+        <button type="button" class="btn-primary" style="width:100%; padding:11px; font-weight:800; background:linear-gradient(135deg,#D4AF37,#b89628); color:#000;" onclick="AuthEngine.submitNewPassword()">
+          💾 Simpan Password Baru & Login
+        </button>
+      </div>
+
+      <div style="margin-top:16px; border-top:1px solid var(--chrome-border); padding-top:12px; text-align:center;">
+        <a href="#" onclick="AuthEngine.closeModal('modal-forgot-password'); AuthEngine.openModal('modal-login');" style="font-size:0.8rem; color:var(--text-muted); text-decoration:none;">
+          ← Kembali ke Halaman Login
+        </a>
       </div>
     </div>
   </div>
@@ -9527,8 +9593,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260820_153700"></script>
-  <script src="js/app.js?v=20260820_153700"></script>
+  <script src="js/auth.js?v=20260820_175200"></script>
+  <script src="js/app.js?v=20260820_175200"></script>
   <script>
     lucide.createIcons();
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache
