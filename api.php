@@ -447,7 +447,6 @@ function ensureM7Tables($sPdo) {
                 ('log_002', 'lapak_002', 'SEWA', '2026-08-01', '2027-01-31', 27000, 'PAID', 'Pembayaran sewa 6 bulan lunas (Diskon Silver 10%)', 'usr_superadmin'),
                 ('log_003', 'lapak_003', 'SEWA', '2026-02-01', '2026-07-31', 28500, 'PAID', 'Pembayaran sewa 6 bulan lunas (Diskon Bronze 5%)', 'usr_superadmin');
             ");
-        }
     } catch (Exception $e) {}
 }
 
