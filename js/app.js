@@ -16426,9 +16426,13 @@ const M6Engine = {
           : `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; padding:4px 10px; font-size:0.75rem;">⏳ PENDING</span>`);
 
       const actionBtn = isSuccess
-        ? `<button style="background:transparent; border:none; outline:none; cursor:pointer; font-size:1.15rem; padding:2px 6px;" onclick="window.viewDonationReceipt('${d.id}')" title="Detail / Receipt">🧾</button>`
-        : `<button style="background:transparent; border:none; outline:none; cursor:pointer; font-size:1.15rem; padding:2px 6px;" onclick="window.verifyDonation('${d.id}', true)" title="Verifikasi Lunas">✅</button>
-           <button style="background:transparent; border:none; outline:none; cursor:pointer; font-size:1.15rem; padding:2px 6px;" onclick="window.verifyDonation('${d.id}', false)" title="Tolak">❌</button>`;
+        ? `<div style="display:flex; gap:6px; justify-content:center;">
+             <button class="btn-outline" style="font-size:0.75rem; padding:4px 8px; border-color:var(--accent-gold); color:var(--accent-gold); border-radius:6px; cursor:pointer;" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer">🖼️ Bukti</button>
+             <button class="btn-outline" style="font-size:0.75rem; padding:4px 8px; border-color:var(--primary-emerald); color:var(--primary-emerald); border-radius:6px; cursor:pointer;" onclick="window.viewDonationReceipt('${d.id}')" title="Kwitansi Digital Resmi">🧾 Kwitansi</button>
+           </div>`
+        : `<div style="display:flex; gap:6px; justify-content:center;">
+             <button class="btn-primary" style="font-size:0.75rem; padding:4px 10px; background:linear-gradient(135deg,#D4AF37,#b89628); color:#000; font-weight:800; border-radius:6px; border:none; cursor:pointer; box-shadow:0 2px 8px rgba(212,175,55,0.3);" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Periksa Bukti & Verifikasi">🔍 Cek Bukti & Verifikasi</button>
+           </div>`;
 
       const campObj = (this.donationData.campaigns || []).find(c => c.id === d.campaign_id);
       const campTitle = campObj ? campObj.title : d.campaign_id;
@@ -16745,14 +16749,27 @@ const M6Engine = {
   },
 
   openDonationVerifyModal(donationId) {
-    const don = this.donationData.donations.find(d => d.id === donationId) || {};
+    const don = (this.donationData && Array.isArray(this.donationData.donations))
+      ? this.donationData.donations.find(d => d.id === donationId) || {}
+      : {};
     this.activeDonationVerifyId = donationId;
 
-    document.getElementById('verify-don-name').innerText = don.donor_name || 'Donatur MB INA';
-    document.getElementById('verify-don-amount').innerText = 'Rp ' + parseFloat(don.amount || 500000).toLocaleString('id-ID');
-    document.getElementById('verify-don-method').innerText = don.payment_method || 'TRANSFER';
-    document.getElementById('verify-don-date').innerText = don.created_at || '10/08/2026';
+    const nameEl = document.getElementById('verify-don-name');
+    const amtEl = document.getElementById('verify-don-amount');
+    const methodEl = document.getElementById('verify-don-method');
+    const dateEl = document.getElementById('verify-don-date');
+    const proofImg = document.getElementById('verify-don-proof-img');
+
+    if (nameEl) nameEl.innerText = `${don.donor_name || 'Donatur MB INA'} ${don.member_id ? '(' + don.member_id + ')' : ''}`;
+    if (amtEl) amtEl.innerText = 'Rp ' + parseFloat(don.amount || 0).toLocaleString('id-ID');
+    if (methodEl) methodEl.innerText = `${don.payment_method || 'TRANSFER'} • ${don.status || 'PENDING'}`;
+    if (dateEl) dateEl.innerText = don.created_at || 'Hari Ini';
     
+    if (proofImg) {
+      proofImg.src = don.payment_proof_url || 'assets/mb_hero.jpg';
+      proofImg.onerror = function() { this.src = 'assets/mb_hero.jpg'; };
+    }
+
     AuthEngine.openModal('modal-donation-verify');
   },
 
