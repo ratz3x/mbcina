@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // m10_laporan.php - M10 - Laporan, Export, Snapshot
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router

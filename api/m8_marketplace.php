@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // m8_marketplace.php - M8 - Lapak Marketplace, Produk, Review
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // m4_keanggotaan.php - M4 - Keanggotaan, Verifikasi, Tiers
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router

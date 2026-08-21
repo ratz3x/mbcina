@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // m_sponsor.php - Sponsor Dashboard
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router

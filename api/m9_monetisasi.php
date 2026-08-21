@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // m9_monetisasi.php - M9 - Endorse, Iklan, Keuangan
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router

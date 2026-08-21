@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // m5_forum.php - M5 - Forum, Thread, Broadcast, Moderasi
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router

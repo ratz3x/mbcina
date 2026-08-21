@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // m0_init.php - M0 - Inisialisasi & Autentikasi
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router
