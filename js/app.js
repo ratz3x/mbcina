@@ -3430,12 +3430,7 @@ const AppEngine = {
 
   ensureDataPopulated() {
     if (!this.m2Data.clubs || this.m2Data.clubs.length === 0) {
-      this.m2Data.clubs = [
-        { id: 'clb_001', code: 'W124-JKT', name: 'Mercedes-Benz W124 Club Indonesia Chapter Jakarta', region: 'Regional Metro DKI Jakarta', city: 'Jakarta Selatan', type: 'CHAPTER', member_count: 320, leader: 'H. Bambang Soesatyo' },
-        { id: 'clb_002', code: 'MBW202-BDG', name: 'MB W202 Club Indonesia Chapter Bandung', region: 'Regional Jawa Barat', city: 'Bandung', type: 'CHAPTER', member_count: 215, leader: 'Dr. Rochady Hendra' },
-        { id: 'clb_003', code: 'MBC-SBY', name: 'Mercedes-Benz Club Surabaya', region: 'Regional Jawa Timur & Bali', city: 'Surabaya', type: 'CLUB', member_count: 180, leader: 'Ir. Raymond Sanjaya' }
-      ];
-      this.clubs = this.m2Data.clubs;
+      this.m2Data.clubs = this.clubs || [];
     }
     if (!this.m3Data.members || this.m3Data.members.length === 0) {
       this.m3Data.members = [
@@ -3548,14 +3543,7 @@ const AppEngine = {
 
   ensureDataPopulated() {
     if (!this.m2Data.clubs || this.m2Data.clubs.length === 0) {
-      this.m2Data.clubs = [
-        { id: 'clb_001', code: 'W124-JKT', name: 'Mercedes-Benz W124 Club Indonesia Chapter Jakarta', region: 'Regional Metro DKI Jakarta', city: 'Jakarta Selatan', type: 'CHAPTER', member_count: 320, leader: 'H. Bambang Soesatyo' },
-        { id: 'clb_002', code: 'MBW202-BDG', name: 'MB W202 Club Indonesia Chapter Bandung', region: 'Regional Jawa Barat', city: 'Bandung', type: 'CHAPTER', member_count: 215, leader: 'Dr. Rochady Hendra' },
-        { id: 'clb_003', code: 'MBC-SBY', name: 'Mercedes-Benz Club Surabaya', region: 'Regional Jawa Timur & Bali', city: 'Surabaya', type: 'CLUB', member_count: 180, leader: 'Ir. Raymond Sanjaya' },
-        { id: 'clb_004', code: 'MBC-MED', name: 'Mercedes-Benz Club Medan Chapter', region: 'Regional Sumatra', city: 'Medan', type: 'CHAPTER', member_count: 145, leader: 'Andi Wijaya' },
-        { id: 'clb_005', code: 'W210-SMG', name: 'W210 Club Indonesia Semarang', region: 'Regional Jawa Tengah', city: 'Semarang', type: 'CLUB', member_count: 110, leader: 'Budi Santoso' }
-      ];
-      this.clubs = this.m2Data.clubs;
+      this.m2Data.clubs = this.clubs || [];
     }
 
     if (!this.m3Data.members || this.m3Data.members.length === 0) {
@@ -5725,7 +5713,7 @@ const AppEngine = {
     const container = document.getElementById('m2-clubs-container');
     if (!container) return;
 
-    const clubs = this.m2Data.clubs || [];
+    const clubs = (this.m2Data && this.m2Data.clubs && this.m2Data.clubs.length) ? this.m2Data.clubs : (this.clubs || []);
 
     // Regions list with exact DB value mapping
     const regions = [
