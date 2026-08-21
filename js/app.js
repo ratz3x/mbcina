@@ -3505,6 +3505,7 @@ const AppEngine = {
       this.syncCurrentUserStatusFromList();
       this.renderClubsList();
       this.renderLandingPageVisionMission();
+      this.renderLandingSponsors();
       if (this.activeAdminTab === 'm2_org') this.renderM2Module();
       if (this.activeAdminTab === 'm3_membership') this.renderM3Module();
       if (this.activeAdminTab === 'm4_registration') this.renderM4Module();
@@ -19117,6 +19118,9 @@ const M8Engine = {
       // Quietly use local fallback without throwing console errors
     }
     this.renderAll();
+    if (window.AppEngine && typeof window.AppEngine.renderLandingSponsors === 'function') {
+      window.AppEngine.renderLandingSponsors();
+    }
   },
 
   loadLocalFallback: function() {
@@ -21212,6 +21216,7 @@ const M8Engine = {
     this.renderDynamicAds();
     this.renderRotatorOrderTable();
     if (typeof this.renderCampaignList === 'function') this.renderCampaignList();
+    if (window.AppEngine && typeof window.AppEngine.renderLandingSponsors === 'function') window.AppEngine.renderLandingSponsors();
 
     try {
       await fetch('api.php?action=update_ad_campaign', {
@@ -21253,6 +21258,7 @@ const M8Engine = {
       this.savePersistentCampaigns();
       this.renderDynamicAds();
       this.renderRotatorOrderTable();
+      if (window.AppEngine && typeof window.AppEngine.renderLandingSponsors === 'function') window.AppEngine.renderLandingSponsors();
 
       try {
         await Promise.all([
@@ -21290,6 +21296,7 @@ const M8Engine = {
       this.savePersistentCampaigns();
       this.renderDynamicAds();
       this.renderRotatorOrderTable();
+      if (window.AppEngine && typeof window.AppEngine.renderLandingSponsors === 'function') window.AppEngine.renderLandingSponsors();
 
       try {
         await Promise.all([
@@ -21315,6 +21322,7 @@ const M8Engine = {
     this.renderDynamicAds();
     this.renderRotatorOrderTable();
     if (typeof this.renderCampaignList === 'function') this.renderCampaignList();
+    if (window.AppEngine && typeof window.AppEngine.renderLandingSponsors === 'function') window.AppEngine.renderLandingSponsors();
 
     try {
       await fetch('api.php?action=delete_ad_campaign', {
