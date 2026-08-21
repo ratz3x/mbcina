@@ -20861,12 +20861,27 @@ const M8Engine = {
     }
   },
 
+  cleanImageUrl: function(url) {
+    if (!url || typeof url !== 'string') return url || '';
+    const trimmed = url.trim();
+    const gDriveMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (gDriveMatch && gDriveMatch[1]) {
+      return `https://lh3.googleusercontent.com/d/${gDriveMatch[1]}`;
+    }
+    return trimmed;
+  },
+
   previewBannerUrl: function(url) {
     const box = document.getElementById('ac-banner-preview-box');
     const img = document.getElementById('ac-banner-preview-img');
+    const inputEl = document.getElementById('ac-form-banner-url');
     if (!box || !img) return;
-    if (url && url.trim().length > 5) {
-      img.src = url;
+    const cleanUrl = this.cleanImageUrl(url);
+    if (inputEl && cleanUrl !== url && url.includes('drive.google.com')) {
+      inputEl.value = cleanUrl;
+    }
+    if (cleanUrl && cleanUrl.length > 5) {
+      img.src = cleanUrl;
       box.style.display = 'block';
     } else {
       box.style.display = 'none';
@@ -21050,7 +21065,8 @@ const M8Engine = {
     let status       = document.getElementById('ac-form-status')?.value || 'DRAFT';
     const startDate  = document.getElementById('ac-form-start')?.value || '2026-08-15';
     const endDate    = document.getElementById('ac-form-end')?.value || '2026-09-15';
-    const bannerUrl  = document.getElementById('ac-form-banner-url')?.value?.trim() || '';
+    const rawBanner  = document.getElementById('ac-form-banner-url')?.value?.trim() || '';
+    const bannerUrl  = this.cleanImageUrl(rawBanner);
     const desc       = document.getElementById('ac-form-desc')?.value?.trim() || 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge';
     const cta        = document.getElementById('ac-form-cta')?.value?.trim() || 'Ajukan Kartu Sekarang';
     const link       = document.getElementById('ac-form-link')?.value?.trim() || 'https://www.bankmandiri.co.id/mbina';
