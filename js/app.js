@@ -5725,17 +5725,6 @@ const AppEngine = {
     const container = document.getElementById('m2-clubs-container');
     if (!container) return;
 
-    // Pastikan data 111 klub terambil live dari database Supabase Cloud jika belum lengkap
-    if (!this.m2Data.clubs || this.m2Data.clubs.length <= 5) {
-      if (!this._fetchingM2Clubs) {
-        this._fetchingM2Clubs = true;
-        this.fetchM2Data().then(() => {
-          this._fetchingM2Clubs = false;
-          this.renderM2Clubs();
-        });
-      }
-    }
-
     const clubs = this.m2Data.clubs || [];
 
     // Regions list with exact DB value mapping
