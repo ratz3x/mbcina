@@ -1,7 +1,10 @@
-<?php
+﻿<?php
 // m8_marketplace.php - M8 - Lapak Marketplace, Produk, Review
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router
+
+require_once __DIR__ . '/ensure_tables.php'; // lazy-loaded
+
 
 switch ($action) {
     case 'get_m7_data':
@@ -384,7 +387,7 @@ switch ($action) {
             echo json_encode([
                 'success' => true,
                 'is_published' => $isPublished,
-                'message' => $isPublished ? '🎉 Iklan berhasil DITERBITKAN dan tayang di Katalog Marketplace!' : '⏸️ Iklan telah di-unpublish dari katalog publik.'
+                'message' => $isPublished ? 'ðŸŽ‰ Iklan berhasil DITERBITKAN dan tayang di Katalog Marketplace!' : 'â¸ï¸ Iklan telah di-unpublish dari katalog publik.'
             ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);

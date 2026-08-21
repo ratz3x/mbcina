@@ -1,7 +1,10 @@
-<?php
+﻿<?php
 // m5_forum.php - M5 - Forum, Thread, Broadcast, Moderasi
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router
+
+require_once __DIR__ . '/ensure_tables.php'; // lazy-loaded
+
 
 switch ($action) {
     case 'get_m5_data':

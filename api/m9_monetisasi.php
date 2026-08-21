@@ -1,7 +1,10 @@
-<?php
+﻿<?php
 // m9_monetisasi.php - M9 - Endorse, Iklan, Keuangan
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router
+
+require_once __DIR__ . '/ensure_tables.php'; // lazy-loaded
+
 
 switch ($action) {
     case 'get_sponsorship_inventory_status':
@@ -20,7 +23,7 @@ switch ($action) {
                     'next_queue_number' => 3,
                     'available_at' => '2026-09-15',
                     'placement_type' => 'PREMIUM_HEADER_ROTATION_SPONSOR_WALL',
-                    'badge' => '🔴 FULL — 2/2 SLOT TERISI'
+                    'badge' => 'ðŸ”´ FULL â€” 2/2 SLOT TERISI'
                 ],
                 'pkg_gold' => [
                     'id' => 'pkg_gold',
@@ -33,7 +36,7 @@ switch ($action) {
                     'remaining_slots' => 2,
                     'waitlist_queue_count' => 0,
                     'placement_type' => 'HEADER_FEED_ROTATION',
-                    'badge' => '🟡 2 SLOT TERSISA'
+                    'badge' => 'ðŸŸ¡ 2 SLOT TERSISA'
                 ],
                 'pkg_silver' => [
                     'id' => 'pkg_silver',
@@ -46,7 +49,7 @@ switch ($action) {
                     'remaining_slots' => 7,
                     'waitlist_queue_count' => 0,
                     'placement_type' => 'FEED_NATIVE',
-                    'badge' => '🟢 AVAILABLE'
+                    'badge' => 'ðŸŸ¢ AVAILABLE'
                 ],
                 'pkg_bronze' => [
                     'id' => 'pkg_bronze',
@@ -59,7 +62,7 @@ switch ($action) {
                     'remaining_slots' => 8,
                     'waitlist_queue_count' => 0,
                     'placement_type' => 'FOOTER_SPONSOR',
-                    'badge' => '🟢 AVAILABLE'
+                    'badge' => 'ðŸŸ¢ AVAILABLE'
                 ],
                 'ad_sidebar' => [
                     'id' => 'ad_sidebar',
@@ -69,7 +72,7 @@ switch ($action) {
                     'current_active' => 2,
                     'status' => 'AVAILABLE',
                     'remaining_slots' => 2,
-                    'badge' => '🟢 2 SLOT TERSISA'
+                    'badge' => 'ðŸŸ¢ 2 SLOT TERSISA'
                 ],
                 'ad_sponsored' => [
                     'id' => 'ad_sponsored',
@@ -79,7 +82,7 @@ switch ($action) {
                     'current_active' => 2,
                     'status' => 'AVAILABLE',
                     'remaining_slots' => 8,
-                    'badge' => '🟢 AVAILABLE'
+                    'badge' => 'ðŸŸ¢ AVAILABLE'
                 ],
                 'ad_native' => [
                     'id' => 'ad_native',
@@ -89,7 +92,7 @@ switch ($action) {
                     'current_active' => 1,
                     'status' => 'AVAILABLE',
                     'remaining_slots' => 5,
-                    'badge' => '🟢 AVAILABLE'
+                    'badge' => 'ðŸŸ¢ AVAILABLE'
                 ],
                 'ad_premium' => [
                     'id' => 'ad_premium',
@@ -99,7 +102,7 @@ switch ($action) {
                     'current_active' => 1,
                     'status' => 'AVAILABLE',
                     'remaining_slots' => 1,
-                    'badge' => '🟢 1 SLOT TERSISA'
+                    'badge' => 'ðŸŸ¢ 1 SLOT TERSISA'
                 ]
             ];
             echo json_encode(['success' => true, 'inventory' => $inventory]);
@@ -133,8 +136,8 @@ switch ($action) {
                 'available_at' => $availableAt,
                 'contract_number' => $contractNo,
                 'message' => $isWaitlist 
-                    ? "📌 pendaftaran Paket PLATINUM berhasil masuk WAITING LIST (Nomor Antrean #{$queueNo})! Estimasi slot tersedia: 15 September 2026." 
-                    : "✅ Pendaftaran Kontrak Endorse berhasil disimpan!"
+                    ? "ðŸ“Œ pendaftaran Paket PLATINUM berhasil masuk WAITING LIST (Nomor Antrean #{$queueNo})! Estimasi slot tersedia: 15 September 2026." 
+                    : "âœ… Pendaftaran Kontrak Endorse berhasil disimpan!"
             ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);

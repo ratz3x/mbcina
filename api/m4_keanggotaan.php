@@ -1,7 +1,10 @@
-<?php
+﻿<?php
 // m4_keanggotaan.php - M4 - Keanggotaan, Verifikasi, Tiers
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router
+
+require_once __DIR__ . '/ensure_tables.php'; // lazy-loaded
+
 
 switch ($action) {
     case 'get_m3_members':
@@ -400,7 +403,7 @@ switch ($action) {
                 $stmt->execute([':mid' => $memberId, ':notes' => $adminNotes, ':id' => $id]);
 
                 // Create Notification & Activity
-                $sPdo->prepare("INSERT INTO notifications (id, user_id, type, title, message) VALUES (:id, :uid, 'APPROVAL', 'Verifikasi Keanggotaan Disetujui! 🎉', :msg)")
+                $sPdo->prepare("INSERT INTO notifications (id, user_id, type, title, message) VALUES (:id, :uid, 'APPROVAL', 'Verifikasi Keanggotaan Disetujui! ðŸŽ‰', :msg)")
                      ->execute([':id' => 'notif_' . uniqid(), ':uid' => $id, ':msg' => "Selamat! Pendaftaran Anda disetujui. Member ID Anda: $memberId"]);
 
                 $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'REGISTRATION', 'Member Terverifikasi', :detail)")
@@ -533,11 +536,11 @@ switch ($action) {
                 $sPdo->prepare("INSERT INTO tier_history (id, user_id, tier, total_donation, year) VALUES (:id, :uid, :tier, :tot, :yr)")
                      ->execute([':id' => 'th_' . uniqid(), ':uid' => $userId, ':tier' => $newTier, ':tot' => $totalDonation, ':yr' => $year]);
 
-                $sPdo->prepare("INSERT INTO notifications (id, user_id, type, title, message) VALUES (:id, :uid, 'UPGRADE', 'Selamat! Tier Anda Naik 🏆', :msg)")
+                $sPdo->prepare("INSERT INTO notifications (id, user_id, type, title, message) VALUES (:id, :uid, 'UPGRADE', 'Selamat! Tier Anda Naik ðŸ†', :msg)")
                      ->execute([':id' => 'notif_' . uniqid(), ':uid' => $userId, ':msg' => "Tier Anda telah berhasil di-upgrade dari $oldTier ke $newTier!"]);
 
                 $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'UPGRADE', 'Upgrade Tier Otomatis', :detail)")
-                     ->execute([':id' => 'act_' . uniqid(), ':uid' => $userId, ':detail' => "Upgrade Tier: $oldTier → $newTier (Total Donasi: Rp " . number_format($totalDonation, 0, ',', '.') . ")"]);
+                     ->execute([':id' => 'act_' . uniqid(), ':uid' => $userId, ':detail' => "Upgrade Tier: $oldTier â†’ $newTier (Total Donasi: Rp " . number_format($totalDonation, 0, ',', '.') . ")"]);
             }
 
             // Log activity donation
@@ -1098,7 +1101,7 @@ switch ($action) {
             $scoreRapat = 15; // 50% Rapat
             $administrationScore = $scoreLaporan + $scoreDokumen + $scoreRapat;
 
-            // Final Weighted Score = (Aktivitas × 35%) + (Keanggotaan × 25%) + (Partisipasi × 25%) + (Administrasi × 15%)
+            // Final Weighted Score = (Aktivitas Ã— 35%) + (Keanggotaan Ã— 25%) + (Partisipasi Ã— 25%) + (Administrasi Ã— 15%)
             $finalScore = round(($activityScore * 0.35) + ($membershipScore * 0.25) + ($participationScore * 0.25) + ($administrationScore * 0.15), 2);
 
             $grade = 'B';
@@ -1141,10 +1144,10 @@ switch ($action) {
             ];
 
             $recommendations = [];
-            if ($scoreJamnas < 40) $recommendations[] = "⚠️ Tingkatkan partisipasi di Jambore Nasional tahun depan.";
-            if ($scoreSocial < 20) $recommendations[] = "⚠️ Buat minimal 1 kegiatan sosial per tahun.";
-            if ($scoreRapat < 30) $recommendations[] = "⚠️ Tingkatkan kehadiran pengurus dalam rapat koordinasi pusat.";
-            if ($scoreGrowth >= 30) $recommendations[] = "✅ Pertahankan pertumbuhan dan retensi member aktif.";
+            if ($scoreJamnas < 40) $recommendations[] = "âš ï¸ Tingkatkan partisipasi di Jambore Nasional tahun depan.";
+            if ($scoreSocial < 20) $recommendations[] = "âš ï¸ Buat minimal 1 kegiatan sosial per tahun.";
+            if ($scoreRapat < 30) $recommendations[] = "âš ï¸ Tingkatkan kehadiran pengurus dalam rapat koordinasi pusat.";
+            if ($scoreGrowth >= 30) $recommendations[] = "âœ… Pertahankan pertumbuhan dan retensi member aktif.";
 
             echo json_encode([
                 'success' => true,
@@ -1274,7 +1277,7 @@ switch ($action) {
     case 'update_tier':
         $tierId = $input['id'] ?? '';
         $name = trim($input['name'] ?? '');
-        $icon = trim($input['icon'] ?? '⭐');
+        $icon = trim($input['icon'] ?? 'â­');
         $color = trim($input['color'] ?? '#D4AF37');
         $minDonation = (int)($input['min_donation'] ?? $input['fee'] ?? 0);
         $maxDonation = isset($input['max_donation']) && $input['max_donation'] !== null && $input['max_donation'] !== '' ? (int)$input['max_donation'] : null;

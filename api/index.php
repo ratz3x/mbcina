@@ -11,7 +11,7 @@ register_shutdown_function(function() {
 });
 
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/ensure_tables.php';
+// NOTE: ensure_tables.php is NOT pre-loaded here — each module requires it lazily
 
 $input  = json_decode(file_get_contents('php://input'), true) ?? $_POST ?? [];
 $action = $_GET['action'] ?? $input['action'] ?? $_POST['action'] ?? '';

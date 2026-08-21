@@ -1,7 +1,10 @@
-<?php
+﻿<?php
 // m_sponsor.php - Sponsor Dashboard
 // Digunakan oleh api/index.php (router)
 // $sPdo, $input, $action sudah di-set oleh router
+
+require_once __DIR__ . '/ensure_tables.php'; // lazy-loaded
+
 
 switch ($action) {
     case 'get_landing_sponsors':
@@ -15,13 +18,13 @@ switch ($action) {
                         'order_seq' => (int)($c['sort_order'] ?? ($idx + 1)),
                         'name' => $c['name'],
                         'partner_name' => $c['partner_name'] ?? 'MB INA Official Partner',
-                        'tier' => (stripos($c['package_name'] ?? '', 'gold') !== false) ? '🥇 GOLD SPONSOR' : '💎 PLATINUM SPONSOR',
-                        'category' => !empty($c['partner_name']) ? ('OFFICIAL PARTNER • ' . strtoupper($c['partner_name'])) : 'OFFICIAL STRATEGIC PARTNER',
+                        'tier' => (stripos($c['package_name'] ?? '', 'gold') !== false) ? 'ðŸ¥‡ GOLD SPONSOR' : 'ðŸ’Ž PLATINUM SPONSOR',
+                        'category' => !empty($c['partner_name']) ? ('OFFICIAL PARTNER â€¢ ' . strtoupper($c['partner_name'])) : 'OFFICIAL STRATEGIC PARTNER',
                         'logo' => $c['banner_url'] ?: ($c['image_url'] ?: 'assets/mb_badge.jpg'),
                         'banner_url' => $c['banner_url'] ?: ($c['image_url'] ?: 'assets/mb_badge.jpg'),
                         'link' => $c['link'] ?: 'https://www.mercedes-benz.co.id',
                         'desc' => $c['description'] ?: ($c['notes'] ?: ''),
-                        'cta_text' => $c['cta_text'] ?: ('Kunjungi Website Resmi ' . ($c['partner_name'] ?: $c['name']) . ' ↗')
+                        'cta_text' => $c['cta_text'] ?: ('Kunjungi Website Resmi ' . ($c['partner_name'] ?: $c['name']) . ' â†—')
                     ];
                 }, $campaigns, array_keys($campaigns));
                 echo json_encode(['success' => true, 'sponsors' => $sponsors]);
@@ -38,7 +41,7 @@ switch ($action) {
         try {
             $id = $input['id'] ?? ('sp_landing_' . uniqid());
             $name = $input['name'] ?? 'PT Sponsor Indonesia';
-            $tier = $input['tier'] ?? '💎 PLATINUM SPONSOR';
+            $tier = $input['tier'] ?? 'ðŸ’Ž PLATINUM SPONSOR';
             $category = $input['category'] ?? 'Official Partner';
             $logo = $input['logo'] ?? 'assets/mb_badge.jpg';
             $link = $input['link'] ?? 'https://www.mercedes-benz.co.id';
