@@ -1,11 +1,11 @@
 <?php
-// m11_koperasi.php - M11 Koperasi Mercedes-Benz Club Indonesia
+// m11_koperasi.php - M11 Koperasi Bersama Satu Bintang
 // Status: Under Construction / Development Phase
 
 echo json_encode([
     'success' => true,
     'module' => 'M11_KOPERASI',
-    'title' => 'Koperasi Mercedes-Benz Club Indonesia',
+    'title' => 'Koperasi Bersama Satu Bintang',
     'status' => 'UNDER_CONSTRUCTION',
     'progress_percent' => 35,
     'target_release' => 'Q4 2026',
