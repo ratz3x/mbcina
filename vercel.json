@@ -7,15 +7,15 @@
   },
   "routes": [
     {
-      "src": "^/api\\.php(.*)$",
-      "dest": "/api/index.php$1"
-    },
-    {
-      "src": "^/api/(.*)$",
+      "src": "^/api\\.php",
       "dest": "/api/index.php"
     },
     {
-      "src": "^/api$",
+      "src": "^/api/(.*)",
+      "dest": "/api/index.php"
+    },
+    {
+      "src": "^/api",
       "dest": "/api/index.php"
     },
     {
