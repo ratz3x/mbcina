@@ -3480,6 +3480,16 @@ const AppEngine = {
         if (res.clubApplications && res.clubApplications.length) this.m4Data.applications = res.clubApplications;
         if (res.clubApplicationNotes && res.clubApplicationNotes.length) this.m4Data.notes = res.clubApplicationNotes;
         if (res.clubEvaluations && res.clubEvaluations.length) this.m4Data.evaluations = res.clubEvaluations;
+
+        // Simpan data lapak & produk ke AppEngine agar tombol Review bisa menemukannya
+        if (res.lapak && res.lapak.length) {
+          this.lapak = res.lapak;
+          if (window.M7Engine) window.M7Engine.data.lapak = res.lapak;
+        }
+        if (res.lapakProducts && res.lapakProducts.length) {
+          this.lapakProducts = res.lapakProducts;
+          if (window.M7Engine) window.M7Engine.data.products = res.lapakProducts;
+        }
       }
     } catch (e) {
       console.warn("API Offline / slow, ensuring local fallback data is populated:", e);
@@ -17994,40 +18004,36 @@ window.M7Engine = {
   },
 
   openAdminVerifyIklanModal: function(productId) {
-    const engine = (this && this.data) ? this : (window.M7Engine || {});
-    const prods = (engine.data && Array.isArray(engine.data.products)) ? engine.data.products : (window.M7Engine?.data?.products || []);
-    const lapaks = (engine.data && Array.isArray(engine.data.lapak)) ? engine.data.lapak : (window.M7Engine?.data?.lapak || []);
+    // Cari produk dari semua sumber yang tersedia
+    const m7Prods = window.M7Engine?.data?.products || [];
+    const appProds = window.AppEngine?.lapakProducts || [];
+    const globalProds = (typeof window.getGlobalUnifiedProducts === 'function') ? window.getGlobalUnifiedProducts() : [];
 
-    let p = prods.find(x => String(x.id) === String(productId));
+    // Gabungkan semua sumber, deduplicate by id
+    const allProds = [...m7Prods];
+    [...appProds, ...globalProds].forEach(p => {
+      if (!allProds.find(x => String(x.id) === String(p.id))) allProds.push(p);
+    });
+
+    const m7Lapaks = window.M7Engine?.data?.lapak || [];
+    const appLapaks = window.AppEngine?.lapak || window.AppEngine?.m2Data?.lapak || [];
+    const allLapaks = [...m7Lapaks];
+    appLapaks.forEach(l => { if (!allLapaks.find(x => String(x.id) === String(l.id))) allLapaks.push(l); });
+
+    let p = allProds.find(x => String(x.id) === String(productId));
+    if (!p) p = allProds.find(x => String(x.id).trim() === String(productId).trim());
     if (!p) {
-      p = prods.find(x => String(x.id).trim() === String(productId).trim());
-    }
-    if (!p && typeof productId === 'string') {
-      p = prods.find(x => x.name && productId.toLowerCase().includes(x.name.toLowerCase()));
-    }
-    if (!p) {
-      p = {
-        id: productId,
-        name: 'Blok Mesin W124',
-        price: 25000000,
-        condition: 'USED',
-        status: 'PENDING',
-        description: 'Blok mesin copotan mobil bekas garansi kompresi mulus & liner tanpa baret.',
-        category: 'Parts & Komponen',
-        contact_whatsapp: '08545585568',
-        seller_name: 'Ratih Kusumastuti',
-        member_id: 'MBINA-JAM-2026-000011',
-        lapak_name: 'Garasi FayFay'
-      };
+      showToast('❌ Data produk tidak ditemukan. Coba refresh tab M7.', 'error');
+      return;
     }
 
-    const lapak = lapaks.find(l => String(l.id) === String(p.lapak_id)) || { 
-      name: p.lapak_name || 'Garasi FayFay', 
+    const lapak = allLapaks.find(l => String(l.id) === String(p.lapak_id)) || { 
+      name: p.lapak_name || 'Lapak MB INA', 
       user_id: 'usr_superadmin', 
-      contact_whatsapp: p.contact_whatsapp || '08545585568' 
+      contact_whatsapp: p.contact_whatsapp || ''
     };
-    const ownerName = p.seller_name || lapak.pemilik || 'Ratih Kusumastuti';
-    const memberId = p.member_id || lapak.member_id || 'MBINA-JAM-2026-000011';
+    const ownerName = p.seller_name || lapak.pemilik || 'Member MB INA';
+    const memberId = p.member_id || lapak.member_id || '';
 
     const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
     const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.innerText = txt; };
