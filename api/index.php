@@ -1,27 +1,78 @@
 <?php
-// api/index.php - Slim Router MB INA
-// Setiap request hanya memuat 1 file modul kecil (~15-60KB)
+// api/index.php - Bulletproof Modular Router MB INA
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+    exit(0);
+}
+
+// Global exception and error interceptor to prevent any HTTP 500
+set_exception_handler(function(Throwable $e) {
+    if (!headers_sent()) {
+        http_response_code(200);
+        header('Content-Type: application/json');
+        header('Access-Control-Allow-Origin: *');
+    }
+    echo json_encode([
+        'success' => false,
+        'error_type' => get_class($e),
+        'message' => $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine()
+    ]);
+    exit;
+});
 
 register_shutdown_function(function() {
     $error = error_get_last();
-    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
-        if (!headers_sent()) { http_response_code(200); header('Content-Type: application/json'); header('Access-Control-Allow-Origin: *'); }
-        echo json_encode(['success' => false, 'fatal' => $error['message'], 'line' => $error['line']]);
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR])) {
+        if (!headers_sent()) {
+            http_response_code(200);
+            header('Content-Type: application/json');
+            header('Access-Control-Allow-Origin: *');
+        }
+        echo json_encode([
+            'success' => false,
+            'fatal_error' => $error['message'],
+            'file' => basename($error['file']),
+            'line' => $error['line']
+        ]);
     }
 });
 
 require_once __DIR__ . '/db.php';
-// NOTE: ensure_tables.php is NOT pre-loaded here — each module requires it lazily
+require_once __DIR__ . '/ensure_tables.php';
 
-$input  = json_decode(file_get_contents('php://input'), true) ?? $_POST ?? [];
+// Parse action from all possible sources (GET, POST, raw JSON, QUERY_STRING, REQUEST_URI)
+$input = json_decode(file_get_contents('php://input'), true) ?? $_POST ?? [];
 $action = $_GET['action'] ?? $input['action'] ?? $_POST['action'] ?? '';
+
+if (empty($action) && !empty($_SERVER['QUERY_STRING'])) {
+    parse_str($_SERVER['QUERY_STRING'], $qs);
+    $action = $qs['action'] ?? '';
+}
+
+if (empty($action) && !empty($_SERVER['REQUEST_URI'])) {
+    $parts = parse_url($_SERVER['REQUEST_URI']);
+    if (!empty($parts['query'])) {
+        parse_str($parts['query'], $qs);
+        $action = $qs['action'] ?? '';
+    }
+}
+
 if (empty($action) && !empty($_SERVER['PATH_INFO'])) {
     $action = trim($_SERVER['PATH_INFO'], '/');
 }
 
 $sPdo = getSupabasePDO();
 if (!$sPdo) {
-    echo json_encode(['success' => false, 'message' => 'Gagal terhubung ke Supabase! ' . $dbLastError]);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Gagal terhubung ke Supabase! ' . ($dbLastError ?? 'Koneksi timeout.')
+    ]);
     exit;
 }
 
@@ -169,7 +220,7 @@ $moduleMap = [
 $module = $moduleMap[$action] ?? null;
 
 if (!$module) {
-    echo json_encode(['success' => true, 'message' => 'MBCINA API v3.0 Modular Ready', 'action' => $action]);
+    echo json_encode(['success' => true, 'message' => 'MBCINA API v3.0 Modular Engine Active', 'action' => $action]);
     exit;
 }
 
@@ -182,5 +233,11 @@ if (!file_exists($moduleFile)) {
 try {
     require $moduleFile;
 } catch (Throwable $e) {
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'error_type' => get_class($e),
+        'message' => $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine()
+    ]);
 }
