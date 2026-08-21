@@ -3905,43 +3905,33 @@ const AppEngine = {
 
     let campaigns = [];
 
-    // 1. Ambil dari live M8Engine.data.campaigns jika sudah tersedia
+    // Prioritas 1: Ambil dari memory M8Engine / AppEngine yang sudah sinkron dari DB
     if (window.M8Engine && Array.isArray(window.M8Engine.data?.campaigns) && window.M8Engine.data.campaigns.length > 0) {
       campaigns = window.M8Engine.data.campaigns;
     } else if (Array.isArray(this.adCampaigns) && this.adCampaigns.length > 0) {
       campaigns = this.adCampaigns;
     } else {
-      // 2. Cek cache persistent admin rotator
-      const cached = localStorage.getItem('mbcina_rotator_campaigns_v4');
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) campaigns = parsed;
-        } catch(e) {}
-      }
-    }
-
-    // 3. Jika masih kosong, fetch dari API
-    if (!campaigns.length) {
+      // Prioritas 2: Fetch langsung dari endpoint API database live
       try {
-        const res = await fetch('api.php?action=get_landing_sponsors').then(r => r.json());
-        if (res && res.success && Array.isArray(res.sponsors) && res.sponsors.length > 0) {
-          campaigns = res.sponsors;
+        const res = await fetch('api.php?action=get_m8_data').then(r => r.json());
+        if (res && res.success && Array.isArray(res.campaigns) && res.campaigns.length > 0) {
+          campaigns = res.campaigns;
+          if (window.M8Engine) window.M8Engine.data.campaigns = res.campaigns;
         }
       } catch(e) {}
     }
 
-    // Filter iklan / sponsor yang berstatus ACTIVE dan urutkan sesuai sort_order admin (#1, #2, #3, ...)
-    let activeCampaigns = (campaigns || []).filter(c => c.status === 'ACTIVE' || !c.status);
+    // Filter kampanye aktif dari database dan urutkan sesuai urutan prioritas admin (sort_order)
+    let activeCampaigns = (campaigns || []).filter(c => c.status === 'ACTIVE');
     activeCampaigns.sort((a, b) => (parseInt(a.sort_order || a.order_seq) || 99) - (parseInt(b.sort_order || b.order_seq) || 99));
 
-    if (!activeCampaigns.length) {
-      // Fallback data jika belum ada iklan aktif
+    // Jika database belum termuat
+    if (!activeCampaigns.length && (!campaigns || !campaigns.length)) {
       activeCampaigns = [
         { id: 'ac_rotator_1', name: 'Banner Promo Ban Michelin Pilot Sport 5', partner_name: 'Michelin Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL TIRE PARTNER', banner_url: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', link: 'https://www.michelin.co.id/mbina', desc: 'Promo spesial ban high-performance Michelin Pilot Sport 5 diskon 15% khusus member MB INA', cta_text: 'Beli Ban Michelin' },
-        { id: 'ac_rotator_2', name: 'Banner Mandiri Q3 2026', partner_name: 'Bank Mandiri', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL BANKING PARTNER', banner_url: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', link: 'https://www.bankmandiri.co.id/mbina', desc: 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge', cta_text: 'Ajukan Kartu Sekarang' },
-        { id: 'ac_rotator_3', name: 'Sponsored Post: Perawatan Transmisi 7G-Tronic', partner_name: 'ZF Aftermarket Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL TRANSMISSION PARTNER', banner_url: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', link: 'https://www.zf.com/indonesia/mbina', desc: 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF', cta_text: 'Booking Servis' },
-        { id: 'ac_rotator_4', name: 'Sponsored Event MB Jamnas 2026', partner_name: 'BCA Prioritas', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL EVENT PARTNER', banner_url: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', link: 'https://www.bca.co.id/mbina', desc: 'Dukungan Penuh BCA Prioritas untuk Gathering & Jamnas MB INA 2026', cta_text: 'Lihat Detail Event' }
+        { id: 'ac_001', name: 'Banner Mandiri Q3 2026', partner_name: 'Bank Mandiri', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL BANKING PARTNER', banner_url: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', link: 'https://www.bankmandiri.co.id/mbina', desc: 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge', cta_text: 'Ajukan Kartu Sekarang' },
+        { id: 'ac_rotator_2', name: 'Sponsored Post: Perawatan Transmisi 7G-Tronic', partner_name: 'ZF Aftermarket Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL TRANSMISSION PARTNER', banner_url: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', link: 'https://www.zf.com/indonesia/mbina', desc: 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF', cta_text: 'Booking Servis' },
+        { id: 'ac_009', name: 'Event MB Jamnas 2026', partner_name: 'BCA Prioritas', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL EVENT PARTNER', banner_url: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', link: 'https://www.bca.co.id/mbina', desc: 'Dukungan Penuh BCA Prioritas untuk Gathering & Jamnas MB INA 2026', cta_text: 'Lihat Detail Event' }
       ];
     }
 
@@ -19146,15 +19136,10 @@ const M8Engine = {
 
     if (!this.loadPersistentCampaigns()) {
       this.data.campaigns = [
-        { id: 'ac_001', name: 'APM Utama & Official Automotive Principal MB INA', type: 'Header Rotator', partner_name: 'PT Mercedes-Benz Distribution Indonesia', budget: 37500000, status: 'ACTIVE', package_name: 'PLATINUM', sort_order: 1, banner_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1200&q=80', impressions: 52400, clicks: 4210, ctr: 8.9, start_date: '2026-01-01', end_date: '2026-12-31' },
-        { id: 'ac_002', name: 'Promo BNI TapCash Co-Branding & E-KTA MB INA', type: 'Header Rotator', partner_name: 'PT Bank Negara Indonesia (Persero) Tbk', budget: 37500000, status: 'ACTIVE', package_name: 'PLATINUM', sort_order: 2, banner_url: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?auto=format&fit=crop&w=1200&q=80', impressions: 45200, clicks: 3840, ctr: 8.5, start_date: '2026-01-01', end_date: '2026-12-31' },
-        { id: 'ac_003', name: 'Pelumas Fastron Synthetic Series MB INA', type: 'Header Rotator', partner_name: 'PT Pertamina Lubricants', budget: 11250000, status: 'ACTIVE', package_name: 'PLATINUM', sort_order: 3, banner_url: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80', impressions: 38900, clicks: 2910, ctr: 7.48, start_date: '2026-01-01', end_date: '2026-12-31' },
-        { id: 'ac_004', name: 'Mandiri Livin\' Merchant Sponsorship Jamnas 2026', type: 'Feed Banner', partner_name: 'PT Bank Mandiri (Persero) Tbk', budget: 37500000, status: 'ACTIVE', package_name: 'PLATINUM', sort_order: 4, banner_url: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80', impressions: 28400, clicks: 1980, ctr: 6.97, start_date: '2026-01-01', end_date: '2026-12-31' },
-        { id: 'ac_005', name: 'Bahan Bakar Shell V-Power Cash-Back ClubSmart', type: 'Sidebar Banner', partner_name: 'PT Shell Indonesia', budget: 26250000, status: 'ACTIVE', package_name: 'PLATINUM', sort_order: 5, banner_url: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80', impressions: 22100, clicks: 1750, ctr: 7.91, start_date: '2026-01-01', end_date: '2026-12-31' },
-        { id: 'ac_006', name: 'Castrol EDGE Fluid TITANIUM Protection', type: 'Sidebar Banner', partner_name: 'PT Castrol Indonesia', budget: 26250000, status: 'ACTIVE', package_name: 'PLATINUM', sort_order: 6, banner_url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', impressions: 19800, clicks: 1420, ctr: 7.17, start_date: '2026-01-01', end_date: '2026-12-31' },
-        { id: 'ac_007', name: 'TotalEnergies 7G-Tronic Transmission Oil', type: 'Feed Banner', partner_name: 'PT TotalEnergies Marketing Indonesia', budget: 26250000, status: 'ACTIVE', package_name: 'PLATINUM', sort_order: 7, banner_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1200&q=80', impressions: 16500, clicks: 1210, ctr: 7.33, start_date: '2026-01-01', end_date: '2026-12-31' },
-        { id: 'ac_008', name: 'Diskon Ban Michelin Pilot Sport MB INA', type: 'Header Rotator', partner_name: 'PT Michelin Indonesia', budget: 26250000, status: 'ACTIVE', package_name: 'GOLD', sort_order: 8, banner_url: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?auto=format&fit=crop&w=1200&q=80', impressions: 31200, clicks: 2450, ctr: 7.85, start_date: '2026-01-01', end_date: '2026-12-31' },
-        { id: 'ac_009', name: 'Astra Otoparts Sparepart OEM Mercedes-Benz', type: 'Feed Banner', partner_name: 'PT Astra Otoparts Tbk', budget: 26250000, status: 'ACTIVE', package_name: 'GOLD', sort_order: 9, banner_url: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=1200&q=80', impressions: 0, clicks: 0, ctr: 0, start_date: '2026-03-01', end_date: '2026-09-30' }
+        { id: 'ac_rotator_1', name: 'Banner Promo Ban Michelin Pilot Sport 5', type: 'Header Rotator', partner_name: 'Michelin Indonesia', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 1, banner_url: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', impressions: 18400, clicks: 1920, ctr: 10.43, start_date: '2026-08-01', end_date: '2027-08-01', cta_text: 'Beli Ban Michelin', link: 'https://www.michelin.co.id/mbina', description: 'Promo spesial ban high-performance Michelin Pilot Sport 5 diskon 15% khusus member MB INA' },
+        { id: 'ac_001', name: 'Banner Mandiri Q3 2026', type: 'Header Rotator', partner_name: 'Bank Mandiri', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 2, banner_url: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', impressions: 12450, clicks: 1234, ctr: 9.91, start_date: '2026-08-15', end_date: '2026-09-15', cta_text: 'Ajukan Kartu Sekarang', link: 'https://www.bankmandiri.co.id/mbina', description: 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge' },
+        { id: 'ac_rotator_2', name: 'Sponsored Post: Perawatan Transmisi 7G-Tronic', type: 'Sponsored Post', partner_name: 'ZF Aftermarket Indonesia', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 3, banner_url: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', impressions: 14200, clicks: 1510, ctr: 10.63, start_date: '2026-08-01', end_date: '2027-08-01', cta_text: 'Booking Servis', link: 'https://www.zf.com/indonesia/mbina', description: 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF' },
+        { id: 'ac_009', name: 'Event MB Jamnas 2026', type: 'Header Rotator', partner_name: 'BCA Prioritas', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 4, banner_url: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', impressions: 9800, clicks: 1020, ctr: 10.41, start_date: '2026-07-01', end_date: '2026-11-30', cta_text: 'Lihat Detail Event', link: 'https://www.bca.co.id/mbina', description: 'Dukungan Penuh BCA Prioritas untuk Gathering & Jamnas MB INA 2026' }
       ];
       this.savePersistentCampaigns();
     }
