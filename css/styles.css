@@ -1026,16 +1026,21 @@ body.light-mode {
   border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
-  padding: 10px 4px;
-  gap: 6px;
+  padding: 6px 4px;
+  gap: 3px;
   z-index: 990;
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(245, 158, 11, 0.3) transparent;
 }
 
 .yt-sidebar::-webkit-scrollbar {
-  display: none;
+  width: 4px;
+}
+.yt-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.3);
+  border-radius: 4px;
 }
 
 .yt-sidebar.expanded {
@@ -1047,8 +1052,8 @@ body.light-mode {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10px 4px;
-  border-radius: 12px;
+  padding: 6px 4px;
+  border-radius: 10px;
   color: var(--sidebar-icon-idle);
   text-decoration: none;
   cursor: pointer;
@@ -1060,8 +1065,8 @@ body.light-mode {
 .yt-sidebar.expanded .yt-nav-item {
   flex-direction: row;
   justify-content: flex-start;
-  padding: 10px 14px;
-  gap: 12px;
+  padding: 7px 12px;
+  gap: 10px;
 }
 
 .yt-nav-item:hover {

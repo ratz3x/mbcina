@@ -3725,6 +3725,8 @@ const AppEngine = {
         M9Engine.init();
         M9Engine.switchSubtab('9_1_dashboard');
       }
+    } else if (tab === 'm11_koperasi') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   },
 
