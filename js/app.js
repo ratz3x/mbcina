@@ -4049,48 +4049,21 @@ const AppEngine = {
     const total = items.length;
 
     container.innerHTML = `
-      <div class="glass-card" style="grid-column:1/-1; position:relative; width:100%; border-radius:20px; overflow:hidden; border:1.5px solid var(--accent-gold); background:linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.95) 100%); box-shadow:0 12px 35px rgba(0,0,0,0.6);" onmouseenter="AppEngine.stopSponsorCarouselTimer()" onmouseleave="AppEngine.startSponsorCarouselTimer()">
+      <div class="glass-card" style="grid-column:1/-1; position:relative; width:100%; border-radius:20px; overflow:hidden; border:1.5px solid var(--accent-gold); background:#000; box-shadow:0 12px 35px rgba(0,0,0,0.6);" onmouseenter="AppEngine.stopSponsorCarouselTimer()" onmouseleave="AppEngine.startSponsorCarouselTimer()">
         
-        <!-- MAIN SLIDE BANNER HERO STAGE -->
+        <!-- MAIN SLIDE BANNER HERO STAGE (FULL-BLEED CLICKABLE BANNER) -->
         <div style="position:relative; width:100%; height:340px; overflow:hidden; background:#000;">
-          <img src="${current.banner_url || current.logo}" alt="${current.name}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.78); transition:all 0.6s ease-in-out;">
-          <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(11,14,20,0.95) 0%, rgba(11,14,20,0.3) 50%, rgba(0,0,0,0.5) 100%);"></div>
-
-          <!-- TOP BADGES -->
-          <div style="position:absolute; top:16px; left:18px; right:18px; display:flex; justify-content:space-between; align-items:center; z-index:10;">
-            <span class="tier-badge" style="background:rgba(245,158,11,0.25); color:var(--accent-gold); border:1.5px solid var(--accent-gold); font-size:0.75rem; padding:4px 12px; font-weight:800; backdrop-filter:blur(8px); border-radius:8px;">
-              ${current.tier || '💎 PLATINUM SPONSOR'}
-            </span>
-            <span style="font-size:0.72rem; color:var(--accent-gold); font-weight:800; background:rgba(0,0,0,0.6); padding:3px 10px; border-radius:6px; border:1px solid rgba(245,158,11,0.3);">
-              #${this.sponsorCarouselIndex + 1} dari ${total}
-            </span>
-          </div>
-
-          <!-- OVERLAY TEXT & BRAND DETAILS -->
-          <div style="position:absolute; bottom:18px; left:20px; right:20px; z-index:10;">
-            <div style="font-size:0.82rem; color:var(--accent-gold); font-weight:900; letter-spacing:1px; margin-bottom:4px; text-transform:uppercase;">
-              🏷️ ${current.category || 'OFFICIAL STRATEGIC PARTNER'}
-            </div>
-            <h3 style="font-size:1.5rem; font-weight:900; color:#fff; margin:0 0 6px 0; text-shadow:0 2px 10px rgba(0,0,0,0.8);">
-              ${current.name}
-            </h3>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 14px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
-              ${current.desc || ''}
-            </p>
-            <div style="display:flex; align-items:center; justify-content:flex-start; flex-wrap:wrap; gap:10px;">
-              <a href="${current.link}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="font-size:0.82rem; padding:8px 18px; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                🌐 ${current.cta_text || ('Kunjungi Website ' + (current.partner_name || current.name) + ' ↗')}
-              </a>
-            </div>
-          </div>
+          <a href="${current.link || '#'}" target="_blank" rel="noopener noreferrer" style="display:block; width:100%; height:100%; text-decoration:none; cursor:pointer;" title="${current.name || 'Sponsor MB INA'}">
+            <img src="${current.banner_url || current.logo}" alt="${current.name}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:100%; height:100%; object-fit:cover; display:block; transition:all 0.5s ease-in-out;">
+          </a>
 
           <!-- CAROUSEL ARROW NAVIGATION BUTTONS -->
-          <button onclick="event.stopPropagation(); AppEngine.prevSponsorSlide();" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:20; backdrop-filter:blur(4px);">❮</button>
-          <button onclick="event.stopPropagation(); AppEngine.nextSponsorSlide();" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.3); color:#fff; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:20; backdrop-filter:blur(4px);">❯</button>
+          <button onclick="event.stopPropagation(); AppEngine.prevSponsorSlide();" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); width:40px; height:40px; border-radius:50%; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.4); color:#fff; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:20; backdrop-filter:blur(6px); transition:all 0.2s;" onmouseenter="this.style.background='var(--accent-gold)'; this.style.color='#000';" onmouseleave="this.style.background='rgba(0,0,0,0.65)'; this.style.color='#fff';">❮</button>
+          <button onclick="event.stopPropagation(); AppEngine.nextSponsorSlide();" style="position:absolute; right:14px; top:50%; transform:translateY(-50%); width:40px; height:40px; border-radius:50%; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.4); color:#fff; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:20; backdrop-filter:blur(6px); transition:all 0.2s;" onmouseenter="this.style.background='var(--accent-gold)'; this.style.color='#000';" onmouseleave="this.style.background='rgba(0,0,0,0.65)'; this.style.color='#fff';">❯</button>
         </div>
 
         <!-- BOTTOM DOTS INDICATOR BAR -->
-        <div style="display:flex; justify-content:center; align-items:center; gap:8px; padding:12px 18px; background:rgba(15,23,42,0.9); border-top:1px solid var(--chrome-border); overflow-x:auto;">
+        <div style="display:flex; justify-content:center; align-items:center; gap:8px; padding:12px 18px; background:rgba(15,23,42,0.95); border-top:1px solid var(--chrome-border); overflow-x:auto;">
           <div style="display:flex; align-items:center; gap:8px;">
             ${items.map((s, idx) => `
               <span onclick="AppEngine.goToSponsorSlide(${idx})" style="width:${idx === this.sponsorCarouselIndex ? '24px' : '8px'}; height:8px; border-radius:4px; background:${idx === this.sponsorCarouselIndex ? 'var(--accent-gold)' : 'rgba(255,255,255,0.25)'}; cursor:pointer; transition:all 0.3s ease;" title="${s.name}"></span>
