@@ -215,6 +215,8 @@ $moduleMap = [
     'save_landing_sponsor' => 'm_sponsor',
     'delete_landing_sponsor' => 'm_sponsor',
     'get_sponsor_dashboard_data' => 'm_sponsor',
+    'get_m11_data' => 'm11_koperasi',
+    'm11_koperasi' => 'm11_koperasi',
 ];
 
 $module = $moduleMap[$action] ?? null;
