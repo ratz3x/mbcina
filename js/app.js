@@ -4022,13 +4022,10 @@ const AppEngine = {
             <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 14px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">
               ${current.desc || ''}
             </p>
-            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; justify-content:flex-start; flex-wrap:wrap; gap:10px;">
               <a href="${current.link}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="font-size:0.82rem; padding:8px 18px; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
                 🌐 Kunjungi Website Resmi ${current.name} ↗
               </a>
-              <button class="btn-primary" style="font-size:0.78rem; padding:6px 14px; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border-radius:8px; cursor:pointer;" onclick="event.stopPropagation(); AppEngine.openManageSponsorModal();">
-                ⚙️ Admin: Atur Urutan & Edit Sponsor
-              </button>
             </div>
           </div>
 
