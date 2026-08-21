@@ -1,46 +1,45 @@
 {
   "version": 2,
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.7.1",
-      "maxDuration": 30
-    },
-    "api/ping.php": {
-      "runtime": "vercel-php@0.7.1",
-      "maxDuration": 10
-    },
-    "api.php": {
-      "runtime": "vercel-php@0.7.1",
-      "maxDuration": 30
-    }
-  },
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/ping",
-      "destination": "/api/ping.php"
+      "src": "api/index.php",
+      "use": "vercel-php@0.7.1",
+      "config": { "maxDuration": 30 }
     },
     {
-      "source": "/api.php",
-      "destination": "/api/index.php"
+      "src": "api/ping.php",
+      "use": "vercel-php@0.7.1",
+      "config": { "maxDuration": 10 }
     },
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.php"
+      "src": "api.php",
+      "use": "vercel-php@0.7.1",
+      "config": { "maxDuration": 30 }
     },
     {
-      "source": "/api",
-      "destination": "/api/index.php"
+      "src": "**",
+      "use": "@vercel/static"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
+      "src": "^/api/ping",
+      "dest": "/api/ping.php"
+    },
+    {
+      "src": "^/api\\.php",
+      "dest": "/api/index.php"
+    },
+    {
+      "src": "^/api/(.*)",
+      "dest": "/api/index.php"
+    },
+    {
+      "src": "^/api",
+      "dest": "/api/index.php"
+    },
+    {
+      "handle": "filesystem"
     }
   ]
 }
