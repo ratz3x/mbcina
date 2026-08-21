@@ -1,27 +1,6 @@
 <?php
-function logAudit($userId, $action, $module, $details) {
-    $sPdo = getSupabasePDO();
-    if ($sPdo) {
-        try {
-            $logId = 'log_' . uniqid();
-            $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
-            $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'Web Portal';
-            
-            $detailsJson = is_string($details) ? $details : json_encode($details);
-
-            $stmt = $sPdo->prepare("INSERT INTO audit_logs (id, user_id, action, module, details, ip_address, user_agent, timestamp) VALUES (:id, :user_id, :action::audit_action_enum, :module, :details, :ip, :ua, NOW())");
-            $stmt->execute([
-                ':id' => $logId,
-                ':user_id' => $userId ?: 'usr_superadmin',
-                ':action' => in_array($action, ['CREATE','UPDATE','DELETE','LOGIN','LOGOUT','SUSPEND','RESET_PASSWORD']) ? $action : 'UPDATE',
-                ':module' => $module,
-                ':details' => $detailsJson,
-                ':ip' => $ip,
-                ':ua' => $ua
-            ]);
-        } catch (Exception $e) {}
-    }
-}
+// ensure_tables.php - Semua fungsi ensureM*Tables()
+// Digunakan oleh api/index.php (router)
 
 function ensureM3Tables($sPdo) {
     if (!$sPdo) return;
@@ -736,3 +715,4 @@ function ensureM9Tables($pdo) {
         ");
     } catch (Throwable $e) {}
 }
+
