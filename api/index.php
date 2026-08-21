@@ -37,10 +37,6 @@ $supabasePass = getenv('SUPABASE_DB_PASSWORD') ?: 'ssPynlbKpyunChJ2';
 $dbLastError = '';
 function getSupabasePDO() {
     global $supabaseHost, $supabasePort, $supabaseDb, $supabaseUser, $supabasePass, $dbLastError;
-    static $cachedPdo = null;
-    if ($cachedPdo !== null) {
-        return $cachedPdo;
-    }
 
     if (!extension_loaded('pdo_pgsql')) {
         $dbLastError = 'PHP Extension pdo_pgsql is not loaded in serverless environment!';
@@ -49,20 +45,21 @@ function getSupabasePDO() {
 
     $connectionAttempts = [
         ['host' => $supabaseHost, 'port' => $supabasePort, 'user' => $supabaseUser],
-        ['host' => 'aws-0-ap-northeast-1.pooler.supabase.com', 'port' => '5432', 'user' => $supabaseUser]
+        ['host' => 'aws-0-ap-northeast-1.pooler.supabase.com', 'port' => '6543', 'user' => 'postgres.gpmpoobvfmwdnbzgofhk'],
+        ['host' => 'aws-0-ap-northeast-1.pooler.supabase.com', 'port' => '5432', 'user' => 'postgres.gpmpoobvfmwdnbzgofhk'],
+        ['host' => 'db.gpmpoobvfmwdnbzgofhk.supabase.co', 'port' => '5432', 'user' => 'postgres']
     ];
 
     $errors = [];
     foreach ($connectionAttempts as $attempt) {
         try {
-            $dsn = "pgsql:host={$attempt['host']};port={$attempt['port']};dbname=$supabaseDb;sslmode=require;connect_timeout=3";
+            $dsn = "pgsql:host={$attempt['host']};port={$attempt['port']};dbname=$supabaseDb;sslmode=require";
             $pdo = new PDO($dsn, $attempt['user'], $supabasePass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => true,
-                PDO::ATTR_TIMEOUT => 3
+                PDO::ATTR_TIMEOUT => 5
             ]);
-            $cachedPdo = $pdo;
             return $pdo;
         } catch (Throwable $e) {
             $errors[] = "[{$attempt['host']}:{$attempt['port']}] " . $e->getMessage();
