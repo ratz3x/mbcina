@@ -565,20 +565,17 @@ function ensureM8Tables($sPdo) {
             ALTER TABLE ad_campaigns ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 99;
         ");
 
-        // Ensure 4 Rotator Platinum Campaigns Always Exist
-        $sPdo->exec("
-            INSERT INTO ad_campaigns (id, name, type, partner_name, package_name, budget, spent, start_date, end_date, impressions_target, clicks_target, impressions_current, clicks_current, ctr, status, banner_url, image_url, description, cta_text, link, position, sort_order, created_by)
-            VALUES 
-            ('ac_rotator_1', 'Banner Promo Ban Michelin Pilot Sport 5', 'BANNER', 'Michelin Indonesia', 'Platinum', 10000000, 4500000, '2026-08-01', '2027-08-01', 50000, 5000, 18400, 1920, 10.43, 'ACTIVE', 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', 'Promo spesial ban high-performance Michelin Pilot Sport 5 diskon 15% khusus member MB INA', 'Beli Ban Michelin', 'https://www.michelin.co.id/mbina', 'HEADER', 1, 'usr_superadmin'),
-            ('ac_rotator_2', 'Sponsored Post: Perawatan Transmisi 7G-Tronic', 'SPONSORED', 'ZF Aftermarket Indonesia', 'Platinum', 10000000, 3800000, '2026-08-01', '2027-08-01', 50000, 5000, 14200, 1510, 10.63, 'ACTIVE', 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF', 'Booking Servis', 'https://www.zf.com/indonesia/mbina', 'HEADER', 2, 'usr_superadmin'),
-            ('ac_rotator_3', 'Banner Mandiri Q3 2026', 'BANNER', 'Bank Mandiri', 'Platinum', 10000000, 8200000, '2026-07-01', '2026-12-31', 50000, 5000, 12450, 1234, 9.91, 'ACTIVE', 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge', 'Ajukan Kartu Sekarang', 'https://www.bankmandiri.co.id/mbina', 'HEADER', 3, 'usr_superadmin'),
-            ('ac_rotator_4', 'Sponsored Event MB Jamnas 2026', 'BANNER', 'BCA Prioritas', 'Platinum', 10000000, 5000000, '2026-08-01', '2026-12-31', 50000, 5000, 9800, 1020, 10.41, 'ACTIVE', 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', 'Dukungan Penuh BCA Prioritas untuk Gathering & Jamnas MB INA 2026', 'Lihat Detail Event', 'https://www.bca.co.id/mbina', 'HEADER', 4, 'usr_superadmin')
-            ON CONFLICT (id) DO UPDATE SET
-                package_name = EXCLUDED.package_name,
-                position = EXCLUDED.position;
-
-            DELETE FROM ad_campaigns WHERE id IN ('ac_004', 'ac_005');
-        ");
+        $cntAds = (int)$sPdo->query("SELECT COUNT(*) FROM ad_campaigns")->fetchColumn();
+        if ($cntAds === 0) {
+            $sPdo->exec("
+                INSERT INTO ad_campaigns (id, name, type, partner_name, package_name, budget, spent, start_date, end_date, impressions_target, clicks_target, impressions_current, clicks_current, ctr, status, banner_url, image_url, description, cta_text, link, position, sort_order, created_by)
+                VALUES 
+                ('ac_rotator_1', 'Banner Promo Ban Michelin Pilot Sport 5', 'BANNER', 'Michelin Indonesia', 'Platinum', 10000000, 4500000, '2026-08-01', '2027-08-01', 50000, 5000, 18400, 1920, 10.43, 'ACTIVE', 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', 'Promo spesial ban high-performance Michelin Pilot Sport 5 diskon 15% khusus member MB INA', 'Beli Ban Michelin', 'https://www.michelin.co.id/mbina', 'HEADER', 1, 'usr_superadmin'),
+                ('ac_rotator_2', 'Sponsored Post: Perawatan Transmisi 7G-Tronic', 'SPONSORED', 'ZF Aftermarket Indonesia', 'Platinum', 10000000, 3800000, '2026-08-01', '2027-08-01', 50000, 5000, 14200, 1510, 10.63, 'ACTIVE', 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF', 'Booking Servis', 'https://www.zf.com/indonesia/mbina', 'HEADER', 2, 'usr_superadmin'),
+                ('ac_rotator_3', 'Banner Mandiri Q3 2026', 'BANNER', 'Bank Mandiri', 'Platinum', 10000000, 8200000, '2026-07-01', '2026-12-31', 50000, 5000, 12450, 1234, 9.91, 'ACTIVE', 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge', 'Ajukan Kartu Sekarang', 'https://www.bankmandiri.co.id/mbina', 'HEADER', 3, 'usr_superadmin'),
+                ('ac_rotator_4', 'Sponsored Event MB Jamnas 2026', 'BANNER', 'BCA Prioritas', 'Platinum', 10000000, 5000000, '2026-08-01', '2026-12-31', 50000, 5000, 9800, 1020, 10.41, 'ACTIVE', 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', 'Dukungan Penuh BCA Prioritas untuk Gathering & Jamnas MB INA 2026', 'Lihat Detail Event', 'https://www.bca.co.id/mbina', 'HEADER', 4, 'usr_superadmin');
+            ");
+        }
 
         $sPdo->exec("
 

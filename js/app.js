@@ -19152,6 +19152,7 @@ const M8Engine = {
     try { if (typeof this.renderTaxPeriod === 'function') this.renderTaxPeriod(); } catch(e) { console.warn('M8 renderTaxPeriod error:', e); }
     try { if (typeof this.renderCompliance === 'function') this.renderCompliance(); } catch(e) { console.warn('M8 renderCompliance error:', e); }
     try { if (typeof this.renderDynamicAds === 'function') this.renderDynamicAds(); } catch(e) { console.warn('M8 renderDynamicAds error:', e); }
+    try { if (typeof this.renderRotatorOrderTable === 'function') this.renderRotatorOrderTable(); } catch(e) { console.warn('M8 renderRotatorOrderTable error:', e); }
   },
 
   // ─── NAVIGATION ──────────────────────────────────────────────────
@@ -20859,19 +20860,30 @@ const M8Engine = {
     const editIdEl = document.getElementById('ac-form-edit-id');
 
     if (acId) {
-      const ac = this.data.campaigns.find(c => c.id === acId);
+      const ac = (this.data.campaigns || []).find(c => String(c.id).trim() === String(acId).trim());
       if (ac) {
         if (titleEl) titleEl.innerHTML = `✏️ EDIT KAMPANYE IKLAN`;
         if (editIdEl) editIdEl.value = ac.id;
 
-        document.getElementById('ac-form-name').value    = ac.name || '';
+        const nameEl = document.getElementById('ac-form-name');
+        if (nameEl) nameEl.value = ac.name || '';
+        
         const typeVal = ac.type || 'BANNER';
-        document.getElementById('ac-form-type').value    = typeVal;
+        const typeEl = document.getElementById('ac-form-type');
+        if (typeEl) typeEl.value = typeVal;
         this.updateAdTypeHelpText(typeVal);
-        document.getElementById('ac-form-partner').value = ac.partner_name || '';
-        document.getElementById('ac-form-status').value  = ac.status || 'DRAFT';
-        document.getElementById('ac-form-start').value   = ac.start_date || '2026-08-15';
-        document.getElementById('ac-form-end').value     = ac.end_date || '2026-09-15';
+
+        const partnerEl = document.getElementById('ac-form-partner');
+        if (partnerEl) partnerEl.value = ac.partner_name || '';
+
+        const statusEl = document.getElementById('ac-form-status');
+        if (statusEl) statusEl.value = ac.status || 'ACTIVE';
+
+        const startEl = document.getElementById('ac-form-start');
+        if (startEl) startEl.value = ac.start_date || '2026-08-15';
+
+        const endEl = document.getElementById('ac-form-end');
+        if (endEl) endEl.value = ac.end_date || '2027-08-15';
 
         const descEl = document.getElementById('ac-form-desc');
         if (descEl) descEl.value = ac.description || 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge';
@@ -20887,17 +20899,12 @@ const M8Engine = {
 
         const pkgSelect = document.getElementById('ac-form-package');
         if (pkgSelect) {
-          if (ac.package_name) {
-            pkgSelect.value = ac.package_name.charAt(0).toUpperCase() + ac.package_name.slice(1).toLowerCase();
-          } else if (ac.budget >= 10000000) {
-            pkgSelect.value = 'Platinum';
-          } else if (ac.budget >= 7500000) {
-            pkgSelect.value = 'Gold';
-          } else if (ac.budget >= 5000000) {
-            pkgSelect.value = 'Silver';
-          } else {
-            pkgSelect.value = 'Bronze';
-          }
+          const pkgStr = String(ac.package_name || ac.tier || 'Platinum').toLowerCase();
+          if (pkgStr.includes('platinum')) pkgSelect.value = 'Platinum';
+          else if (pkgStr.includes('gold')) pkgSelect.value = 'Gold';
+          else if (pkgStr.includes('silver')) pkgSelect.value = 'Silver';
+          else if (pkgStr.includes('bronze')) pkgSelect.value = 'Bronze';
+          else pkgSelect.value = 'Platinum';
         }
 
         const bannerUrl = ac.banner_url || ac.image_url || '';
@@ -20910,23 +20917,36 @@ const M8Engine = {
       if (editIdEl) editIdEl.value = '';
 
       document.getElementById('form-ad-campaign')?.reset();
-      document.getElementById('ac-form-name').value    = 'Banner Mandiri Q3 2026';
-      document.getElementById('ac-form-type').value    = 'BANNER';
+      const nameEl = document.getElementById('ac-form-name');
+      if (nameEl) nameEl.value = 'Banner Promo Baru 2026';
+      
+      const typeEl = document.getElementById('ac-form-type');
+      if (typeEl) typeEl.value = 'BANNER';
       this.updateAdTypeHelpText('BANNER');
-      document.getElementById('ac-form-partner').value = 'Bank Mandiri';
-      document.getElementById('ac-form-package').value = 'Platinum';
-      document.getElementById('ac-form-start').value   = '2026-08-15';
-      document.getElementById('ac-form-end').value     = '2026-09-15';
-      document.getElementById('ac-form-status').value  = 'DRAFT';
+
+      const partnerEl = document.getElementById('ac-form-partner');
+      if (partnerEl) partnerEl.value = 'Mitra Sponsor';
+
+      const pkgSelect = document.getElementById('ac-form-package');
+      if (pkgSelect) pkgSelect.value = 'Platinum';
+
+      const startEl = document.getElementById('ac-form-start');
+      if (startEl) startEl.value = '2026-08-01';
+
+      const endEl = document.getElementById('ac-form-end');
+      if (endEl) endEl.value = '2027-08-01';
+
+      const statusEl = document.getElementById('ac-form-status');
+      if (statusEl) statusEl.value = 'ACTIVE';
 
       const descEl = document.getElementById('ac-form-desc');
-      if (descEl) descEl.value = 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge';
+      if (descEl) descEl.value = 'Deskripsi promo & penawaran eksklusif khusus member MB INA';
 
       const ctaEl = document.getElementById('ac-form-cta');
-      if (ctaEl) ctaEl.value = 'Ajukan Kartu Sekarang';
+      if (ctaEl) ctaEl.value = 'Kunjungi Website';
 
       const linkEl = document.getElementById('ac-form-link');
-      if (linkEl) linkEl.value = 'https://www.bankmandiri.co.id/mbina';
+      if (linkEl) linkEl.value = 'https://www.mercedes-benz.co.id';
 
       const posEl = document.getElementById('ac-form-pos');
       if (posEl) posEl.value = 'HEADER';
@@ -20938,12 +20958,16 @@ const M8Engine = {
     }
 
     modal.style.display = 'flex';
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
   },
 
   closeCampaignModal: function() {
     const modal = document.getElementById('modal-ad-campaign');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
     document.body.style.overflow = '';
   },
 
@@ -20972,11 +20996,16 @@ const M8Engine = {
   },
 
   deleteCampaign: async function(acId) {
-    const ac = this.data.campaigns.find(c => c.id === acId);
+    const ac = (this.data.campaigns || []).find(c => String(c.id).trim() === String(acId).trim());
     const name = ac ? ac.name : 'kampanye ini';
-    if (!confirm(`Apakah Anda yakin ingin menghapus iklan "${name}"?`)) return;
+    if (!confirm(`🗑️ Apakah Anda yakin ingin menghapus iklan "${name}"?`)) return;
 
-    this.data.campaigns = this.data.campaigns.filter(c => c.id !== acId);
+    this.data.campaigns = (this.data.campaigns || []).filter(c => String(c.id).trim() !== String(acId).trim());
+    this.savePersistentCampaigns();
+    this.renderAll();
+    this.renderRotatorOrderTable();
+    if (window.AppEngine && window.AppEngine.renderLandingSponsors) window.AppEngine.renderLandingSponsors();
+
     try {
       await fetch('api.php?action=delete_ad_campaign', {
         method: 'POST',
@@ -20985,8 +21014,6 @@ const M8Engine = {
       });
     } catch(e) {}
 
-    this.renderAll();
-    if (window.AppEngine && window.AppEngine.renderLandingSponsors) window.AppEngine.renderLandingSponsors();
     window.showToast(`🗑️ Iklan "${name}" berhasil dihapus.`, 'success');
   },
 
@@ -21013,13 +21040,11 @@ const M8Engine = {
     else if (pkgName === 'Silver') budget = 5000000;
     else if (pkgName === 'Bronze') budget = 3000000;
 
-    // Automatic Status Check (Expired if end date past today)
     const todayStr = new Date().toISOString().split('T')[0];
     if (status === 'ACTIVE' && endDate < todayStr) {
       status = 'EXPIRED';
     }
 
-    // Format dates DD/MM/YYYY
     const sParts = startDate.split('-');
     const eParts = endDate.split('-');
     const startFmt = sParts.length === 3 ? `${sParts[2]}/${sParts[1]}/${sParts[0]}` : startDate;
@@ -21141,107 +21166,6 @@ const M8Engine = {
     }, ms);
   },
 
-  toggleRotatorAdStatus: async function(acId) {
-    const ad = (this.data.campaigns || []).find(c => c.id === acId);
-    if (!ad) return;
-    const newStatus = (ad.status === 'ACTIVE') ? 'PAUSED' : 'ACTIVE';
-    ad.status = newStatus;
-
-    // Send status update to DB targeting unique ID
-    try {
-      await fetch('api.php?action=update_ad_campaign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: ad.id, status: newStatus })
-      });
-    } catch(e) {}
-
-    // Target ONLY the exact campaign by unique ID (do not touch other campaigns sharing the same name)
-    (this.data.campaigns || []).forEach(c => {
-      if (c.id === ad.id) {
-        c.status = newStatus;
-      }
-    });
-
-    if (newStatus === 'PAUSED') {
-      if (window.showToast) window.showToast(`⏸️ Banner #${acId.slice(-4)} "${ad.name}" di-stop / diskip dari rotator!`, 'info');
-    } else {
-      if (window.showToast) window.showToast(`▶️ Banner #${acId.slice(-4)} "${ad.name}" diaktifkan kembali!`, 'success');
-    }
-    this.renderDynamicAds();
-    this.renderRotatorOrderTable();
-  },
-
-  moveRotatorOrderUp: async function(idx) {
-    const today = new Date().toISOString().split('T')[0];
-    const headerAds = (this.data.campaigns || [])
-      .filter(c => (c.status === 'ACTIVE' || c.status === 'PAUSED') && (!c.end_date || c.end_date >= today) && ((c.package_name || '').toUpperCase() === 'PLATINUM' || (c.notes || '').toUpperCase().includes('PLATINUM') || (c.budget && c.budget >= 10000000)))
-      .sort((a, b) => (a.sort_order || 99) - (b.sort_order || 99));
-
-    if (idx > 0 && idx < headerAds.length) {
-      const currentOrder = headerAds[idx].sort_order || (idx + 1);
-      const prevOrder = headerAds[idx - 1].sort_order || idx;
-      
-      headerAds[idx].sort_order = prevOrder;
-      headerAds[idx - 1].sort_order = currentOrder;
-
-      try {
-        await Promise.all([
-          fetch('api.php?action=update_ad_campaign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: headerAds[idx].id, sort_order: prevOrder }) }),
-          fetch('api.php?action=update_ad_campaign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: headerAds[idx - 1].id, sort_order: currentOrder }) })
-        ]);
-      } catch(e) {}
-
-      this.renderDynamicAds();
-      this.renderRotatorOrderTable();
-      if (window.showToast) window.showToast('✅ Urutan rotator banner berhasil dinaikkan!', 'success');
-    }
-  },
-
-  moveRotatorOrderDown: async function(idx) {
-    const today = new Date().toISOString().split('T')[0];
-    const headerAds = (this.data.campaigns || [])
-      .filter(c => (c.status === 'ACTIVE' || c.status === 'PAUSED') && (!c.end_date || c.end_date >= today) && ((c.package_name || '').toUpperCase() === 'PLATINUM' || (c.notes || '').toUpperCase().includes('PLATINUM') || (c.budget && c.budget >= 10000000)))
-      .sort((a, b) => (a.sort_order || 99) - (b.sort_order || 99));
-
-    if (idx >= 0 && idx < headerAds.length - 1) {
-      const currentOrder = headerAds[idx].sort_order || (idx + 1);
-      const nextOrder = headerAds[idx + 1].sort_order || (idx + 2);
-
-      headerAds[idx].sort_order = nextOrder;
-      headerAds[idx + 1].sort_order = currentOrder;
-
-      try {
-        await Promise.all([
-          fetch('api.php?action=update_ad_campaign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: headerAds[idx].id, sort_order: nextOrder }) }),
-          fetch('api.php?action=update_ad_campaign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: headerAds[idx + 1].id, sort_order: currentOrder }) })
-        ]);
-      } catch(e) {}
-
-      this.renderDynamicAds();
-      this.renderRotatorOrderTable();
-      if (window.showToast) window.showToast('✅ Urutan rotator banner berhasil diturunkan!', 'success');
-    }
-  },
-
-  deleteRotatorAd: function(adId) {
-    if (!confirm('Apakah Anda yakin ingin menghapus banner rotator ini secara permanen?')) return;
-
-    if (this.data && Array.isArray(this.data.campaigns)) {
-      this.data.campaigns = this.data.campaigns.filter(c => c.id !== adId);
-    }
-
-    fetch('api.php?action=delete_landing_sponsor', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: adId })
-    }).catch(e => {});
-
-    if (window.showToast) window.showToast('✓ Banner rotator berhasil dihapus dari database.', 'success');
-    this.renderDynamicAds();
-    this.renderRotatorOrderTable();
-  },
-
   savePersistentCampaigns: function() {
     try {
       localStorage.setItem('mbcina_rotator_campaigns_v4', JSON.stringify(this.data.campaigns));
@@ -21262,49 +21186,129 @@ const M8Engine = {
     return false;
   },
 
-  deleteRotatorAd: function(id) {
-    if (!confirm('🗑️ Apakah Anda yakin ingin menghapus banner rotator ini dari daftar secara permanen?')) return;
-    this.data.campaigns = (this.data.campaigns || []).filter(c => c.id !== id);
+  toggleRotatorAdStatus: async function(acId) {
+    const ad = (this.data.campaigns || []).find(c => String(c.id).trim() === String(acId).trim());
+    if (!ad) return;
+    const newStatus = (ad.status === 'ACTIVE') ? 'PAUSED' : 'ACTIVE';
+    ad.status = newStatus;
+
     this.savePersistentCampaigns();
-    this.renderRotatorOrderTable();
     this.renderDynamicAds();
-    if (window.showToast) window.showToast('🗑️ Banner rotator berhasil dihapus!');
-  },
+    this.renderRotatorOrderTable();
+    if (typeof this.renderCampaignList === 'function') this.renderCampaignList();
 
-  moveRotatorOrderUp: function(i) {
-    const campaigns = (this.data.campaigns || []).filter(c => c.status === 'ACTIVE' || c.status === 'PAUSED' || c.status === 'DRAFT' || c.status === 'STOPPED');
-    if (i > 0 && i < campaigns.length) {
-      const tempSeq = campaigns[i].sort_order || (i + 1);
-      campaigns[i].sort_order = campaigns[i - 1].sort_order || i;
-      campaigns[i - 1].sort_order = tempSeq;
-      this.data.campaigns.sort((a, b) => (a.sort_order || 99) - (b.sort_order || 99));
-      this.savePersistentCampaigns();
-      this.renderRotatorOrderTable();
-      this.renderDynamicAds();
+    try {
+      await fetch('api.php?action=update_ad_campaign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: ad.id, status: newStatus })
+      });
+    } catch(e) {}
+
+    if (newStatus === 'PAUSED') {
+      if (window.showToast) window.showToast(`⏸️ Banner "${ad.name}" di-stop / diskip dari rotator!`, 'info');
+    } else {
+      if (window.showToast) window.showToast(`▶️ Banner "${ad.name}" diaktifkan kembali!`, 'success');
     }
   },
 
-  moveRotatorOrderDown: function(i) {
-    const campaigns = (this.data.campaigns || []).filter(c => c.status === 'ACTIVE' || c.status === 'PAUSED' || c.status === 'DRAFT' || c.status === 'STOPPED');
-    if (i >= 0 && i < campaigns.length - 1) {
-      const tempSeq = campaigns[i].sort_order || (i + 1);
-      campaigns[i].sort_order = campaigns[i + 1].sort_order || (i + 2);
-      campaigns[i + 1].sort_order = tempSeq;
-      this.data.campaigns.sort((a, b) => (a.sort_order || 99) - (b.sort_order || 99));
+  moveRotatorOrderUp: async function(idx) {
+    let headerAds = (this.data.campaigns || [])
+      .filter(c => c.status === 'ACTIVE' || c.status === 'PAUSED' || c.status === 'DRAFT' || c.status === 'STOPPED')
+      .sort((a, b) => (parseInt(a.sort_order) || 99) - (parseInt(b.sort_order) || 99));
+
+    if (idx > 0 && idx < headerAds.length) {
+      const currentAd = headerAds[idx];
+      const prevAd = headerAds[idx - 1];
+
+      const currentOrder = currentAd.sort_order || (idx + 1);
+      const prevOrder = prevAd.sort_order || idx;
+
+      currentAd.sort_order = prevOrder;
+      prevAd.sort_order = currentOrder;
+
+      headerAds[idx] = prevAd;
+      headerAds[idx - 1] = currentAd;
+      headerAds.forEach((ad, i) => {
+        ad.sort_order = i + 1;
+      });
+
+      this.data.campaigns.sort((a, b) => (parseInt(a.sort_order) || 99) - (parseInt(b.sort_order) || 99));
       this.savePersistentCampaigns();
-      this.renderRotatorOrderTable();
       this.renderDynamicAds();
+      this.renderRotatorOrderTable();
+
+      try {
+        await Promise.all([
+          fetch('api.php?action=update_ad_campaign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: currentAd.id, sort_order: currentAd.sort_order }) }),
+          fetch('api.php?action=update_ad_campaign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: prevAd.id, sort_order: prevAd.sort_order }) })
+        ]);
+      } catch(e) {}
+
+      if (window.showToast) window.showToast('✅ Urutan rotator banner berhasil dinaikkan!', 'success');
     }
   },
 
-  toggleRotatorAdStatus: function(id) {
-    const ad = (this.data.campaigns || []).find(c => c.id === id);
-    if (ad) {
-      ad.status = ad.status === 'ACTIVE' ? 'STOPPED' : 'ACTIVE';
+  moveRotatorOrderDown: async function(idx) {
+    let headerAds = (this.data.campaigns || [])
+      .filter(c => c.status === 'ACTIVE' || c.status === 'PAUSED' || c.status === 'DRAFT' || c.status === 'STOPPED')
+      .sort((a, b) => (parseInt(a.sort_order) || 99) - (parseInt(b.sort_order) || 99));
+
+    if (idx >= 0 && idx < headerAds.length - 1) {
+      const currentAd = headerAds[idx];
+      const nextAd = headerAds[idx + 1];
+
+      const currentOrder = currentAd.sort_order || (idx + 1);
+      const nextOrder = nextAd.sort_order || (idx + 2);
+
+      currentAd.sort_order = nextOrder;
+      nextAd.sort_order = currentOrder;
+
+      headerAds[idx] = nextAd;
+      headerAds[idx + 1] = currentAd;
+      headerAds.forEach((ad, i) => {
+        ad.sort_order = i + 1;
+      });
+
+      this.data.campaigns.sort((a, b) => (parseInt(a.sort_order) || 99) - (parseInt(b.sort_order) || 99));
       this.savePersistentCampaigns();
-      this.renderRotatorOrderTable();
       this.renderDynamicAds();
+      this.renderRotatorOrderTable();
+
+      try {
+        await Promise.all([
+          fetch('api.php?action=update_ad_campaign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: currentAd.id, sort_order: currentAd.sort_order }) }),
+          fetch('api.php?action=update_ad_campaign', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: nextAd.id, sort_order: nextAd.sort_order }) })
+        ]);
+      } catch(e) {}
+
+      if (window.showToast) window.showToast('✅ Urutan rotator banner berhasil diturunkan!', 'success');
     }
+  },
+
+  deleteRotatorAd: async function(adId) {
+    const ad = (this.data.campaigns || []).find(c => String(c.id).trim() === String(adId).trim());
+    const name = ad ? ad.name : 'banner ini';
+    if (!confirm(`🗑️ Apakah Anda yakin ingin menghapus banner "${name}" secara permanen?`)) return;
+
+    if (this.data && Array.isArray(this.data.campaigns)) {
+      this.data.campaigns = this.data.campaigns.filter(c => String(c.id).trim() !== String(adId).trim());
+    }
+
+    this.savePersistentCampaigns();
+    this.renderDynamicAds();
+    this.renderRotatorOrderTable();
+    if (typeof this.renderCampaignList === 'function') this.renderCampaignList();
+
+    try {
+      await fetch('api.php?action=delete_ad_campaign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: adId })
+      });
+    } catch(e) {}
+
+    if (window.showToast) window.showToast(`🗑️ Banner "${name}" berhasil dihapus!`, 'success');
   },
 
   renderRotatorOrderTable: function() {
