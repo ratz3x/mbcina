@@ -2,6 +2,18 @@
 error_reporting(0);
 ini_set('display_errors', '0');
 
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR])) {
+        if (!headers_sent()) {
+            http_response_code(200);
+            header('Content-Type: application/json');
+            header('Access-Control-Allow-Origin: *');
+        }
+        echo json_encode(['success' => false, 'fatal_error' => $error['message'], 'file' => $error['file'], 'line' => $error['line']]);
+    }
+});
+
 // Polyfills for PHP 7.4 compatibility on Vercel
 if (!function_exists('str_starts_with')) {
     function str_starts_with(string $haystack, string $needle): bool {
