@@ -14,25 +14,22 @@
       "maxDuration": 30
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "^/api/ping",
-      "dest": "/api/ping.php"
+      "source": "/api/ping",
+      "destination": "/api/ping.php"
     },
     {
-      "src": "^/api\\.php",
-      "dest": "/api/index.php"
+      "source": "/api.php",
+      "destination": "/api/index.php"
     },
     {
-      "src": "^/api/(.*)",
-      "dest": "/api/index.php"
+      "source": "/api/(.*)",
+      "destination": "/api/index.php"
     },
     {
-      "src": "^/api",
-      "dest": "/api/index.php"
-    },
-    {
-      "handle": "filesystem"
+      "source": "/api",
+      "destination": "/api/index.php"
     }
   ],
   "headers": [
