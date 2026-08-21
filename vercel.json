@@ -8,6 +8,10 @@
     "api/ping.php": {
       "runtime": "vercel-php@0.7.1",
       "maxDuration": 10
+    },
+    "api.php": {
+      "runtime": "vercel-php@0.7.1",
+      "maxDuration": 30
     }
   },
   "routes": [
