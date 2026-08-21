@@ -4480,42 +4480,15 @@ const AppEngine = {
     const list = (this.events && this.events.length >= 3) ? this.events : defaultEvents;
 
     container.innerHTML = list.map(e => {
-      const campId = e.campaign_id || 'camp_yogya_2026';
-      const target = e.target_amount || (e.goal_amount || 50000000);
-      const collected = e.collected_amount || 32450000;
-      const percent = Math.min(100, Math.round((collected / target) * 100));
-      const donors = e.donors_count || 23;
-
       return `
-        <div class="glass-card" style="padding:22px; display:flex; flex-direction:column; justify-content:space-between; border-radius:18px;">
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; font-size:0.72rem; padding:3px 10px; border-radius:12px;">${e.category || 'UPCOMING'}</span>
-              <span style="font-size:0.78rem; color:var(--accent-gold); font-weight:700;">🗓️ ${e.date || e.start_date || '2026'}</span>
-            </div>
-            <h4 style="font-size:1.15rem; font-weight:800; color:var(--text-main); margin-bottom:8px; line-height:1.3;">${e.title}</h4>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">📍 ${e.location}</p>
-            <p style="font-size:0.85rem; color:var(--text-main); line-height:1.4; margin-bottom:16px;">${e.description}</p>
-            
-            <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:14px; margin-bottom:16px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <span style="font-size:0.78rem; font-weight:800; color:var(--accent-gold);">💰 ${e.campaign_title || 'Kampanye Donasi Terkait'}</span>
-                <span style="font-size:0.75rem; color:var(--accent-emerald); font-weight:800;">${percent}% Terkumpul</span>
-              </div>
-              <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; margin-bottom:8px;">
-                <div style="width:${percent}%; height:100%; background:linear-gradient(90deg, #f59e0b, #10b981); border-radius:4px;"></div>
-              </div>
-              <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-muted);">
-                <span>Terkumpul: <strong style="color:#fff;">Rp ${collected.toLocaleString('id-ID')}</strong></span>
-                <span>Target: Rp ${target.toLocaleString('id-ID')} (${donors} Donatur)</span>
-              </div>
-            </div>
+        <div class="glass-card" style="padding:22px; display:flex; flex-direction:column; justify-content:flex-start; border-radius:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; font-size:0.72rem; padding:3px 10px; border-radius:12px;">${e.category || 'UPCOMING'}</span>
+            <span style="font-size:0.78rem; color:var(--accent-gold); font-weight:700;">🗓️ ${e.date || e.start_date || '2026'}</span>
           </div>
-
-          <div style="display:flex; gap:10px; align-items:center; border-top:1px solid var(--chrome-border); padding-top:14px;">
-            <button class="btn-outline" style="flex:1; padding:8px 12px; font-size:0.78rem; font-weight:800;" onclick="AppEngine.handleRSVP('${e.id}')">🎫 RSVP Event</button>
-            <button class="btn-primary" style="flex:1.2; padding:8px 12px; font-size:0.78rem; font-weight:800; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none;" onclick="AppEngine.openMemberDonationModal('${campId}')">💰 Salurkan Donasi</button>
-          </div>
+          <h4 style="font-size:1.15rem; font-weight:800; color:var(--text-main); margin-bottom:8px; line-height:1.3;">${e.title}</h4>
+          <p style="font-size:0.85rem; color:var(--accent-silver); margin-bottom:12px;">📍 ${e.location}</p>
+          <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5; margin:0;">${e.description}</p>
         </div>
       `;
     }).join('');
