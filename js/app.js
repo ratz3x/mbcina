@@ -3431,9 +3431,9 @@ const AppEngine = {
   ensureDataPopulated() {
     if (!this.m2Data.clubs || this.m2Data.clubs.length === 0) {
       this.m2Data.clubs = [
-        { id: 'clb_001', code: 'W124-JKT', name: 'Mercedes-Benz W124 Club Indonesia Chapter Jakarta', region: 'Regional Metro DKI Jakarta', city: 'Jakarta Selatan', member_count: 320, leader: 'H. Bambang Soesatyo' },
-        { id: 'clb_002', code: 'MBW202-BDG', name: 'MB W202 Club Indonesia Chapter Bandung', region: 'Regional Jawa Barat', city: 'Bandung', member_count: 215, leader: 'Dr. Rochady Hendra' },
-        { id: 'clb_003', code: 'MBC-SBY', name: 'Mercedes-Benz Club Surabaya', region: 'Regional Jawa Timur & Bali', city: 'Surabaya', member_count: 180, leader: 'Ir. Raymond Sanjaya' }
+        { id: 'clb_001', code: 'W124-JKT', name: 'Mercedes-Benz W124 Club Indonesia Chapter Jakarta', region: 'Regional Metro DKI Jakarta', city: 'Jakarta Selatan', type: 'CHAPTER', member_count: 320, leader: 'H. Bambang Soesatyo' },
+        { id: 'clb_002', code: 'MBW202-BDG', name: 'MB W202 Club Indonesia Chapter Bandung', region: 'Regional Jawa Barat', city: 'Bandung', type: 'CHAPTER', member_count: 215, leader: 'Dr. Rochady Hendra' },
+        { id: 'clb_003', code: 'MBC-SBY', name: 'Mercedes-Benz Club Surabaya', region: 'Regional Jawa Timur & Bali', city: 'Surabaya', type: 'CLUB', member_count: 180, leader: 'Ir. Raymond Sanjaya' }
       ];
       this.clubs = this.m2Data.clubs;
     }
@@ -3549,11 +3549,11 @@ const AppEngine = {
   ensureDataPopulated() {
     if (!this.m2Data.clubs || this.m2Data.clubs.length === 0) {
       this.m2Data.clubs = [
-        { id: 'clb_001', code: 'W124-JKT', name: 'Mercedes-Benz W124 Club Indonesia Chapter Jakarta', region: 'Regional Metro DKI Jakarta', city: 'Jakarta Selatan', member_count: 320, leader: 'H. Bambang Soesatyo' },
-        { id: 'clb_002', code: 'MBW202-BDG', name: 'MB W202 Club Indonesia Chapter Bandung', region: 'Regional Jawa Barat', city: 'Bandung', member_count: 215, leader: 'Dr. Rochady Hendra' },
-        { id: 'clb_003', code: 'MBC-SBY', name: 'Mercedes-Benz Club Surabaya', region: 'Regional Jawa Timur & Bali', city: 'Surabaya', member_count: 180, leader: 'Ir. Raymond Sanjaya' },
-        { id: 'clb_004', code: 'MBC-MED', name: 'Mercedes-Benz Club Medan Chapter', region: 'Regional Sumatra', city: 'Medan', member_count: 145, leader: 'Andi Wijaya' },
-        { id: 'clb_005', code: 'W210-SMG', name: 'W210 Club Indonesia Semarang', region: 'Regional Jawa Tengah', city: 'Semarang', member_count: 110, leader: 'Budi Santoso' }
+        { id: 'clb_001', code: 'W124-JKT', name: 'Mercedes-Benz W124 Club Indonesia Chapter Jakarta', region: 'Regional Metro DKI Jakarta', city: 'Jakarta Selatan', type: 'CHAPTER', member_count: 320, leader: 'H. Bambang Soesatyo' },
+        { id: 'clb_002', code: 'MBW202-BDG', name: 'MB W202 Club Indonesia Chapter Bandung', region: 'Regional Jawa Barat', city: 'Bandung', type: 'CHAPTER', member_count: 215, leader: 'Dr. Rochady Hendra' },
+        { id: 'clb_003', code: 'MBC-SBY', name: 'Mercedes-Benz Club Surabaya', region: 'Regional Jawa Timur & Bali', city: 'Surabaya', type: 'CLUB', member_count: 180, leader: 'Ir. Raymond Sanjaya' },
+        { id: 'clb_004', code: 'MBC-MED', name: 'Mercedes-Benz Club Medan Chapter', region: 'Regional Sumatra', city: 'Medan', type: 'CHAPTER', member_count: 145, leader: 'Andi Wijaya' },
+        { id: 'clb_005', code: 'W210-SMG', name: 'W210 Club Indonesia Semarang', region: 'Regional Jawa Tengah', city: 'Semarang', type: 'CLUB', member_count: 110, leader: 'Budi Santoso' }
       ];
       this.clubs = this.m2Data.clubs;
     }
@@ -5725,7 +5725,18 @@ const AppEngine = {
     const container = document.getElementById('m2-clubs-container');
     if (!container) return;
 
-    const clubs = this.m2Data.clubs;
+    // Pastikan data 111 klub terambil live dari database Supabase Cloud jika belum lengkap
+    if (!this.m2Data.clubs || this.m2Data.clubs.length <= 5) {
+      if (!this._fetchingM2Clubs) {
+        this._fetchingM2Clubs = true;
+        this.fetchM2Data().then(() => {
+          this._fetchingM2Clubs = false;
+          this.renderM2Clubs();
+        });
+      }
+    }
+
+    const clubs = this.m2Data.clubs || [];
 
     // Regions list with exact DB value mapping
     const regions = [
@@ -5845,9 +5856,12 @@ const AppEngine = {
       `;
     }
 
-    return clubsList.map(c => `
+    return clubsList.map(c => {
+      const clubType = (c.type || c.club_type || 'CLUB').toUpperCase();
+      const isChapter = clubType.includes('CHAPTER');
+      return `
       <tr style="border-bottom:1px solid var(--chrome-border);">
-        <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${c.code}</td>
+        <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${c.code || '-'}</td>
         <td style="padding:12px; font-weight:700; color:var(--text-main); cursor:pointer;" 
             onclick="AppEngine.showClubHoverModal('${c.id}')"
             title="Klik untuk melihat Sejarah Ringkas, Ketua Umum, & Contact Person">
@@ -5855,14 +5869,14 @@ const AppEngine = {
             ${c.name} ℹ️
           </span>
         </td>
-        <td style="padding:12px; color:var(--text-muted); font-size:0.8rem;">${c.region}</td>
-        <td style="padding:12px;">${c.city}</td>
+        <td style="padding:12px; color:var(--text-muted); font-size:0.8rem;">${c.region || 'Regional Pusat'}</td>
+        <td style="padding:12px;">${c.city || '-'}</td>
         <td style="padding:12px;">
-          <span class="tier-badge" style="background:${c.type === 'CHAPTER' ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)'}; color:${c.type === 'CHAPTER' ? 'var(--accent-blue)' : 'var(--accent-gold)'}; border:1px solid ${c.type === 'CHAPTER' ? 'var(--accent-blue)' : 'var(--accent-gold)'};">
-            ${c.type}
+          <span class="tier-badge" style="background:${isChapter ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)'}; color:${isChapter ? 'var(--accent-blue)' : 'var(--accent-gold)'}; border:1px solid ${isChapter ? 'var(--accent-blue)' : 'var(--accent-gold)'};">
+            ${clubType}
           </span>
         </td>
-        <td style="padding:12px; font-weight:700;">👥 ${c.member_count}</td>
+        <td style="padding:12px; font-weight:700;">👥 ${c.member_count || 0}</td>
         <td style="padding:12px; text-align:right;">
           <div style="display:inline-flex; gap:6px;">
             <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditClubModal('${c.id}')">✏️ Edit</button>
@@ -5870,7 +5884,8 @@ const AppEngine = {
           </div>
         </td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   },
 
   showClubHoverModal(clubId) {
