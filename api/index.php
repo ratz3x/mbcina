@@ -948,11 +948,13 @@ try {
             $productCategoriesList = [];
             try {
                 ensureM7Tables($sPdo);
+                ensureM8Tables($sPdo);
                 $lapakList = $sPdo->query("SELECT l.*, COALESCE(u.username, u.name, 'Member MB INA') AS pemilik, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id, COALESCE(u.tier, 'GOLD') AS tier FROM lapak l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC")->fetchAll() ?: [];
                 $lapakProductsList = $sPdo->query("SELECT * FROM lapak_products ORDER BY created_at DESC")->fetchAll() ?: [];
                 $lapakReviewsList = $sPdo->query("SELECT * FROM lapak_reviews ORDER BY created_at DESC")->fetchAll() ?: [];
                 $lapakSewaLogsList = $sPdo->query("SELECT * FROM lapak_sewa_logs ORDER BY created_at DESC")->fetchAll() ?: [];
                 $productCategoriesList = $sPdo->query("SELECT * FROM product_categories ORDER BY display_order ASC")->fetchAll() ?: [];
+                $adCampaignsList = $sPdo->query("SELECT * FROM ad_campaigns ORDER BY sort_order ASC, created_at DESC")->fetchAll() ?: [];
             } catch (Exception $ex) {}
 
             echo json_encode([
@@ -978,6 +980,7 @@ try {
                 'lapakReviews' => $lapakReviewsList,
                 'lapakSewaLogs' => $lapakSewaLogsList,
                 'productCategories' => $productCategoriesList,
+                'adCampaigns' => $adCampaignsList,
                 'source' => 'SUPABASE_CLOUD'
             ]);
         } catch (Exception $e) {
@@ -4836,8 +4839,29 @@ try {
 
     case 'get_landing_sponsors':
         try {
-            $sponsors = $sPdo->query("SELECT * FROM sponsors ORDER BY order_seq ASC, created_at DESC")->fetchAll();
-            echo json_encode(['success' => true, 'sponsors' => $sponsors ?: []]);
+            ensureM8Tables($sPdo);
+            $campaigns = $sPdo->query("SELECT * FROM ad_campaigns WHERE status = 'ACTIVE' ORDER BY sort_order ASC, created_at DESC")->fetchAll() ?: [];
+            if (!empty($campaigns)) {
+                $sponsors = array_map(function($c, $idx) {
+                    return [
+                        'id' => $c['id'],
+                        'order_seq' => (int)($c['sort_order'] ?? ($idx + 1)),
+                        'name' => $c['name'],
+                        'partner_name' => $c['partner_name'] ?? 'MB INA Official Partner',
+                        'tier' => (stripos($c['package_name'] ?? '', 'gold') !== false) ? '🥇 GOLD SPONSOR' : '💎 PLATINUM SPONSOR',
+                        'category' => !empty($c['partner_name']) ? ('OFFICIAL PARTNER • ' . strtoupper($c['partner_name'])) : 'OFFICIAL STRATEGIC PARTNER',
+                        'logo' => $c['banner_url'] ?: ($c['image_url'] ?: 'assets/mb_badge.jpg'),
+                        'banner_url' => $c['banner_url'] ?: ($c['image_url'] ?: 'assets/mb_badge.jpg'),
+                        'link' => $c['link'] ?: 'https://www.mercedes-benz.co.id',
+                        'desc' => $c['description'] ?: ($c['notes'] ?: ''),
+                        'cta_text' => $c['cta_text'] ?: ('Kunjungi Website Resmi ' . ($c['partner_name'] ?: $c['name']) . ' ↗')
+                    ];
+                }, $campaigns, array_keys($campaigns));
+                echo json_encode(['success' => true, 'sponsors' => $sponsors]);
+            } else {
+                $sponsors = $sPdo->query("SELECT * FROM sponsors ORDER BY order_seq ASC, created_at DESC")->fetchAll();
+                echo json_encode(['success' => true, 'sponsors' => $sponsors ?: []]);
+            }
         } catch (Exception $e) {
             echo json_encode(['success' => true, 'sponsors' => []]);
         }

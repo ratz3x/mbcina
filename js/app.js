@@ -3490,6 +3490,12 @@ const AppEngine = {
           this.lapakProducts = res.lapakProducts;
           if (window.M7Engine) window.M7Engine.data.products = res.lapakProducts;
         }
+        if (res.adCampaigns && res.adCampaigns.length) {
+          this.adCampaigns = res.adCampaigns;
+          if (window.M8Engine) {
+            window.M8Engine.data.campaigns = res.adCampaigns;
+          }
+        }
       }
     } catch (e) {
       console.warn("API Offline / slow, ensuring local fallback data is populated:", e);
@@ -3897,52 +3903,71 @@ const AppEngine = {
     const container = document.getElementById('landing-sponsors-grid-container');
     if (!container) return;
 
-    const defaultSponsors = [
-      // 💎 PLATINUM SPONSORS (KHUSUS HERO ROTATOR CAROUSEL SLIDESHOW)
-      { id: 'sp_landing_001', order_seq: 1, name: 'PT Mercedes-Benz Distribution Indonesia', tier: '💎 SPONSOR UTAMA PLATINUM', category: 'Official Automaker Principal', logo: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800', link: 'https://www.mercedes-benz.co.id', desc: 'APM Resmi Mercedes-Benz di Indonesia.' },
-      { id: 'sp_landing_002', order_seq: 2, name: 'PT Bank Negara Indonesia (Persero) Tbk', tier: '💎 SPONSOR UTAMA PLATINUM', category: 'Official Banking & E-KTA Partner', logo: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800', link: 'https://www.bni.co.id', desc: 'Mitra Perbankan Resmi MB Club Indonesia & Penerbit Co-Branding Kartu Anggota E-KTA.' },
-      { id: 'sp_landing_003', order_seq: 3, name: 'PT Pertamina Lubricants (Pertamina Fastron)', tier: '💎 PLATINUM SPONSOR', category: 'Official Lubricant Partner', logo: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80', link: 'https://pertaminalubricants.com', desc: 'Pelumas Resmi Fastron Platinum Synthetic Series.' },
-      { id: 'sp_landing_004', order_seq: 4, name: 'PT Bank Mandiri (Persero) Tbk', tier: '💎 PLATINUM SPONSOR', category: 'Official Digital Payment Partner', logo: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=800', link: 'https://www.bankmandiri.co.id', desc: 'Layanan Pembayaran Digital Livin\'.' },
-      { id: 'sp_landing_005', order_seq: 5, name: 'PT Shell Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'Official Fuel & Energy Partner', logo: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800', link: 'https://www.shell.co.id', desc: 'Bahan Bakar High Octane Shell V-Power.' },
-      { id: 'sp_landing_006', order_seq: 6, name: 'PT Castrol Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'Official Performance Fluid Partner', logo: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800', link: 'https://www.castrol.com', desc: 'Pelumas Castrol EDGE Fluid TITANIUM Technology.' },
-      { id: 'sp_landing_007', order_seq: 7, name: 'PT TotalEnergies Marketing Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'Specialty Drivetrain Fluid Partner', logo: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800', link: 'https://totalenergies.id', desc: 'Formulasi Khusus Pelumas Transmisi 7G-Tronic.' },
+    let campaigns = [];
 
-      // 🥇 GOLD SPONSORS (KHUSUS SPONSOR GRID CARDS WALL ATAS)
-      { id: 'sp_landing_008', order_seq: 8, name: 'FDR Tyre Indonesia (PT Suryaraya Rubberindo)', tier: '🥇 GOLD SPONSOR', category: 'Official High Performance Tyre', logo: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=800', link: 'https://fdrtire.com', desc: 'Ban & Velg High Performance khusus touring & perlombaan MB INA.' },
-      { id: 'sp_landing_009', order_seq: 9, name: 'PT Michelin Indonesia', tier: '🥇 GOLD SPONSOR', category: 'Official Radial Tyre Partner', logo: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=800', link: 'https://www.michelin.co.id', desc: 'Michelin Pilot Sport Series disukai member dengan daya cengkeram optimal.' },
-      { id: 'sp_landing_010', order_seq: 10, name: 'PT Astra Otoparts Tbk', tier: '🥇 GOLD SPONSOR', category: 'Official OEM Spareparts Partner', logo: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=800', link: 'https://www.astra-otoparts.com', desc: 'Suku cadang & komponen OEM Mercedes-Benz bergaransi resmi.' }
-    ];
-
-    let sponsorsList = defaultSponsors;
-
-    // Check if user has saved custom sponsor list in localStorage
-    const cached = localStorage.getItem('mbcina_sponsors_custom');
-    if (cached !== null) {
-      try {
-        sponsorsList = JSON.parse(cached);
-      } catch(e) {}
+    // 1. Ambil dari live M8Engine.data.campaigns jika sudah tersedia
+    if (window.M8Engine && Array.isArray(window.M8Engine.data?.campaigns) && window.M8Engine.data.campaigns.length > 0) {
+      campaigns = window.M8Engine.data.campaigns;
+    } else if (Array.isArray(this.adCampaigns) && this.adCampaigns.length > 0) {
+      campaigns = this.adCampaigns;
     } else {
-      // Fetch dynamic live sponsors directly from Supabase Cloud API
+      // 2. Cek cache persistent admin rotator
+      const cached = localStorage.getItem('mbcina_rotator_campaigns_v4');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) campaigns = parsed;
+        } catch(e) {}
+      }
+    }
+
+    // 3. Jika masih kosong, fetch dari API
+    if (!campaigns.length) {
       try {
-        const res = await fetch('api.php?action=get_landing_sponsors');
-        const data = await res.json();
-        if (data && data.success && Array.isArray(data.sponsors) && data.sponsors.length > 0) {
-          sponsorsList = data.sponsors.map((row, idx) => ({
-            id: row.id,
-            order_seq: parseInt(row.order_seq) || (idx + 1),
-            name: row.company_name || row.name || 'PT Sponsor Indonesia',
-            tier: row.package_type || row.tier || '💎 PLATINUM SPONSOR',
-            category: row.contact_person || row.category || 'Official Strategic Partner',
-            logo: row.logo_url || row.logo || 'assets/mb_badge.jpg',
-            link: row.banner_url || row.link || 'https://www.mercedes-benz.co.id',
-            desc: row.package_description || row.desc || ''
-          }));
+        const res = await fetch('api.php?action=get_landing_sponsors').then(r => r.json());
+        if (res && res.success && Array.isArray(res.sponsors) && res.sponsors.length > 0) {
+          campaigns = res.sponsors;
         }
       } catch(e) {}
     }
 
-    // Sort strictly by order_seq ascending (1, 2, 3...)
-    sponsorsList.sort((a, b) => (parseInt(a.order_seq) || 99) - (parseInt(b.order_seq) || 99));
+    // Filter iklan / sponsor yang berstatus ACTIVE dan urutkan sesuai sort_order admin (#1, #2, #3, ...)
+    let activeCampaigns = (campaigns || []).filter(c => c.status === 'ACTIVE' || !c.status);
+    activeCampaigns.sort((a, b) => (parseInt(a.sort_order || a.order_seq) || 99) - (parseInt(b.sort_order || b.order_seq) || 99));
+
+    if (!activeCampaigns.length) {
+      // Fallback data jika belum ada iklan aktif
+      activeCampaigns = [
+        { id: 'ac_rotator_1', name: 'Banner Promo Ban Michelin Pilot Sport 5', partner_name: 'Michelin Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL TIRE PARTNER', banner_url: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', link: 'https://www.michelin.co.id/mbina', desc: 'Promo spesial ban high-performance Michelin Pilot Sport 5 diskon 15% khusus member MB INA', cta_text: 'Beli Ban Michelin' },
+        { id: 'ac_rotator_2', name: 'Banner Mandiri Q3 2026', partner_name: 'Bank Mandiri', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL BANKING PARTNER', banner_url: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', link: 'https://www.bankmandiri.co.id/mbina', desc: 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge', cta_text: 'Ajukan Kartu Sekarang' },
+        { id: 'ac_rotator_3', name: 'Sponsored Post: Perawatan Transmisi 7G-Tronic', partner_name: 'ZF Aftermarket Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL TRANSMISSION PARTNER', banner_url: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', link: 'https://www.zf.com/indonesia/mbina', desc: 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF', cta_text: 'Booking Servis' },
+        { id: 'ac_rotator_4', name: 'Sponsored Event MB Jamnas 2026', partner_name: 'BCA Prioritas', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL EVENT PARTNER', banner_url: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', link: 'https://www.bca.co.id/mbina', desc: 'Dukungan Penuh BCA Prioritas untuk Gathering & Jamnas MB INA 2026', cta_text: 'Lihat Detail Event' }
+      ];
+    }
+
+    const sponsorsList = activeCampaigns.map((c, idx) => {
+      const pkgStr = String(c.package_name || c.tier || 'Platinum').toUpperCase();
+      const tierLabel = pkgStr.includes('GOLD') ? '🥇 GOLD SPONSOR' : pkgStr.includes('SILVER') ? '🥈 SILVER SPONSOR' : pkgStr.includes('BRONZE') ? '🥉 BRONZE SPONSOR' : '💎 PLATINUM SPONSOR';
+      const partner = c.partner_name || 'MB INA Strategic Partner';
+      const cat = c.category || ('OFFICIAL PARTNER • ' + partner.toUpperCase());
+      const bannerImg = c.banner_url || c.image_url || c.logo || 'assets/mb_badge.jpg';
+      const targetLink = c.link || 'https://www.mercedes-benz.co.id';
+      const ctaBtn = c.cta_text || `Kunjungi Website ${partner} ↗`;
+
+      return {
+        id: c.id,
+        order_seq: parseInt(c.sort_order || c.order_seq) || (idx + 1),
+        name: c.name || partner,
+        partner_name: partner,
+        tier: tierLabel,
+        category: cat,
+        logo: bannerImg,
+        banner_url: bannerImg,
+        link: targetLink,
+        cta_text: ctaBtn,
+        desc: c.description || c.desc || 'Mitra Resmi Mercedes-Benz Club Indonesia.'
+      };
+    });
 
     this.sponsorCarouselItems = sponsorsList;
     if (this.sponsorCarouselIndex >= sponsorsList.length) this.sponsorCarouselIndex = 0;
@@ -3957,26 +3982,27 @@ const AppEngine = {
     const badgeEl = document.getElementById('sponsor-wall-inventory-badge');
     if (!container) return;
 
-    // RULE: SPONSOR GRID CARDS WALL KHUSUS UNTUK GOLD SPONSOR
+    // RULE: SPONSOR GRID CARDS WALL UNTUK SEMUA MITRA ATAU GOLD SPONSORS
     const goldItems = (this.sponsorCarouselItems || []).filter(s => String(s.tier || '').toUpperCase().includes('GOLD'));
+    const displayItems = goldItems.length > 0 ? goldItems : (this.sponsorCarouselItems || []).slice(0, 4);
 
     if (badgeEl) {
-      badgeEl.textContent = `🥇 GOLD SPONSOR INVENTORY: ${goldItems.length} ACTIVE`;
+      badgeEl.textContent = `🤝 OFFICIAL SPONSORS: ${displayItems.length} ACTIVE`;
     }
 
-    if (!goldItems.length) {
-      container.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Gold Sponsor terdaftar.</div>`;
+    if (!displayItems.length) {
+      container.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Mitra Sponsor aktif.</div>`;
       return;
     }
 
-    container.innerHTML = goldItems.map(s => `
+    container.innerHTML = displayItems.map(s => `
       <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(59,130,246,0.3); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
-        <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:800; background:rgba(59,130,246,0.2); color:#60a5fa; padding:2px 8px; border-radius:10px;">${s.tier || '🥇 GOLD'}</div>
+        <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:800; background:rgba(59,130,246,0.2); color:#60a5fa; padding:2px 8px; border-radius:10px;">${s.tier || '💎 SPONSOR'}</div>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
           <img src="${s.logo || 'assets/mb_badge.jpg'}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
           <div>
             <div style="font-weight:900; font-size:0.92rem; color:#fff;">${s.name || 'PT Sponsor'}</div>
-            <div style="font-size:0.72rem; color:#60a5fa; font-weight:700;">${s.category || 'Official Partner'}</div>
+            <div style="font-size:0.72rem; color:#60a5fa; font-weight:700;">${s.partner_name || s.category || 'Official Partner'}</div>
           </div>
         </div>
         <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">${s.desc || 'Mitra Resmi Mercedes-Benz Club Indonesia.'}</p>
@@ -3992,29 +4018,31 @@ const AppEngine = {
     const container = document.getElementById('landing-sponsors-grid-container');
     if (!container || !this.sponsorCarouselItems || !this.sponsorCarouselItems.length) return;
 
-    // RULE: ROTATOR CAROUSEL SLIDESHOW KHUSUS UNTUK PLATINUM SPONSOR
-    const platinumItems = this.sponsorCarouselItems.filter(s => String(s.tier || '').toUpperCase().includes('PLATINUM'));
-    if (!platinumItems.length) {
-      container.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Platinum Sponsor terdaftar.</div>`;
+    const items = this.sponsorCarouselItems;
+    if (!items.length) {
+      container.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Banner Rotator aktif terdaftar.</div>`;
       return;
     }
 
-    if (this.sponsorCarouselIndex >= platinumItems.length) this.sponsorCarouselIndex = 0;
-    const current = platinumItems[this.sponsorCarouselIndex];
-    const total = platinumItems.length;
+    if (this.sponsorCarouselIndex >= items.length) this.sponsorCarouselIndex = 0;
+    const current = items[this.sponsorCarouselIndex];
+    const total = items.length;
 
     container.innerHTML = `
       <div class="glass-card" style="grid-column:1/-1; position:relative; width:100%; border-radius:20px; overflow:hidden; border:1.5px solid var(--accent-gold); background:linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.95) 100%); box-shadow:0 12px 35px rgba(0,0,0,0.6);" onmouseenter="AppEngine.stopSponsorCarouselTimer()" onmouseleave="AppEngine.startSponsorCarouselTimer()">
         
         <!-- MAIN SLIDE BANNER HERO STAGE -->
         <div style="position:relative; width:100%; height:340px; overflow:hidden; background:#000;">
-          <img src="${current.logo}" alt="${current.name}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.78); transition:all 0.6s ease-in-out;">
+          <img src="${current.banner_url || current.logo}" alt="${current.name}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.78); transition:all 0.6s ease-in-out;">
           <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(11,14,20,0.95) 0%, rgba(11,14,20,0.3) 50%, rgba(0,0,0,0.5) 100%);"></div>
 
           <!-- TOP BADGES -->
           <div style="position:absolute; top:16px; left:18px; right:18px; display:flex; justify-content:space-between; align-items:center; z-index:10;">
             <span class="tier-badge" style="background:rgba(245,158,11,0.25); color:var(--accent-gold); border:1.5px solid var(--accent-gold); font-size:0.75rem; padding:4px 12px; font-weight:800; backdrop-filter:blur(8px); border-radius:8px;">
               ${current.tier || '💎 PLATINUM SPONSOR'}
+            </span>
+            <span style="font-size:0.72rem; color:var(--accent-gold); font-weight:800; background:rgba(0,0,0,0.6); padding:3px 10px; border-radius:6px; border:1px solid rgba(245,158,11,0.3);">
+              #${this.sponsorCarouselIndex + 1} dari ${total}
             </span>
           </div>
 
@@ -4031,7 +4059,7 @@ const AppEngine = {
             </p>
             <div style="display:flex; align-items:center; justify-content:flex-start; flex-wrap:wrap; gap:10px;">
               <a href="${current.link}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="font-size:0.82rem; padding:8px 18px; font-weight:800; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
-                🌐 Kunjungi Website Resmi ${current.name} ↗
+                🌐 ${current.cta_text || ('Kunjungi Website ' + (current.partner_name || current.name) + ' ↗')}
               </a>
             </div>
           </div>
@@ -4044,7 +4072,7 @@ const AppEngine = {
         <!-- BOTTOM DOTS INDICATOR BAR -->
         <div style="display:flex; justify-content:center; align-items:center; gap:8px; padding:12px 18px; background:rgba(15,23,42,0.9); border-top:1px solid var(--chrome-border); overflow-x:auto;">
           <div style="display:flex; align-items:center; gap:8px;">
-            ${platinumItems.map((s, idx) => `
+            ${items.map((s, idx) => `
               <span onclick="AppEngine.goToSponsorSlide(${idx})" style="width:${idx === this.sponsorCarouselIndex ? '24px' : '8px'}; height:8px; border-radius:4px; background:${idx === this.sponsorCarouselIndex ? 'var(--accent-gold)' : 'rgba(255,255,255,0.25)'}; cursor:pointer; transition:all 0.3s ease;" title="${s.name}"></span>
             `).join('')}
           </div>
@@ -4056,9 +4084,12 @@ const AppEngine = {
 
   startSponsorCarouselTimer() {
     this.stopSponsorCarouselTimer();
+    const durationMs = (window.M8Engine && window.M8Engine.rotatorSpeedSeconds) 
+      ? window.M8Engine.rotatorSpeedSeconds * 1000 
+      : 5000;
     this.sponsorCarouselTimer = setInterval(() => {
       this.nextSponsorSlide();
-    }, 4500);
+    }, durationMs);
   },
 
   stopSponsorCarouselTimer() {
@@ -4069,23 +4100,23 @@ const AppEngine = {
   },
 
   nextSponsorSlide() {
-    const platinumItems = (this.sponsorCarouselItems || []).filter(s => String(s.tier || '').toUpperCase().includes('PLATINUM'));
-    if (!platinumItems.length) return;
-    this.sponsorCarouselIndex = (this.sponsorCarouselIndex + 1) % platinumItems.length;
+    const items = this.sponsorCarouselItems || [];
+    if (!items.length) return;
+    this.sponsorCarouselIndex = (this.sponsorCarouselIndex + 1) % items.length;
     this.renderSponsorCarouselFrame();
   },
 
   prevSponsorSlide() {
-    const platinumItems = (this.sponsorCarouselItems || []).filter(s => String(s.tier || '').toUpperCase().includes('PLATINUM'));
-    if (!platinumItems.length) return;
-    this.sponsorCarouselIndex = (this.sponsorCarouselIndex - 1 + platinumItems.length) % platinumItems.length;
+    const items = this.sponsorCarouselItems || [];
+    if (!items.length) return;
+    this.sponsorCarouselIndex = (this.sponsorCarouselIndex - 1 + items.length) % items.length;
     this.renderSponsorCarouselFrame();
   },
 
   goToSponsorSlide(idx) {
-    const platinumItems = (this.sponsorCarouselItems || []).filter(s => String(s.tier || '').toUpperCase().includes('PLATINUM'));
-    if (!platinumItems.length) return;
-    this.sponsorCarouselIndex = idx % platinumItems.length;
+    const items = this.sponsorCarouselItems || [];
+    if (!items.length) return;
+    this.sponsorCarouselIndex = idx % items.length;
     this.renderSponsorCarouselFrame();
   },
 
