@@ -3444,10 +3444,11 @@ const AppEngine = {
     this.showLoader('Memuat Data Organisasi, Klub & Keanggotaan (Supabase Cloud)...');
     try {
       const resp = await fetch('api.php?action=get_app_init_data');
-      const text = await resp.text();
-      let res = null;
-      try { res = JSON.parse(text); } catch (jsonErr) { res = null; }
-      if (res && res.success) {
+      if (resp && resp.ok) {
+        const text = await resp.text();
+        let res = null;
+        try { res = JSON.parse(text); } catch (jsonErr) { res = null; }
+        if (res && res.success) {
         if (res.organization) this.m2Data.organization = res.organization;
         if (res.founders && res.founders.length) this.m2Data.founders = res.founders;
         if (res.history && res.history.length) this.m2Data.history = res.history;
@@ -3492,7 +3493,8 @@ const AppEngine = {
           }
         }
       }
-    } catch (e) {
+    }
+  } catch (e) {
       console.warn("API Offline / slow, ensuring local fallback data is populated:", e);
     } finally {
       this.ensureDataPopulated();

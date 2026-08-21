@@ -45,20 +45,18 @@ function getSupabasePDO() {
 
     $connectionAttempts = [
         ['host' => $supabaseHost, 'port' => $supabasePort, 'user' => $supabaseUser],
-        ['host' => 'aws-0-ap-northeast-1.pooler.supabase.com', 'port' => '6543', 'user' => 'postgres.gpmpoobvfmwdnbzgofhk'],
-        ['host' => 'aws-0-ap-northeast-1.pooler.supabase.com', 'port' => '5432', 'user' => 'postgres.gpmpoobvfmwdnbzgofhk'],
-        ['host' => 'db.gpmpoobvfmwdnbzgofhk.supabase.co', 'port' => '5432', 'user' => 'postgres']
+        ['host' => 'aws-0-ap-northeast-1.pooler.supabase.com', 'port' => '5432', 'user' => $supabaseUser]
     ];
 
     $errors = [];
     foreach ($connectionAttempts as $attempt) {
         try {
-            $dsn = "pgsql:host={$attempt['host']};port={$attempt['port']};dbname=$supabaseDb;sslmode=require";
+            $dsn = "pgsql:host={$attempt['host']};port={$attempt['port']};dbname=$supabaseDb;sslmode=require;connect_timeout=2";
             $pdo = new PDO($dsn, $attempt['user'], $supabasePass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => true,
-                PDO::ATTR_TIMEOUT => 5
+                PDO::ATTR_TIMEOUT => 2
             ]);
             return $pdo;
         } catch (Throwable $e) {
