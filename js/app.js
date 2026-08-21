@@ -4001,13 +4001,10 @@ const AppEngine = {
           <img src="${current.logo}" alt="${current.name}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.78); transition:all 0.6s ease-in-out;">
           <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(11,14,20,0.95) 0%, rgba(11,14,20,0.3) 50%, rgba(0,0,0,0.5) 100%);"></div>
 
-          <!-- TOP BADGES & ORDER TAG -->
-          <div style="position:absolute; top:16px; left:18px; right:18px; display:flex; justify-content:space-between; align-items:center; z-index:10; flex-wrap:wrap; gap:8px;">
+          <!-- TOP BADGES -->
+          <div style="position:absolute; top:16px; left:18px; right:18px; display:flex; justify-content:space-between; align-items:center; z-index:10;">
             <span class="tier-badge" style="background:rgba(245,158,11,0.25); color:var(--accent-gold); border:1.5px solid var(--accent-gold); font-size:0.75rem; padding:4px 12px; font-weight:800; backdrop-filter:blur(8px); border-radius:8px;">
               ${current.tier || '💎 PLATINUM SPONSOR'}
-            </span>
-            <span style="background:rgba(0,0,0,0.7); color:#fff; font-size:0.72rem; padding:4px 10px; border-radius:20px; border:1px solid rgba(255,255,255,0.2); font-weight:800; backdrop-filter:blur(8px);">
-              URUTAN #${current.order_seq || (this.sponsorCarouselIndex + 1)} SLIDE (${this.sponsorCarouselIndex + 1}/${total})
             </span>
           </div>
 
@@ -4035,14 +4032,11 @@ const AppEngine = {
         </div>
 
         <!-- BOTTOM DOTS INDICATOR BAR -->
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:12px 18px; background:rgba(15,23,42,0.9); border-top:1px solid var(--chrome-border); overflow-x:auto;">
+        <div style="display:flex; justify-content:center; align-items:center; gap:8px; padding:12px 18px; background:rgba(15,23,42,0.9); border-top:1px solid var(--chrome-border); overflow-x:auto;">
           <div style="display:flex; align-items:center; gap:8px;">
             ${platinumItems.map((s, idx) => `
-              <span onclick="AppEngine.goToSponsorSlide(${idx})" style="width:${idx === this.sponsorCarouselIndex ? '24px' : '8px'}; height:8px; border-radius:4px; background:${idx === this.sponsorCarouselIndex ? 'var(--accent-gold)' : 'rgba(255,255,255,0.25)'}; cursor:pointer; transition:all 0.3s ease;" title="${s.name} (Urutan #${s.order_seq || idx+1})"></span>
+              <span onclick="AppEngine.goToSponsorSlide(${idx})" style="width:${idx === this.sponsorCarouselIndex ? '24px' : '8px'}; height:8px; border-radius:4px; background:${idx === this.sponsorCarouselIndex ? 'var(--accent-gold)' : 'rgba(255,255,255,0.25)'}; cursor:pointer; transition:all 0.3s ease;" title="${s.name}"></span>
             `).join('')}
-          </div>
-          <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">
-            ⏳ Otomatis Rotasi (4.5s) • Sentuh/Klik Titik untuk Pilih Sponsor
           </div>
         </div>
 
