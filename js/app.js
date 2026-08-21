@@ -21189,22 +21189,11 @@ const M8Engine = {
   },
 
   savePersistentCampaigns: function() {
-    try {
-      localStorage.setItem('mbcina_rotator_campaigns_v4', JSON.stringify(this.data.campaigns));
-    } catch(e) {}
+    // Database Supabase adalah single source of truth utama
   },
 
   loadPersistentCampaigns: function() {
-    try {
-      const cached = localStorage.getItem('mbcina_rotator_campaigns_v4');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          this.data.campaigns = parsed;
-          return true;
-        }
-      }
-    } catch(e) {}
+    // Jangan pernah muat dummy data lama dari localStorage
     return false;
   },
 

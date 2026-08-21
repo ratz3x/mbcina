@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260821_103800">
+  <link rel="stylesheet" href="css/styles.css?v=20260821_113300">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -27,6 +27,14 @@
     if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'))) {
       try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch(e) {}
     }
+    // HAPUS PERMANEN SEMUA CACHE DUMMY LAMA DARI BROWSER LOCALSTORAGE
+    try {
+      Object.keys(localStorage).forEach(function(key) {
+        if (key.startsWith('mbcina_rotator_') || key.startsWith('mbcina_sponsors_') || key === 'mbcina_sponsors_custom') {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch(e) {}
   </script>
   <!-- INSTANT GLOBAL SUBTAB NAVIGATION ENGINE & DONATION ACTIONS v3 -->
   <script>
@@ -9594,8 +9602,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260821_103800"></script>
-  <script src="js/app.js?v=20260821_103800"></script>
+  <script src="js/auth.js?v=20260821_113300"></script>
+  <script src="js/app.js?v=20260821_113300"></script>
   <script>
     lucide.createIcons();
     try {
