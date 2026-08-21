@@ -957,6 +957,33 @@
           </div>
         </div>
 
+        <!-- ── KARTU 5: KOPERASI BERSAMA SATU BINTANG (PORTAL MEMBER) ── -->
+        <div class="glass-panel" style="padding:14px 18px; border-radius:14px; border:1px solid rgba(245,158,11,0.4); background:linear-gradient(135deg,rgba(245,158,11,0.12) 0%,rgba(15,23,42,0.96) 100%); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+          <div style="display:flex; align-items:center; gap:12px; min-width:220px;">
+            <div style="width:46px;height:46px;border-radius:50%;background:#000;border:2px solid var(--accent-gold);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 0 12px rgba(245,158,11,0.35);">
+              <img src="assets/logo_koperasi.jpg" alt="Logo Koperasi" style="width:100%; height:100%; object-fit:contain;">
+            </div>
+            <div>
+              <div style="font-weight:900;font-size:0.98rem;color:#fff;display:flex;align-items:center;gap:6px;">
+                Koperasi Bersama Satu Bintang
+                <span style="font-size:0.65rem; background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); padding:1px 6px; border-radius:4px; font-weight:800;">MB CLUB INA</span>
+              </div>
+              <div style="font-size:0.75rem;color:var(--accent-gold);font-weight:700;">Simpan Pinjam, Unit Usaha & Bengkel Khusus Mercedes-Benz</div>
+            </div>
+          </div>
+          <div style="flex:1; min-width:260px; font-size:0.78rem; color:#cbd5e1; line-height:1.4;">
+            Wadah ekonomi gotong royong resmi 15.000+ anggota di bawah naungan MB Club INA. Diluncurkan Jamnas XX Bandung.
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+            <button class="btn-primary" style="font-size:0.78rem;padding:8px 16px;font-weight:800;background:var(--accent-gold);color:#000;border:none;" onclick="AppEngine.openMemberKoperasi('member')">
+              🤝 Buka Modul Koperasi →
+            </button>
+            <button class="btn-outline" style="font-size:0.75rem;padding:8px 12px;font-weight:700;border-color:var(--accent-gold);color:var(--accent-gold);background:rgba(245,158,11,0.08);" onclick="document.getElementById('modal-about-koperasi').style.display='flex'">
+              ℹ️ Tentang Koperasi
+            </button>
+          </div>
+        </div>
+
       </div>
       <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
 
@@ -5197,8 +5224,11 @@
 
         <!-- Action Button Bar -->
         <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
-          <button type="button" class="btn-primary" onclick="AppEngine.switchAdminTab('m1_portal')" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 12px 28px; border-radius: 12px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+          <button id="btn-kop-return-admin" type="button" class="btn-primary" onclick="AppEngine.switchAdminTab('m1_portal')" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 12px 28px; border-radius: 12px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
             <span>🏠</span> Kembali ke Dashboard Admin
+          </button>
+          <button id="btn-kop-return-member" type="button" class="btn-primary" onclick="AppEngine.openPortalMember()" style="background: var(--accent-gold); color: #000; font-weight: 800; padding: 12px 28px; border-radius: 12px; border: none; cursor: pointer; display: none; align-items: center; gap: 8px;">
+            <span>🔙</span> Kembali ke Dashboard Member
           </button>
           <button type="button" class="btn-outline" onclick="document.getElementById('modal-about-koperasi').style.display='flex'" style="border: 1px solid var(--accent-gold); color: var(--accent-gold); padding: 12px 24px; border-radius: 12px; font-weight: 800; background: rgba(245,158,11,0.08); cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
             <span>ℹ️</span> Tentang Koperasi
@@ -9823,7 +9853,7 @@
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="js/auth.js?v=20260821_124100"></script>
-  <script src="js/app.js?v=20260821_140500"></script>
+  <script src="js/app.js?v=20260821_153800"></script>
   <script>
     lucide.createIcons();
     try {

@@ -225,6 +225,33 @@ const AppEngine = {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
+  openMemberKoperasi(fromView = 'member') {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const adminView = document.getElementById('view-admin-dashboard');
+    if (adminView) adminView.style.display = 'block';
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const kopTab = document.getElementById('admin-tab-m11_koperasi');
+    if (kopTab) kopTab.style.display = 'block';
+
+    const btnReturnAdmin = document.getElementById('btn-kop-return-admin');
+    const btnReturnMember = document.getElementById('btn-kop-return-member');
+    if (fromView === 'member') {
+      if (btnReturnAdmin) btnReturnAdmin.style.display = 'none';
+      if (btnReturnMember) btnReturnMember.style.display = 'inline-flex';
+      const sidebar = document.getElementById('app-sidebar');
+      if (sidebar) sidebar.style.display = 'none';
+      const btnHamburger = document.getElementById('btn-hamburger-toggle');
+      if (btnHamburger) btnHamburger.style.display = 'none';
+      document.body.classList.remove('yt-has-sidebar');
+    } else {
+      if (btnReturnAdmin) btnReturnAdmin.style.display = 'inline-flex';
+      if (btnReturnMember) btnReturnMember.style.display = 'none';
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
   getMemberTotalContribution(u) {
     if (!u) return 0;
     const mid = (u.member_id || u.memberId || '').toUpperCase();
@@ -3726,6 +3753,10 @@ const AppEngine = {
         M9Engine.switchSubtab('9_1_dashboard');
       }
     } else if (tab === 'm11_koperasi') {
+      const btnReturnAdmin = document.getElementById('btn-kop-return-admin');
+      const btnReturnMember = document.getElementById('btn-kop-return-member');
+      if (btnReturnAdmin) btnReturnAdmin.style.display = 'inline-flex';
+      if (btnReturnMember) btnReturnMember.style.display = 'none';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   },
