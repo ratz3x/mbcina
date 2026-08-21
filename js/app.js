@@ -3922,13 +3922,15 @@ const AppEngine = {
       } catch(e) {}
     }
 
-    // Filter kampanye aktif dari database dan urutkan sesuai urutan prioritas admin (sort_order)
-    let activeCampaigns = (campaigns || []).filter(c => c.status === 'ACTIVE');
-    activeCampaigns.sort((a, b) => (parseInt(a.sort_order || a.order_seq) || 99) - (parseInt(b.sort_order || b.order_seq) || 99));
+    // 1. FILTER KHUSUS PLATINUM SPONSOR -> UNTUK ROTATOR SLIDESHOW UTAMA ATAS
+    let platinumCampaigns = (campaigns || []).filter(c => {
+      const pkg = String(c.package_name || c.tier || 'Platinum').toUpperCase();
+      return (pkg.includes('PLATINUM') || !c.package_name) && (c.status === 'ACTIVE' || !c.status);
+    });
+    platinumCampaigns.sort((a, b) => (parseInt(a.sort_order || a.order_seq) || 99) - (parseInt(b.sort_order || b.order_seq) || 99));
 
-    // Jika database belum termuat
-    if (!activeCampaigns.length && (!campaigns || !campaigns.length)) {
-      activeCampaigns = [
+    if (!platinumCampaigns.length) {
+      platinumCampaigns = [
         { id: 'ac_rotator_1', name: 'Banner Promo Ban Michelin Pilot Sport 5', partner_name: 'Michelin Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL TIRE PARTNER', banner_url: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', link: 'https://www.michelin.co.id/mbina', desc: 'Promo spesial ban high-performance Michelin Pilot Sport 5 diskon 15% khusus member MB INA', cta_text: 'Beli Ban Michelin' },
         { id: 'ac_001', name: 'Banner Mandiri Q3 2026', partner_name: 'Bank Mandiri', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL BANKING PARTNER', banner_url: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', link: 'https://www.bankmandiri.co.id/mbina', desc: 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge', cta_text: 'Ajukan Kartu Sekarang' },
         { id: 'ac_rotator_2', name: 'Sponsored Post: Perawatan Transmisi 7G-Tronic', partner_name: 'ZF Aftermarket Indonesia', tier: '💎 PLATINUM SPONSOR', category: 'OFFICIAL TRANSMISSION PARTNER', banner_url: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', link: 'https://www.zf.com/indonesia/mbina', desc: 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF', cta_text: 'Booking Servis' },
@@ -3936,9 +3938,7 @@ const AppEngine = {
       ];
     }
 
-    const sponsorsList = activeCampaigns.map((c, idx) => {
-      const pkgStr = String(c.package_name || c.tier || 'Platinum').toUpperCase();
-      const tierLabel = pkgStr.includes('GOLD') ? '🥇 GOLD SPONSOR' : pkgStr.includes('SILVER') ? '🥈 SILVER SPONSOR' : pkgStr.includes('BRONZE') ? '🥉 BRONZE SPONSOR' : '💎 PLATINUM SPONSOR';
+    this.sponsorCarouselItems = platinumCampaigns.map((c, idx) => {
       const partner = c.partner_name || 'MB INA Strategic Partner';
       const cat = c.category || ('OFFICIAL PARTNER • ' + partner.toUpperCase());
       const bannerImg = c.banner_url || c.image_url || c.logo || 'assets/mb_badge.jpg';
@@ -3950,7 +3950,7 @@ const AppEngine = {
         order_seq: parseInt(c.sort_order || c.order_seq) || (idx + 1),
         name: c.name || partner,
         partner_name: partner,
-        tier: tierLabel,
+        tier: '💎 PLATINUM SPONSOR',
         category: cat,
         logo: bannerImg,
         banner_url: bannerImg,
@@ -3960,8 +3960,38 @@ const AppEngine = {
       };
     });
 
-    this.sponsorCarouselItems = sponsorsList;
-    if (this.sponsorCarouselIndex >= sponsorsList.length) this.sponsorCarouselIndex = 0;
+    if (this.sponsorCarouselIndex >= this.sponsorCarouselItems.length) this.sponsorCarouselIndex = 0;
+
+    // 2. FILTER KHUSUS GOLD & SILVER SPONSORS -> UNTUK SPONSOR GRID WALL BAWAH
+    let goldSilverCampaigns = (campaigns || []).filter(c => {
+      const pkg = String(c.package_name || c.tier || '').toUpperCase();
+      return (pkg.includes('GOLD') || pkg.includes('SILVER') || pkg.includes('BRONZE')) && (c.status === 'ACTIVE' || !c.status);
+    });
+
+    if (!goldSilverCampaigns.length) {
+      goldSilverCampaigns = [
+        { id: 'sp_gold_001', name: 'FDR Tyre Indonesia (PT Suryaraya Rubberindo)', partner_name: 'PT Suryaraya Rubberindo', tier: '🥇 GOLD SPONSOR', category: 'Official High Performance Tyre', logo: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=800', link: 'https://fdrtire.com', desc: 'Ban & Velg High Performance khusus touring & perlombaan MB INA.' },
+        { id: 'sp_gold_002', name: 'PT Astra Otoparts Tbk', partner_name: 'PT Astra Otoparts Tbk', tier: '🥇 GOLD SPONSOR', category: 'Official OEM Spareparts Partner', logo: 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=800', link: 'https://www.astra-otoparts.com', desc: 'Suku cadang & komponen OEM Mercedes-Benz bergaransi resmi.' },
+        { id: 'sp_silver_001', name: 'PT Pertamina Lubricants (Fastron Synthetic Series)', partner_name: 'PT Pertamina Lubricants', tier: '🥈 SILVER SPONSOR', category: 'Official Lubricant Partner', logo: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80', link: 'https://pertaminalubricants.com', desc: 'Pelumas Resmi Fastron Platinum & Synthetic Series.' },
+        { id: 'sp_silver_002', name: 'Meguiar\'s Indonesia (PT Meguiar Coating)', partner_name: 'Meguiar\'s Indonesia', tier: '🥈 SILVER SPONSOR', category: 'Official Auto Detailing Partner', logo: 'https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800', link: 'https://www.meguiars.co.id', desc: 'Perawatan bodi & ceramic coating khusus Mercedes-Benz.' }
+      ];
+    }
+
+    this.sponsorGridWallItems = goldSilverCampaigns.map((c, idx) => {
+      const pkgStr = String(c.package_name || c.tier || 'Gold').toUpperCase();
+      const tierLabel = pkgStr.includes('SILVER') ? '🥈 SILVER SPONSOR' : pkgStr.includes('BRONZE') ? '🥉 BRONZE SPONSOR' : '🥇 GOLD SPONSOR';
+      const partner = c.partner_name || c.name || 'PT Sponsor Indonesia';
+      return {
+        id: c.id,
+        name: c.name || partner,
+        partner_name: partner,
+        tier: tierLabel,
+        category: c.category || (pkgStr.includes('SILVER') ? 'Official Lubricant & Fluid' : 'Official High-Performance OEM Partner'),
+        logo: c.banner_url || c.image_url || c.logo || 'assets/mb_badge.jpg',
+        link: c.link || 'https://www.mercedes-benz.co.id',
+        desc: c.description || c.desc || 'Mitra Resmi Mercedes-Benz Club Indonesia.'
+      };
+    });
 
     this.renderSponsorCarouselFrame();
     this.renderSponsorGridWall();
@@ -3973,27 +4003,26 @@ const AppEngine = {
     const badgeEl = document.getElementById('sponsor-wall-inventory-badge');
     if (!container) return;
 
-    // RULE: SPONSOR GRID CARDS WALL UNTUK SEMUA MITRA ATAU GOLD SPONSORS
-    const goldItems = (this.sponsorCarouselItems || []).filter(s => String(s.tier || '').toUpperCase().includes('GOLD'));
-    const displayItems = goldItems.length > 0 ? goldItems : (this.sponsorCarouselItems || []).slice(0, 4);
+    // RULE: SPONSOR GRID CARDS WALL KHUSUS UNTUK GOLD & SILVER SPONSORS
+    const displayItems = this.sponsorGridWallItems || [];
 
     if (badgeEl) {
-      badgeEl.textContent = `🤝 OFFICIAL SPONSORS: ${displayItems.length} ACTIVE`;
+      badgeEl.textContent = `🥇🥈 GOLD & SILVER SPONSORS: ${displayItems.length} ACTIVE`;
     }
 
     if (!displayItems.length) {
-      container.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Mitra Sponsor aktif.</div>`;
+      container.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Gold & Silver Sponsor aktif.</div>`;
       return;
     }
 
     container.innerHTML = displayItems.map(s => `
-      <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(59,130,246,0.3); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
-        <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:800; background:rgba(59,130,246,0.2); color:#60a5fa; padding:2px 8px; border-radius:10px;">${s.tier || '💎 SPONSOR'}</div>
+      <div style="background:rgba(15,23,42,0.8); border:1px solid ${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.35)' : 'rgba(245,158,11,0.35)'}; border-radius:14px; padding:16px; position:relative; overflow:hidden;">
+        <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:800; background:${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.15)' : 'rgba(245,158,11,0.15)'}; color:${s.tier.includes('SILVER') ? '#cbd5e1' : '#fbbf24'}; padding:2px 8px; border-radius:10px; border:1px solid ${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.3)' : 'rgba(245,158,11,0.3)'};">${s.tier}</div>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
           <img src="${s.logo || 'assets/mb_badge.jpg'}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
-          <div>
+          <div style="padding-right:80px;">
             <div style="font-weight:900; font-size:0.92rem; color:#fff;">${s.name || 'PT Sponsor'}</div>
-            <div style="font-size:0.72rem; color:#60a5fa; font-weight:700;">${s.partner_name || s.category || 'Official Partner'}</div>
+            <div style="font-size:0.72rem; color:${s.tier.includes('SILVER') ? '#cbd5e1' : 'var(--accent-gold)'}; font-weight:700;">${s.partner_name || s.category || 'Official Partner'}</div>
           </div>
         </div>
         <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">${s.desc || 'Mitra Resmi Mercedes-Benz Club Indonesia.'}</p>
