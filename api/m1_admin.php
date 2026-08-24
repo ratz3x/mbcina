@@ -448,7 +448,7 @@ switch ($action) {
         try {
             $stmt = $sPdo->query("
                 SELECT u.id, u.username, u.name, u.email, u.phone, u.role, u.status,
-                       u.avatar_url, u.photo_url, u.avatar_url as avatar, u.photo_url as \"photoUrl\",
+                       u.photo_url, u.photo_url as \"photoUrl\",
                        u.province_id as \"provinceId\", u.is_system_architect as \"isSystemArchitect\",
                        u.is_protected as \"isProtected\", u.member_id as \"memberId\", u.city,
                        u.club, u.club as \"clubName\",
@@ -666,7 +666,7 @@ switch ($action) {
         $club = trim($input['club'] ?? '');
         $vehicleModel = trim($input['vehicle_model'] ?? $input['vehicle'] ?? '');
         $licensePlate = trim($input['license_plate'] ?? $input['plate'] ?? '');
-        $photoUrl = trim($input['photo_url'] ?? $input['avatar_url'] ?? '');
+        $photoUrl = trim($input['photo_url'] ?? '');
 
         if (empty($userId) || empty($name) || empty($email) || empty($phone) || empty($username)) {
             echo json_encode(['success' => false, 'message' => 'Lengkapi seluruh bidang wajib pengeditan!']);
@@ -686,7 +686,7 @@ switch ($action) {
         }
 
         try {
-            $stmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, role = :role::role_enum, status = :status::user_status_enum, city = :city, province_id = :province_id, club = COALESCE(NULLIF(:club, ''), club), club_id = :club_id, vehicle_model = COALESCE(NULLIF(:vehicle, ''), vehicle_model), license_plate = COALESCE(NULLIF(:plate, ''), license_plate), photo_url = COALESCE(NULLIF(:photo_url, ''), photo_url), avatar_url = COALESCE(NULLIF(:photo_url, ''), avatar_url), updated_at = NOW() WHERE id = :id OR username = :id OR member_id = :id");
+            $stmt = $sPdo->prepare("UPDATE users SET name = :name, email = :email, phone = :phone, username = :username, role = :role::role_enum, status = :status::user_status_enum, city = :city, province_id = :province_id, club = COALESCE(NULLIF(:club, ''), club), club_id = :club_id, vehicle_model = COALESCE(NULLIF(:vehicle, ''), vehicle_model), license_plate = COALESCE(NULLIF(:plate, ''), license_plate), photo_url = COALESCE(NULLIF(:photo_url, ''), photo_url), updated_at = NOW() WHERE id = :id OR username = :id OR member_id = :id");
             $stmt->execute([
                 ':name' => $name,
                 ':email' => $email,
@@ -860,6 +860,57 @@ switch ($action) {
             echo json_encode(['success' => true, 'message' => 'Pengaturan sistem berhasil diperbarui di Supabase Cloud!']);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Gagal menyimpan ke Supabase: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'upload_image':
+        try {
+            $file = $_FILES['photo_file'] ?? ($_FILES['file'] ?? ($_FILES['image'] ?? null));
+            if (!$file || !isset($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
+                echo json_encode(['success' => false, 'message' => 'Tidak ada file yang diunggah atau terjadi kesalahan upload.']);
+                exit;
+            }
+
+            if ($file['size'] > 5 * 1024 * 1024) {
+                echo json_encode(['success' => false, 'message' => 'Ukuran file melebihi batas 5MB!']);
+                exit;
+            }
+
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                $ext = 'png';
+            }
+
+            $uploadDir = dirname(__DIR__) . '/assets/banners/';
+            if (!file_exists($uploadDir)) {
+                @mkdir($uploadDir, 0777, true);
+            }
+
+            $fileName = 'banner_' . time() . '_' . substr(md5(uniqid()), 0, 6) . '.' . $ext;
+            $targetPath = $uploadDir . $fileName;
+            $relPath = 'assets/banners/' . $fileName;
+
+            if (@move_uploaded_file($file['tmp_name'], $targetPath)) {
+                echo json_encode([
+                    'success' => true,
+                    'url' => $relPath,
+                    'file_name' => $fileName,
+                    'message' => 'Gambar banner berhasil diunggah ke server!'
+                ]);
+            } else {
+                // Fallback to reading bytes as Data URI if local storage is read-only (serverless)
+                $mimeType = ($ext === 'png') ? 'image/png' : (($ext === 'webp') ? 'image/webp' : 'image/jpeg');
+                $raw = @file_get_contents($file['tmp_name']);
+                $dataUri = 'data:' . $mimeType . ';base64,' . base64_encode($raw);
+                echo json_encode([
+                    'success' => true,
+                    'url' => $dataUri,
+                    'file_name' => $fileName,
+                    'message' => 'Gambar banner berhasil diproses!'
+                ]);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Gagal upload gambar: ' . $e->getMessage()]);
         }
         break;
 

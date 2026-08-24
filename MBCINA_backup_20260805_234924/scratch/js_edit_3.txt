@@ -1,0 +1,776 @@
+/* Main Web Application Engine & Dynamic RBAC Controller for MB INA - M0 & M1 INTEGRATED */
+
+const AppEngine = {
+  currentRole: 'GUEST',
+  currentUser: null,
+  isLightMode: false,
+  activeAdminTab: 'dashboard',
+  clubs: [],
+  events: [],
+  users: [],
+  provinces: [],
+  testimonials: [
+    {
+      name: 'Derist Touriano',
+      role: 'Super Admin & System Architect',
+      city: 'Jambi',
+      avatar: 'DT',
+      quote: 'Platform MB INA menghubungkan ribuan pecinta motor dan klub resmi dengan sistem keanggotaan terintegrasi, transparan, dan sangat modern.'
+    },
+    {
+      name: 'Ir. Raymond Sanjaya',
+      role: 'Pengurus Pusat MB INA',
+      city: 'Bandung',
+      avatar: 'RS',
+      quote: 'Proses verifikasi keanggotaan yang mudah tanpa perlu risau privasi dokumen fisik. Sangat mendukung operasional touring dan event jamnas.'
+    },
+    {
+      name: 'Siti Rahayu',
+      role: 'Member Gold Tier',
+      city: 'Jakarta',
+      avatar: 'SR',
+      quote: 'Fasilitas Kartu Member Digital dengan QR Code sangat praktis saat menghadiri event VIP dan mendapatkan diskon khusus partner.'
+    }
+  ],
+  adminStats: null,
+  auditLogs: [],
+  systemSettings: null,
+
+  async init() {
+    console.log("MB INA Platform Engine Initializing (M0 Revised Landing & Auth Ready)...");
+    this.initTheme();
+    await this.fetchData();
+    this.bindRoleSwitcher();
+    this.bindAdminTabs();
+    this.renderTestimonials();
+    this.renderView();
+  },
+
+  initTheme() {
+    const savedTheme = localStorage.getItem('mbina_theme');
+    if (savedTheme === 'light') {
+      this.isLightMode = true;
+      document.body.classList.add('light-mode');
+    }
+    this.updateThemeToggleUI();
+  },
+
+  toggleTheme() {
+    this.isLightMode = !this.isLightMode;
+    if (this.isLightMode) {
+      document.body.classList.add('light-mode');
+      localStorage.setItem('mbina_theme', 'light');
+    } else {
+      document.body.classList.remove('light-mode');
+      localStorage.setItem('mbina_theme', 'dark');
+    }
+    this.updateThemeToggleUI();
+  },
+
+  updateThemeToggleUI() {
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    if (themeBtn) {
+      themeBtn.innerHTML = this.isLightMode ? '🌙 Dark Mode' : '☀️ Light Mode';
+    }
+  },
+
+  async fetchData() {
+    try {
+      const [resClubs, resEvents, resUsers, resStats, resLogs, resSettings, resProv] = await Promise.all([
+        fetch('api.php?action=get_clubs').then(r => r.json()),
+        fetch('api.php?action=get_events').then(r => r.json()),
+        fetch('api.php?action=get_users').then(r => r.json()),
+        fetch('api.php?action=get_admin_stats').then(r => r.json()),
+        fetch('api.php?action=get_audit_logs').then(r => r.json()),
+        fetch('api.php?action=get_system_settings').then(r => r.json()),
+        fetch('api.php?action=get_provinces').then(r => r.json())
+      ]);
+
+      if (resClubs.success) this.clubs = resClubs.clubs;
+      if (resEvents.success) this.events = resEvents.events;
+      if (resUsers.success) this.users = resUsers.users;
+      if (resStats.success) this.adminStats = resStats;
+      if (resLogs.success) this.auditLogs = resLogs.auditLogs;
+      if (resSettings.success) this.systemSettings = resSettings.settings;
+      if (resProv.success) this.provinces = resProv.provinces;
+
+      this.renderClubsList();
+      this.renderEventsList();
+      this.renderProvincesDropdown();
+    } catch (e) {
+      console.error("Error loading API data:", e);
+    }
+  },
+
+  renderProvincesDropdown() {
+    const selectEl = document.getElementById('reg-province-select');
+    if (!selectEl || this.provinces.length === 0) return;
+
+    selectEl.innerHTML = this.provinces.map(p => `
+      <option value="${p.id}">${p.name} (${p.region})</option>
+    `).join('');
+  },
+
+  renderTestimonials() {
+    const container = document.getElementById('testimonials-grid-container');
+    if (!container) return;
+
+    container.innerHTML = this.testimonials.map(t => `
+      <div class="testimonial-card">
+        <p style="font-style:italic; font-size:0.9rem; color:var(--text-main); margin-bottom:16px;">
+          "${t.quote}"
+        </p>
+        <div style="display:flex; align-items:center; gap:12px; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <div style="width:40px; height:40px; border-radius:50%; background:var(--accent-gold); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:0.85rem;">
+            ${t.avatar}
+          </div>
+          <div>
+            <h4 style="font-size:0.95rem; line-height:1.2;">${t.name}</h4>
+            <span style="font-size:0.75rem; color:var(--accent-gold);">${t.role} (${t.city})</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  bindRoleSwitcher() {
+    document.querySelectorAll('.role-pill-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const role = e.currentTarget.getAttribute('data-role');
+        this.setRole(role);
+      });
+    });
+  },
+
+  bindAdminTabs() {
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tab = e.currentTarget.getAttribute('data-admin-tab');
+        this.switchAdminTab(tab);
+      });
+    });
+  },
+
+  switchAdminTab(tab) {
+    this.activeAdminTab = tab;
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      if (btn.getAttribute('data-admin-tab') === tab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const targetContent = document.getElementById(`admin-tab-${tab}`);
+    if (targetContent) targetContent.style.display = 'block';
+
+    if (tab === 'dashboard') this.renderAdminDashboard();
+    else if (tab === 'users') this.renderUserManagement();
+    else if (tab === 'audit') this.renderAuditLogs();
+    else if (tab === 'settings') this.renderSystemSettings();
+  },
+
+  setRole(role, userData = null) {
+    this.currentRole = role;
+    this.currentUser = userData || this.getDefaultUserForRole(role);
+
+    document.querySelectorAll('.role-pill-btn').forEach(btn => {
+      if (btn.getAttribute('data-role') === role) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    const currentRoleLabel = document.getElementById('active-role-display');
+    if (currentRoleLabel) {
+      currentRoleLabel.innerText = this.formatRoleName(role);
+    }
+
+    this.renderView();
+  },
+
+  getDefaultUserForRole(role) {
+    switch (role) {
+      case 'SUPER_ADMIN':
+        return { name: 'Derist Touriano', username: 'usr_superadmin', role: 'SUPER_ADMIN', tier: 'PLATINUM', status: 'ACTIVE', club: 'Jakarta Bikers Club', domicile: 'Jambi', isSystemArchitect: true };
+      case 'ADMIN_ORGANISASI':
+        return { name: 'Ir. Raymond Sanjaya', username: 'raymond_s', role: 'ADMIN_ORGANISASI', tier: 'GOLD', status: 'ACTIVE', club: 'Bandung Riders Community', domicile: 'Bandung' };
+      case 'PENGURUS_PUSAT':
+        return { name: 'Drs. Ananda Sukarlan', username: 'ananda_s', role: 'PENGURUS_PUSAT', tier: 'GOLD', status: 'ACTIVE', club: 'Surabaya Cruisers', domicile: 'Surabaya' };
+      case 'PENGURUS_KLUB':
+        return { name: 'Captain Herman S.', username: 'herman_amg', role: 'PENGURUS_KLUB', tier: 'SILVER', status: 'ACTIVE', club: 'Jakarta Bikers Club', domicile: 'Tangerang Selatan' };
+      case 'MEMBER':
+        return { name: 'Budi Santoso', username: 'member_jkt_001', role: 'MEMBER', tier: 'BRONZE', status: 'ACTIVE', club: 'Jakarta Bikers Club', memberId: 'MBINA-JKT-2026-000001', domicile: 'Jakarta' };
+      case 'CALON_MEMBER':
+        return { name: 'Siti Rahayu', username: 'member_jkt_002', role: 'CALON_MEMBER', tier: 'BRONZE', status: 'PENDING', club: 'Jakarta Bikers Club', birthDate: '1995-03-20', gender: 'WANITA', domicile: 'Jakarta', occupation: 'Swasta' };
+      case 'GUEST':
+      default:
+        return null;
+    }
+  },
+
+  formatRoleName(role) {
+    const map = {
+      'SUPER_ADMIN': 'Super Admin',
+      'ADMIN_ORGANISASI': 'Admin Organisasi',
+      'PENGURUS_PUSAT': 'Pengurus Pusat',
+      'PENGURUS_KLUB': 'Pengurus Klub',
+      'MEMBER': 'Member Terverifikasi',
+      'CALON_MEMBER': 'Calon Member (Pending)',
+      'GUEST': 'Guest (Pengunjung)'
+    };
+    return map[role] || role;
+  },
+
+  renderView() {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+
+    const navLoginBtn = document.getElementById('nav-login-btn');
+    const navRegBtn = document.getElementById('nav-reg-btn');
+    const userProfileWidget = document.getElementById('nav-user-profile');
+
+    if (this.currentRole === 'GUEST') {
+      if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
+      if (navRegBtn) navRegBtn.style.display = 'inline-flex';
+      if (userProfileWidget) userProfileWidget.style.display = 'none';
+
+      const landingView = document.getElementById('view-landing-page');
+      if (landingView) landingView.style.display = 'block';
+    } else {
+      if (navLoginBtn) navLoginBtn.style.display = 'none';
+      if (navRegBtn) navRegBtn.style.display = 'none';
+      if (userProfileWidget) {
+        userProfileWidget.style.display = 'flex';
+        document.getElementById('nav-user-name').innerText = this.currentUser.name;
+        document.getElementById('nav-user-role-badge').innerText = this.formatRoleName(this.currentRole);
+      }
+
+      if (this.currentRole === 'CALON_MEMBER') {
+        const calonView = document.getElementById('view-calon-member-dashboard');
+        if (calonView) calonView.style.display = 'block';
+        this.renderCalonMemberStatus();
+      } else if (this.currentRole === 'MEMBER') {
+        const memberView = document.getElementById('view-member-dashboard');
+        if (memberView) memberView.style.display = 'block';
+        this.renderMemberDigitalCard();
+      } else if (this.currentRole === 'ADMIN_ORGANISASI' || this.currentRole === 'SUPER_ADMIN') {
+        const adminView = document.getElementById('view-admin-dashboard');
+        if (adminView) adminView.style.display = 'block';
+        this.switchAdminTab(this.activeAdminTab);
+      } else {
+        const generalDashboard = document.getElementById('view-general-dashboard');
+        if (generalDashboard) generalDashboard.style.display = 'block';
+      }
+    }
+  },
+
+  renderClubsList() {
+    const container = document.getElementById('clubs-grid-container');
+    if (!container) return;
+
+    container.innerHTML = this.clubs.map(c => `
+      <div class="glass-card" style="padding:20px;">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
+          <div style="width:48px; height:48px; border-radius:12px; background:rgba(245,158,11,0.15); border:1px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-weight:800;">
+            ${c.code.substring(0, 3)}
+          </div>
+          <div>
+            <h4 style="font-size:1.05rem;">${c.name}</h4>
+            <span style="font-size:0.75rem; color:var(--text-muted);">${c.city || 'Indonesia'}</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">${c.description || 'Klub resmi terdaftar di bawah naungan MB INA.'}</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <span style="font-size:0.8rem; color:var(--accent-gold); font-weight:700;">👥 ${c.memberCount} Anggota</span>
+          <button class="role-pill-btn" style="border-color:var(--accent-gold);" onclick="alert('Mendaftar ke club ${c.name}')">Lihat Club</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderEventsList() {
+    const container = document.getElementById('events-grid-container');
+    if (!container) return;
+
+    container.innerHTML = this.events.map(e => `
+      <div class="glass-card" style="padding:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">UPCOMING</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${e.eventDate.split(' ')[0]}</span>
+        </div>
+        <h4 style="font-size:1.1rem; margin-bottom:8px;">${e.title}</h4>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">📍 ${e.location}</p>
+        <p style="font-size:0.85rem; color:var(--text-main); margin-bottom:16px;">${e.description}</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <span style="font-size:0.8rem; color:var(--text-muted);">${e.registeredCount} / ${e.maxAttendees} Terdaftar</span>
+          <button class="btn-primary" style="padding:6px 16px; font-size:0.8rem;" onclick="AppEngine.handleRSVP('${e.id}')">RSVP Event</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderAdminDashboard() {
+    const stats = this.adminStats ? this.adminStats.stats : { totalMembers: 12544, activeClubs: 34, monthlyTransactionRp: 'Rp 425.500.000', pendingApprovals: 1 };
+    
+    document.getElementById('stat-members-count').innerText = stats.totalMembers.toLocaleString();
+    document.getElementById('stat-clubs-count').innerText = stats.activeClubs;
+    document.getElementById('stat-revenue-amount').innerText = stats.monthlyTransactionRp;
+    document.getElementById('stat-pending-count').innerText = stats.pendingApprovals;
+
+    const growthData = (this.adminStats && this.adminStats.chartGrowth) ? this.adminStats.chartGrowth.weekly : { Sen: 42, Sel: 65, Rab: 58, Kam: 84, Jum: 96, Sab: 120, Ming: 110 };
+    const chartContainer = document.getElementById('admin-growth-chart');
+    if (chartContainer) {
+      const maxVal = Math.max(...Object.values(growthData));
+      chartContainer.innerHTML = Object.entries(growthData).map(([day, val]) => `
+        <div class="chart-bar-col">
+          <div class="chart-bar" style="height: ${(val / maxVal) * 100}%;" title="${val} Registrasi Baru"></div>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${day}</span>
+        </div>
+      `).join('');
+    }
+
+    const regData = (this.adminStats && this.adminStats.regionalDistribution) ? this.adminStats.regionalDistribution : [
+      { region: 'DKI Jakarta & Banten', count: 4820, percentage: 38 },
+      { region: 'Jawa Barat', count: 2950, percentage: 24 },
+      { region: 'Jawa Tengah & DIY', count: 1840, percentage: 15 },
+      { region: 'Jawa Timur & Bali', count: 1650, percentage: 13 },
+      { region: 'Sumatera & Kalimantan', count: 1280, percentage: 10 }
+    ];
+    const regionContainer = document.getElementById('admin-region-distribution');
+    if (regionContainer) {
+      regionContainer.innerHTML = regData.map(r => `
+        <div class="region-progress-row">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+            <span>${r.region}</span>
+            <strong style="color:var(--accent-gold);">${r.count} Anggota (${r.percentage}%)</strong>
+          </div>
+          <div class="region-progress-bar">
+            <div class="region-progress-fill" style="width:${r.percentage}%;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const alerts = (this.adminStats && this.adminStats.systemAlerts) ? this.adminStats.systemAlerts : [];
+    const alertsContainer = document.getElementById('admin-alerts-feed');
+    if (alertsContainer) {
+      alertsContainer.innerHTML = alerts.map(a => `
+        <div style="padding:12px; border-bottom:1px solid var(--chrome-border); display:flex; align-items:center; gap:12px; font-size:0.85rem;">
+          <span class="tier-badge" style="background:${a.level === 'WARNING' ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}; color:${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'}; border:1px solid ${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'};">
+            ${a.level}
+          </span>
+          <span style="flex:1;">${a.message}</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${a.time}</span>
+        </div>
+      `).join('');
+    }
+
+    this.renderVerificationQueue();
+  },
+
+  renderUserManagement() {
+    const tableContainer = document.getElementById('user-mgmt-table');
+    if (!tableContainer) return;
+
+    const searchTerm = (document.getElementById('user-mgmt-search') ? document.getElementById('user-mgmt-search').value : '').toLowerCase();
+    const roleFilter = document.getElementById('user-mgmt-role-filter') ? document.getElementById('user-mgmt-role-filter').value : '';
+    const statusFilter = document.getElementById('user-mgmt-status-filter') ? document.getElementById('user-mgmt-status-filter').value : '';
+
+    let filtered = this.users;
+
+    if (searchTerm) {
+      filtered = filtered.filter(u => u.name.toLowerCase().includes(searchTerm) || u.email.toLowerCase().includes(searchTerm) || (u.username && u.username.toLowerCase().includes(searchTerm)));
+    }
+    if (roleFilter) {
+      filtered = filtered.filter(u => u.role === roleFilter);
+    }
+    if (statusFilter) {
+      filtered = filtered.filter(u => u.status === statusFilter);
+    }
+
+    tableContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">ID & Username</th>
+            <th style="padding:12px;">Nama Lengkap</th>
+            <th style="padding:12px;">Email & WhatsApp</th>
+            <th style="padding:12px;">Role</th>
+            <th style="padding:12px;">Status</th>
+            <th style="padding:12px; text-align:right;">Aksi Manajemen</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(u => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:14px 12px; font-family:monospace; font-size:0.8rem;">
+                ${u.id}<br>
+                <span style="color:var(--accent-gold); font-weight:700;">@${u.username || 'user'}</span>
+                ${u.isSystemArchitect ? '<br><span style="color:var(--primary-emerald); font-size:0.7rem;">🔒 System Architect</span>' : ''}
+              </td>
+              <td style="padding:14px 12px; font-weight:600;">
+                ${u.name}
+                <div style="font-size:0.75rem; color:var(--text-muted);">${u.city || 'Indonesia'}</div>
+              </td>
+              <td style="padding:14px 12px; color:var(--text-muted);">
+                ${u.email}<br>${u.phone}
+              </td>
+              <td style="padding:14px 12px;">
+                <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+                  ${this.formatRoleName(u.role)}
+                </span>
+              </td>
+              <td style="padding:14px 12px;">
+                <span class="tier-badge" style="background:${u.status === 'ACTIVE' ? 'rgba(16,185,129,0.2)' : u.status === 'SUSPENDED' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)'}; color:${u.status === 'ACTIVE' ? 'var(--primary-emerald)' : u.status === 'SUSPENDED' ? 'var(--accent-red)' : 'var(--accent-gold)'};">
+                  ${u.status}
+                </span>
+              </td>
+              <td style="padding:14px 12px; text-align:right;">
+                <div style="display:flex; justify-content:flex-end; gap:6px;">
+                  <button class="role-pill-btn" onclick="AppEngine.suspendUser('${u.id}')" title="Suspend/Activate User">
+                    ${u.status === 'SUSPENDED' ? '✅ Activate' : '⛔ Suspend'}
+                  </button>
+                  <button class="role-pill-btn" onclick="AppEngine.resetPassword('${u.id}')" title="Reset Password">
+                    🔑 Reset
+                  </button>
+                  ${u.isProtected ? '' : `
+                  <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteUser('${u.id}')" title="Hapus User">
+                    🗑️ Hapus
+                  </button>`}
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  async suspendUser(userId) {
+    try {
+      const res = await fetch('api.php?action=suspend_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      this.renderUserManagement();
+    } catch (e) {
+      alert('Gagal mengaktifkan/mensuspend akun!');
+    }
+  },
+
+  async resetPassword(userId) {
+    if (!confirm(`Reset password untuk user ID ${userId}?`)) return;
+    try {
+      const res = await fetch('api.php?action=reset_password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      alert(data.message);
+    } catch (e) {
+      alert('Gagal me-reset password!');
+    }
+  },
+
+  async deleteUser(userId) {
+    if (!confirm(`Hapus permanen user ID ${userId} dari database?`)) return;
+    try {
+      const res = await fetch('api.php?action=delete_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      this.renderUserManagement();
+    } catch (e) {
+      alert('Gagal menghapus user!');
+    }
+  },
+
+  simulateBulkImport() {
+    const fileInput = document.getElementById('csv-import-file');
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      alert('Pilih berkas CSV/Excel data member terlebih dahulu!');
+      return;
+    }
+    alert(`Bulk Import Berhasil! 25 Data member baru telah di-import ke sistem MB INA.`);
+    AuthEngine.closeAllModals();
+  },
+
+  simulateExport(format) {
+    alert(`Export data member dalam format ${format.toUpperCase()} telah diunduh: MB_INA_Members_2026.${format}`);
+  },
+
+  renderAuditLogs() {
+    const logContainer = document.getElementById('audit-logs-table');
+    if (!logContainer) return;
+
+    const moduleFilter = document.getElementById('audit-module-filter') ? document.getElementById('audit-module-filter').value : '';
+    const actionFilter = document.getElementById('audit-action-filter') ? document.getElementById('audit-action-filter').value : '';
+
+    let filteredLogs = this.auditLogs;
+
+    if (moduleFilter) {
+      filteredLogs = filteredLogs.filter(l => l.module === moduleFilter);
+    }
+    if (actionFilter) {
+      filteredLogs = filteredLogs.filter(l => l.action === actionFilter);
+    }
+
+    logContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">Log ID</th>
+            <th style="padding:12px;">User ID</th>
+            <th style="padding:12px;">Action</th>
+            <th style="padding:12px;">Module</th>
+            <th style="padding:12px;">Details JSON</th>
+            <th style="padding:12px;">IP Address</th>
+            <th style="padding:12px;">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredLogs.map(l => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:12px; font-family:monospace; color:var(--text-muted);">${l.id}</td>
+              <td style="padding:12px; font-weight:600;">${l.userId}</td>
+              <td style="padding:12px;">
+                <span class="tier-badge" style="background:${l.action === 'DELETE' || l.action === 'SUSPEND' ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}; color:${l.action === 'DELETE' || l.action === 'SUSPEND' ? 'var(--accent-red)' : 'var(--accent-blue)'}; font-size:0.7rem;">
+                  ${l.action}
+                </span>
+              </td>
+              <td style="padding:12px; font-weight:600; color:var(--accent-gold);">${l.module}</td>
+              <td style="padding:12px; font-family:monospace; font-size:0.75rem; color:var(--text-muted);">${JSON.stringify(l.details || {})}</td>
+              <td style="padding:12px; font-size:0.8rem;">${l.ipAddress}</td>
+              <td style="padding:12px; font-size:0.8rem; color:var(--text-muted);">${l.timestamp}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  renderSystemSettings() {
+    const s = this.systemSettings || {};
+    const themeSelect = document.getElementById('setting-theme-select');
+    const langSelect = document.getElementById('setting-lang-select');
+    const tzSelect = document.getElementById('setting-tz-select');
+    const maintSwitch = document.getElementById('setting-maint-switch');
+
+    if (themeSelect) themeSelect.value = s.defaultTheme || 'LIGHT';
+    if (langSelect) langSelect.value = s.language || 'ID';
+    if (tzSelect) tzSelect.value = s.timezone || 'Asia/Jakarta (WIB)';
+    if (maintSwitch) maintSwitch.checked = s.maintenanceMode || false;
+  },
+
+  async saveSystemSettings() {
+    const defaultTheme = document.getElementById('setting-theme-select').value;
+    const language = document.getElementById('setting-lang-select').value;
+    const timezone = document.getElementById('setting-tz-select').value;
+    const maintenanceMode = document.getElementById('setting-maint-switch').checked;
+
+    try {
+      const res = await fetch('api.php?action=update_system_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ defaultTheme, language, timezone, maintenanceMode })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+    } catch (e) {
+      alert('Gagal menyimpan pengaturan sistem!');
+    }
+  },
+
+  async backupDatabase() {
+    try {
+      const res = await fetch('api.php?action=backup_database').then(r => r.json());
+      alert(res.message);
+    } catch (e) {
+      alert('Gagal membuat backup database!');
+    }
+  },
+
+  renderCalonMemberStatus() {
+    const statusContainer = document.getElementById('calon-status-card');
+    if (!statusContainer) return;
+    const u = this.currentUser;
+
+    statusContainer.innerHTML = `
+      <div class="glass-panel" style="padding:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="font-size:1.4rem;">Status Permohonan Keanggotaan MB INA</h3>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Username: <strong style="color:var(--accent-gold);">@${u.username || 'dtouriano'}</strong> | ID: REG-${Math.floor(100000 + Math.random() * 900000)}</p>
+          </div>
+          <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.9rem; padding:6px 16px;">
+            ⏳ STATUS: PENDING VERIFIKASI
+          </span>
+        </div>
+
+        <div style="background:rgba(0,0,0,0.03); border:1px solid var(--chrome-border); border-radius:14px; padding:20px; margin-bottom:24px;">
+          <h4 style="font-size:1rem; margin-bottom:12px; color:var(--accent-gold);">Data Profil Keanggotaan (Minimal & Aman)</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; font-size:0.88rem;">
+            <div><span style="color:var(--text-muted);">Nama Lengkap:</span><br><strong>${u.name}</strong></div>
+            <div><span style="color:var(--text-muted);">Username:</span><br><strong>@${u.username || 'dtouriano'}</strong></div>
+            <div><span style="color:var(--text-muted);">Jenis Kelamin:</span><br><strong>${u.gender || 'PRIA'}</strong></div>
+            <div><span style="color:var(--text-muted);">Kota / Kabupaten:</span><br><strong>${u.city || 'Jambi'}</strong></div>
+            <div><span style="color:var(--text-muted);">Role Pendaftaran:</span><br><strong style="color:var(--accent-gold);">${this.formatRoleName(u.role)}</strong></div>
+            <div><span style="color:var(--text-muted);">WhatsApp OTP:</span><br><strong style="color:var(--primary-emerald);">✓ Terverifikasi 6 Digit</strong></div>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  renderMemberDigitalCard() {
+    const container = document.getElementById('digital-member-card-wrapper');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="glass-card" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border:1px solid var(--accent-gold); border-radius:20px; padding:24px; color:#fff; position:relative; overflow:hidden;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+          <div>
+            <div style="font-size:0.75rem; letter-spacing:2px; color:var(--accent-gold); text-transform:uppercase; font-weight:800;">MERCEDES-BENZ CLUB INDONESIA</div>
+            <h3 style="font-size:1.3rem; margin-top:4px;">${this.currentUser.name}</h3>
+            <span style="font-size:0.8rem; color:#94a3b8;">@${this.currentUser.username || 'dtouriano'} | ${this.currentUser.memberId || 'MBINA-SA-2026-000001'}</span>
+          </div>
+          <span class="tier-badge">${this.currentUser.tier || 'PLATINUM'} MEMBER</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:28px;">
+          <div>
+            <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase;">Klub Registered & Kota</div>
+            <div style="font-size:0.9rem; font-weight:600; color:#fff;">${this.currentUser.club || 'Jakarta Bikers Club'}</div>
+            <div style="font-size:0.75rem; color:var(--accent-gold); margin-top:4px;">📍 ${this.currentUser.city || 'Jambi'}</div>
+          </div>
+          <div style="width:64px; height:64px; background:#fff; padding:4px; border-radius:8px;">
+            <svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+              <rect width="100" height="100" fill="white"/>
+              <rect x="10" y="10" width="30" height="30" fill="black"/>
+              <rect x="60" y="10" width="30" height="30" fill="black"/>
+              <rect x="10" y="60" width="30" height="30" fill="black"/>
+              <rect x="20" y="20" width="10" height="10" fill="white"/>
+              <rect x="70" y="20" width="10" height="10" fill="white"/>
+              <rect x="20" y="70" width="10" height="10" fill="white"/>
+              <rect x="50" y="50" width="15" height="15" fill="black"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  renderVerificationQueue() {
+    const queueContainer = document.getElementById('admin-verification-table');
+    if (!queueContainer) return;
+
+    const pendingUsers = this.users.filter(u => u.status === 'PENDING' || u.role === 'CALON_MEMBER');
+
+    if (pendingUsers.length === 0) {
+      queueContainer.innerHTML = `<p style="padding:20px; color:var(--text-muted);">Tidak ada permohonan calon member baru saat ini.</p>`;
+      return;
+    }
+
+    queueContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">Nama & Username</th>
+            <th style="padding:12px;">Kontak & Email</th>
+            <th style="padding:12px;">Kota & Usia</th>
+            <th style="padding:12px;">Role Permohonan</th>
+            <th style="padding:12px; text-align:right;">Aksi Verifikasi</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingUsers.map(u => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:14px 12px; font-weight:600;">
+                ${u.name}<br>
+                <span style="font-size:0.75rem; color:var(--accent-gold);">@${u.username || 'user'}</span>
+              </td>
+              <td style="padding:14px 12px; color:var(--text-muted);">
+                ${u.email}<br>${u.phone}
+              </td>
+              <td style="padding:14px 12px;">
+                ${u.city || 'Indonesia'}
+              </td>
+              <td style="padding:14px 12px;">
+                <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+                  ${this.formatRoleName(u.role)}
+                </span>
+              </td>
+              <td style="padding:14px 12px; text-align:right;">
+                <button class="btn-primary" style="padding:6px 12px; font-size:0.75rem;" onclick="AppEngine.approveUser('${u.id}')">✓ Approve Member</button>
+                <button class="btn-outline" style="padding:6px 12px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="AppEngine.rejectUser('${u.id}')">✕ Reject</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  async approveUser(userId) {
+    if (!confirm('Apakah Anda yakin ingin menyetujui verifikasi keanggotaan calon member ini?')) return;
+
+    try {
+      const res = await fetch('api.php?action=update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, status: 'ACTIVE', role: 'MEMBER' })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+      else if (this.activeAdminTab === 'users') this.renderUserManagement();
+    } catch (e) {
+      alert('Gagal menyetujui member!');
+    }
+  },
+
+  async rejectUser(userId) {
+    if (!confirm('Tolak permohonan calon member ini?')) return;
+
+    try {
+      const res = await fetch('api.php?action=update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, status: 'REJECTED' })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+      else if (this.activeAdminTab === 'users') this.renderUserManagement();
+    } catch (e) {
+      alert('Gagal menolak permohonan!');
+    }
+  },
+
+  handleRSVP(eventId) {
+    if (this.currentRole === 'GUEST') {
+      alert('Silakan login atau daftar sebagai member MB INA terlebih dahulu untuk mengonfirmasi kehadiran event!');
+      AuthEngine.openModal('modal-login');
+    } else {
+      alert('Terima kasih! RSVP Anda telah tercatat pada sistem event MB INA.');
+    }
+  }
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  AppEngine.init();
+});

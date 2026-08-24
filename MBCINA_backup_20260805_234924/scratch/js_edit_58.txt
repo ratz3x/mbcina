@@ -1,0 +1,26 @@
+  switchM2Subtab(subtab) {
+    if (!subtab || typeof subtab !== 'string') subtab = 'profile';
+    this.activeM2Subtab = subtab;
+    document.querySelectorAll('[data-m2sub]').forEach(btn => {
+      if (btn.getAttribute('data-m2sub') === subtab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.m2-subtab-content').forEach(el => el.style.display = 'none');
+    const targetContent = document.getElementById(`m2sub-${subtab}`);
+    if (targetContent) targetContent.style.display = 'block';
+
+    if (subtab === 'profile') this.renderM2Profile();
+    else if (subtab === 'founders') this.renderM2Founders();
+    else if (subtab === 'vision') this.renderM2Vision();
+    else if (subtab === 'presidents') this.renderM2Presidents();
+    else if (subtab === 'structure') this.renderM2Structure();
+    else if (subtab === 'clubs') this.renderM2Clubs();
+  },
+
+  renderM2Module() {
+    this.switchM2Subtab(this.activeM2Subtab || 'profile');
+  },

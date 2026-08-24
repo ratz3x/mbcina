@@ -1,0 +1,591 @@
+  handleRSVP(eventId) {
+    alert('Terima kasih! RSVP Anda telah tercatat pada sistem event MB INA.');
+  },
+
+  // ============================================
+  // M3 - MANAJEMEN KEANGGOTAAN ENGINE METHODS
+  // ============================================
+  async fetchM3Data() {
+    try {
+      const res = await fetch('api.php?action=get_m3_members').then(r => r.json());
+      if (res.success) {
+        this.m3Data.members = res.members || [];
+        this.m3Data.pendingCount = res.pendingCount || 0;
+
+        const badgeEl = document.getElementById('m3-pending-badge');
+        if (badgeEl) badgeEl.innerText = `⏳ ${res.pendingCount} PENDING VERIFIKASI`;
+
+        const pillCount = document.getElementById('m3-verify-pill-count');
+        if (pillCount) pillCount.innerText = res.pendingCount;
+
+        this.populateM3ClubDropdowns();
+      }
+    } catch (e) {
+      console.error("Error loading M3 Data:", e);
+    }
+  },
+
+  populateM3ClubDropdowns() {
+    const clubsList = (this.m2Data && this.m2Data.clubs && this.m2Data.clubs.length) ? this.m2Data.clubs : this.clubs;
+    const optionsHtml = `<option value="">Semua Klub & Chapter</option>` + 
+      clubsList.map(c => `<option value="${c.name}">${c.name} (${c.region})</option>`).join('');
+
+    const filterSelect = document.getElementById('m3-club-filter');
+    if (filterSelect && filterSelect.options.length <= 1) filterSelect.innerHTML = optionsHtml;
+
+    const addSelect = document.getElementById('m3-add-club');
+    if (addSelect && !addSelect.children.length) {
+      addSelect.innerHTML = clubsList.map(c => `<option value="${c.name}">${c.name} (${c.code || 'MB'})</option>`).join('');
+    }
+
+    const editSelect = document.getElementById('m3-edit-club');
+    if (editSelect && !editSelect.children.length) {
+      editSelect.innerHTML = clubsList.map(c => `<option value="${c.name}">${c.name} (${c.code || 'MB'})</option>`).join('');
+    }
+  },
+
+  async renderM3Module() {
+    await this.fetchM3Data();
+    this.switchM3Subtab(this.m3Data.activeSubtab || 'list');
+  },
+
+  switchM3Subtab(subtab) {
+    this.m3Data.activeSubtab = subtab;
+    document.querySelectorAll('[data-m3sub]').forEach(btn => {
+      if (btn.getAttribute('data-m3sub') === subtab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.m3-subtab-content').forEach(el => el.style.display = 'none');
+    const target = document.getElementById(`m3sub-${subtab}`);
+    if (target) target.style.display = 'block';
+
+    if (subtab === 'list') this.renderM3MemberList();
+    else if (subtab === 'verify') this.renderM3VerifyList();
+    else if (subtab === 'add') this.populateM3ClubDropdowns();
+  },
+
+  renderM3MemberList() {
+    const container = document.getElementById('m3-member-table-container');
+    if (!container) return;
+
+    const searchQuery = (document.getElementById('m3-search-input')?.value || '').toLowerCase().trim();
+    const tierFilter = document.getElementById('m3-tier-filter')?.value || '';
+    const statusFilter = document.getElementById('m3-status-filter')?.value || '';
+    const clubFilter = document.getElementById('m3-club-filter')?.value || '';
+
+    let filtered = this.m3Data.members;
+
+    if (searchQuery) {
+      filtered = filtered.filter(m => 
+        (m.name || '').toLowerCase().includes(searchQuery) ||
+        (m.email || '').toLowerCase().includes(searchQuery) ||
+        (m.username || '').toLowerCase().includes(searchQuery) ||
+        (m.member_id || '').toLowerCase().includes(searchQuery)
+      );
+    }
+
+    if (tierFilter) filtered = filtered.filter(m => m.tier === tierFilter);
+    if (statusFilter) filtered = filtered.filter(m => m.status === statusFilter);
+    if (clubFilter) filtered = filtered.filter(m => m.club === clubFilter);
+
+    const getTierBadge = (t) => {
+      const map = {
+        'PLATINUM': '<span class="tier-badge" style="background:rgba(168,85,247,0.2); color:#A855F7; border:1px solid #A855F7;">💎 PLATINUM</span>',
+        'GOLD': '<span class="tier-badge" style="background:rgba(212,175,55,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">🥇 GOLD</span>',
+        'SILVER': '<span class="tier-badge" style="background:rgba(192,192,192,0.2); color:#C0C0C0; border:1px solid #C0C0C0;">🥈 SILVER</span>',
+        'BRONZE': '<span class="tier-badge" style="background:rgba(205,127,50,0.2); color:#CD7F32; border:1px solid #CD7F32;">🥉 BRONZE</span>'
+      };
+      return map[t] || map['BRONZE'];
+    };
+
+    const getStatusBadge = (s) => {
+      if (s === 'ACTIVE') return '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">🟢 ACTIVE</span>';
+      if (s === 'PENDING') return '<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red);">⏳ PENDING</span>';
+      return '<span class="tier-badge" style="background:rgba(100,116,139,0.2); color:var(--text-muted); border:1px solid var(--chrome-border);">❌ REJECTED</span>';
+    };
+
+    container.innerHTML = `
+      <table class="data-table" style="width:100%;">
+        <thead>
+          <tr>
+            <th>ID MEMBER</th>
+            <th>NAMA MEMBER</th>
+            <th>EMAIL & WHATSAPP</th>
+            <th>KLUB / CHAPTER</th>
+            <th>TIER</th>
+            <th>STATUS</th>
+            <th>TOTAL DONASI</th>
+            <th>AKSI</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.length === 0 ? `
+            <tr>
+              <td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">
+                Tidak ada data member yang sesuai dengan filter pencarian.
+              </td>
+            </tr>
+          ` : filtered.map(m => `
+            <tr>
+              <td style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.88rem;">
+                ${m.member_id || '<span style="color:var(--accent-red);">[PENDING ID]</span>'}
+              </td>
+              <td>
+                <div style="font-weight:700; color:var(--text-main); font-size:0.95rem;">${m.name}</div>
+                <span style="font-size:0.75rem; color:var(--text-muted);">@${m.username || 'user'}</span>
+              </td>
+              <td>
+                <div style="font-size:0.85rem; color:var(--text-main);">${m.email}</div>
+                <div style="font-size:0.78rem; color:var(--accent-gold); font-weight:700;">📞 ${m.phone || '-'}</div>
+              </td>
+              <td style="font-size:0.85rem;">${m.club || 'HQ MB INA'}</td>
+              <td>${getTierBadge(m.tier)}</td>
+              <td>${getStatusBadge(m.status)}</td>
+              <td style="font-weight:800; color:var(--primary-emerald); font-size:0.9rem;">
+                Rp ${new Intl.NumberFormat('id-ID').format(m.total_donation || 0)}
+              </td>
+              <td>
+                <div style="display:flex; gap:6px; flex-wrap:nowrap;">
+                  <button class="role-pill-btn" style="border-color:var(--accent-blue); color:var(--accent-blue);" onclick="AppEngine.openM3MemberDetail('${m.id}')" title="Detail Profile Member">👁️ Detail</button>
+                  <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditM3MemberModal('${m.id}')" title="Edit Member">✏️ Edit</button>
+                  <button class="role-pill-btn" style="border-color:var(--primary-emerald); color:var(--primary-emerald);" onclick="AppEngine.openM3AddDonationModal('${m.id}')" title="Catat Donasi & Upgrade Tier">💰 Donasi</button>
+                  <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteM3Member('${m.id}')" title="Hapus Member">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:16px; font-size:0.8rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+        <span>Menampilkan ${filtered.length} dari ${this.m3Data.members.length} total member MB INA</span>
+        <span style="color:var(--accent-gold); font-weight:700;">Database Live: Supabase Cloud PostgreSQL</span>
+      </div>
+    `;
+  },
+
+  renderM3VerifyList() {
+    const container = document.getElementById('m3-verify-table-container');
+    if (!container) return;
+
+    const pendingMembers = this.m3Data.members.filter(m => m.status === 'PENDING' || m.role === 'CALON_MEMBER');
+
+    container.innerHTML = `
+      <table class="data-table" style="width:100%;">
+        <thead>
+          <tr>
+            <th>NAMA CALON MEMBER</th>
+            <th>EMAIL & WHATSAPP</th>
+            <th>KLUB TUJUAN</th>
+            <th>PROVINSI & KOTA</th>
+            <th>TANGGAL DAFTAR</th>
+            <th>AKSI VERIFIKASI</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingMembers.length === 0 ? `
+            <tr>
+              <td colspan="6" style="text-align:center; padding:32px; color:var(--primary-emerald); font-weight:700;">
+                🎉 Tidak ada antrean verifikasi pending! Semua pendaftar telah diproses.
+              </td>
+            </tr>
+          ` : pendingMembers.map(m => `
+            <tr>
+              <td>
+                <div style="font-weight:700; color:var(--text-main); font-size:0.95rem;">${m.name}</div>
+                <span style="font-size:0.75rem; color:var(--accent-gold);">@${m.username || 'calon_member'}</span>
+              </td>
+              <td>
+                <div style="font-size:0.85rem; color:var(--text-main);">${m.email}</div>
+                <div style="font-size:0.78rem; color:var(--accent-gold); font-weight:700;">📞 ${m.phone || '-'}</div>
+              </td>
+              <td style="font-weight:700; color:var(--text-main); font-size:0.88rem;">${m.club || 'HQ MB INA'}</td>
+              <td style="font-size:0.85rem;">${m.city || '-'}, ${m.province || '-'}</td>
+              <td style="font-size:0.8rem; color:var(--text-muted);">${m.created_at ? new Date(m.created_at).toLocaleDateString('id-ID') : 'Baru Saja'}</td>
+              <td>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn-primary" style="padding:6px 14px; font-size:0.78rem;" onclick="AppEngine.openM3VerifyModal('${m.id}', 'APPROVE')">✅ Setujui (Approve)</button>
+                  <button class="btn-outline" style="padding:6px 14px; font-size:0.78rem; border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.openM3VerifyModal('${m.id}', 'REJECT')">❌ Tolak (Reject)</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  openAddM3MemberModal() {
+    this.switchM3Subtab('add');
+  },
+
+  async saveM3MemberFromForm(event) {
+    event.preventDefault();
+    const name = document.getElementById('m3-add-name').value.trim();
+    const username = document.getElementById('m3-add-username').value.trim();
+    const email = document.getElementById('m3-add-email').value.trim();
+    const phone = document.getElementById('m3-add-phone').value.trim();
+    const birth_date = document.getElementById('m3-add-bdate').value;
+    const gender = document.getElementById('m3-add-gender').value;
+    const province = document.getElementById('m3-add-province').value.trim();
+    const city = document.getElementById('m3-add-city').value.trim();
+    const club = document.getElementById('m3-add-club').value;
+    const tier = document.getElementById('m3-add-tier').value;
+    const status = document.getElementById('m3-add-status').value;
+    const admin_notes = document.getElementById('m3-add-notes').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=create_m3_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, username, email, phone, birth_date, gender, province, city, club, tier, status, admin_notes })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      await this.fetchM3Data();
+      this.switchM3Subtab('list');
+    } catch (err) {
+      alert('❌ Gagal menambah member: ' + err.message);
+    }
+  },
+
+  openEditM3MemberModal(id) {
+    const m = this.m3Data.members.find(x => x.id === id);
+    if (!m) return;
+
+    this.populateM3ClubDropdowns();
+
+    document.getElementById('m3-edit-id').value = m.id;
+    document.getElementById('m3-edit-name').value = m.name;
+    document.getElementById('m3-edit-member-id').value = m.member_id || '[PENDING ID]';
+    document.getElementById('m3-edit-email').value = m.email;
+    document.getElementById('m3-edit-phone').value = m.phone || '';
+    document.getElementById('m3-edit-club').value = m.club || '';
+    document.getElementById('m3-edit-tier').value = m.tier || 'BRONZE';
+    document.getElementById('m3-edit-status').value = m.status || 'ACTIVE';
+    document.getElementById('m3-edit-province').value = m.province || '';
+    document.getElementById('m3-edit-city').value = m.city || '';
+    document.getElementById('m3-edit-notes').value = m.admin_notes || '';
+
+    AuthEngine.openModal('modal-m3-edit-member');
+  },
+
+  async saveM3MemberFromModal(event) {
+    event.preventDefault();
+    const id = document.getElementById('m3-edit-id').value;
+    const name = document.getElementById('m3-edit-name').value.trim();
+    const email = document.getElementById('m3-edit-email').value.trim();
+    const phone = document.getElementById('m3-edit-phone').value.trim();
+    const club = document.getElementById('m3-edit-club').value;
+    const tier = document.getElementById('m3-edit-tier').value;
+    const status = document.getElementById('m3-edit-status').value;
+    const province = document.getElementById('m3-edit-province').value.trim();
+    const city = document.getElementById('m3-edit-city').value.trim();
+    const admin_notes = document.getElementById('m3-edit-notes').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=update_m3_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, email, phone, club, tier, status, province, city, admin_notes })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchM3Data();
+      this.renderM3MemberList();
+    } catch (err) {
+      alert('❌ Gagal memperbarui member: ' + err.message);
+    }
+  },
+
+  openM3VerifyModal(id, defaultAction = 'APPROVE') {
+    const m = this.m3Data.members.find(x => x.id === id);
+    if (!m) return;
+
+    document.getElementById('m3-verify-id').value = m.id;
+    document.getElementById('m3-verify-name').innerText = m.name;
+    document.getElementById('m3-verify-info').innerText = `${m.email} | 📞 ${m.phone} | Klub: ${m.club}`;
+    document.getElementById('m3-verify-reason').value = '';
+    document.getElementById('m3-verify-notes').value = '';
+
+    const radios = document.getElementsByName('verify_action');
+    for (let r of radios) {
+      if (r.value === defaultAction) r.checked = true;
+    }
+
+    document.getElementById('m3-reject-reason-box').style.display = (defaultAction === 'REJECT') ? 'block' : 'none';
+
+    AuthEngine.openModal('modal-m3-verify-member');
+  },
+
+  async saveM3Verification(event) {
+    event.preventDefault();
+    const id = document.getElementById('m3-verify-id').value;
+    const radios = document.getElementsByName('verify_action');
+    let type = 'APPROVE';
+    for (let r of radios) {
+      if (r.checked) type = r.value;
+    }
+    const reason = document.getElementById('m3-verify-reason').value.trim();
+    const notes = document.getElementById('m3-verify-notes').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=verify_m3_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, type, reason, notes })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchM3Data();
+      this.switchM3Subtab('verify');
+    } catch (err) {
+      alert('❌ Gagal memproses verifikasi: ' + err.message);
+    }
+  },
+
+  async openM3MemberDetail(id) {
+    const container = document.getElementById('m3-detail-content-body');
+    if (!container) return;
+
+    container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--accent-gold);">⏳ Memuat detail profil member dari Supabase Cloud...</div>`;
+    AuthEngine.openModal('modal-m3-member-detail');
+
+    try {
+      const res = await fetch('api.php?action=get_m3_member_detail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      }).then(r => r.json());
+
+      if (!res.success) {
+        container.innerHTML = `<div style="color:var(--accent-red); padding:20px;">Gagal memuat detail member: ${res.message}</div>`;
+        return;
+      }
+
+      const m = res.member;
+      const donations = res.donations || [];
+      const tierHistory = res.tierHistory || [];
+      const activities = res.activities || [];
+
+      const getTierBadge = (t) => {
+        if (t === 'PLATINUM') return '<span class="tier-badge" style="background:rgba(168,85,247,0.2); color:#A855F7; border:1px solid #A855F7;">💎 PLATINUM</span>';
+        if (t === 'GOLD') return '<span class="tier-badge" style="background:rgba(212,175,55,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">🥇 GOLD</span>';
+        if (t === 'SILVER') return '<span class="tier-badge" style="background:rgba(192,192,192,0.2); color:#C0C0C0; border:1px solid #C0C0C0;">🥈 SILVER</span>';
+        return '<span class="tier-badge" style="background:rgba(205,127,50,0.2); color:#CD7F32; border:1px solid #CD7F32;">🥉 BRONZE</span>';
+      };
+
+      container.innerHTML = `
+        <div style="display:grid; grid-template-columns:240px 1fr; gap:24px; margin-bottom:28px;">
+          <!-- PROFILE AVATAR CARD -->
+          <div class="glass-card" style="padding:24px; text-align:center; display:flex; flex-direction:column; align-items:center; border-top:4px solid var(--accent-gold);">
+            <div style="width:84px; height:84px; border-radius:50%; background:linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%); display:flex; align-items:center; justify-content:center; color:#fff; font-size:2rem; font-weight:900; border:3px solid var(--accent-gold); margin-bottom:14px; box-shadow:0 0 16px var(--accent-gold-glow);">
+              ${m.name ? m.name.substring(0, 2).toUpperCase() : 'MB'}
+            </div>
+            <h3 style="font-size:1.15rem; margin-bottom:4px;" class="text-gradient">${m.name}</h3>
+            <span style="font-size:0.8rem; color:var(--accent-gold); font-weight:700;">@${m.username || 'member'}</span>
+            <div style="margin-top:12px; margin-bottom:12px;">${getTierBadge(m.tier)}</div>
+            <span style="font-family:monospace; font-size:0.85rem; font-weight:800; color:var(--text-main); background:rgba(0,0,0,0.1); padding:4px 10px; border-radius:6px; border:1px solid var(--chrome-border);">
+              ${m.member_id || '[PENDING ID]'}
+            </span>
+          </div>
+
+          <!-- PROFILE DETAILS TABLE -->
+          <div class="glass-card" style="padding:24px;">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">─── 3.4.1 Informasi Lengkap Member ───</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:0.85rem;">
+              <div><strong>Email:</strong> ${m.email}</div>
+              <div><strong>WhatsApp:</strong> ${m.phone || '-'}</div>
+              <div><strong>Klub / Chapter:</strong> ${m.club || 'HQ MB INA'}</div>
+              <div><strong>Domisili:</strong> ${m.city || '-'}, ${m.province || '-'}</div>
+              <div><strong>Jenis Kelamin:</strong> ${m.gender || 'Pria'}</div>
+              <div><strong>Tanggal Lahir:</strong> ${m.birth_date || '-'}</div>
+              <div><strong>Tanggal Bergabung:</strong> ${m.created_at ? new Date(m.created_at).toLocaleDateString('id-ID') : '-'}</div>
+              <div><strong>Status Verifikasi:</strong> <strong style="color:var(--primary-emerald);">${m.status}</strong></div>
+            </div>
+
+            <!-- STATISTIK BOX -->
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:16px;">
+              <div style="background:rgba(16,185,129,0.1); border:1px solid var(--primary-emerald); padding:10px; border-radius:8px; text-align:center;">
+                <div style="font-size:0.72rem; color:var(--text-muted);">Total Donasi</div>
+                <div style="font-size:0.9rem; font-weight:800; color:var(--primary-emerald);">Rp ${new Intl.NumberFormat('id-ID').format(m.total_donation || 0)}</div>
+              </div>
+              <div style="background:rgba(59,130,246,0.1); border:1px solid var(--accent-blue); padding:10px; border-radius:8px; text-align:center;">
+                <div style="font-size:0.72rem; color:var(--text-muted);">Total Event</div>
+                <div style="font-size:0.95rem; font-weight:800; color:var(--accent-blue);">${m.total_events || 0}</div>
+              </div>
+              <div style="background:rgba(245,158,11,0.1); border:1px solid var(--accent-gold); padding:10px; border-radius:8px; text-align:center;">
+                <div style="font-size:0.72rem; color:var(--text-muted);">Loyalty Points</div>
+                <div style="font-size:0.95rem; font-weight:800; color:var(--accent-gold);">${m.points || 0} pts</div>
+              </div>
+              <div style="background:rgba(168,85,247,0.1); border:1px solid #A855F7; padding:10px; border-radius:8px; text-align:center;">
+                <div style="font-size:0.72rem; color:var(--text-muted);">Thread Forum</div>
+                <div style="font-size:0.95rem; font-weight:800; color:#A855F7;">${m.forum_threads_count || 0}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIWAYAT TIER TIMELINE & DONASI -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px;">
+          <!-- 3.4.3 RIWAYAT DONASI -->
+          <div class="glass-card" style="padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h4 style="font-size:1rem; color:var(--accent-gold);">💰 3.4.3 Riwayat Donasi</h4>
+              <button class="role-pill-btn" style="border-color:var(--primary-emerald); color:var(--primary-emerald);" onclick="AppEngine.openM3AddDonationModal('${m.id}')">+ Donasi</button>
+            </div>
+            ${donations.length === 0 ? '<p style="font-size:0.82rem; color:var(--text-muted);">Belum ada riwayat donasi.</p>' : `
+              <div style="max-height:180px; overflow-y:auto;">
+                <table class="data-table" style="font-size:0.78rem; width:100%;">
+                  <thead>
+                    <tr><th>TANGGAL</th><th>JUMLAH</th><th>METODE</th><th>STATUS</th></tr>
+                  </thead>
+                  <tbody>
+                    ${donations.map(d => `
+                      <tr>
+                        <td>${new Date(d.created_at).toLocaleDateString('id-ID')}</td>
+                        <td style="font-weight:700; color:var(--primary-emerald);">Rp ${new Intl.NumberFormat('id-ID').format(d.amount)}</td>
+                        <td>${d.payment_method}</td>
+                        <td><span style="color:var(--primary-emerald); font-weight:800;">${d.status}</span></td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            `}
+          </div>
+
+          <!-- RIWAYAT TIER TIMELINE -->
+          <div class="glass-card" style="padding:20px;">
+            <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:12px;">🏅 Riwayat Tier Member</h4>
+            ${tierHistory.length === 0 ? `
+              <p style="font-size:0.82rem; color:var(--text-muted);">Awal mendaftar sebagai Tier 🥉 BRONZE.</p>
+            ` : `
+              <ul style="font-size:0.82rem; list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
+                ${tierHistory.map(th => `
+                  <li style="background:var(--bg-card); border:1px solid var(--chrome-border); padding:8px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Tier <strong>${th.tier}</strong> (${th.year})</span>
+                    <span style="color:var(--text-muted); font-size:0.75rem;">Total: Rp ${new Intl.NumberFormat('id-ID').format(th.total_donation)}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            `}
+          </div>
+        </div>
+
+        <!-- 3.4.2 RIWAYAT AKTIVITAS TIMELINE -->
+        <div class="glass-card" style="padding:20px;">
+          <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:12px;">📋 3.4.2 Log Riwayat Aktivitas Member</h4>
+          ${activities.length === 0 ? '<p style="font-size:0.82rem; color:var(--text-muted);">Belum ada aktivitas tercatat.</p>' : `
+            <div style="max-height:200px; overflow-y:auto;">
+              <table class="data-table" style="font-size:0.78rem; width:100%;">
+                <thead>
+                  <tr><th>WAKTU</th><th>AKTIVITAS</th><th>DETAIL KETERANGAN</th></tr>
+                </thead>
+                <tbody>
+                  ${activities.map(a => `
+                    <tr>
+                      <td style="color:var(--text-muted);">${new Date(a.created_at).toLocaleString('id-ID')}</td>
+                      <td style="font-weight:700; color:var(--accent-gold);">${a.title}</td>
+                      <td>${a.detail}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `}
+        </div>
+      `;
+
+    } catch (err) {
+      container.innerHTML = `<div style="color:var(--accent-red); padding:20px;">Error: ${err.message}</div>`;
+    }
+  },
+
+  openM3AddDonationModal(id) {
+    const m = this.m3Data.members.find(x => x.id === id);
+    if (!m) return;
+
+    document.getElementById('m3-don-userid').value = m.id;
+    document.getElementById('m3-don-member-name').innerText = m.name;
+    document.getElementById('m3-don-member-id').innerText = `ID: ${m.member_id || '[PENDING ID]'} | Tier Saat Ini: ${m.tier}`;
+    document.getElementById('m3-don-amount').value = 4500000;
+    document.getElementById('m3-don-notes').value = 'Donasi Jamnas & Kas MB INA';
+
+    AuthEngine.openModal('modal-m3-add-donation');
+  },
+
+  async saveM3Donation(event) {
+    event.preventDefault();
+    const user_id = document.getElementById('m3-don-userid').value;
+    const amount = parseInt(document.getElementById('m3-don-amount').value || 0);
+    const payment_method = document.getElementById('m3-don-method').value;
+    const notes = document.getElementById('m3-don-notes').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=add_m3_donation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id, amount, payment_method, notes })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchM3Data();
+      this.renderM3MemberList();
+    } catch (err) {
+      alert('❌ Gagal memproses donasi: ' + err.message);
+    }
+  },
+
+  async deleteM3Member(id) {
+    const m = this.m3Data.members.find(x => x.id === id);
+    if (!m) return;
+
+    if (!confirm(`⚠️ Apakah Anda yakin ingin menghapus Member '${m.name}' (${m.member_id || 'Pending'}) dari Supabase Database?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch('api.php?action=delete_m3_member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      alert('🗑️ ' + data.message);
+      await this.fetchM3Data();
+      this.renderM3MemberList();
+    } catch (err) {
+      alert('❌ Gagal menghapus member: ' + err.message);
+    }
+  },
+
+  openM3ExportModal() {
+    AuthEngine.openModal('modal-m3-export');
+  },
+
+  processM3Export(event) {
+    event.preventDefault();
+    const formatRadios = document.getElementsByName('export_format');
+    let format = 'PDF';
+    for (let r of formatRadios) {
+      if (r.checked) format = r.value;
+    }
+
+    const selectedFields = [];
+    document.querySelectorAll('.exp-field').forEach(cb => {
+      if (cb.checked) selectedFields.push(cb.value);
+    });
+
+    const startDate = document.getElementById('m3-exp-start').value;
+    const endDate = document.getElementById('m3-exp-end').value;
+
+    alert(`📥 Berkas Export Data Member MB INA berformat ${format} berhasil dibuat! (Periode: ${startDate} s/d ${endDate}, Total Field: ${selectedFields.length})`);
+    AuthEngine.closeAllModals();
+  }

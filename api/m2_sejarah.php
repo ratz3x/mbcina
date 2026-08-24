@@ -182,7 +182,7 @@ switch ($action) {
             }
 
             // 2. Ambil data user saat ini
-            $stmtUser = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, avatar_url, join_date, is_system_architect, is_protected, is_active, created_at, updated_at FROM users WHERE id = :id OR username = :u OR email = :e LIMIT 1");
+            $stmtUser = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, join_date, is_system_architect, is_protected, is_active, created_at, updated_at FROM users WHERE id = :id OR username = :u OR email = :e LIMIT 1");
             $stmtUser->execute([':id' => $userId, ':u' => $userId, ':e' => $userId]);
             $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
@@ -529,6 +529,13 @@ switch ($action) {
                 ':sort_order' => $sortOrder,
                 ':id' => $id
             ]);
+
+            if ($photoUrl && ($isCurrent === 'true' || $isCurrent === true || stripos($name, 'Rochady') !== false)) {
+                try {
+                    $sPdo->prepare("UPDATE users SET photo_url = :photo_url WHERE role = 'PRESIDEN' OR id = 'usr_presiden' OR username = 'presiden_mbina' OR name LIKE '%Rochady%'")
+                         ->execute([':photo_url' => $photoUrl]);
+                } catch (Exception $ex) {}
+            }
 
             logAudit('usr_superadmin', 'UPDATE', 'PRESIDENT_MANAGEMENT', ['id' => $id, 'name' => $name, 'photo_url' => $photoUrl]);
             echo json_encode(['success' => true, 'message' => "Data Presiden $name (termasuk Foto/Bio) berhasil diperbarui di Supabase Cloud!"]);

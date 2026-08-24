@@ -261,7 +261,7 @@ switch ($action) {
             $memberId = trim($input['member_id'] ?? '');
 
             // Find user
-            $stmtUser = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, avatar_url, join_date, is_system_architect, is_protected, is_active, created_at, updated_at FROM users WHERE member_id = :mid OR username = :mid OR id = :mid LIMIT 1");
+            $stmtUser = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, join_date, is_system_architect, is_protected, is_active, created_at, updated_at FROM users WHERE member_id = :mid OR username = :mid OR id = :mid LIMIT 1");
             $stmtUser->execute([':mid' => $memberId]);
             $u = $stmtUser->fetch();
 

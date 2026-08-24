@@ -1,0 +1,165 @@
+                <!-- STEP 2: DOKUMEN WAJIB (UPLOAD BERKAS) -->
+                <div id="m4-step-2-content" style="display:none;">
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">📁 Dokumen Wajib Pendaftaran Klub</h4>
+                  
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+                    <!-- 1. AD/ART -->
+                    <div class="glass-card" style="padding:14px; border-left:3px solid var(--accent-gold);">
+                      <label style="font-weight:700; font-size:0.88rem; color:var(--text-main); display:block; margin-bottom:4px;">1. AD/ART Klub (PDF, max 5MB) *</label>
+                      <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Salinan Anggaran Dasar & Anggaran Rumah Tangga (Notaris).</div>
+                      <div style="display:flex; gap:8px;">
+                        <input type="text" id="m4-form-ad-art" class="form-input" value="assets/docs/sample_ad_art.pdf" style="font-size:0.8rem;" placeholder="Path / Link AD/ART PDF">
+                        <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px; white-space:nowrap;" onclick="alert('📁 File AD/ART berhasil diunggah (Simulasi).')">📁 Upload</button>
+                      </div>
+                    </div>
+
+                    <!-- 2. Susunan Pengurus -->
+                    <div class="glass-card" style="padding:14px; border-left:3px solid var(--accent-gold);">
+                      <label style="font-weight:700; font-size:0.88rem; color:var(--text-main); display:block; margin-bottom:4px;">2. Susunan Kepengurusan (PDF/DOCX, max 2MB) *</label>
+                      <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Struktur organisasi (Ketua, Wakil, Sekretaris, Bendahara).</div>
+                      <div style="display:flex; gap:8px;">
+                        <input type="text" id="m4-form-mgmt" class="form-input" value="assets/docs/sample_pengurus.pdf" style="font-size:0.8rem;" placeholder="Path / Link Susunan Pengurus">
+                        <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px; white-space:nowrap;" onclick="alert('📁 File Susunan Pengurus berhasil diunggah.')">📁 Upload</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+                    <!-- 3. Domisili -->
+                    <div class="glass-card" style="padding:14px; border-left:3px solid var(--accent-gold);">
+                      <label style="font-weight:700; font-size:0.88rem; color:var(--text-main); display:block; margin-bottom:4px;">3. Domisili Sekretariat (PDF/JPG/PNG, max 2MB) *</label>
+                      <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Surat Keterangan Domisili / bukti kantor sekretariat tetap.</div>
+                      <div style="display:flex; gap:8px;">
+                        <input type="text" id="m4-form-domicile" class="form-input" value="assets/docs/sample_domisili.pdf" style="font-size:0.8rem;" placeholder="Path / Link Surat Domisili">
+                        <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px; white-space:nowrap;" onclick="alert('📁 File Domisili berhasil diunggah.')">📁 Upload</button>
+                      </div>
+                    </div>
+
+                    <!-- 4. Logo Klub -->
+                    <div class="glass-card" style="padding:14px; border-left:3px solid var(--accent-gold);">
+                      <label style="font-weight:700; font-size:0.88rem; color:var(--text-main); display:block; margin-bottom:4px;">4. Logo Klub (PNG/JPG/SVG/CDR, max 2MB) *</label>
+                      <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Format vektor (CorelDraw/SVG) lebih disarankan.</div>
+                      <div style="display:flex; gap:8px;">
+                        <input type="text" id="m4-form-logo" class="form-input" value="assets/mb_badge.jpg" style="font-size:0.8rem;" placeholder="Path Logo Klub">
+                        <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px; white-space:nowrap;" onclick="alert('📁 Logo Klub berhasil diunggah.')">📁 Upload</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+                    <!-- 5. Stempel Klub -->
+                    <div class="glass-card" style="padding:14px; border-left:3px solid var(--accent-gold);">
+                      <label style="font-weight:700; font-size:0.88rem; color:var(--text-main); display:block; margin-bottom:4px;">5. Stempel Resmi Klub (JPG/PNG, max 1MB) *</label>
+                      <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Foto / cetakan stempel resmi klub.</div>
+                      <div style="display:flex; gap:8px;">
+                        <input type="text" id="m4-form-stamp" class="form-input" value="assets/docs/sample_stempel.png" style="font-size:0.8rem;" placeholder="Path / Link Stempel Resmi">
+                        <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px; white-space:nowrap;" onclick="alert('📁 File Stempel berhasil diunggah.')">📁 Upload</button>
+                      </div>
+                    </div>
+
+                    <!-- 6. Foto Kegiatan (min 3) -->
+                    <div class="glass-card" style="padding:14px; border-left:3px solid var(--accent-gold);">
+                      <label style="font-weight:700; font-size:0.88rem; color:var(--text-main); display:block; margin-bottom:4px;">6. Foto Kegiatan (JPG/PNG, min 3, max 5 foto) *</label>
+                      <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:8px;">Minimal 3 foto kegiatan touring / sosial klub.</div>
+                      <input type="text" id="m4-form-photos" class="form-input" value="assets/mb_hero.jpg, assets/mb_badge.jpg, assets/mb_hero.jpg" style="font-size:0.8rem;" placeholder="Pisahkan dengan koma">
+                    </div>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between; margin-top:20px;">
+                    <button type="button" class="btn-outline" onclick="AppEngine.goToM4Step(1)">⬅️ Kembali</button>
+                    <button type="button" class="btn-primary" onclick="AppEngine.goToM4Step(3)">Lanjut ke Persyaratan Anggota & Pembayaran ➔</button>
+                  </div>
+                </div>
+
+                <!-- STEP 3: PERSYARATAN ANGGOTA & BIAYA ADMINISTRASI -->
+                <div id="m4-step-3-content" style="display:none;">
+                  
+                  <!-- PERSYARATAN ANGGOTA & KTA IMI -->
+                  <div class="glass-card" style="padding:16px; margin-bottom:20px; border-left:4px solid var(--accent-blue);">
+                    <h4 style="font-size:1.05rem; color:var(--accent-blue); margin-bottom:12px;">👥 Persyaratan Anggota & KTA IMI Aktif</h4>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px;">
+                      <div>
+                        <label class="form-label">Jumlah Anggota Aktif (Minimal 15 Orang) *</label>
+                        <input type="number" id="m4-form-total-members" class="form-input" value="15" min="15" required style="font-weight:700; color:var(--accent-gold);">
+                      </div>
+                      <div style="padding-top:24px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem; font-weight:700; color:var(--primary-emerald);">
+                          <input type="checkbox" id="m4-form-kta-imi" checked style="width:18px; height:18px;">
+                          ✅ Semua anggota inti memiliki KTA IMI Aktif
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- DAFTAR ANGGOTA PREVIEW TABLE -->
+                    <div style="margin-top:12px;">
+                      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <strong style="font-size:0.85rem; color:var(--text-main);">📋 Preview Daftar 15 Anggota Pendiri:</strong>
+                        <button type="button" class="btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="alert('📤 File Excel Daftar Anggota berhasil diunggah!')">📤 Upload List Excel/PDF</button>
+                      </div>
+                      <div style="max-height:160px; overflow-y:auto; border:1px solid var(--chrome-border); border-radius:6px;">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+                          <thead style="background:rgba(0,0,0,0.3); color:var(--text-muted); position:sticky; top:0;">
+                            <tr>
+                              <th style="padding:6px; text-align:center; width:35px;">No</th>
+                              <th style="padding:6px; text-align:left;">Nama Anggota</th>
+                              <th style="padding:6px; text-align:left;">KTA IMI</th>
+                              <th style="padding:6px; text-align:center;">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr style="border-bottom:1px solid var(--chrome-border);"><td style="text-align:center; padding:5px;">1</td><td style="padding:5px; font-weight:700;">Budi Santoso (Ketua)</td><td style="padding:5px; font-family:monospace; color:var(--accent-gold);">IMI-2026-001</td><td style="text-align:center; color:var(--primary-emerald); font-weight:700;">✅ Aktif</td></tr>
+                            <tr style="border-bottom:1px solid var(--chrome-border);"><td style="text-align:center; padding:5px;">2</td><td style="padding:5px; font-weight:700;">Andi Wijaya (Wakil)</td><td style="padding:5px; font-family:monospace; color:var(--accent-gold);">IMI-2026-002</td><td style="text-align:center; color:var(--primary-emerald); font-weight:700;">✅ Aktif</td></tr>
+                            <tr style="border-bottom:1px solid var(--chrome-border);"><td style="text-align:center; padding:5px;">3</td><td style="padding:5px; font-weight:700;">Siti Rahayu (Sekretaris)</td><td style="padding:5px; font-family:monospace; color:var(--accent-gold);">IMI-2026-003</td><td style="text-align:center; color:var(--primary-emerald); font-weight:700;">✅ Aktif</td></tr>
+                            <tr style="border-bottom:1px solid var(--chrome-border);"><td style="text-align:center; padding:5px;">4</td><td style="padding:5px; font-weight:700;">Rizky Febrian (Bendahara)</td><td style="padding:5px; font-family:monospace; color:var(--accent-gold);">IMI-2026-004</td><td style="text-align:center; color:var(--primary-emerald); font-weight:700;">✅ Aktif</td></tr>
+                            <tr style="border-bottom:1px solid var(--chrome-border);"><td style="text-align:center; padding:5px;">5-15</td><td style="padding:5px; color:var(--text-muted);">11 Anggota Aktif Lainnya...</td><td style="padding:5px; font-family:monospace; color:var(--accent-gold);">IMI-2026-005 s/d 015</td><td style="text-align:center; color:var(--primary-emerald); font-weight:700;">✅ Aktif</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- BIAYA ADMINISTRASI & METODE PEMBAYARAN -->
+                  <div class="glass-card" style="padding:16px; margin-bottom:20px; border-left:4px solid var(--accent-gold);">
+                    <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:12px;">💰 Biaya Administrasi Pendaftaran Klub Baru</h4>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(245,158,11,0.1); padding:12px; border-radius:8px; border:1px dashed var(--accent-gold); margin-bottom:14px;">
+                      <div>
+                        <div style="font-size:0.78rem; color:var(--text-muted);">Total Biaya Resmi Pendaftaran Klub Baru:</div>
+                        <div style="font-size:1.5rem; font-weight:900; color:var(--accent-gold);">Rp 350.000</div>
+                      </div>
+                      <div style="text-align:right;">
+                        <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">Status: PAID / SIAP VERIFIKASI</span>
+                      </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:12px;">
+                      <div>
+                        <label class="form-label">Rekening Tujuan Transfer *</label>
+                        <div class="glass-card" style="padding:10px; font-size:0.82rem;">
+                          <strong style="color:var(--text-main);">🏦 Bank Mandiri</strong><br>
+                          No. Rekening: <span style="font-family:monospace; font-weight:800; color:var(--accent-gold);">123-00-1234567-8</span><br>
+                          Atas Nama: <strong>MB Club Indonesia</strong>
+                        </div>
+                      </div>
+                      <div>
+                        <label class="form-label">Bukti Transfer Pembayaran (JPG/PNG/PDF) *</label>
+                        <input type="text" id="m4-form-payment-proof" class="form-input" value="assets/docs/sample_bukti_transfer.jpg" style="font-size:0.8rem;" placeholder="Path / Link Bukti Transfer">
+                        <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px; margin-top:6px; width:100%;" onclick="alert('📁 Bukti Transfer Pembayaran berhasil diunggah.')">📁 Upload Bukti Transfer</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- SUBMIT & DECLARATION -->
+                  <div class="form-group" style="display:flex; gap:10px; align-items:center; margin-bottom:20px;">
+                    <input type="checkbox" id="m4-form-agree" style="width:18px; height:18px;" checked>
+                    <label for="m4-form-agree" style="font-size:0.85rem; color:var(--text-main); cursor:pointer;">
+                      Saya menyatakan bahwa seluruh berkas, 15+ anggota KTA IMI, dan bukti pembayaran Rp 350.000 adalah asli dan sah sesuai AD/ART MB Club Indonesia.
+                    </label>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between;">
+                    <button type="button" class="btn-outline" onclick="AppEngine.goToM4Step(2)">⬅️ Kembali</button>
+                    <button type="submit" class="btn-primary" style="background:var(--primary-emerald); border-color:var(--primary-emerald); font-weight:800; font-size:0.95rem; padding:10px 24px;">🚀 Submit Pengajuan Klub Baru</button>
+                  </div>
+                </div>

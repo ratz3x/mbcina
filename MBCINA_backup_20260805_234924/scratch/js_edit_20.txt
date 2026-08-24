@@ -1,0 +1,67 @@
+  generateM2ClubTableRows(clubsList) {
+    if (!clubsList || clubsList.length === 0) {
+      return `
+        <tr>
+          <td colspan="7" style="padding:32px; text-align:center; color:var(--text-muted);">
+            🔍 <strong>Tidak ada Klub / Chapter yang cocok dengan pencarian atau filter region.</strong><br>
+            <span style="font-size:0.8rem; margin-top:6px; display:block;">Coba ubah kata kunci atau tekan tombol 'Reset Filter'.</span>
+          </td>
+        </tr>
+      `;
+    }
+
+    return clubsList.map(c => `
+      <tr style="border-bottom:1px solid var(--chrome-border);">
+        <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${c.code}</td>
+        <td style="padding:12px; font-weight:700; color:var(--text-main); cursor:pointer;" 
+            onmouseover="AppEngine.showClubHoverModal('${c.id}')" 
+            onclick="AppEngine.showClubHoverModal('${c.id}')"
+            title="Hover/Klik untuk melihat Sejarah Ringkas, Ketua Umum, & Contact Person">
+          <span style="border-bottom:1px dashed var(--accent-gold); color:var(--accent-gold); transition:all 0.2s;" onmouseenter="this.style.color='var(--accent-blue)'" onmouseleave="this.style.color='var(--accent-gold)'">
+            ${c.name} ℹ️
+          </span>
+        </td>
+        <td style="padding:12px; color:var(--text-muted); font-size:0.8rem;">${c.region}</td>
+        <td style="padding:12px;">${c.city}</td>
+        <td style="padding:12px;">
+          <span class="tier-badge" style="background:${c.type === 'CHAPTER' ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)'}; color:${c.type === 'CHAPTER' ? 'var(--accent-blue)' : 'var(--accent-gold)'}; border:1px solid ${c.type === 'CHAPTER' ? 'var(--accent-blue)' : 'var(--accent-gold)'};">
+            ${c.type}
+          </span>
+        </td>
+        <td style="padding:12px; font-weight:700;">👥 ${c.member_count}</td>
+        <td style="padding:12px; text-align:right;">
+          <div style="display:inline-flex; gap:6px;">
+            <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditClubModal('${c.id}')">✏️ Edit</button>
+            <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteClub('${c.id}')">🗑️ Hapus</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  },
+
+  showClubHoverModal(clubId) {
+    const c = this.m2Data.clubs.find(x => x.id === clubId);
+    if (!c) return;
+
+    const badgeEl = document.getElementById('hover-club-badge');
+    const nameEl = document.getElementById('hover-club-name');
+    const regEl = document.getElementById('hover-club-region');
+    const histEl = document.getElementById('hover-club-history');
+    const yearEl = document.getElementById('hover-club-year');
+    const cityEl = document.getElementById('hover-club-city');
+    const ketuaEl = document.getElementById('hover-club-ketua');
+    const cpEl = document.getElementById('hover-club-cp');
+    const phoneEl = document.getElementById('hover-club-phone');
+
+    if (badgeEl) badgeEl.innerText = c.code ? c.code.substring(0, 4) : 'MB';
+    if (nameEl) nameEl.innerText = c.name;
+    if (regEl) regEl.innerText = `${c.region} (${c.type})`;
+    if (histEl) histEl.innerText = c.description || `Klub/Chapter ${c.name} merupakan bagian resmi dari MB INA yang aktif mengagendakan touring regional dan bakti sosial.`;
+    if (yearEl) yearEl.innerText = c.founded_year || '2004';
+    if (cityEl) cityEl.innerText = c.city || 'Indonesia';
+    if (ketuaEl) ketuaEl.innerText = c.ketua_umum || 'H. Ahmad Fauzi, S.E.';
+    if (cpEl) cpEl.innerText = c.contact_person || 'Hendra (Sekretaris Club)';
+    if (phoneEl) phoneEl.innerText = c.contact_phone || '0812-3456-7890';
+
+    AuthEngine.openModal('modal-club-hover-info');
+  },

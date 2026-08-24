@@ -1,0 +1,18 @@
+  async fetchData() {
+    try {
+      const [resEvents, resStats, resProv] = await Promise.all([
+        fetch('api.php?action=get_events').then(r => r.json()),
+        fetch('api.php?action=get_admin_stats').then(r => r.json()),
+        fetch('api.php?action=get_provinces_admin').then(r => r.json())
+      ]);
+
+      if (resEvents.success) this.events = resEvents.events;
+      if (resStats.success) this.adminStats = resStats;
+      if (resProv.success) this.provinces = resProv.provinces;
+
+      this.renderEventsList();
+      this.renderProvincesDropdown();
+    } catch (e) {
+      console.error("Error loading API data:", e);
+    }
+  },

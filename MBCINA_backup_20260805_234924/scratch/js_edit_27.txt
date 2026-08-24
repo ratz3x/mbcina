@@ -1,0 +1,12 @@
+    // Hotspot Jarum Pentul Coordinates mapped precisely over images/indonesia_map.png (viewBox 0 0 1000 480)
+    // Midpoint calibration: Needle tip touches (x, y + 16) directly in the vertical center of island land masses
+    const pins = [
+      { key: 'Regional Sumatra', name: 'Regional Sumatra', x: 170, y: 182, color: '#f59e0b' },
+      { key: 'Regional Banten', name: 'Regional Banten', x: 260, y: 315, color: '#3b82f6' },
+      { key: 'Regional Metro DKI Jakarta', name: 'Regional Metro DKI Jakarta', x: 285, y: 316, color: '#10b981' },
+      { key: 'Regional Jawa Barat', name: 'Regional Jawa Barat', x: 315, y: 322, color: '#f59e0b' },
+      { key: 'Regional Jawa Tengah', name: 'Regional Jawa Tengah', x: 365, y: 326, color: '#ef4444' },
+      { key: 'Regional Yogyakarta', name: 'Regional Yogyakarta', x: 385, y: 334, color: '#8b5cf6' },
+      { key: 'Regional Jawa Timur & Bali', name: 'Regional Jawa Timur & Bali', x: 490, y: 338, color: '#ec4899' },
+      { key: 'Regional Kalimantan & Sulawesi', name: 'Regional Kalimantan & Sulawesi', x: 475, y: 215, color: '#06b6d4' }
+    ];

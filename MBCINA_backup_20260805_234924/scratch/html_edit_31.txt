@@ -1,0 +1,10 @@
+      <!-- Executive Styled Admin Tab Bar -->
+      <div class="admin-tab-bar">
+        <button class="admin-tab-btn active" data-admin-tab="dashboard">📊 Dashboard Realtime</button>
+        <button class="admin-tab-btn" data-admin-tab="m2_org">🏛️ M2 - Manajemen Organisasi</button>
+        <button class="admin-tab-btn" data-admin-tab="m3_membership">👥 M3 - Manajemen Keanggotaan</button>
+        <button class="admin-tab-btn" data-admin-tab="m4_registration">📝 M4 - Pendaftaran Klub</button>
+        <button class="admin-tab-btn" data-admin-tab="users">👥 Manajemen User (RBAC)</button>
+        <button class="admin-tab-btn" data-admin-tab="audit">📜 Audit Log</button>
+        <button class="admin-tab-btn" data-admin-tab="settings">⚙️ 3.1.4 Pengaturan Sistem</button>
+      </div>

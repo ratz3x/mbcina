@@ -1,0 +1,372 @@
+/* Main Web Application Engine & Dynamic RBAC Controller for MB INA */
+
+const AppEngine = {
+  currentRole: 'GUEST',
+  currentUser: null,
+  clubs: [],
+  events: [],
+  users: [],
+
+  async init() {
+    console.log("MB INA Platform Engine Initializing...");
+    await this.fetchData();
+    this.bindRoleSwitcher();
+    this.renderView();
+  },
+
+  async fetchData() {
+    try {
+      const [resClubs, resEvents, resUsers] = await Promise.all([
+        fetch('api.php?action=get_clubs').then(r => r.json()),
+        fetch('api.php?action=get_events').then(r => r.json()),
+        fetch('api.php?action=get_users').then(r => r.json())
+      ]);
+
+      if (resClubs.success) this.clubs = resClubs.clubs;
+      if (resEvents.success) this.events = resEvents.events;
+      if (resUsers.success) this.users = resUsers.users;
+
+      this.renderClubsList();
+      this.renderEventsList();
+    } catch (e) {
+      console.error("Error loading API data:", e);
+    }
+  },
+
+  bindRoleSwitcher() {
+    document.querySelectorAll('.role-pill-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const role = e.currentTarget.getAttribute('data-role');
+        this.setRole(role);
+      });
+    });
+  },
+
+  setRole(role, userData = null) {
+    this.currentRole = role;
+    this.currentUser = userData || this.getDefaultUserForRole(role);
+
+    // Update active pill button UI
+    document.querySelectorAll('.role-pill-btn').forEach(btn => {
+      if (btn.getAttribute('data-role') === role) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    const currentRoleLabel = document.getElementById('active-role-display');
+    if (currentRoleLabel) {
+      currentRoleLabel.innerText = this.formatRoleName(role);
+    }
+
+    this.renderView();
+  },
+
+  getDefaultUserForRole(role) {
+    switch (role) {
+      case 'SUPER_ADMIN':
+        return { name: 'Dr. H. Bambang Soesatyo', role: 'SUPER_ADMIN', tier: 'PLATINUM', status: 'ACTIVE', club: 'MB Club Classic Indonesia' };
+      case 'ADMIN_ORGANISASI':
+        return { name: 'Ir. Raymond Sanjaya', role: 'ADMIN_ORGANISASI', tier: 'GOLD', status: 'ACTIVE', club: 'Mercedes-Benz W204 Club Indonesia' };
+      case 'PENGURUS_PUSAT':
+        return { name: 'Drs. Ananda Sukarlan', role: 'PENGURUS_PUSAT', tier: 'GOLD', status: 'ACTIVE', club: 'Mercedes-Benz W212 Club Indonesia' };
+      case 'PENGURUS_KLUB':
+        return { name: 'Captain Herman S.', role: 'PENGURUS_KLUB', tier: 'SILVER', status: 'ACTIVE', club: 'Mercedes-AMG Owners Club Indonesia' };
+      case 'MEMBER':
+        return { name: 'Guruh Soekarno', role: 'MEMBER', tier: 'SILVER', status: 'ACTIVE', club: 'MB Club Classic Indonesia', memberId: 'MBINA-2026-0842' };
+      case 'CALON_MEMBER':
+        return { name: 'Budi Santoso', role: 'CALON_MEMBER', tier: 'BRONZE', status: 'PENDING', club: 'Mercedes-Benz W212 Club Indonesia', vehicleModel: 'Mercedes-Benz E 300 (W212) 2012', licensePlate: 'B 1926 MB' };
+      case 'GUEST':
+      default:
+        return null;
+    }
+  },
+
+  formatRoleName(role) {
+    const map = {
+      'SUPER_ADMIN': 'Super Admin',
+      'ADMIN_ORGANISASI': 'Admin Organisasi',
+      'PENGURUS_PUSAT': 'Pengurus Pusat',
+      'PENGURUS_KLUB': 'Pengurus Klub',
+      'MEMBER': 'Member Terverifikasi',
+      'CALON_MEMBER': 'Calon Member (Pending)',
+      'GUEST': 'Guest (Pengunjung)'
+    };
+    return map[role] || role;
+  },
+
+  renderView() {
+    // Hide all view containers
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+
+    // Show navbar items based on role
+    const navLoginBtn = document.getElementById('nav-login-btn');
+    const navRegBtn = document.getElementById('nav-reg-btn');
+    const userProfileWidget = document.getElementById('nav-user-profile');
+
+    if (this.currentRole === 'GUEST') {
+      if (navLoginBtn) navLoginBtn.style.display = 'inline-flex';
+      if (navRegBtn) navRegBtn.style.display = 'inline-flex';
+      if (userProfileWidget) userProfileWidget.style.display = 'none';
+
+      // Show Landing Page
+      const landingView = document.getElementById('view-landing-page');
+      if (landingView) landingView.style.display = 'block';
+    } else {
+      if (navLoginBtn) navLoginBtn.style.display = 'none';
+      if (navRegBtn) navRegBtn.style.display = 'none';
+      if (userProfileWidget) {
+        userProfileWidget.style.display = 'flex';
+        document.getElementById('nav-user-name').innerText = this.currentUser.name;
+        document.getElementById('nav-user-role-badge').innerText = this.formatRoleName(this.currentRole);
+      }
+
+      // Show specific role workspace
+      if (this.currentRole === 'CALON_MEMBER') {
+        const calonView = document.getElementById('view-calon-member-dashboard');
+        if (calonView) calonView.style.display = 'block';
+        this.renderCalonMemberStatus();
+      } else if (this.currentRole === 'MEMBER') {
+        const memberView = document.getElementById('view-member-dashboard');
+        if (memberView) memberView.style.display = 'block';
+        this.renderMemberDigitalCard();
+      } else if (this.currentRole === 'ADMIN_ORGANISASI' || this.currentRole === 'SUPER_ADMIN') {
+        const adminView = document.getElementById('view-admin-dashboard');
+        if (adminView) adminView.style.display = 'block';
+        this.renderVerificationQueue();
+      } else {
+        const generalDashboard = document.getElementById('view-general-dashboard');
+        if (generalDashboard) generalDashboard.style.display = 'block';
+      }
+    }
+  },
+
+  renderClubsList() {
+    const container = document.getElementById('clubs-grid-container');
+    if (!container) return;
+
+    container.innerHTML = this.clubs.map(c => `
+      <div class="glass-card" style="padding:20px;">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
+          <div style="width:48px; height:48px; border-radius:12px; background:rgba(16,185,129,0.15); border:1px solid var(--primary-emerald); display:flex; align-items:center; justify-content:center; color:var(--primary-emerald); font-weight:800;">
+            ${c.code.substring(0, 3)}
+          </div>
+          <div>
+            <h4 style="font-size:1.05rem;">${c.name}</h4>
+            <span style="font-size:0.75rem; color:var(--silver-muted);">${c.region}</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; color:#cbd5e1; margin-bottom:14px;">Klub resmi terdaftar di bawah naungan Mercedes-Benz Club Indonesia.</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <span style="font-size:0.8rem; color:var(--primary-emerald); font-weight:700;">👥 ${c.memberCount} Anggota</span>
+          <button class="role-pill-btn" style="border-color:var(--primary-emerald);" onclick="alert('Mendaftar ke club ${c.name}')">Lihat Club</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderEventsList() {
+    const container = document.getElementById('events-grid-container');
+    if (!container) return;
+
+    container.innerHTML = this.events.map(e => `
+      <div class="glass-card" style="padding:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span class="tier-badge" style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6;">UPCOMING</span>
+          <span style="font-size:0.75rem; color:var(--silver-muted);">${e.eventDate.split(' ')[0]}</span>
+        </div>
+        <h4 style="font-size:1.1rem; margin-bottom:8px;">${e.title}</h4>
+        <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:14px;">📍 ${e.location}</p>
+        <p style="font-size:0.85rem; color:#cbd5e1; margin-bottom:16px;">${e.description}</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <span style="font-size:0.8rem; color:var(--silver-muted);">${e.registeredCount} / ${e.maxAttendees} Terdaftar</span>
+          <button class="btn-primary" style="padding:6px 16px; font-size:0.8rem;" onclick="AppEngine.handleRSVP('${e.id}')">RSVP Event</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderCalonMemberStatus() {
+    const statusContainer = document.getElementById('calon-status-card');
+    if (!statusContainer) return;
+
+    statusContainer.innerHTML = `
+      <div class="glass-panel" style="padding:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="font-size:1.4rem;">Status Permohonan Keanggotaan MB INA</h3>
+            <p style="color:var(--silver-muted); font-size:0.9rem;">ID Pendaftaran: REG-${Math.floor(100000 + Math.random() * 900000)}</p>
+          </div>
+          <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.9rem; padding:6px 16px;">
+            ⏳ STATUS: PENDING VERIFIKASI
+          </span>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--chrome-border); border-radius:14px; padding:20px; margin-bottom:24px;">
+          <h4 style="font-size:1rem; margin-bottom:12px; color:var(--primary-emerald);">Checklist Dokumen Persyaratan</h4>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
+              <span>📄 Dokumen KTP (Identitas Diri)</span>
+              <strong style="color:var(--primary-emerald);">✓ Terunggah (Dalam Review)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
+              <span>🪪 Dokumen SIM A (Surat Izin Mengemudi)</span>
+              <strong style="color:var(--primary-emerald);">✓ Terunggah (Dalam Review)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
+              <span>🚗 STNK Kendaraan (${this.currentUser.vehicleModel || 'Mercedes-Benz'})</span>
+              <strong style="color:var(--primary-emerald);">✓ Terunggah (Dalam Review)</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
+              <span>💬 Verifikasi WhatsApp OTP</span>
+              <strong style="color:var(--primary-emerald);">✓ Terverifikasi</strong>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size:0.85rem; color:var(--silver-muted);">
+          ℹ️ Proses verifikasi fisik dan keabsahan dokumen kendaraan STNK membutuhkan waktu maksimal 1x24 jam kerja oleh Pengurus Organisasi MB INA. Anda akan menerima notifikasi via Email & WhatsApp setelah keanggotaan Anda disetujui.
+        </p>
+      </div>
+    `;
+  },
+
+  renderMemberDigitalCard() {
+    const container = document.getElementById('digital-member-card-wrapper');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="digital-card">
+        <div class="card-header-flex">
+          <div>
+            <div style="font-size:0.75rem; letter-spacing:2px; color:var(--primary-emerald); text-transform:uppercase; font-weight:800;">MERCEDES-BENZ CLUB INDONESIA</div>
+            <h3 style="font-size:1.3rem; margin-top:4px;">${this.currentUser.name}</h3>
+            <span style="font-size:0.8rem; color:var(--silver-muted);">${this.currentUser.memberId || 'MBINA-2026-0842'}</span>
+          </div>
+          <span class="tier-badge">${this.currentUser.tier || 'SILVER'} MEMBER</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:28px;">
+          <div>
+            <div style="font-size:0.7rem; color:var(--silver-muted); text-transform:uppercase;">Klub Registered</div>
+            <div style="font-size:0.9rem; font-weight:600; color:#fff;">${this.currentUser.club}</div>
+            <div style="font-size:0.75rem; color:var(--primary-emerald); margin-top:4px;">Status: ACTIVE VERIFIED MEMBER</div>
+          </div>
+          <div class="qr-code-placeholder" title="Scan for digital verify">
+            <svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+              <rect width="100" height="100" fill="white"/>
+              <rect x="10" y="10" width="30" height="30" fill="black"/>
+              <rect x="60" y="10" width="30" height="30" fill="black"/>
+              <rect x="10" y="60" width="30" height="30" fill="black"/>
+              <rect x="20" y="20" width="10" height="10" fill="white"/>
+              <rect x="70" y="20" width="10" height="10" fill="white"/>
+              <rect x="20" y="70" width="10" height="10" fill="white"/>
+              <rect x="50" y="50" width="15" height="15" fill="black"/>
+              <rect x="75" y="65" width="15" height="15" fill="black"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  renderVerificationQueue() {
+    const queueContainer = document.getElementById('admin-verification-table');
+    if (!queueContainer) return;
+
+    const pendingUsers = this.users.filter(u => u.status === 'PENDING' || u.role === 'CALON_MEMBER');
+
+    if (pendingUsers.length === 0) {
+      queueContainer.innerHTML = `<p style="padding:20px; color:var(--silver-muted);">Tidak ada permohonan calon member baru saat ini.</p>`;
+      return;
+    }
+
+    queueContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--silver-muted);">
+            <th style="padding:12px;">Nama Calon Member</th>
+            <th style="padding:12px;">Kontak & Email</th>
+            <th style="padding:12px;">Model & STNK</th>
+            <th style="padding:12px;">Dokumen</th>
+            <th style="padding:12px; text-align:right;">Aksi Verifikasi</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingUsers.map(u => `
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:14px 12px; font-weight:600;">
+                ${u.name}
+                <div style="font-size:0.75rem; color:var(--primary-emerald);">${u.tier} TIER</div>
+              </td>
+              <td style="padding:14px 12px; color:var(--silver-muted);">
+                ${u.email}<br>${u.phone}
+              </td>
+              <td style="padding:14px 12px;">
+                ${u.vehicleModel || 'Mercedes-Benz'}<br>
+                <strong style="color:var(--accent-gold); font-size:0.8rem;">${u.licensePlate || 'B 1926 MB'}</strong>
+              </td>
+              <td style="padding:14px 12px;">
+                <span class="role-pill-btn" onclick="alert('KTP: Verified\\nSIM A: Verified\\nSTNK: Valid Match')">👁️ Lihat Dokumen (3)</span>
+              </td>
+              <td style="padding:14px 12px; text-align:right;">
+                <button class="btn-primary" style="padding:6px 12px; font-size:0.75rem;" onclick="AppEngine.approveUser('${u.id}')">✓ Approve Member</button>
+                <button class="btn-outline" style="padding:6px 12px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="AppEngine.rejectUser('${u.id}')">✕ Reject</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  async approveUser(userId) {
+    if (!confirm('Apakah Anda yakin ingin menyetujui verifikasi keanggotaan calon member ini?')) return;
+
+    try {
+      const res = await fetch('api.php?action=update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, status: 'ACTIVE', role: 'MEMBER' })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      this.renderVerificationQueue();
+    } catch (e) {
+      alert('Gagal menyetujui member!');
+    }
+  },
+
+  async rejectUser(userId) {
+    if (!confirm('Tolak permohonan calon member ini?')) return;
+
+    try {
+      const res = await fetch('api.php?action=update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, status: 'REJECTED' })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      this.renderVerificationQueue();
+    } catch (e) {
+      alert('Gagal menolak permohonan!');
+    }
+  },
+
+  handleRSVP(eventId) {
+    if (this.currentRole === 'GUEST') {
+      alert('Silakan login atau daftar sebagai member MB INA terlebih dahulu untuk mengonfirmasi kehadiran event!');
+      AuthEngine.openModal('modal-login');
+    } else {
+      alert('Terima kasih! RSVP Anda telah tercatat pada sistem event MB INA.');
+    }
+  }
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  AppEngine.init();
+});

@@ -1,0 +1,187 @@
+  // ============================================
+  // 2.2 & 2.3 DAFTAR & DETAIL KLUB (110+ KLUB - 8 REGION WITH FULL CRUD)
+  // ============================================
+  renderM2Clubs() {
+    const container = document.getElementById('m2-clubs-container');
+    if (!container) return;
+
+    const clubs = this.m2Data.clubs;
+
+    // Regions list with exact DB value mapping
+    const regions = [
+      { value: '', label: '🌐 Semua Region (8 Region)' },
+      { value: 'Regional Sumatra', label: '1. Regional Sumatra' },
+      { value: 'Regional Banten', label: '2. Regional Banten' },
+      { value: 'Regional Metro DKI Jakarta', label: '3. Regional Metro DKI Jakarta' },
+      { value: 'Regional Jawa Barat', label: '4. Regional Jawa Barat' },
+      { value: 'Regional Jawa Tengah', label: '5. Regional Jawa Tengah' },
+      { value: 'Regional Yogyakarta', label: '6. Regional Yogyakarta' },
+      { value: 'Regional Jawa Timur & Bali', label: '7. Regional Jawa Timur & Bali' },
+      { value: 'Regional Kalimantan & Sulawesi', label: '8. Regional Kalimantan & Sulawesi' }
+    ];
+
+    container.innerHTML = `
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h4 style="font-size:1.2rem; color:var(--accent-gold);">🚗 2.2 & 2.3 Daftar Klub & Chapter Terdaftar MB INA (<span id="m2-club-total-count">${clubs.length}</span> Klub - 8 Region)</h4>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Kelola seluruh 110+ Klub & Chapter resmi MB INA (Supabase Cloud PostgreSQL Active)</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-primary" onclick="AppEngine.openAddClubModal()">+ Tambah Klub / Chapter Baru</button>
+          </div>
+        </div>
+
+        <!-- SEARCH & REGION FILTER BAR -->
+        <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap; background:rgba(0,0,0,0.03); border:1px solid var(--chrome-border); padding:16px; border-radius:12px; align-items:center;">
+          <div style="flex:1; min-width:260px;">
+            <label style="font-size:0.75rem; color:var(--text-muted); font-weight:700; display:block; margin-bottom:4px;">CARI KODE ATAU NAMA KLUB:</label>
+            <input type="text" id="m2-club-search" class="form-input" placeholder="🔍 Ketik kode (contoh: MCCI, MBC, W124) atau nama..." style="width:100%; font-weight:600;" oninput="AppEngine.filterM2Clubs()" onkeyup="AppEngine.filterM2Clubs()">
+          </div>
+
+          <div style="flex:1; min-width:260px;">
+            <label style="font-size:0.75rem; color:var(--text-muted); font-weight:700; display:block; margin-bottom:4px;">FILTER REGIONAL WILAYAH:</label>
+            <select id="m2-club-region-filter" class="form-input" style="width:100%; font-weight:600;" onchange="AppEngine.filterM2Clubs()">
+              ${regions.map(r => `<option value="${r.value}">${r.label}</option>`).join('')}
+            </select>
+          </div>
+
+          <div style="padding-top:18px;">
+            <button class="btn-outline" style="padding:10px 16px; font-size:0.8rem;" onclick="AppEngine.resetM2ClubFilters()">🔄 Reset Filter</button>
+          </div>
+        </div>
+
+        <!-- LIVE FILTER STATUS COUNTER BADGE -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; font-size:0.85rem;">
+          <span id="m2-club-filter-status" style="color:var(--accent-gold); font-weight:700;">
+            📊 Menampilkan ${clubs.length} dari ${clubs.length} Klub & Chapter
+          </span>
+          <span style="color:var(--text-muted); font-size:0.78rem;">Supabase PostgreSQL Live Search</span>
+        </div>
+
+        <!-- 2.2.3 STATISTIK KLUB SUMMARY BAR -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon">🚗</div>
+            <div>
+              <div class="stat-value" id="stat-club-card-count">${clubs.length}</div>
+              <div class="stat-label">Total Klub & Chapter</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(59,130,246,0.15); color:var(--accent-blue);">🗺️</div>
+            <div>
+              <div class="stat-value">8 Region</div>
+              <div class="stat-label">Cakupan Wilayah</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald);">📍</div>
+            <div>
+              <div class="stat-value">60+</div>
+              <div class="stat-label">Chapter & Region</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(245,158,11,0.15); color:var(--accent-gold);">👥</div>
+            <div>
+              <div class="stat-value">15.000+</div>
+              <div class="stat-label">Member Terdaftar</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="m2-clubs-table-wrapper" class="glass-panel" style="padding:20px; overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+                <th style="padding:12px;">Kode</th>
+                <th style="padding:12px;">Nama Resmi Klub / Chapter</th>
+                <th style="padding:12px;">Region Wilayah</th>
+                <th style="padding:12px;">Kota / Domisili</th>
+                <th style="padding:12px;">Tipe</th>
+                <th style="padding:12px;">Jumlah Member</th>
+                <th style="padding:12px; text-align:right;">Aksi Management</th>
+              </tr>
+            </thead>
+            <tbody id="m2-clubs-table-body">
+              ${this.generateM2ClubTableRows(clubs)}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  },
+
+  generateM2ClubTableRows(clubsList) {
+    if (!clubsList || clubsList.length === 0) {
+      return `
+        <tr>
+          <td colspan="7" style="padding:32px; text-align:center; color:var(--text-muted);">
+            🔍 <strong>Tidak ada Klub / Chapter yang cocok dengan pencarian atau filter region.</strong><br>
+            <span style="font-size:0.8rem; margin-top:6px; display:block;">Coba ubah kata kunci atau tekan tombol 'Reset Filter'.</span>
+          </td>
+        </tr>
+      `;
+    }
+
+    return clubsList.map(c => `
+      <tr style="border-bottom:1px solid var(--chrome-border);">
+        <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${c.code}</td>
+        <td style="padding:12px; font-weight:700; color:var(--text-main);">${c.name}</td>
+        <td style="padding:12px; color:var(--text-muted); font-size:0.8rem;">${c.region}</td>
+        <td style="padding:12px;">${c.city}</td>
+        <td style="padding:12px;">
+          <span class="tier-badge" style="background:${c.type === 'CHAPTER' ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)'}; color:${c.type === 'CHAPTER' ? 'var(--accent-blue)' : 'var(--accent-gold)'}; border:1px solid ${c.type === 'CHAPTER' ? 'var(--accent-blue)' : 'var(--accent-gold)'};">
+            ${c.type}
+          </span>
+        </td>
+        <td style="padding:12px; font-weight:700;">👥 ${c.member_count}</td>
+        <td style="padding:12px; text-align:right;">
+          <div style="display:inline-flex; gap:6px;">
+            <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditClubModal('${c.id}')">✏️ Edit</button>
+            <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteClub('${c.id}')">🗑️ Hapus</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  },
+
+  filterM2Clubs() {
+    const q = (document.getElementById('m2-club-search') ? document.getElementById('m2-club-search').value : '').trim().toLowerCase();
+    const reg = (document.getElementById('m2-club-region-filter') ? document.getElementById('m2-club-region-filter').value : '').trim().toLowerCase();
+    const tbody = document.getElementById('m2-clubs-table-body');
+    const statusEl = document.getElementById('m2-club-filter-status');
+    if (!tbody) return;
+
+    const totalClubs = this.m2Data.clubs.length;
+
+    const filtered = this.m2Data.clubs.filter(c => {
+      const name = (c.name || '').toLowerCase();
+      const code = (c.code || '').toLowerCase();
+      const city = (c.city || '').toLowerCase();
+      const alias = (c.alias || '').toLowerCase();
+      const cRegion = (c.region || '').toLowerCase();
+
+      const matchSearch = !q || name.includes(q) || code.includes(q) || city.includes(q) || alias.includes(q);
+      const matchRegion = !reg || cRegion.includes(reg);
+
+      return matchSearch && matchRegion;
+    });
+
+    tbody.innerHTML = this.generateM2ClubTableRows(filtered);
+
+    if (statusEl) {
+      statusEl.innerHTML = `📊 Menampilkan <strong>${filtered.length}</strong> dari <strong>${totalClubs}</strong> Klub & Chapter`;
+    }
+  },
+
+  resetM2ClubFilters() {
+    const searchInput = document.getElementById('m2-club-search');
+    const regionSelect = document.getElementById('m2-club-region-filter');
+
+    if (searchInput) searchInput.value = '';
+    if (regionSelect) regionSelect.value = '';
+
+    this.filterM2Clubs();
+  },

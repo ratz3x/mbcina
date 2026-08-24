@@ -1,0 +1,59 @@
+    container.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="data-table" style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="white-space:nowrap; padding:12px 14px;">ID MEMBER</th>
+              <th style="white-space:nowrap; padding:12px 14px;">NAMA MEMBER</th>
+              <th style="white-space:nowrap; padding:12px 14px;">EMAIL & WHATSAPP</th>
+              <th style="white-space:nowrap; padding:12px 14px;">KLUB / CHAPTER</th>
+              <th style="white-space:nowrap; padding:12px 14px;">TIER</th>
+              <th style="white-space:nowrap; padding:12px 14px;">STATUS</th>
+              <th style="white-space:nowrap; padding:12px 14px;">TOTAL DONASI</th>
+              <th style="white-space:nowrap; padding:12px 14px; text-align:center;">AKSI</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.length === 0 ? `
+              <tr>
+                <td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">
+                  Tidak ada data member yang sesuai dengan filter pencarian.
+                </td>
+              </tr>
+            ` : filtered.map(m => `
+              <tr>
+                <td style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.88rem; white-space:nowrap; padding:12px 14px;">
+                  ${m.member_id || '<span style="color:var(--accent-red);">[PENDING ID]</span>'}
+                </td>
+                <td style="white-space:nowrap; padding:12px 14px;">
+                  <div style="font-weight:700; color:var(--text-main); font-size:0.95rem;">${m.name}</div>
+                  <span style="font-size:0.75rem; color:var(--text-muted);">@${m.username || 'user'}</span>
+                </td>
+                <td style="white-space:nowrap; padding:12px 14px;">
+                  <div style="font-size:0.85rem; color:var(--text-main);">${m.email}</div>
+                  <div style="font-size:0.78rem; color:var(--accent-gold); font-weight:700;">📞 ${m.phone || '-'}</div>
+                </td>
+                <td style="font-size:0.85rem; white-space:nowrap; padding:12px 14px;">${m.club || 'HQ MB INA'}</td>
+                <td style="white-space:nowrap; padding:12px 14px;">${getTierBadge(m.tier)}</td>
+                <td style="white-space:nowrap; padding:12px 14px;">${getStatusBadge(m.status)}</td>
+                <td style="font-weight:800; color:var(--primary-emerald); font-size:0.9rem; white-space:nowrap; padding:12px 14px;">
+                  Rp ${new Intl.NumberFormat('id-ID').format(m.total_donation || 0)}
+                </td>
+                <td style="white-space:nowrap; text-align:center; padding:12px 14px;">
+                  <div style="display:inline-flex; gap:6px; align-items:center;">
+                    <button class="role-pill-btn" style="border-color:var(--accent-blue); color:var(--accent-blue); padding:6px 10px; font-size:0.95rem; border-radius:8px; cursor:pointer;" onclick="AppEngine.openM3MemberDetail('${m.id}')" title="Detail Profile Member">👁️</button>
+                    <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold); padding:6px 10px; font-size:0.95rem; border-radius:8px; cursor:pointer;" onclick="AppEngine.openEditM3MemberModal('${m.id}')" title="Edit Data Member">✏️</button>
+                    <button class="role-pill-btn" style="border-color:var(--primary-emerald); color:var(--primary-emerald); padding:6px 10px; font-size:0.95rem; border-radius:8px; cursor:pointer;" onclick="AppEngine.openM3AddDonationModal('${m.id}')" title="Catat Donasi & Tier">💰</button>
+                    <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red); padding:6px 10px; font-size:0.95rem; border-radius:8px; cursor:pointer;" onclick="AppEngine.deleteM3Member('${m.id}')" title="Hapus Member">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:16px; font-size:0.8rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
+        <span>Menampilkan ${filtered.length} dari ${this.m3Data.members.length} total member MB INA</span>
+        <span style="color:var(--accent-gold); font-weight:700;">Database Live: Supabase Cloud PostgreSQL</span>
+      </div>
+    `;

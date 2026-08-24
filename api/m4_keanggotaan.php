@@ -5,7 +5,6 @@
 
 require_once __DIR__ . '/ensure_tables.php'; // lazy-loaded
 
-
 switch ($action) {
     case 'get_m3_members':
         try {
@@ -13,7 +12,7 @@ switch ($action) {
             $stmt = $sPdo->query("
                 SELECT id, username, name, email, phone, role, status, tier, club, club_id, province, city, 
                        member_id, vehicle_model, license_plate, total_donation, total_events, points, gender, birth_date, 
-                       admin_notes, photo_url, avatar_url, rejection_reason, verified_at, created_at 
+                       admin_notes, photo_url, rejection_reason, verified_at, created_at 
                 FROM users 
                 ORDER BY created_at DESC
             ");
@@ -309,7 +308,6 @@ switch ($action) {
                     license_plate = :plate,
                     admin_notes = :notes, 
                     photo_url = CASE WHEN :photo_url != '' THEN :photo_url ELSE photo_url END, 
-                    avatar_url = CASE WHEN :photo_url != '' THEN :photo_url ELSE avatar_url END,
                     updated_at = NOW()
                 WHERE id = :id OR username = :id OR member_id = :id OR email = :id OR LOWER(email) = LOWER(:email)
             ");
@@ -349,7 +347,7 @@ switch ($action) {
         }
 
         try {
-            $userStmt = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, avatar_url, join_date, is_system_architect, is_protected, is_active, notes, documents, created_at, updated_at FROM users WHERE id = :id");
+            $userStmt = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, join_date, is_system_architect, is_protected, is_active, notes, documents, created_at, updated_at FROM users WHERE id = :id");
             $userStmt->execute([':id' => $id]);
             $u = $userStmt->fetch();
 
@@ -440,7 +438,7 @@ switch ($action) {
         }
 
         try {
-            $userStmt = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, avatar_url, join_date, is_system_architect, is_protected, is_active, notes, documents, created_at, updated_at FROM users WHERE id = :id");
+            $userStmt = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, join_date, is_system_architect, is_protected, is_active, notes, documents, created_at, updated_at FROM users WHERE id = :id");
             $userStmt->execute([':id' => $id]);
             $member = $userStmt->fetch();
 
@@ -569,7 +567,7 @@ switch ($action) {
                 $dataUrl = $base64;
                 if (!empty($userId)) {
                     try {
-                        $stmt = $sPdo->prepare("UPDATE users SET photo_url = :url, avatar_url = :url WHERE id = :id OR member_id = :id");
+                        $stmt = $sPdo->prepare("UPDATE users SET photo_url = :url WHERE id = :id OR member_id = :id");
                         $stmt->execute([':url' => $dataUrl, ':id' => $userId]);
                         logAudit($userId, 'UPDATE', 'MEMBER_PHOTO', ['user_id' => $userId]);
                     } catch (Exception $e) {}
@@ -625,7 +623,7 @@ switch ($action) {
         // Update Supabase PostgreSQL database
         if (!empty($userId)) {
             try {
-                $stmt = $sPdo->prepare("UPDATE users SET photo_url = :url, avatar_url = :url WHERE id = :id OR member_id = :id");
+                $stmt = $sPdo->prepare("UPDATE users SET photo_url = :url WHERE id = :id OR member_id = :id");
                 $stmt->execute([':url' => $webUrl, ':id' => $userId]);
                 logAudit($userId, 'UPDATE', 'MEMBER_PHOTO', ['user_id' => $userId]);
             } catch (Exception $e) {}

@@ -1,0 +1,17 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MB INA - Organisasi Motor Indonesia</title>
+  <meta name="description" content="Platform Resmi Mercedes-Benz Club Indonesia (MB INA). Wadah integrasi keanggotaan klub otomotif motor Indonesia.">
+  
+  <!-- Explicit Favicon & Manifest -->
+  <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
+  <link rel="shortcut icon" href="assets/mb_badge.jpg">
+  <link rel="apple-touch-icon" href="assets/mb_badge.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0e14">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+</head>

@@ -1,0 +1,72 @@
+  openAddClubModal() {
+    document.getElementById('edit-club-id').value = '';
+    document.getElementById('modal-club-title').innerText = '🚗 Tambah Klub / Chapter Baru';
+    document.getElementById('edit-club-name').value = '';
+    document.getElementById('edit-club-code').value = '';
+    document.getElementById('edit-club-type').value = 'CLUB';
+    document.getElementById('edit-club-region').value = 'Regional Sumatra';
+    document.getElementById('edit-club-city').value = '';
+    document.getElementById('edit-club-member-count').value = 50;
+    document.getElementById('edit-club-ketua').value = '';
+    document.getElementById('edit-club-cp').value = '';
+    document.getElementById('edit-club-phone').value = '';
+    document.getElementById('edit-club-year').value = 2004;
+    document.getElementById('edit-club-desc').value = '';
+
+    AuthEngine.openModal('modal-edit-club');
+  },
+
+  openEditClubModal(id) {
+    const c = this.m2Data.clubs.find(x => x.id === id);
+    if (!c) return;
+
+    document.getElementById('edit-club-id').value = c.id;
+    document.getElementById('modal-club-title').innerText = `✏️ Edit Klub / Chapter: ${c.name}`;
+    document.getElementById('edit-club-name').value = c.name || '';
+    document.getElementById('edit-club-code').value = c.code || '';
+    document.getElementById('edit-club-type').value = c.type || 'CLUB';
+    document.getElementById('edit-club-region').value = c.region || 'Regional Sumatra';
+    document.getElementById('edit-club-city').value = c.city || '';
+    document.getElementById('edit-club-member-count').value = c.member_count || 50;
+    document.getElementById('edit-club-ketua').value = c.ketua_umum || '';
+    document.getElementById('edit-club-cp').value = c.contact_person || '';
+    document.getElementById('edit-club-phone').value = c.contact_phone || '';
+    document.getElementById('edit-club-year').value = c.founded_year || 2004;
+    document.getElementById('edit-club-desc').value = c.description || '';
+
+    AuthEngine.openModal('modal-edit-club');
+  },
+
+  async saveClubFromModal(event) {
+    event.preventDefault();
+    const id = document.getElementById('edit-club-id').value;
+    const name = document.getElementById('edit-club-name').value.trim();
+    const code = document.getElementById('edit-club-code').value.trim();
+    const type = document.getElementById('edit-club-type').value;
+    const region = document.getElementById('edit-club-region').value;
+    const city = document.getElementById('edit-club-city').value.trim();
+    const member_count = parseInt(document.getElementById('edit-club-member-count').value || 50);
+    const ketua_umum = document.getElementById('edit-club-ketua').value.trim();
+    const contact_person = document.getElementById('edit-club-cp').value.trim();
+    const contact_phone = document.getElementById('edit-club-phone').value.trim();
+    const founded_year = parseInt(document.getElementById('edit-club-year').value || 2004);
+    const description = document.getElementById('edit-club-desc').value.trim();
+
+    const action = id ? 'update_m2_club' : 'create_m2_club';
+
+    try {
+      const res = await fetch(`api.php?action=${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, code, type, region, city, member_count, ketua_umum, contact_person, contact_phone, founded_year, description })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchM2Data();
+      this.renderM2Clubs();
+      this.renderClubsList();
+    } catch (e) {
+      alert('Gagal menyimpan Klub!');
+    }
+  },

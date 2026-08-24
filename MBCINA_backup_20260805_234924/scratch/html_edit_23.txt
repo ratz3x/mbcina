@@ -1,0 +1,271 @@
+  <!-- MODAL M3: EDIT MEMBER -->
+  <div id="modal-m3-edit-member" class="modal-backdrop">
+    <div class="modal-container" style="max-width:580px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">✏️ Edit Data Member (Supabase Cloud)</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Perbarui Data Profil, Status, & Tier</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="m3-edit-member-form" onsubmit="AppEngine.saveM3MemberFromModal(event)">
+          <input type="hidden" id="m3-edit-id">
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap *</label>
+              <input type="text" id="m3-edit-name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Member ID (Fixed)</label>
+              <input type="text" id="m3-edit-member-id" class="form-input" readonly style="font-family:monospace; font-weight:800; color:var(--accent-gold);">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Email *</label>
+              <input type="email" id="m3-edit-email" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp *</label>
+              <input type="text" id="m3-edit-phone" class="form-input" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Klub / Chapter *</label>
+              <select id="m3-edit-club" class="form-input" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tier</label>
+              <select id="m3-edit-tier" class="form-input">
+                <option value="BRONZE">🥉 BRONZE</option>
+                <option value="SILVER">🥈 SILVER</option>
+                <option value="GOLD">🥇 GOLD</option>
+                <option value="PLATINUM">💎 PLATINUM</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="m3-edit-status" class="form-input">
+                <option value="ACTIVE">🟢 ACTIVE</option>
+                <option value="PENDING">⏳ PENDING</option>
+                <option value="REJECTED">❌ REJECTED</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Provinsi</label>
+              <input type="text" id="m3-edit-province" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kota Domisili</label>
+              <input type="text" id="m3-edit-city" class="form-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan Admin</label>
+            <textarea id="m3-edit-notes" class="form-input" rows="2"></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;">💾 Simpan Perubahan Member ke Supabase</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL M3: VERIFIKASI MEMBER (APPROVE / REJECT) -->
+  <div id="modal-m3-verify-member" class="modal-backdrop">
+    <div class="modal-container" style="max-width:540px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">✅ Verifikasi Member Pending</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Proses Persetujuan Pendaftaran Member Baru</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="m3-verify-form" onsubmit="AppEngine.saveM3Verification(event)">
+          <input type="hidden" id="m3-verify-id">
+
+          <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="font-weight:800; font-size:1.1rem; color:var(--text-main);" id="m3-verify-name">Nama Member</div>
+            <div style="font-size:0.85rem; color:var(--accent-gold);" id="m3-verify-info">Email | WA | Klub</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Keputusan Verifikasi *</label>
+            <div style="display:flex; gap:16px; margin-top:6px;">
+              <label style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--primary-emerald); cursor:pointer;">
+                <input type="radio" name="verify_action" value="APPROVE" checked style="width:18px; height:18px; accent-color:var(--primary-emerald);" onchange="document.getElementById('m3-reject-reason-box').style.display='none'">
+                ✅ Disetujui (Approve & Generate Member ID)
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-weight:700; color:var(--accent-red); cursor:pointer;">
+                <input type="radio" name="verify_action" value="REJECT" style="width:18px; height:18px; accent-color:var(--accent-red);" onchange="document.getElementById('m3-reject-reason-box').style.display='block'">
+                ❌ Ditolak (Reject)
+              </label>
+            </div>
+          </div>
+
+          <div id="m3-reject-reason-box" class="form-group" style="display:none;">
+            <label class="form-label">Alasan Penolakan *</label>
+            <textarea id="m3-verify-reason" class="form-input" rows="2" placeholder="contoh: Dokumen STNK/Buku Pemilik tidak sesuai dengan data klub..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan Tambahan Admin</label>
+            <textarea id="m3-verify-notes" class="form-input" rows="2" placeholder="Catatan internal pengurus..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;">⚙️ Diproses Sekarang</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL M3: DETAIL PROFILE MEMBER (PROFIL, DONASI, RIWAYAT AKTIVITAS, TIER HISTORY) -->
+  <div id="modal-m3-member-detail" class="modal-backdrop">
+    <div class="modal-container" style="max-width:840px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.3rem;">👤 Detail Profil & Riwayat Member</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Statistik Keanggotaan, Donasi & Activity Log</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body" id="m3-detail-content-body">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL M3: CATAT DONASI MEMBER (FOR AUTO TIER UPGRADE) -->
+  <div id="modal-m3-add-donation" class="modal-backdrop">
+    <div class="modal-container" style="max-width:480px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">💰 Catat Donasi & Auto Upgrade Tier</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Input Donasi Member (Hitung Otomatis Upgrade Tier)</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="m3-donation-form" onsubmit="AppEngine.saveM3Donation(event)">
+          <input type="hidden" id="m3-don-userid">
+
+          <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:10px; padding:12px; margin-bottom:16px;">
+            <div style="font-weight:800; font-size:1rem;" id="m3-don-member-name">Nama Member</div>
+            <div style="font-size:0.8rem; color:var(--accent-gold);" id="m3-don-member-id">Member ID</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Jumlah Donasi (Rp) *</label>
+            <input type="number" id="m3-don-amount" class="form-input" placeholder="4500000" required min="10000">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Metode Pembayaran *</label>
+            <select id="m3-don-method" class="form-input">
+              <option value="TRANSFER">Bank Transfer (Mandiri)</option>
+              <option value="QRIS">QRIS Statis/Dinamis</option>
+              <option value="VA">Virtual Account Mandiri</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan / Keterangan Donasi</label>
+            <input type="text" id="m3-don-notes" class="form-input" value="Donasi Kegiatan Jamnas & Kas MB INA">
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;">💳 Proses Donasi & Hitung Tier</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL M3: EXPORT DATA MEMBER -->
+  <div id="modal-m3-export" class="modal-backdrop">
+    <div class="modal-container" style="max-width:540px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">📥 Export Data Member MB INA</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Pilih Format & Field Data yang Diexport</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="m3-export-form" onsubmit="AppEngine.processM3Export(event)">
+          <div class="form-group">
+            <label class="form-label">Format Berkas Export *</label>
+            <div style="display:flex; gap:16px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;">
+                <input type="radio" name="export_format" value="PDF" checked style="accent-color:var(--accent-gold);"> 📄 PDF Document
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;">
+                <input type="radio" name="export_format" value="EXCEL" style="accent-color:var(--primary-emerald);"> 📊 Excel (.xlsx)
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;">
+                <input type="radio" name="export_format" value="CSV" style="accent-color:var(--accent-blue);"> 📋 CSV Format
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Pilih Field Data yang Diexport:</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:var(--bg-card); padding:14px; border-radius:10px; border:1px solid var(--chrome-border);">
+              <label style="font-size:0.85rem; display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" class="exp-field" value="member_id" checked> ID Member
+              </label>
+              <label style="font-size:0.85rem; display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" class="exp-field" value="name" checked> Nama Lengkap
+              </label>
+              <label style="font-size:0.85rem; display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" class="exp-field" value="email" checked> Email
+              </label>
+              <label style="font-size:0.85rem; display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" class="exp-field" value="phone" checked> WhatsApp
+              </label>
+              <label style="font-size:0.85rem; display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" class="exp-field" value="tier" checked> Tier Keanggotaan
+              </label>
+              <label style="font-size:0.85rem; display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" class="exp-field" value="status" checked> Status
+              </label>
+              <label style="font-size:0.85rem; display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" class="exp-field" value="club" checked> Klub / Chapter
+              </label>
+              <label style="font-size:0.85rem; display:flex; gap:8px; align-items:center;">
+                <input type="checkbox" class="exp-field" value="total_donation" checked> Total Donasi
+              </label>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Periode Mulai</label>
+              <input type="date" id="m3-exp-start" class="form-input" value="2024-01-01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Periode Akhir</label>
+              <input type="date" id="m3-exp-end" class="form-input" value="2026-12-31">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;">📥 Unduh Berkas Export</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->

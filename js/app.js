@@ -123,6 +123,7 @@ const AppEngine = {
       this.fetchM5Data();
       this.fetchDonationData();
       this.renderTestimonials();
+      this.updateLandingCounters();
     }, 20);
   },
 
@@ -333,7 +334,7 @@ const AppEngine = {
       }
       if (liveUser.photo_url && (!u.photo_url || u.photo_url.includes('mb_badge.jpg'))) {
         u.photo_url = liveUser.photo_url;
-        u.avatar_url = liveUser.photo_url;
+        // avatar_url removed
       }
       if (liveUser.vehicle_model && !u.vehicle_model) u.vehicle_model = liveUser.vehicle_model;
       if (liveUser.license_plate && !u.license_plate) u.license_plate = liveUser.license_plate;
@@ -386,7 +387,7 @@ const AppEngine = {
       ktaTierBadge.style.color = tierCalc.color || 'var(--accent-gold)';
     }
     if (ktaPhoto) {
-      const userPhoto = u.photo_url || u.avatar_url || (liveUser && (liveUser.photo_url || liveUser.avatar_url)) || 'assets/mb_badge.jpg';
+      const userPhoto = u.photo_url || (liveUser && (liveUser.photo_url)) || 'assets/mb_badge.jpg';
       ktaPhoto.src = userPhoto;
       ktaPhoto.onerror = function() { this.src = 'assets/mb_badge.jpg'; };
     }
@@ -449,7 +450,7 @@ const AppEngine = {
     const canManageStatus = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'SEKJEN'].includes(userRole);
     const dAuthBadge = document.getElementById('dash-status-auth-badge');
 
-    const photoSrc = u.photo_url || u.avatar_url || 'assets/mb_badge.jpg';
+    const photoSrc = u.photo_url || 'assets/mb_badge.jpg';
     if (dPhoto) dPhoto.src = photoSrc;
     if (dId) dId.value = memberId;
     if (dStatus) {
@@ -1136,14 +1137,14 @@ const AppEngine = {
 
       if (this.currentUser) {
         this.currentUser.photo_url = dataUrl;
-        this.currentUser.avatar_url = dataUrl;
+        // avatar_url removed
         try { localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser)); } catch (err) {}
 
         const updatePhotoTarget = (item) => {
           if (!item) return;
           if (item.id === this.currentUser.id || item.username === this.currentUser.username || item.email === this.currentUser.email || item.member_id === this.currentUser.member_id) {
             item.photo_url = dataUrl;
-            item.avatar_url = dataUrl;
+            // avatar_url removed
           }
         };
         if (Array.isArray(this.users)) this.users.forEach(updatePhotoTarget);
@@ -1196,7 +1197,7 @@ const AppEngine = {
       ? (document.getElementById('dash-member-status')?.value || u.status || 'ACTIVE').trim()
       : (u.status || 'ACTIVE');
     const notes = (document.getElementById('dash-member-notes')?.value || '').trim();
-    const photo = (u.photo_url || u.avatar_url || document.getElementById('dash-member-photo')?.src || '').trim();
+    const photo = (u.photo_url || document.getElementById('dash-member-photo')?.src || '').trim();
 
     if (!name || !email || !phone) {
       window.showToast('Nama Lengkap, Email, dan Nomor WhatsApp wajib diisi!', 'error');
@@ -1218,7 +1219,7 @@ const AppEngine = {
       this.currentUser.admin_notes = notes;
       if (photo && !photo.includes('mb_badge.jpg')) {
         this.currentUser.photo_url = photo;
-        this.currentUser.avatar_url = photo;
+        // avatar_url removed
       }
       try {
         localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
@@ -1245,7 +1246,7 @@ const AppEngine = {
         item.admin_notes = notes;
         if (photo && !photo.includes('mb_badge.jpg')) {
           item.photo_url = photo;
-          item.avatar_url = photo;
+          // avatar_url removed
         }
       }
     };
@@ -2705,11 +2706,11 @@ const AppEngine = {
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
           ${((this.m2Data && this.m2Data.presidents) ? this.m2Data.presidents : []).map(p => `
             <div style="background:rgba(15,23,42,0.6); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; text-align:center;">
-              <div style="width:70px; height:70px; border-radius:50%; border:2px solid var(--accent-gold); overflow:hidden; margin:0 auto 10px auto;">
-                <img src="${p.photo || 'assets/presidents/default.jpg'}" style="width:100%; height:100%; object-fit:cover;">
+              <div style="width:70px; height:70px; border-radius:50%; border:2px solid var(--accent-gold); overflow:hidden; margin:0 auto 10px auto; background:#000;">
+                <img src="${p.photo_url || p.photo || 'assets/mb_badge.jpg'}" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';">
               </div>
-              <h5 style="font-size:0.95rem; line-height:1.2;">${p.name}</h5>
-              <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700; margin-top:4px;">Periode ${p.period}</div>
+              <h5 style="font-size:0.95rem; line-height:1.2; margin:0 0 4px 0;">${p.name}</h5>
+              <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700; margin-top:4px;">Periode ${p.period || `${p.period_start} - ${p.period_end}`}</div>
               <div style="font-size:0.75rem; color:var(--text-muted);">${p.club || 'MB INA'}</div>
             </div>
           `).join('')}
@@ -3429,9 +3430,51 @@ const AppEngine = {
       this.renderLandingSponsors();
       this.renderEventsList();
       this.renderProvincesDropdown();
+      this.updateLandingCounters();
     } catch (e) {
       console.error("Error loading API data:", e);
+      this.updateLandingCounters();
     }
+  },
+
+  updateLandingCounters() {
+    const elMembers = document.getElementById('landing-stat-members');
+    const elClubs = document.getElementById('landing-stat-clubs');
+    const elClubsSub = document.getElementById('landing-stat-clubs-sub');
+    const elEvents = document.getElementById('landing-stat-events');
+
+    let totalMembers = 18;
+    if (this.adminStats && (this.adminStats.totalUsers || this.adminStats.totalMembers)) {
+      totalMembers = this.adminStats.totalUsers || this.adminStats.totalMembers;
+    } else if (this.m3Data && this.m3Data.members && this.m3Data.members.length > 0) {
+      totalMembers = this.m3Data.members.length;
+    } else if (this.users && this.users.length > 0) {
+      totalMembers = this.users.length;
+    }
+
+    let totalClubs = 111;
+    let totalRegions = 9;
+    const clubsList = (this.m2Data && this.m2Data.clubs && this.m2Data.clubs.length > 0) 
+      ? this.m2Data.clubs 
+      : (this.clubs && this.clubs.length > 0 ? this.clubs : (this.allClubsSelectionData || []));
+
+    if (clubsList.length > 0) {
+      totalClubs = clubsList.length;
+      const uniqueRegions = new Set(clubsList.map(c => c.region).filter(Boolean));
+      if (uniqueRegions.size > 0) totalRegions = uniqueRegions.size;
+    }
+
+    let totalEvents = 4;
+    if (this.m6Data && this.m6Data.events && this.m6Data.events.length > 0) {
+      totalEvents = this.m6Data.events.length;
+    } else if (this.events && this.events.length > 0) {
+      totalEvents = this.events.length;
+    }
+
+    if (elMembers) elMembers.innerText = new Intl.NumberFormat('id-ID').format(totalMembers);
+    if (elClubs) elClubs.innerText = new Intl.NumberFormat('id-ID').format(totalClubs);
+    if (elClubsSub) elClubsSub.innerText = `${totalRegions} Regional Wilayah`;
+    if (elEvents) elEvents.innerText = new Intl.NumberFormat('id-ID').format(totalEvents);
   },
 
   showLoader(message = 'Memuat Data (Supabase Cloud)...') {
@@ -3492,6 +3535,25 @@ const AppEngine = {
         if (res.members && res.members.length) {
           this.m3Data.members = res.members;
           this.users = res.members;
+          
+          // Auto-sync Header with live record from Supabase database table
+          if (this.currentUser && this.currentUser.role !== 'GUEST') {
+            const dbUser = res.members.find(m => 
+              (this.currentUser.id && m.id === this.currentUser.id) ||
+              (this.currentUser.member_id && m.member_id === this.currentUser.member_id) ||
+              (this.currentUser.email && m.email && m.email.toLowerCase() === this.currentUser.email.toLowerCase()) ||
+              (this.currentUser.username && m.username && m.username.toLowerCase() === this.currentUser.username.toLowerCase())
+            );
+            if (dbUser) {
+              this.currentUser = Object.assign({}, this.currentUser, dbUser);
+              const nameEl = document.getElementById('nav-user-name');
+              const ddNameEl = document.getElementById('dropdown-user-name');
+              const navAvatar = document.getElementById('nav-user-avatar');
+              if (nameEl && dbUser.name) nameEl.innerText = dbUser.name;
+              if (ddNameEl && dbUser.name) ddNameEl.innerText = dbUser.name;
+              if (navAvatar && dbUser.name) navAvatar.innerText = dbUser.name.substring(0, 2).toUpperCase();
+            }
+          }
         }
         if (res.pendingCount !== undefined) {
           this.m3Data.pendingCount = res.pendingCount;
@@ -3530,6 +3592,7 @@ const AppEngine = {
       this.renderClubsList();
       this.renderLandingPageVisionMission();
       this.renderLandingSponsors();
+      this.updateLandingCounters();
       if (this.activeAdminTab === 'm2_org') this.renderM2Module();
       if (this.activeAdminTab === 'm3_membership') this.renderM3Module();
       if (this.activeAdminTab === 'm4_registration') this.renderM4Module();
@@ -4075,9 +4138,9 @@ const AppEngine = {
       <div class="glass-card" style="grid-column:1/-1; position:relative; width:100%; border-radius:20px; overflow:hidden; border:1.5px solid var(--accent-gold); background:#000; box-shadow:0 12px 35px rgba(0,0,0,0.6);" onmouseenter="AppEngine.stopSponsorCarouselTimer()" onmouseleave="AppEngine.startSponsorCarouselTimer()">
         
         <!-- MAIN SLIDE BANNER HERO STAGE (FULL-BLEED CLICKABLE BANNER) -->
-        <div style="position:relative; width:100%; height:340px; overflow:hidden; background:#000;">
-          <a href="${current.link || '#'}" target="_blank" rel="noopener noreferrer" style="display:block; width:100%; height:100%; text-decoration:none; cursor:pointer;" title="${current.name || 'Sponsor MB INA'}">
-            <img src="${current.banner_url || current.logo}" alt="${current.name}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:100%; height:100%; object-fit:cover; display:block; transition:all 0.5s ease-in-out;">
+        <div style="position:relative; width:100%; height:auto; min-height:160px; max-height:420px; overflow:hidden; background:#0b1120; display:flex; align-items:center; justify-content:center;">
+          <a href="${current.link || '#'}" target="_blank" rel="noopener noreferrer" style="display:block; width:100%; text-decoration:none; cursor:pointer;" title="${current.name || 'Sponsor MB INA'}">
+            <img src="${current.banner_url || current.logo}" alt="${current.name}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:100%; height:auto; max-height:400px; object-fit:contain; display:block; margin:0 auto; transition:all 0.5s ease-in-out;">
           </a>
 
           <!-- CAROUSEL ARROW NAVIGATION BUTTONS -->
@@ -6223,7 +6286,7 @@ const AppEngine = {
     }
 
     const mid = this.getOfficialMemberId(u);
-    const photoSrc = u.photo_url || u.avatar_url || 'assets/mb_badge.jpg';
+    const photoSrc = u.photo_url || 'assets/mb_badge.jpg';
 
     // Header Identitas Terkunci
     const dMid = document.getElementById('edit-user-display-mid');
@@ -7994,6 +8057,25 @@ const AppEngine = {
         this.m3Data.members = res.members || [];
         this.m3Data.pendingCount = res.pendingCount || 0;
 
+        // Auto-sync Header with live record from Supabase database table
+        if (this.currentUser && this.currentUser.role !== 'GUEST' && Array.isArray(res.members)) {
+          const dbUser = res.members.find(m => 
+            (this.currentUser.id && m.id === this.currentUser.id) ||
+            (this.currentUser.member_id && m.member_id === this.currentUser.member_id) ||
+            (this.currentUser.email && m.email && m.email.toLowerCase() === this.currentUser.email.toLowerCase()) ||
+            (this.currentUser.username && m.username && m.username.toLowerCase() === this.currentUser.username.toLowerCase())
+          );
+          if (dbUser) {
+            this.currentUser = Object.assign({}, this.currentUser, dbUser);
+            const nameEl = document.getElementById('nav-user-name');
+            const ddNameEl = document.getElementById('dropdown-user-name');
+            const navAvatar = document.getElementById('nav-user-avatar');
+            if (nameEl && dbUser.name) nameEl.innerText = dbUser.name;
+            if (ddNameEl && dbUser.name) ddNameEl.innerText = dbUser.name;
+            if (navAvatar && dbUser.name) navAvatar.innerText = dbUser.name.substring(0, 2).toUpperCase();
+          }
+        }
+
         const badgeEl = document.getElementById('m3-pending-badge');
         if (badgeEl) badgeEl.innerText = `⏳ ${res.pendingCount} PENDING VERIFIKASI`;
 
@@ -8783,7 +8865,7 @@ const AppEngine = {
     }
     document.getElementById('m3-edit-notes').value = m.admin_notes || '';
 
-    const photo = m.photo_url || m.avatar_url || 'assets/mb_badge.jpg';
+    const photo = m.photo_url || 'assets/mb_badge.jpg';
     if (document.getElementById('m3-edit-photo-url')) document.getElementById('m3-edit-photo-url').value = m.photo_url || '';
     if (document.getElementById('m3-edit-photo-preview')) document.getElementById('m3-edit-photo-preview').src = photo;
     if (document.getElementById('m3-edit-photo-badge')) document.getElementById('m3-edit-photo-badge').innerText = m.photo_url ? '✅ Foto Tersedia' : '';
@@ -8862,7 +8944,7 @@ const AppEngine = {
     if (clubEl) clubEl.innerText = clubName;
     if (locEl) locEl.innerText = `${cityName}, ${provName}`;
     
-    // Sinkronisasi foto: Prioritas dari Edit Form, photo_url member, avatar_url, atau Detail View
+    // Sinkronisasi foto: Prioritas dari Edit Form, photo_url member, atau Detail View
     let photo = '';
     const activeEditId = document.getElementById('m3-edit-id')?.value;
     if (activeEditId && String(activeEditId) === String(id)) {
@@ -8871,7 +8953,7 @@ const AppEngine = {
     }
 
     if (!photo) {
-      photo = m.photo_url || m.avatar_url || '';
+      photo = m.photo_url || '';
     }
 
     if (!photo) {
@@ -8961,7 +9043,7 @@ const AppEngine = {
       // Update session user
       if (this.currentUser) {
         this.currentUser.photo_url = dataUrl;
-        this.currentUser.avatar_url = dataUrl;
+        // avatar_url removed
         localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
       }
 
@@ -19165,10 +19247,10 @@ const M8Engine = {
 
     if (!this.loadPersistentCampaigns()) {
       this.data.campaigns = [
-        { id: 'ac_rotator_1', name: 'Banner Promo Ban Michelin Pilot Sport 5', type: 'Header Rotator', partner_name: 'Michelin Indonesia', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 1, banner_url: 'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200', impressions: 18400, clicks: 1920, ctr: 10.43, start_date: '2026-08-01', end_date: '2027-08-01', cta_text: 'Beli Ban Michelin', link: 'https://www.michelin.co.id/mbina', description: 'Promo spesial ban high-performance Michelin Pilot Sport 5 diskon 15% khusus member MB INA' },
-        { id: 'ac_001', name: 'Banner Mandiri Q3 2026', type: 'Header Rotator', partner_name: 'Bank Mandiri', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 2, banner_url: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200', impressions: 12450, clicks: 1234, ctr: 9.91, start_date: '2026-08-15', end_date: '2026-09-15', cta_text: 'Ajukan Kartu Sekarang', link: 'https://www.bankmandiri.co.id/mbina', description: 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge' },
-        { id: 'ac_rotator_2', name: 'Sponsored Post: Perawatan Transmisi 7G-Tronic', type: 'Sponsored Post', partner_name: 'ZF Aftermarket Indonesia', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 3, banner_url: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?w=1200', impressions: 14200, clicks: 1510, ctr: 10.63, start_date: '2026-08-01', end_date: '2027-08-01', cta_text: 'Booking Servis', link: 'https://www.zf.com/indonesia/mbina', description: 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF' },
-        { id: 'ac_009', name: 'Event MB Jamnas 2026', type: 'Header Rotator', partner_name: 'BCA Prioritas', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 4, banner_url: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=1200', impressions: 9800, clicks: 1020, ctr: 10.41, start_date: '2026-07-01', end_date: '2026-11-30', cta_text: 'Lihat Detail Event', link: 'https://www.bca.co.id/mbina', description: 'Dukungan Penuh BCA Prioritas untuk Gathering & Jamnas MB INA 2026' }
+        { id: 'ac_rotator_1', name: 'Banner Promo Ban Michelin Pilot Sport 5', type: 'Header Rotator', partner_name: 'Michelin Indonesia', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 1, banner_url: 'assets/banner_michelin.png', impressions: 18400, clicks: 1920, ctr: 10.43, start_date: '2026-08-01', end_date: '2027-08-01', cta_text: 'Beli Ban Michelin', link: 'https://www.michelin.co.id/mbina', description: 'Promo spesial ban high-performance Michelin Pilot Sport 5 diskon 20% khusus member MB INA' },
+        { id: 'ac_001', name: 'Banner Mandiri Q3 2026', type: 'Header Rotator', partner_name: 'Bank Mandiri', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 2, banner_url: 'assets/banner_mandiri.png', impressions: 12450, clicks: 1234, ctr: 9.91, start_date: '2026-08-15', end_date: '2026-09-15', cta_text: 'Ajukan Kartu Sekarang', link: 'https://www.bankmandiri.co.id/mbina', description: 'Cashback 10% SPBU, Bebas Iuran Tahunan, & Akses Airport Lounge' },
+        { id: 'ac_rotator_2', name: 'Sponsored Post: Perawatan Transmisi 7G-Tronic', type: 'Sponsored Post', partner_name: 'ZF Aftermarket Indonesia', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 3, banner_url: 'assets/7tronik.png', impressions: 14200, clicks: 1510, ctr: 10.63, start_date: '2026-08-01', end_date: '2027-08-01', cta_text: 'Booking Servis', link: 'https://www.zf.com/indonesia/mbina', description: 'Paket servis & ganti oli transmisi otomatis 7G-Tronic / 9G-Tronic garansi resmi ZF' },
+        { id: 'ac_009', name: 'Event MB Jamnas 2026', type: 'Header Rotator', partner_name: 'BCA Prioritas', budget: 10000000, status: 'ACTIVE', package_name: 'Platinum', sort_order: 4, banner_url: 'assets/mb_hero.jpg', impressions: 9800, clicks: 1020, ctr: 10.41, start_date: '2026-07-01', end_date: '2026-11-30', cta_text: 'Lihat Detail Event', link: 'https://www.bca.co.id/mbina', description: 'Dukungan Penuh BCA Prioritas untuk Gathering & Jamnas MB INA 2026' }
       ];
       this.savePersistentCampaigns();
     }
@@ -19440,14 +19522,23 @@ const M8Engine = {
     if (!this.data.contracts.length) { tbody.innerHTML = '<tr><td colspan="7" style="padding:20px; text-align:center; color:var(--text-muted);">Belum ada kontrak endorse.</td></tr>'; return; }
     tbody.innerHTML = this.data.contracts.map((c, idx) => {
       let rotatorBadge = '';
+      const pkgStr = String(c.package_id || c.package_name || '').toUpperCase();
+      const isPaid = (c.payment_status === 'PAID');
+
       if (c.status === 'ACTIVE') {
-        if (c.package_id === 'pkg_platinum' || c.package_name === 'PLATINUM') {
+        if (!isPaid) {
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(239,68,68,0.25);">⏳ Menunggu Pelunasan</div>`;
+        } else if (pkgStr.includes('PLATINUM')) {
           rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#f59e0b; font-weight:800; background:rgba(245,158,11,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(245,158,11,0.3);">🔄 Rotator Header Slot #${(idx % 2) + 1}</div>`;
+        } else if (pkgStr.includes('GOLD')) {
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#60a5fa; font-weight:800; background:rgba(59,130,246,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(59,130,246,0.3);">🔄 Rotator Header / Wall</div>`;
+        } else if (pkgStr.includes('SILVER')) {
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#cbd5e1; font-weight:700; background:rgba(148,163,184,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(148,163,184,0.3);">📌 Sponsor Wall Grid</div>`;
         } else {
-          rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#3b82f6; font-weight:700; background:rgba(59,130,246,0.1); padding:2px 6px; border-radius:4px;">🔄 Rotator Sponsor Wall</div>`;
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#d97706; font-weight:700; background:rgba(217,119,6,0.08); padding:2px 6px; border-radius:4px;">📢 Forum & Social Only</div>`;
         }
       } else if (c.status === 'WAITLIST') {
-        rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#eab308; font-weight:800; background:rgba(234,179,8,0.15); padding:2px 6px; border-radius:4px; border:1px solid #eab308;">📌 WAITLIST Queue #3 (Slot Bebas 15 Sep 2026)</div>`;
+        rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#eab308; font-weight:800; background:rgba(234,179,8,0.15); padding:2px 6px; border-radius:4px; border:1px solid #eab308;">📌 WAITLIST Queue #${idx + 1}</div>`;
       }
 
       const sponsorId = c.sponsor_id || c.member_id || M8Engine.deriveSponsorId(c.partner_name, idx + 1);
@@ -21418,7 +21509,7 @@ const M8Engine = {
             ${durasiStr}
           </td>
           <td style="padding:8px 10px; text-align:center;">
-            <img src="${ad.banner_url || ad.image_url || 'assets/mb_badge.jpg'}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" alt="${ad.name}" style="height:34px; width:120px; object-fit:cover; border-radius:6px; border:1px solid rgba(245,158,11,0.3);">
+            <img src="${ad.banner_url || ad.image_url || 'assets/mb_badge.jpg'}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" alt="${ad.name}" style="height:34px; width:120px; object-fit:contain; background:rgba(0,0,0,0.6); border-radius:6px; border:1px solid rgba(245,158,11,0.3);">
           </td>
           <td style="padding:8px 10px; text-align:center; font-size:1.1rem;" title="${isActive ? '🟢 STATUS: AKTIF' : '🔴 STATUS: STOPPED'}">
             ${isActive ? '🟢' : '🔴'}
@@ -21590,7 +21681,7 @@ const M8Engine = {
           </div>
           <div style="position:relative; width:100%; border-radius:12px; overflow:hidden; border:1px solid rgba(245,158,11,0.3);" onmouseover="if(M8Engine.bannerRotatorTimer) clearInterval(M8Engine.bannerRotatorTimer);" onmouseout="M8Engine.startBannerRotator();">
             <a href="${targetUrl}" target="_blank" onclick="M8Engine.trackAdClick('${activeAd.id}')" style="display:block; text-decoration:none; width:100%; background:#090d16;">
-              <img src="${activeAd.banner_url || activeAd.image_url}" alt="${activeAd.name}" style="width:100%; height:auto; max-height:280px; display:block; object-fit:cover; object-position:center; transition:transform 0.3s ease;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1200&q=80';" onmouseover="this.style.transform='scale(1.008)';" onmouseout="this.style.transform='none';">
+              <img src="${activeAd.banner_url || activeAd.image_url}" alt="${activeAd.name}" style="width:100%; height:auto; display:block; object-fit:contain; object-position:center; transition:transform 0.3s ease; border-radius:8px;" onerror="this.onerror=null; this.src='assets/banner_mandiri.png';" onmouseover="this.style.transform='scale(1.005)';" onmouseout="this.style.transform='none';">
             </a>
             ${ads.length > 1 ? `
               <button onclick="M8Engine.prevRotatorIndex('${slotId}')" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.75); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.5); width:38px; height:38px; border-radius:50%; font-weight:900; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px); transition:all 0.2s;" onmouseover="this.style.background='var(--accent-gold)'; this.style.color='#000';" onmouseout="this.style.background='rgba(0,0,0,0.75)'; this.style.color='var(--accent-gold)';">❮</button>

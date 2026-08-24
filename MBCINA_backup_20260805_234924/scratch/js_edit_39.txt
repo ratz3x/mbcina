@@ -1,0 +1,27 @@
+  async fetchM2Data() {
+    try {
+      const res = await fetch('api.php?action=get_app_init_data').then(r => r.json());
+      if (res.success) {
+        if (res.organization) this.m2Data.organization = res.organization;
+        if (res.founders) this.m2Data.founders = res.founders;
+        if (res.visionMission) this.m2Data.visionMission = res.visionMission;
+        if (res.presidents) this.m2Data.presidents = res.presidents;
+        if (res.clubs) {
+          this.m2Data.clubs = res.clubs;
+          this.clubs = res.clubs;
+        }
+        if (res.members) {
+          this.m3Data.members = res.members;
+          this.users = res.members;
+        }
+        if (res.pendingCount !== undefined) {
+          this.m3Data.pendingCount = res.pendingCount;
+        }
+
+        this.renderClubsList();
+        this.renderLandingPageVisionMission();
+      }
+    } catch (e) {
+      console.error("Error fetching M2 Data:", e);
+    }
+  },

@@ -1,0 +1,92 @@
+        $contactPerson = trim($input['contact_person'] ?? '');
+        $contactPhone = trim($input['contact_phone'] ?? '');
+        $contactEmail = trim($input['contact_email'] ?? '');
+        $socialMedia = is_array($input['social_media'] ?? null) ? json_encode($input['social_media']) : ($input['social_media'] ?? '{}');
+        $logoUrl = trim($input['logo_url'] ?? 'assets/mb_badge.jpg');
+        $photos = is_array($input['photos'] ?? null) ? json_encode($input['photos']) : ($input['photos'] ?? '[]');
+        $submittedBy = trim($input['submitted_by'] ?? 'usr_guest');
+
+        // Document URLs & Requirements
+        $adArtUrl = trim($input['ad_art_url'] ?? 'assets/docs/sample_ad_art.pdf');
+        $mgmtUrl = trim($input['management_structure_url'] ?? 'assets/docs/sample_pengurus.pdf');
+        $domicileUrl = trim($input['domicile_url'] ?? 'assets/docs/sample_domisili.pdf');
+        $stampUrl = trim($input['stamp_url'] ?? 'assets/docs/sample_stempel.png');
+        $actPhotos = is_array($input['activity_photos'] ?? null) ? json_encode($input['activity_photos']) : ($input['activity_photos'] ?? '["assets/mb_hero.jpg","assets/mb_badge.jpg","assets/mb_hero.jpg"]');
+        $membersListUrl = trim($input['members_list_url'] ?? 'assets/docs/sample_daftar_anggota.xlsx');
+        $totalMembers = (int)($input['total_members'] ?? $memberCountEstimate ?? 15);
+        $hasKtaImi = filter_var($input['has_kta_imi'] ?? true, FILTER_VALIDATE_BOOLEAN);
+        $feeAmount = (int)($input['fee_amount'] ?? 350000);
+        $paymentStatus = trim($input['payment_status'] ?? 'PAID');
+        $paymentProofUrl = trim($input['payment_proof_url'] ?? 'assets/docs/sample_bukti_transfer.jpg');
+
+        if (empty($name) || empty($code) || empty($city) || empty($contactPerson) || empty($contactPhone)) {
+            echo json_encode(['success' => false, 'message' => 'Nama Klub, Kode, Kota, dan Kontak Wajib Diisi!']);
+            exit;
+        }
+
+        // Check unique code in club_applications
+        $chkCode = $sPdo->prepare("SELECT id FROM club_applications WHERE code = :code");
+        $chkCode->execute([':code' => $code]);
+        if ($chkCode->fetch()) {
+            echo json_encode(['success' => false, 'message' => "Kode Klub '$code' sudah terdaftar dalam pengajuan! Gunakan kode lain (3-5 huruf)."]);
+            exit;
+        }
+
+        $id = 'app_' . uniqid();
+        try {
+            $stmt = $sPdo->prepare("
+                INSERT INTO club_applications (
+                    id, organization_id, name, code, alias, province_id, province_name, city, address,
+                    founded_year, member_count_estimate, club_type, description, contact_person,
+                    contact_phone, contact_email, social_media, logo_url, photos, status,
+                    ad_art_url, management_structure_url, domicile_url, stamp_url, activity_photos,
+                    members_list_url, total_members, has_kta_imi, fee_amount, payment_status, payment_proof_url,
+                    submitted_by, submitted_at
+                ) VALUES (
+                    :id, 'org_001', :name, :code, :alias, :province_id, :province_name, :city, :address,
+                    :founded_year, :member_count_estimate, :club_type, :description, :contact_person,
+                    :contact_phone, :contact_email, :social_media, :logo_url, :photos, 'PENDING',
+                    :ad_art, :mgmt, :domicile, :stamp, :act_photos::jsonb,
+                    :members_list, :total_members, :has_kta, :fee_amount, :payment_status, :payment_proof,
+                    :submitted_by, NOW()
+                )
+            ");
+            $stmt->execute([
+                ':id' => $id,
+                ':name' => $name,
+                ':code' => $code,
+                ':alias' => $alias,
+                ':province_id' => $provinceId,
+                ':province_name' => $provinceName,
+                ':city' => $city,
+                ':address' => $address,
+                ':founded_year' => $foundedYear,
+                ':member_count_estimate' => $memberCountEstimate,
+                ':club_type' => $clubType,
+                ':description' => $description,
+                ':contact_person' => $contactPerson,
+                ':contact_phone' => $contactPhone,
+                ':contact_email' => $contactEmail,
+                ':social_media' => $socialMedia,
+                ':logo_url' => $logoUrl,
+                ':photos' => $photos,
+                ':ad_art' => $adArtUrl,
+                ':mgmt' => $mgmtUrl,
+                ':domicile' => $domicileUrl,
+                ':stamp' => $stampUrl,
+                ':act_photos' => $actPhotos,
+                ':members_list' => $membersListUrl,
+                ':total_members' => $totalMembers,
+                ':has_kta' => $hasKtaImi ? 'true' : 'false',
+                ':fee_amount' => $feeAmount,
+                ':payment_status' => $paymentStatus,
+                ':payment_proof' => $paymentProofUrl,
+                ':submitted_by' => $submittedBy
+            ]);
+
+            logAudit($submittedBy, 'CREATE', 'CLUB_REGISTRATION', ['app_id' => $id, 'name' => $name, 'code' => $code]);
+            echo json_encode(['success' => true, 'message' => "Pengajuan Pendaftaran Klub '$name' ($code) beserta seluruh berkas & bukti pembayaran Rp 350.000 berhasil dikirim! Status saat ini: PENDING.", 'application_id' => $id]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Gagal mengirim pengajuan: ' . $e->getMessage()]);
+        }
+        break;

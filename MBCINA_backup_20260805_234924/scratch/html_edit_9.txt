@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MB INA - Organisasi Motor Indonesia</title>
+  <meta name="description" content="Platform Resmi Mercedes-Benz Club Indonesia (MB INA). Wadah integrasi keanggotaan klub otomotif motor Indonesia.">
+  
+  <!-- CSS & Fonts -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0e14">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- 1. HEADER (Logo + User Profile + Navigation) -->
+  <header class="app-header">
+    <div class="logo-container" onclick="AppEngine.setRole('SUPER_ADMIN')">
+      <img src="assets/mb_badge.jpg" alt="MB INA Logo">
+      <div>
+        <div class="brand-title text-gradient">MB INA</div>
+        <div class="brand-subtitle">Organisasi Motor Indonesia</div>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li><a class="nav-link active" onclick="AppEngine.switchAdminTab('dashboard')">Dashboard</a></li>
+      <li><a class="nav-link" href="#tentang-kami-section">Tentang Kami</a></li>
+      <li><a class="nav-link" href="#clubs-section">Klub Terdaftar</a></li>
+      <li><a class="nav-link" href="#events-section">Event Terbaru</a></li>
+      <li><a class="nav-link" href="#testimoni-section">Testimoni</a></li>
+      <li><a class="nav-link" onclick="AppEngine.setRole('SUPER_ADMIN')">Portal Admin</a></li>
+    </ul>
+
+    <div style="display:flex; align-items:center; gap:16px;">
+      <!-- Light / Dark Theme Toggle Button -->
+      <button id="theme-toggle-btn" class="theme-toggle-btn" onclick="AppEngine.toggleTheme()">
+        ☀️ Light Mode
+      </button>
+
+      <!-- Clean Executive User Profile Header Badge -->
+      <div id="nav-user-profile" style="display:flex; align-items:center; gap:12px;">
+        <div style="text-align:right;">
+          <div id="nav-user-name" style="font-weight:800; font-size:0.9rem; color:var(--text-main);">Derist Touriano</div>
+          <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px; font-size:0.75rem;">
+            <span id="nav-user-role-badge" style="color:var(--accent-gold); font-weight:700;">Super Admin</span>
+            <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); padding:2px 8px; font-size:0.68rem;">ACTIVE</span>
+          </div>
+        </div>
+        <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; border:2px solid var(--accent-gold); box-shadow:0 0 10px var(--accent-gold-glow);">
+          DT
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Main Content Wrapper -->
+  <main class="main-wrapper">
+
+    <!-- VIEW D: M1 PORTAL ADMIN (DEFAULT EXECUTIVE VIEW) -->
+    <div id="view-admin-dashboard" class="view-container" style="max-width:1440px; margin:0 auto; padding:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 style="font-size:1.8rem;" class="text-gradient">PORTAL ADMIN & OPERASIONAL ORGANISASI</h2>
+          <p style="color:var(--text-muted); font-size:0.9rem;">Kelola statistik real-time, manajemen user RBAC, audit logs, dan pengaturan sistem MB INA (Supabase Cloud Connected)</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.simulateExport('excel')">📊 Export Excel</button>
+          <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.simulateExport('pdf')">📄 Export PDF</button>
+          <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" data-open-modal="modal-add-user">+ Tambah User Baru</button>
+        </div>
+      </div>
+
+      <!-- Executive Styled Admin Tab Bar -->
+      <div class="admin-tab-bar">
+        <button class="admin-tab-btn active" data-admin-tab="dashboard">📊 Dashboard Realtime</button>
+        <button class="admin-tab-btn" data-admin-tab="users">👥 Manajemen User (RBAC)</button>
+        <button class="admin-tab-btn" data-admin-tab="audit">📜 Audit Log</button>
+        <button class="admin-tab-btn" data-admin-tab="settings">⚙️ 3.1.4 Pengaturan Sistem</button>
+      </div>
+
+      <!-- TAB 1: DASHBOARD REALTIME -->
+      <div id="admin-tab-dashboard" class="admin-tab-content">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-bottom:28px;">
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon">👥</div>
+            <div>
+              <div id="stat-members-count" class="stat-value">12.544</div>
+              <div class="stat-label">Total Member Terdaftar</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(59,130,246,0.15); border-color:var(--accent-blue); color:var(--accent-blue);">🚗</div>
+            <div>
+              <div id="stat-clubs-count" class="stat-value">34</div>
+              <div class="stat-label">Klub & Chapter Resmi</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15); border-color:var(--primary-emerald); color:var(--primary-emerald);">💳</div>
+            <div>
+              <div id="stat-revenue-amount" class="stat-value" style="font-size:1.4rem;">Rp 425.500.000</div>
+              <div class="stat-label">Transaksi Iuran (Bulan Ini)</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(239,68,68,0.15); border-color:var(--accent-red); color:var(--accent-red);">⏳</div>
+            <div>
+              <div id="stat-pending-count" class="stat-value">1</div>
+              <div class="stat-label">Antrean Verifikasi Pending</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:24px; margin-bottom:28px;">
+          <div class="glass-panel" style="padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <h3 style="font-size:1.1rem;" class="text-gradient">Grafik Pertumbuhan Registrasi Member</h3>
+            </div>
+            <div id="admin-growth-chart" class="chart-bar-container"></div>
+          </div>
+
+          <div class="glass-panel" style="padding:24px;">
+            <h3 style="font-size:1.1rem; margin-bottom:16px;" class="text-gradient">Peta Persebaran Klub & Region</h3>
+            <div id="admin-region-distribution"></div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:24px;">
+          <div class="glass-panel" style="padding:20px;">
+            <h4 style="font-size:1rem; margin-bottom:12px; color:var(--accent-gold);">🔔 Peringatan Sistem & Notifikasi</h4>
+            <div id="admin-alerts-feed"></div>
+          </div>
+          <div class="glass-panel" style="padding:20px; overflow-x:auto;">
+            <h4 style="font-size:1rem; margin-bottom:12px; color:var(--accent-gold);">📋 Antrean Verifikasi Member Terkini</h4>
+            <div id="admin-verification-table"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: MANAJEMEN USER -->
+      <div id="admin-tab-users" class="admin-tab-content" style="display:none;">
+        <div class="glass-panel" style="padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; gap:12px; flex-wrap:wrap; flex:1;">
+              <input type="text" id="user-mgmt-search" class="form-input" placeholder="🔍 Cari Nama, Email, atau Username..." style="max-width:280px;" onkeyup="AppEngine.renderUserManagement()">
+              <select id="user-mgmt-role-filter" class="form-input" style="width:180px;" onchange="AppEngine.renderUserManagement()">
+                <option value="">Semua Role</option>
+                <option value="SUPER_ADMIN">Super Admin</option>
+                <option value="PRESIDEN">Presiden MB INA</option>
+                <option value="SEKRETARIS_PUSAT">Sekretaris Pusat</option>
+                <option value="BENDAHARA_PUSAT">Bendahara Pusat</option>
+                <option value="ADMIN_ORGANISASI">Admin Organisasi</option>
+                <option value="PENGURUS_PUSAT">Pengurus Pusat</option>
+                <option value="PENGURUS_KLUB">Pengurus Klub</option>
+                <option value="MEMBER">Member</option>
+                <option value="CALON_MEMBER">Calon Member</option>
+              </select>
+              <select id="user-mgmt-status-filter" class="form-input" style="width:150px;" onchange="AppEngine.renderUserManagement()">
+                <option value="">Semua Status</option>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="PENDING">PENDING</option>
+                <option value="SUSPENDED">SUSPENDED</option>
+              </select>
+            </div>
+            <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" data-open-modal="modal-import-csv">
+              📥 Bulk Import (CSV/Excel)
+            </button>
+          </div>
+          <div id="user-mgmt-table" style="overflow-x:auto;"></div>
+        </div>
+      </div>
+
+      <!-- TAB 3: AUDIT LOG -->
+      <div id="admin-tab-audit" class="admin-tab-content" style="display:none;">
+        <div class="glass-panel" style="padding:24px;">
+          <div id="audit-logs-table" style="overflow-x:auto;"></div>
+        </div>
+      </div>
+
+      <!-- TAB 4: 3.1.4 PENGATURAN SISTEM (FULL SUB-MODULES) -->
+      <div id="admin-tab-settings" class="admin-tab-content" style="display:none;">
+        <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-size:1.3rem;" class="text-gradient">⚙️ 3.1.4 PENGATURAN SISTEM</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Pusat konfigurasi platform MB INA yang hanya dapat diakses oleh Super Admin (Derist Touriano)</p>
+            </div>
+            <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">🔒 FULL ACCESS SUPER ADMIN</span>
+          </div>
+
+          <!-- 3.1.4 Sub-Module Navigation Pills -->
+          <div style="display:flex; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--chrome-border); padding-bottom:16px; margin-bottom:24px;">
+            <button class="sub-tab-btn active" data-subtab="general" onclick="AppEngine.switchSettingsSubtab('general')">3.1.4.1 Konfigurasi Umum</button>
+            <button class="sub-tab-btn" data-subtab="tier" onclick="AppEngine.switchSettingsSubtab('tier')">3.1.4.2 Manajemen Tier ⭐</button>
+            <button class="sub-tab-btn" data-subtab="province" onclick="AppEngine.switchSettingsSubtab('province')">3.1.4.3 Manajemen Provinsi (38)</button>
+            <button class="sub-tab-btn" data-subtab="payment" onclick="AppEngine.switchSettingsSubtab('payment')">3.1.4.4 Payment Gateway</button>
+            <button class="sub-tab-btn" data-subtab="email" onclick="AppEngine.switchSettingsSubtab('email')">3.1.4.5 Email Template</button>
+            <button class="sub-tab-btn" data-subtab="backup" onclick="AppEngine.switchSettingsSubtab('backup')">3.1.4.6 Backup & Restore</button>
+          </div>
+
+          <!-- 3.1.4.1 KONFIGURASI UMUM -->
+          <div id="subtab-general" class="settings-subtab-content">
+            <div style="max-width:680px;">
+              <h4 style="font-size:1.05rem; margin-bottom:16px; color:var(--accent-gold);">3.1.4.1 Konfigurasi Umum Platform</h4>
+              <div class="form-group">
+                <label class="form-label">Application Theme (Dark / Light)</label>
+                <select id="setting-theme-select" class="form-input">
+                  <option value="LIGHT">Light Mode (Pilihan Utama)</option>
+                  <option value="DARK">Dark Mode (Obsidian)</option>
+                </select>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group">
+                  <label class="form-label">Bahasa Sistem</label>
+                  <select id="setting-language-select" class="form-input">
+                    <option value="ID">Bahasa Indonesia (Default)</option>
+                    <option value="EN">English</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Zona Waktu (Timezone)</label>
+                  <select id="setting-timezone-select" class="form-input">
+                    <option value="Asia/Jakarta (WIB)">Asia/Jakarta (WIB)</option>
+                    <option value="Asia/Makassar (WITA)">Asia/Makassar (WITA)</option>
+                    <option value="Asia/Jayapura (WIT)">Asia/Jayapura (WIT)</option>
+                  </select>
+                </div>
+              </div>
+              <div style="background:rgba(0,0,0,0.03); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <div>
+                  <strong style="font-size:0.95rem; display:block;">Maintenance Mode (On / Off)</strong>
+                  <span style="font-size:0.8rem; color:var(--text-muted);">Nonaktifkan akses publik sementara saat perbaikan sistem.</span>
+                </div>
+                <label class="switch-toggle">
+                  <input type="checkbox" id="setting-maint-switch">
+                  <span class="slider-round"></span>
+                </label>
+              </div>
+              <button class="btn-primary" style="margin-top:24px;" onclick="AppEngine.saveSystemSettings()">💾 Simpan Konfigurasi Umum →</button>
+            </div>
+          </div>
+
+          <!-- 3.1.4.2 MANAJEMEN TIER ⭐ -->
+          <div id="subtab-tier" class="settings-subtab-content" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+              <div>
+                <h4 style="font-size:1.05rem; color:var(--accent-gold);">3.1.4.2 Manajemen Tier Keanggotaan (Donasi per Tahun)</h4>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Kelola benefit, donasi minimum/maksimum, dan badge visual tiap level</p>
+              </div>
+            </div>
+            <div id="tiers-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px;"></div>
+          </div>
+
+          <!-- 3.1.4.3 MANAJEMEN PROVINSI -->
+          <div id="subtab-province" class="settings-subtab-content" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h4 style="font-size:1.05rem; color:var(--accent-gold);">3.1.4.3 Manajemen Data Provinsi (38 Provinsi Indonesia)</h4>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Master data wilayah operasional klub & pengurus se-Indonesia</p>
+              </div>
+              <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" data-open-modal="modal-add-province">+ Tambah Provinsi Baru</button>
+            </div>
+            <div id="provinces-admin-table" style="overflow-x:auto;"></div>
+          </div>
+
+          <!-- 3.1.4.4 PAYMENT GATEWAY -->
+          <div id="subtab-payment" class="settings-subtab-content" style="display:none;">
+            <div style="max-width:720px;">
+              <h4 style="font-size:1.05rem; margin-bottom:16px; color:var(--accent-gold);">3.1.4.4 Konfigurasi Payment Gateway (Midtrans / Xendit)</h4>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group">
+                  <label class="form-label">Payment Provider</label>
+                  <select id="gw-provider" class="form-input">
+                    <option value="MIDTRANS">Midtrans (BCA VA, QRIS, CC)</option>
+                    <option value="XENDIT">Xendit Payment Engine</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Environment Mode</label>
+                  <select id="gw-mode" class="form-input">
+                    <option value="PRODUCTION">Production (Live Real Money)</option>
+                    <option value="SANDBOX">Sandbox (Testing Simulator)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Merchant ID</label>
+                <input type="text" id="gw-merchant-id" class="form-input" value="G12894567-MBINA">
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group">
+                  <label class="form-label">Client Key (Public)</label>
+                  <input type="text" id="gw-client-key" class="form-input" value="SB-Mid-client-8A9bC0dE1fG">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Server Key (Secret)</label>
+                  <input type="password" id="gw-server-key" class="form-input" value="SB-Mid-server-MBINA2026Secret">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Webhook URL (Notifikasi Otomatis)</label>
+                <input type="text" id="gw-webhook-url" class="form-input" value="https://mbina.or.id/api.php?action=webhook_payment" readonly>
+              </div>
+              <button class="btn-primary" onclick="AppEngine.savePaymentGateway()">💾 Simpan Konfigurasi Payment Gateway →</button>
+            </div>
+          </div>
+
+          <!-- 3.1.4.5 EMAIL TEMPLATE -->
+          <div id="subtab-email" class="settings-subtab-content" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+              <div>
+                <h4 style="font-size:1.05rem; color:var(--accent-gold);">3.1.4.5 Manajemen Email & WhatsApp Template</h4>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Kelola subjek, pesan notifikasi, verifikasi OTP, dan surat konfirmasi</p>
+              </div>
+            </div>
+            <div id="email-templates-table" style="overflow-x:auto;"></div>
+          </div>
+
+          <!-- 3.1.4.6 BACKUP & RESTORE -->
+          <div id="subtab-backup" class="settings-subtab-content" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h4 style="font-size:1.05rem; color:var(--accent-gold);">3.1.4.6 Backup & Restore Database Supabase</h4>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Unduh cadangan data PostgreSQL atau pulihkan database dari riwayat backup</p>
+              </div>
+              <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.createBackupNow()">💾 Backup Database Sekarang</button>
+            </div>
+            <div id="backups-admin-table" style="overflow-x:auto;"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW A: LANDING PAGE -->
+    <div id="view-landing-page" class="view-container" style="display:none;">
+      <div style="max-width:1440px; margin:0 auto; padding:24px;">
+
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+          <img src="assets/mb_hero.jpg" alt="MB INA Motor Indonesia" class="hero-bg-img">
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <div class="hero-badge">⭐ PLATFORM RESMI KEANGGOTAAN ORGANISASI MOTOR</div>
+            <h1 class="hero-title text-gradient">MB INA - Organisasi Motor Indonesia</h1>
+            <p class="hero-description">
+              Wadah resmi dan profesional komunitas motor se-Indonesia. Nikmati integrasi keanggotaan, event touring nusantara, kartu member digital, dan perlindungan privasi data tanpa perlu unggah berkas fisik KTP/SIM/STNK.
+            </p>
+            <div class="btn-group">
+              <button class="btn-primary" data-open-modal="modal-register">
+                [Daftar Member] →
+              </button>
+              <button class="btn-outline" data-open-modal="modal-login">
+                [Login Member / Pengurus]
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- STATISTIK (Member, Klub, Event) -->
+        <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:48px;">
+          <div class="glass-panel" style="padding:24px; text-align:center;">
+            <div style="font-size:2.4rem; font-weight:900; color:var(--accent-gold); font-family:var(--font-heading);">12.540+</div>
+            <div style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Member Terdaftar</div>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Di 38 Provinsi Indonesia</p>
+          </div>
+          <div class="glass-panel" style="padding:24px; text-align:center;">
+            <div style="font-size:2.4rem; font-weight:900; color:var(--accent-blue); font-family:var(--font-heading);">34+</div>
+            <div style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Klub & Chapter Resmi</div>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Terverifikasi Organisasi</p>
+          </div>
+          <div class="glass-panel" style="padding:24px; text-align:center;">
+            <div style="font-size:2.4rem; font-weight:900; color:var(--primary-emerald); font-family:var(--font-heading);">150+</div>
+            <div style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Agenda Event & Jamnas</div>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Touring & Social Rally</p>
+          </div>
+        </section>
+
+        <!-- TENTANG KAMI (Informasi Organisasi & Visi Misi) -->
+        <section id="tentang-kami-section" style="margin-bottom:48px;">
+          <div class="glass-panel" style="padding:36px;">
+            <div style="max-width:800px; margin:0 auto; text-align:center; margin-bottom:32px;">
+              <span class="hero-badge">Tentang MB INA</span>
+              <h2 style="font-size:2rem; margin-top:8px;" class="text-gradient">Visi & Misi Organisasi Motor Indonesia</h2>
+              <p style="color:var(--text-muted); font-size:1rem; margin-top:12px;">
+                MB INA didirikan untuk menyatukan klub dan pengagum otomotif dalam wadah organisasi yang solid, berasas solidaritas, serta menjunjung tinggi keselamatan berkendara di Indonesia.
+              </p>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
+              <div class="glass-card" style="padding:24px;">
+                <div style="font-size:2rem; margin-bottom:12px;">🎯</div>
+                <h3 style="font-size:1.2rem; margin-bottom:10px; color:var(--accent-gold);">Visi Utama</h3>
+                <p style="font-size:0.9rem; color:var(--text-muted);">
+                  Menjadi organisasi motor terbesar, terdepan, dan paling berintegritas di Indonesia yang menaungi seluruh klub dengan standar manajemen digital modern.
+                </p>
+              </div>
+              <div class="glass-card" style="padding:24px;">
+                <div style="font-size:2rem; margin-bottom:12px;">🚀</div>
+                <h3 style="font-size:1.2rem; margin-bottom:10px; color:var(--accent-gold);">Misi Strategis</h3>
+                <ul style="font-size:0.88rem; color:var(--text-muted); padding-left:18px; display:flex; flex-direction:column; gap:6px;">
+                  <li>Mengembangkan jaringan klub motor di 38 Provinsi Indonesia.</li>
+                  <li>Penyelenggaraan event touring nusantara dan Jamnas profesional.</li>
+                  <li>Melindungi keamanan privasi data keanggotaan seluruh anggota.</li>
+                  <li>Meningkatkan sinergi kegiatan sosial dan pelestarian komunitas.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- KLUB TERDAFTAR (Grid Preview) -->
+        <section id="clubs-section" style="margin-bottom:48px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
+            <div>
+              <h2 style="font-size:1.8rem;" class="text-gradient">Klub Terdaftar (Preview)</h2>
+              <p style="color:var(--text-muted); font-size:0.9rem;">Daftar klub dan komunitas motor yang terdaftar di bawah naungan MB INA</p>
+            </div>
+          </div>
+          <div id="clubs-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;"></div>
+        </section>
+
+        <!-- EVENT TERBARU (Card) -->
+        <section id="events-section" style="margin-bottom:48px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
+            <div>
+              <h2 style="font-size:1.8rem;" class="text-gradient">Event Terbaru MB INA</h2>
+              <p style="color:var(--text-muted); font-size:0.9rem;">Jadwal event touring, gathering, dan jambore nasional mendatang</p>
+            </div>
+          </div>
+          <div id="events-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:20px;"></div>
+        </section>
+
+        <!-- TESTIMONI MEMBER -->
+        <section id="testimoni-section" style="margin-bottom:48px;">
+          <div style="margin-bottom:20px;">
+            <h2 style="font-size:1.8rem;" class="text-gradient">Testimoni Member & Pengurus</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Apa kata para pengurus dan member mengenai platform digital MB INA</p>
+          </div>
+          <div id="testimonials-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;"></div>
+        </section>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL 3.1.4.2: EDIT TIER ⭐ -->
+  <div id="modal-edit-tier" class="modal-backdrop">
+    <div class="modal-container" style="max-width:560px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-edit-tier-title" style="font-size:1.2rem;">✏️ Edit Tier Keanggotaan</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Atur Range Donasi & Benefit Tier</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="edit-tier-form" onsubmit="AppEngine.saveTierFromModal(event)">
+          <input type="hidden" id="edit-tier-id">
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Kode Tier</label>
+              <input type="text" id="edit-tier-code" class="form-input" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Level Tier</label>
+              <input type="number" id="edit-tier-level" class="form-input" readonly>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Nama Tier *</label>
+              <input type="text" id="edit-tier-name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Icon</label>
+              <input type="text" id="edit-tier-icon" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Warna Kode</label>
+              <input type="color" id="edit-tier-color" class="form-input" style="height:44px; padding:2px;" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Biaya / Minimal Donasi Pertahun (Rp) *</label>
+            <input type="number" id="edit-tier-fee" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Benefit List (Pisahkan dengan Koma)</label>
+            <textarea id="edit-tier-benefits" class="form-input" rows="4" placeholder="Akses Forum, Diskon 10% Event, Badge Silver"></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;">💾 Simpan Perubahan Tier ke Supabase Cloud</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3.1.4.3: TAMBAH PROVINSI -->
+  <div id="modal-add-province" class="modal-backdrop">
+    <div class="modal-container" style="max-width:480px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">🗺️ Tambah Provinsi Baru</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Master Data Wilayah Supabase</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="add-province-form" onsubmit="AppEngine.createProvinceFromModal(event)">
+          <div style="display:grid; grid-template-columns:1fr 2fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Kode (3-4 Huruf) *</label>
+              <input type="text" id="add-prov-code" class="form-input" placeholder="JKT" maxlength="4" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nama Provinsi *</label>
+              <input type="text" id="add-prov-name" class="form-input" placeholder="DKI Jakarta" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Region Wilayah *</label>
+            <select id="add-prov-region" class="form-input">
+              <option value="Sumatera">Sumatera</option>
+              <option value="Jawa">Jawa</option>
+              <option value="Bali & Nusa Tenggara">Bali & Nusa Tenggara</option>
+              <option value="Kalimantan">Kalimantan</option>
+              <option value="Sulawesi">Sulawesi</option>
+              <option value="Maluku">Maluku</option>
+              <option value="Papua">Papua</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;">+ Simpan Provinsi ke Supabase</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3.1.4.5: EDIT EMAIL TEMPLATE -->
+  <div id="modal-edit-template" class="modal-backdrop">
+    <div class="modal-container" style="max-width:580px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-edit-tmpl-title" style="font-size:1.2rem;">✉️ Edit Email / WA Template</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Subjek & Format Notifikasi</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="edit-tmpl-form" onsubmit="AppEngine.saveEmailTemplateFromModal(event)">
+          <input type="hidden" id="edit-tmpl-code">
+
+          <div class="form-group">
+            <label class="form-label">Subject Line Email *</label>
+            <input type="text" id="edit-tmpl-subject" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Content Body (Gunakan Placeholder: {NAME}, {USERNAME}, {OTP})</label>
+            <textarea id="edit-tmpl-content" class="form-input" rows="6" required></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; gap:12px;">
+            <button type="button" class="btn-outline" onclick="AppEngine.testSendEmailFromModal()">🚀 Test Send Email</button>
+            <button type="submit" class="btn-primary">💾 Simpan Template</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT USER -->
+  <div id="modal-edit-user" class="modal-backdrop">
+    <div class="modal-container" style="max-width:540px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">✏️ Edit Data User (Supabase Cloud)</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Perbarui Data Langsung di Supabase PostgreSQL Database</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="edit-user-form" onsubmit="AppEngine.updateUserFromAdmin(event)">
+          <input type="hidden" id="edit-user-id">
+
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap *</label>
+            <input type="text" id="edit-user-name" class="form-input" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Email Valid *</label>
+              <input type="email" id="edit-user-email" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor WhatsApp *</label>
+              <input type="tel" id="edit-user-phone" class="form-input" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Username *</label>
+              <input type="text" id="edit-user-username" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role Keanggotaan (RBAC) *</label>
+              <select id="edit-user-role" class="form-input">
+                <option value="MEMBER">Member Terverifikasi</option>
+                <option value="PRESIDEN">Presiden MB INA</option>
+                <option value="SEKRETARIS_PUSAT">Sekretaris Pusat</option>
+                <option value="BENDAHARA_PUSAT">Bendahara Pusat</option>
+                <option value="PENGURUS_KLUB">Pengurus Klub</option>
+                <option value="PENGURUS_PUSAT">Pengurus Pusat</option>
+                <option value="ADMIN_ORGANISASI">Admin Organisasi</option>
+                <option value="SUPER_ADMIN">Super Admin</option>
+                <option value="CALON_MEMBER">Calon Member</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Status Akun *</label>
+              <select id="edit-user-status" class="form-input">
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="PENDING">PENDING</option>
+                <option value="SUSPENDED">SUSPENDED</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kota / Kabupaten *</label>
+              <input type="text" id="edit-user-city" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Provinsi *</label>
+            <select id="edit-user-province" class="form-input">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">
+            💾 Simpan Perubahan Data ke Supabase Cloud
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH USER BARU -->
+  <div id="modal-add-user" class="modal-backdrop">
+    <div class="modal-container" style="max-width:540px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">Tambah User Baru (Supabase Cloud)</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Langsung Tersimpan di Supabase PostgreSQL Database</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="add-user-form" onsubmit="AppEngine.createUserFromAdmin(event)">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap *</label>
+            <input type="text" id="add-user-name" class="form-input" placeholder="contoh: Ir. H. Ahmad Dahlan" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Email Valid *</label>
+              <input type="email" id="add-user-email" class="form-input" placeholder="ahmad@mbina.or.id" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor WhatsApp *</label>
+              <input type="tel" id="add-user-phone" class="form-input" placeholder="081234567890" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Username *</label>
+              <input type="text" id="add-user-username" class="form-input" placeholder="ahmad_dahlan" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password *</label>
+              <input type="password" id="add-user-password" class="form-input" placeholder="••••••••" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Role Keanggotaan (RBAC) *</label>
+              <select id="add-user-role" class="form-input">
+                <option value="MEMBER">Member Terverifikasi</option>
+                <option value="PRESIDEN">Presiden MB INA</option>
+                <option value="SEKRETARIS_PUSAT">Sekretaris Pusat</option>
+                <option value="BENDAHARA_PUSAT">Bendahara Pusat</option>
+                <option value="PENGURUS_KLUB">Pengurus Klub</option>
+                <option value="PENGURUS_PUSAT">Pengurus Pusat</option>
+                <option value="ADMIN_ORGANISASI">Admin Organisasi</option>
+                <option value="SUPER_ADMIN">Super Admin</option>
+                <option value="CALON_MEMBER">Calon Member</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status Akun *</label>
+              <select id="add-user-status" class="form-input">
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="PENDING">PENDING</option>
+                <option value="SUSPENDED">SUSPENDED</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Kota / Kabupaten *</label>
+              <input type="text" id="add-user-city" class="form-input" placeholder="Jakarta Selatan" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Provinsi *</label>
+              <select id="add-user-province" class="form-input">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">
+            + Simpan User Baru ke Supabase Cloud
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BULK IMPORT CSV -->
+  <div id="modal-import-csv" class="modal-backdrop">
+    <div class="modal-container" style="max-width:480px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">Bulk Import User (CSV / Excel)</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Import Massal ke Supabase Database</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Pilih Berkas CSV / Excel Data Member</label>
+          <input type="file" id="csv-import-file" class="form-input" accept=".csv, .xlsx, .xls">
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:16px;">
+          Format kolom wajib: <code>Nama, Email, Phone, Username, Role, Kota</code>
+        </p>
+        <button class="btn-primary" style="width:100%;" onclick="AppEngine.simulateBulkImport()">
+          📥 Import Data Massal Now
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div style="max-width:1440px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:32px; margin-bottom:32px;">
+      <div>
+        <div class="logo-container" style="margin-bottom:12px;">
+          <img src="assets/mb_badge.jpg" alt="MB INA Logo">
+          <div>
+            <div class="brand-title text-gradient">MB INA</div>
+            <div class="brand-subtitle">Organisasi Motor Indonesia</div>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted);">
+          Platform resmi manajemen keanggotaan dan klub otomotif motor se-Indonesia dengan sistem RBAC & Supabase Cloud PostgreSQL.
+        </p>
+      </div>
+
+      <div>
+        <h4 style="font-size:1rem; margin-bottom:14px; color:var(--accent-gold);">Navigasi Cepat</h4>
+        <ul style="list-style:none; font-size:0.85rem; display:flex; flex-direction:column; gap:8px;">
+          <li><a href="#tentang-kami-section" style="color:var(--text-muted); text-decoration:none;">Tentang Kami & Visi Misi</a></li>
+          <li><a href="#clubs-section" style="color:var(--text-muted); text-decoration:none;">Klub Terdaftar</a></li>
+          <li><a href="#events-section" style="color:var(--text-muted); text-decoration:none;">Event Terbaru & Jamnas</a></li>
+          <li><a href="#testimoni-section" style="color:var(--text-muted); text-decoration:none;">Testimoni Member</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 style="font-size:1rem; margin-bottom:14px; color:var(--accent-gold);">Kontak Sekretariat</h4>
+        <p style="font-size:0.85rem; color:var(--text-muted);">
+          📍 Gedung Sekretariat MB INA, Jakarta Selatan<br>
+          📞 WhatsApp: +62 821-2970-9595<br>
+          ✉️ Email: info@mbina.or.id
+        </p>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--chrome-border); padding-top:20px; text-align:center; font-size:0.8rem; color:var(--text-muted);">
+      © 2026 Mercedes-Benz Club Indonesia (MB INA). All rights reserved. Created by Derist Touriano (Super Admin & System Architect).
+    </div>
+  </footer>
+
+  <!-- JS Engine Scripts -->
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

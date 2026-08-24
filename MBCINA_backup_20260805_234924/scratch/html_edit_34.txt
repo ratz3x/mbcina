@@ -1,0 +1,141 @@
+  <!-- MODAL 4.4.3: EVALUASI KINERJA KLUB INTERAKTIF (4 KATEGORI BOBOT) -->
+  <div id="modal-m4-evaluation" class="modal-backdrop" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:780px; max-height:90vh; overflow-y:auto;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 id="modal-m4-eval-title" style="font-size:1.2rem; color:var(--accent-gold); margin:0;">📊 Evaluasi Kinerja Klub</h3>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Penilaian Objektif 4 Pilar Kinerja Berdasarkan Kalender MB INA</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <select id="m4-eval-year-select" class="form-input" style="padding:4px 8px; font-size:0.85rem;" onchange="AppEngine.calculateM4EvaluationAuto()">
+            <option value="2026">Periode: 2026</option>
+            <option value="2025">Periode: 2025</option>
+            <option value="2024">Periode: 2024</option>
+          </select>
+          <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px;" onclick="AppEngine.calculateM4EvaluationAuto()">🔄 Hitung Ulang</button>
+          <button class="modal-close" onclick="AuthEngine.closeAllModals()">✕</button>
+        </div>
+      </div>
+
+      <form onsubmit="AppEngine.saveM4EvaluationSubmit(event)">
+        <input type="hidden" id="m4-eval-club-id">
+
+        <div class="modal-body" style="font-size:0.88rem; padding-top:12px;">
+          
+          <!-- BANNER SKOR AKHIR & GRADE -->
+          <div class="glass-card" style="padding:16px; margin-bottom:20px; text-align:center; background:linear-gradient(135deg, rgba(245,158,11,0.1), rgba(16,185,129,0.1)); border:1px solid var(--accent-gold);">
+            <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700;">📈 SKOR AKHIR KLUB</div>
+            <div style="font-size:2.2rem; font-weight:900; color:var(--accent-gold); margin:6px 0;" id="m4-eval-final-score-display">78.50 / 100</div>
+            <div style="display:inline-flex; align-items:center; gap:8px;">
+              <span id="m4-eval-grade-badge" class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-size:0.95rem; font-weight:800; padding:4px 14px;">
+                GRADE B • ✅ GOOD
+              </span>
+            </div>
+          </div>
+
+          <!-- 4 CARDS SUMMARY PER KATEGORI -->
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:20px;">
+            <div class="glass-card" style="padding:12px; text-align:center;">
+              <div style="font-size:0.78rem; font-weight:700; color:var(--text-main);">1. Aktivitas</div>
+              <div style="font-size:1.1rem; font-weight:800; color:var(--accent-gold); margin:4px 0;" id="m4-card-score-act">70/100</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Bobot 35% (<span id="m4-weighted-act">24.5</span>/35)</div>
+              <input type="range" min="0" max="100" value="70" id="m4-range-act" class="form-range" style="width:100%; margin-top:6px;" oninput="AppEngine.updateM4EvaluationManualScore()">
+            </div>
+            <div class="glass-card" style="padding:12px; text-align:center;">
+              <div style="font-size:0.78rem; font-weight:700; color:var(--text-main);">2. Keanggotaan</div>
+              <div style="font-size:1.1rem; font-weight:800; color:var(--accent-gold); margin:4px 0;" id="m4-card-score-mem">85/100</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Bobot 25% (<span id="m4-weighted-mem">21.25</span>/25)</div>
+              <input type="range" min="0" max="100" value="85" id="m4-range-mem" class="form-range" style="width:100%; margin-top:6px;" oninput="AppEngine.updateM4EvaluationManualScore()">
+            </div>
+            <div class="glass-card" style="padding:12px; text-align:center;">
+              <div style="font-size:0.78rem; font-weight:700; color:var(--text-main);">3. Partisipasi</div>
+              <div style="font-size:1.1rem; font-weight:800; color:var(--accent-gold); margin:4px 0;" id="m4-card-score-part">75/100</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Bobot 25% (<span id="m4-weighted-part">18.75</span>/25)</div>
+              <input type="range" min="0" max="100" value="75" id="m4-range-part" class="form-range" style="width:100%; margin-top:6px;" oninput="AppEngine.updateM4EvaluationManualScore()">
+            </div>
+            <div class="glass-card" style="padding:12px; text-align:center;">
+              <div style="font-size:0.78rem; font-weight:700; color:var(--text-main);">4. Administrasi</div>
+              <div style="font-size:1.1rem; font-weight:800; color:var(--accent-gold); margin:4px 0;" id="m4-card-score-adm">90/100</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Bobot 15% (<span id="m4-weighted-adm">13.5</span>/15)</div>
+              <input type="range" min="0" max="100" value="90" id="m4-range-adm" class="form-range" style="width:100%; margin-top:6px;" oninput="AppEngine.updateM4EvaluationManualScore()">
+            </div>
+          </div>
+
+          <!-- DETAIL Rincian PENILAIAN PER KATEGORI -->
+          <div class="glass-panel" style="padding:16px; margin-bottom:20px;">
+            <h4 style="font-size:0.95rem; color:var(--accent-gold); margin-bottom:12px;">📋 Detail Rincian Component Penilaian</h4>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; font-size:0.82rem;">
+              
+              <!-- Kategori 1: Aktivitas -->
+              <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border-left:3px solid var(--accent-gold);">
+                <strong style="color:var(--text-main);">1. Aktivitas (Bobot 35%)</strong>
+                <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px; color:var(--text-muted);" id="m4-detail-act-box">
+                  <div>✅ Event Reguler: 4 event → 40/40</div>
+                  <div>✅ Touring: 2 event → 20/20</div>
+                  <div>⚠️ Sosial: 0 event → 0/20</div>
+                  <div>✅ Internal (Kopdar): 4 event → 20/20</div>
+                </div>
+              </div>
+
+              <!-- Kategori 2: Keanggotaan -->
+              <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border-left:3px solid var(--accent-blue);">
+                <strong style="color:var(--text-main);">2. Keanggotaan (Bobot 25%)</strong>
+                <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px; color:var(--text-muted);" id="m4-detail-mem-box">
+                  <div>✅ Jumlah Member: 35 member → 40/40</div>
+                  <div>✅ Pertumbuhan: +16% → 30/30</div>
+                  <div>⚠️ Retensi Active: 75% → 15/30</div>
+                </div>
+              </div>
+
+              <!-- Kategori 3: Partisipasi -->
+              <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border-left:3px solid var(--primary-emerald);">
+                <strong style="color:var(--text-main);">3. Partisipasi Event (Bobot 25%)</strong>
+                <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px; color:var(--text-muted);" id="m4-detail-part-box">
+                  <div>✅ Jambore Nasional: Hadir → 40/40</div>
+                  <div>✅ Event Nasional: 100% → 30/30</div>
+                  <div>✅ Event Regional: 3/4 → 22.5/30</div>
+                </div>
+              </div>
+
+              <!-- Kategori 4: Administrasi -->
+              <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:6px; border-left:3px solid #a855f7;">
+                <strong style="color:var(--text-main);">4. Administrasi (Bobot 15%)</strong>
+                <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px; color:var(--text-muted);" id="m4-detail-adm-box">
+                  <div>✅ Laporan Tahunan: Tepat Waktu → 40/40</div>
+                  <div>✅ Dokumen Legal: Lengkap → 30/30</div>
+                  <div>⚠️ Kehadiran Rapat: 50% → 15/30</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- REKOMENDASI OTOMATIS -->
+          <div class="glass-panel" style="padding:16px; margin-bottom:16px;">
+            <h4 style="font-size:0.95rem; color:var(--accent-gold); margin-bottom:8px;">📝 Rekomendasi Pengembangan Klub</h4>
+            <div id="m4-eval-recommendations-list" style="display:flex; flex-direction:column; gap:6px; font-size:0.82rem;">
+              <div style="color:var(--accent-gold);">⚠️ Buat minimal 1 kegiatan sosial per tahun.</div>
+              <div style="color:var(--accent-gold);">⚠️ Tingkatkan kehadiran pengurus dalam rapat koordinasi pusat.</div>
+              <div style="color:var(--primary-emerald);">✅ Pertahankan pertumbuhan dan retensi member aktif.</div>
+            </div>
+          </div>
+
+          <!-- CATATAN EVALUATOR -->
+          <div class="form-group">
+            <label class="form-label">Catatan Evaluator & Instruksi Khusus</label>
+            <textarea id="m4-eval-notes" class="form-input" rows="2" placeholder="Tuliskan masukan khusus untuk pengurus klub ini..."></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid var(--chrome-border); padding-top:14px;">
+          <button type="button" class="btn-outline" style="border-color:var(--accent-blue); color:var(--accent-blue);" onclick="alert('✉️ Hasil evaluasi kinerja klub telah dikirimkan ke email official & Pengurus Klub!')">📩 Kirim Notifikasi ke Klub</button>
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn-outline" onclick="AuthEngine.closeAllModals()">Batal</button>
+            <button type="submit" class="btn-primary" style="background:var(--accent-gold); border-color:var(--accent-gold); color:#000; font-weight:800;">💾 Simpan Evaluasi Final</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>

@@ -1,0 +1,18 @@
+          <div class="form-group">
+            <label class="form-label">Foto Presiden (Upload File Komputer atau Masukkan URL) *</label>
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
+              <input type="text" id="edit-pres-photo" class="form-input" placeholder="uploads/photo_xxx.jpg atau assets/presidents/rochady.jpg" style="font-family:monospace; flex:1;" oninput="document.getElementById('pres-photo-preview').src = this.value || 'assets/presidents/default.jpg'">
+              <button type="button" class="btn-primary" style="padding:10px 16px; font-size:0.82rem; white-space:nowrap; cursor:pointer;" onclick="document.getElementById('edit-pres-photo-file').click()">
+                📁 Upload Foto Presiden
+              </button>
+            </div>
+            <input type="file" id="edit-pres-photo-file" accept="image/*" style="display:none;" onchange="AppEngine.handlePhotoFileUpload(event, 'edit-pres-photo', 'pres-photo-preview', 'pres-photo-status')">
+            
+            <div style="display:flex; align-items:center; gap:14px; background:var(--bg-card); border:1px solid var(--chrome-border); padding:10px; border-radius:10px;">
+              <img id="pres-photo-preview" src="assets/presidents/default.jpg" style="width:56px; height:56px; border-radius:10px; object-fit:cover; border:2px solid var(--accent-gold);" onerror="this.src='https://via.placeholder.com/150?text=Foto'">
+              <div>
+                <span style="font-size:0.8rem; font-weight:700; color:var(--text-main); display:block;">Live Preview Foto Presiden</span>
+                <span id="pres-photo-status" style="font-size:0.72rem; color:var(--accent-gold);">Format: JPG, PNG, WEBP. Klik 'Upload Foto Presiden' untuk memilih file dari komputer.</span>
+              </div>
+            </div>
+          </div>

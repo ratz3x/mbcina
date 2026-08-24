@@ -1,0 +1,61 @@
+  switchAdminTab(tab) {
+    this.activeAdminTab = tab;
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      if (btn.getAttribute('data-admin-tab') === tab || (tab === 'm1_portal' && btn.getAttribute('data-admin-tab') === 'm1_portal')) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    
+    let targetId = `admin-tab-${tab}`;
+    if (tab === 'dashboard' || tab === 'users' || tab === 'audit' || tab === 'settings') {
+      targetId = 'admin-tab-m1_portal';
+    }
+
+    const targetContent = document.getElementById(targetId);
+    if (targetContent) targetContent.style.display = 'block';
+
+    if (tab === 'm1_portal' || tab === 'dashboard') {
+      this.switchM1Subtab('dashboard');
+    } else if (tab === 'users') {
+      this.switchM1Subtab('users');
+    } else if (tab === 'audit') {
+      this.switchM1Subtab('audit');
+    } else if (tab === 'settings') {
+      this.switchM1Subtab('settings');
+    } else if (tab === 'm2_org') {
+      this.renderM2Module();
+    } else if (tab === 'm3_membership') {
+      this.renderM3Module();
+    } else if (tab === 'm4_registration') {
+      this.renderM4Module();
+    }
+  },
+
+  switchM1Subtab(subtab) {
+    this.activeM1Subtab = subtab;
+    document.querySelectorAll('[data-m1sub]').forEach(btn => {
+      if (btn.getAttribute('data-m1sub') === subtab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.m1-subtab-content').forEach(el => el.style.display = 'none');
+    const target = document.getElementById(`m1sub-${subtab}`);
+    if (target) target.style.display = 'block';
+
+    if (subtab === 'dashboard') {
+      this.renderAdminDashboard();
+    } else if (subtab === 'users') {
+      this.renderUserManagement();
+    } else if (subtab === 'audit') {
+      this.renderAuditLogs();
+    } else if (subtab === 'settings') {
+      this.renderSystemSettings();
+    }
+  },

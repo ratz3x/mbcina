@@ -1,0 +1,597 @@
+    alert(`📥 Berkas Export Data Member MB INA berformat ${format} berhasil dibuat! (Periode: ${startDate} s/d ${endDate}, Total Field: ${selectedFields.length})`);
+    AuthEngine.closeAllModals();
+  },
+
+  // ============================================
+  // M4 - PENDAFTARAN KLUB CONTROLLER & RENDERERS
+  // ============================================
+  m4Data: {
+    applications: [],
+    notes: [],
+    evaluations: [],
+    activeSubtab: 'form',
+    selectedAppId: null,
+    currentFormStep: 1
+  },
+
+  async fetchM4Data() {
+    try {
+      const res = await fetch('api.php?action=get_m4_data').then(r => r.json());
+      if (res.success) {
+        if (res.applications) this.m4Data.applications = res.applications;
+        if (res.notes) this.m4Data.notes = res.notes;
+        if (res.evaluations) this.m4Data.evaluations = res.evaluations;
+        if (res.clubs) {
+          this.m2Data.clubs = res.clubs;
+          this.clubs = res.clubs;
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching M4 data:", e);
+    }
+  },
+
+  switchM4Subtab(subtab) {
+    this.m4Data.activeSubtab = subtab;
+    document.querySelectorAll('[data-m4sub]').forEach(btn => {
+      if (btn.getAttribute('data-m4sub') === subtab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.m4-subtab-content').forEach(el => el.style.display = 'none');
+    const target = document.getElementById(`m4sub-${subtab}`);
+    if (target) target.style.display = 'block';
+
+    if (subtab === 'form') this.goToM4Step(1);
+    else if (subtab === 'pending') this.renderM4PendingList();
+    else if (subtab === 'detail') this.renderM4DetailReview(this.m4Data.selectedAppId);
+    else if (subtab === 'active_clubs') this.renderM4ActiveClubs();
+  },
+
+  renderM4Module() {
+    this.switchM4Subtab(this.m4Data.activeSubtab || 'form');
+  },
+
+  goToM4Step(step) {
+    this.m4Data.currentFormStep = step;
+
+    for (let i = 1; i <= 3; i++) {
+      const content = document.getElementById(`m4-step-${i}-content`);
+      const ind = document.getElementById(`m4-step-indicator-${i}`);
+
+      if (content) content.style.display = (i === step) ? 'block' : 'none';
+      if (ind) {
+        if (i === step) {
+          ind.style.color = 'var(--accent-gold)';
+          ind.querySelector('span').style.background = 'var(--accent-gold)';
+          ind.querySelector('span').style.color = '#000';
+        } else {
+          ind.style.color = 'var(--text-muted)';
+          ind.querySelector('span').style.background = 'var(--chrome-border)';
+          ind.querySelector('span').style.color = 'var(--text-muted)';
+        }
+      }
+    }
+
+    if (step === 3) {
+      this.renderM4FormSummary();
+    }
+  },
+
+  renderM4FormSummary() {
+    const summaryBox = document.getElementById('m4-preview-summary-container');
+    if (!summaryBox) return;
+
+    const name = document.getElementById('m4-form-name')?.value || '-';
+    const code = document.getElementById('m4-form-code')?.value || '-';
+    const province = document.getElementById('m4-form-province')?.value || '-';
+    const city = document.getElementById('m4-form-city')?.value || '-';
+    const type = document.getElementById('m4-form-type')?.value || 'CLUB';
+    const memberEst = document.getElementById('m4-form-member-est')?.value || '0';
+    const cp = document.getElementById('m4-form-cp')?.value || '-';
+    const phone = document.getElementById('m4-form-phone')?.value || '-';
+
+    summaryBox.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div><strong>Nama Klub:</strong> ${name}</div>
+        <div><strong>Kode Klub:</strong> <span style="font-family:monospace; color:var(--accent-gold); font-weight:800;">${code}</span></div>
+        <div><strong>Provinsi:</strong> ${province}</div>
+        <div><strong>Kota / Kabupaten:</strong> ${city}</div>
+        <div><strong>Jenis Klub:</strong> ${type}</div>
+        <div><strong>Perkiraan Member:</strong> ${memberEst} Anggota</div>
+        <div><strong>Contact Person:</strong> ${cp}</div>
+        <div><strong>WhatsApp:</strong> ${phone}</div>
+      </div>
+    `;
+  },
+
+  async handleM4FormSubmit(event) {
+    event.preventDefault();
+
+    const agree = document.getElementById('m4-form-agree')?.checked;
+    if (!agree) {
+      alert('⚠️ Silakan centang konfirmasi pernyataan kebenaran data terlebih dahulu!');
+      return;
+    }
+
+    const payload = {
+      name: document.getElementById('m4-form-name').value.trim(),
+      code: document.getElementById('m4-form-code').value.trim().toUpperCase(),
+      alias: document.getElementById('m4-form-alias').value.trim(),
+      province_name: document.getElementById('m4-form-province').value,
+      city: document.getElementById('m4-form-city').value.trim(),
+      address: document.getElementById('m4-form-address').value.trim(),
+      founded_year: parseInt(document.getElementById('m4-form-year').value || 2015),
+      member_count_estimate: parseInt(document.getElementById('m4-form-member-est').value || 35),
+      club_type: document.getElementById('m4-form-type').value,
+      description: document.getElementById('m4-form-desc').value.trim(),
+      contact_person: document.getElementById('m4-form-cp').value.trim(),
+      contact_phone: document.getElementById('m4-form-phone').value.trim(),
+      contact_email: document.getElementById('m4-form-email').value.trim(),
+      social_media: {
+        instagram: document.getElementById('m4-form-ig').value.trim(),
+        facebook: document.getElementById('m4-form-fb').value.trim()
+      },
+      logo_url: document.getElementById('m4-form-logo').value.trim(),
+      photos: [document.getElementById('m4-form-photos').value.trim()],
+      submitted_by: this.currentUser.id || 'usr_guest'
+    };
+
+    try {
+      const res = await fetch('api.php?action=submit_club_application', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        document.getElementById('m4-club-reg-form').reset();
+        await this.fetchM4Data();
+        this.switchM4Subtab('pending');
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal mengirim pendaftaran klub: ' + e.message);
+    }
+  },
+
+  renderM4PendingList() {
+    const statsContainer = document.getElementById('m4-stats-container');
+    const tableContainer = document.getElementById('m4-pending-table-container');
+    if (!tableContainer) return;
+
+    const apps = this.m4Data.applications;
+    const pendingCount = apps.filter(a => a.status === 'PENDING').length;
+    const reviewCount = apps.filter(a => a.status === 'REVIEW').length;
+    const approvedCount = apps.filter(a => a.status === 'APPROVED').length;
+    const rejectedCount = apps.filter(a => a.status === 'REJECTED').length;
+
+    if (statsContainer) {
+      statsContainer.innerHTML = `
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon">📄</div>
+          <div>
+            <div class="stat-value">${apps.length}</div>
+            <div class="stat-label">Total Pengajuan</div>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:rgba(239,68,68,0.15); color:var(--accent-red);">⏳</div>
+          <div>
+            <div class="stat-value">${pendingCount}</div>
+            <div class="stat-label">Pending</div>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:rgba(245,158,11,0.15); color:var(--accent-gold);">🔍</div>
+          <div>
+            <div class="stat-value">${reviewCount}</div>
+            <div class="stat-label">Dalam Review</div>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald);">✅</div>
+          <div>
+            <div class="stat-value">${approvedCount}</div>
+            <div class="stat-label">Approved</div>
+          </div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:rgba(100,116,139,0.15); color:var(--text-muted);">❌</div>
+          <div>
+            <div class="stat-value">${rejectedCount}</div>
+            <div class="stat-label">Rejected</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const searchQuery = (document.getElementById('m4-pending-search')?.value || '').toLowerCase().trim();
+    const statusFilter = document.getElementById('m4-pending-status-filter')?.value || '';
+
+    let filtered = apps;
+    if (searchQuery) {
+      filtered = filtered.filter(a =>
+        (a.name || '').toLowerCase().includes(searchQuery) ||
+        (a.code || '').toLowerCase().includes(searchQuery) ||
+        (a.city || '').toLowerCase().includes(searchQuery) ||
+        (a.contact_person || '').toLowerCase().includes(searchQuery)
+      );
+    }
+    if (statusFilter) {
+      filtered = filtered.filter(a => a.status === statusFilter);
+    }
+
+    const getStatusBadge = (s) => {
+      if (s === 'PENDING') return '<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red);">⏳ PENDING</span>';
+      if (s === 'REVIEW') return '<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">🔍 REVIEW</span>';
+      if (s === 'APPROVED') return '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">✅ APPROVED</span>';
+      return '<span class="tier-badge" style="background:rgba(100,116,139,0.2); color:var(--text-muted); border:1px solid var(--chrome-border);">❌ REJECTED</span>';
+    };
+
+    tableContainer.innerHTML = `
+      <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:10px 8px; white-space:nowrap;">KODE</th>
+            <th style="padding:10px 8px;">NAMA KLUB & DOMISILI</th>
+            <th style="padding:10px 8px;">PROVINSI</th>
+            <th style="padding:10px 8px;">CONTACT PERSON</th>
+            <th style="padding:10px 8px; text-align:center;">STATUS</th>
+            <th style="padding:10px 8px; text-align:center; width:120px;">AKSI</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.length === 0 ? `
+            <tr>
+              <td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted);">
+                Tidak ada data pengajuan pendaftaran klub yang sesuai.
+              </td>
+            </tr>
+          ` : filtered.map(a => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.85rem; padding:10px 8px; white-space:nowrap;">
+                ${a.code}
+              </td>
+              <td style="padding:10px 8px;">
+                <div style="font-weight:700; color:var(--text-main); font-size:0.92rem;">${a.name}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${a.city} • Est: ${a.member_count_estimate || 0} Member</div>
+              </td>
+              <td style="font-size:0.85rem; padding:10px 8px; white-space:nowrap;">${a.province_name || '-'}</td>
+              <td style="padding:10px 8px;">
+                <div style="font-size:0.85rem; color:var(--text-main); font-weight:600;">${a.contact_person}</div>
+                <div style="font-size:0.75rem; color:var(--accent-gold);">📞 ${a.contact_phone}</div>
+              </td>
+              <td style="padding:10px 8px; text-align:center; white-space:nowrap;">
+                ${getStatusBadge(a.status)}
+              </td>
+              <td style="padding:10px 8px; text-align:center; white-space:nowrap;">
+                <div style="display:inline-flex; gap:4px;">
+                  <button class="role-pill-btn" style="border-color:var(--accent-blue); color:var(--accent-blue); width:30px; height:30px; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:0.85rem; border-radius:6px; cursor:pointer;" onclick="AppEngine.selectAndReviewM4App('${a.id}')" title="Review Detail Pengajuan">👁️</button>
+                  <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold); width:30px; height:30px; padding:0; display:inline-flex; align-items:center; justify-content:center; font-size:0.85rem; border-radius:6px; cursor:pointer;" onclick="AppEngine.openM4ReviewModal('${a.id}', 'REVIEW')" title="Update Status Review">📝</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  selectAndReviewM4App(id) {
+    this.m4Data.selectedAppId = id;
+    this.switchM4Subtab('detail');
+  },
+
+  renderM4DetailReview(id) {
+    const container = document.getElementById('m4-detail-review-container');
+    if (!container) return;
+
+    let app = this.m4Data.applications.find(a => a.id === id);
+    if (!app && this.m4Data.applications.length > 0) {
+      app = this.m4Data.applications[0];
+      this.m4Data.selectedAppId = app.id;
+    }
+
+    if (!app) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:48px; color:var(--text-muted);">
+          🔍 Belum ada data pengajuan klub yang dipilih untuk direview.<br>
+          <button class="btn-primary" style="margin-top:16px;" onclick="AppEngine.switchM4Subtab('pending')">📋 lihat Daftar Pending</button>
+        </div>
+      `;
+      return;
+    }
+
+    const appNotes = this.m4Data.notes.filter(n => n.application_id === app.id);
+
+    container.innerHTML = `
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:24px;">
+        <div class="glass-panel" style="padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--chrome-border); padding-bottom:16px;">
+            <div>
+              <span style="font-family:monospace; color:var(--accent-gold); font-size:0.9rem; font-weight:800;">KODE: ${app.code}</span>
+              <h3 style="font-size:1.3rem; margin-top:2px;" class="text-gradient">${app.name}</h3>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.85rem;">
+                STATUS: ${app.status}
+              </span>
+              <button class="btn-outline" style="font-size:0.8rem; padding:6px 12px;" onclick="AppEngine.switchM4Subtab('pending')">⬅️ Kembali ke List</button>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:0.88rem; margin-bottom:24px;">
+            <div><strong>Alias:</strong> ${app.alias || '-'}</div>
+            <div><strong>Jenis Klub:</strong> ${app.club_type}</div>
+            <div><strong>Provinsi:</strong> ${app.province_name}</div>
+            <div><strong>Kota:</strong> ${app.city}</div>
+            <div><strong>Tahun Berdiri:</strong> ${app.founded_year}</div>
+            <div><strong>Perkiraan Member:</strong> ${app.member_count_estimate} Anggota</div>
+            <div style="grid-column:1 / -1;"><strong>Alamat Sekretariat:</strong> ${app.address}</div>
+          </div>
+
+          <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:12px;">── Deskripsi Klub ──</h4>
+          <p style="font-size:0.88rem; color:var(--text-main); line-height:1.6; margin-bottom:24px; background:rgba(255,255,255,0.03); padding:12px; border-radius:8px;">
+            ${app.description}
+          </p>
+
+          <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:12px;">── Kontak Penanggung Jawab ──</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; font-size:0.85rem; margin-bottom:24px;">
+            <div><strong>Contact Person:</strong><br>${app.contact_person}</div>
+            <div><strong>No. WhatsApp:</strong><br><span style="color:var(--accent-gold); font-weight:700;">📞 ${app.contact_phone}</span></div>
+            <div><strong>Email Official:</strong><br>${app.contact_email || '-'}</div>
+          </div>
+
+          <!-- ACTION BUTTONS -->
+          <div style="display:flex; gap:12px; border-top:1px solid var(--chrome-border); padding-top:20px; flex-wrap:wrap;">
+            <button class="btn-primary" style="background:var(--primary-emerald); border-color:var(--primary-emerald);" onclick="AppEngine.openM4ReviewModal('${app.id}', 'APPROVED')">✅ Approve Pengajuan</button>
+            <button class="btn-outline" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.openM4ReviewModal('${app.id}', 'REJECTED')">❌ Reject Pengajuan</button>
+            <button class="btn-outline" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openM4ReviewModal('${app.id}', 'REVIEW')">🔍 Tandai Dalam Review</button>
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL: CATATAN INTERNAL & TIMELINE -->
+        <div>
+          <div class="glass-panel" style="padding:20px; margin-bottom:20px;">
+            <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:14px;">📝 Catatan Internal Admin</h4>
+            <div style="display:flex; flex-direction:column; gap:10px; max-height:260px; overflow-y:auto; margin-bottom:16px;">
+              ${appNotes.length === 0 ? `
+                <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:12px;">Belum ada catatan internal.</p>
+              ` : appNotes.map(n => `
+                <div style="font-size:0.82rem; background:rgba(255,255,255,0.03); padding:10px; border-radius:6px; border-left:3px solid var(--accent-gold);">
+                  <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--text-main); margin-bottom:4px;">
+                    <span>${n.user_name || 'Admin'}</span>
+                    <span style="font-size:0.7rem; color:var(--text-muted);">${new Date(n.created_at).toLocaleDateString('id-ID')}</span>
+                  </div>
+                  <div style="color:var(--text-muted);">${n.note}</div>
+                </div>
+              `).join('')}
+            </div>
+
+            <form onsubmit="AppEngine.saveM4InternalNote(event, '${app.id}')">
+              <textarea id="m4-add-note-text" class="form-input" rows="2" placeholder="Tambah catatan admin..." required style="margin-bottom:8px; font-size:0.82rem;"></textarea>
+              <button type="submit" class="btn-primary" style="width:100%; font-size:0.8rem;">+ Tambah Catatan</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  openM4ReviewModal(id, actionType) {
+    const app = this.m4Data.applications.find(a => a.id === id);
+    if (!app) return;
+
+    document.getElementById('m4-review-app-id').value = app.id;
+    document.getElementById('m4-review-action-type').value = actionType;
+
+    const titleEl = document.getElementById('modal-m4-review-title');
+    const submitBtn = document.getElementById('m4-review-submit-btn');
+    const reasonGroup = document.getElementById('m4-rejection-reason-group');
+    const summaryBox = document.getElementById('m4-review-summary-box');
+
+    summaryBox.innerHTML = `
+      <strong>Nama Klub:</strong> ${app.name} (${app.code})<br>
+      <strong>Provinsi & Kota:</strong> ${app.province_name}, ${app.city}<br>
+      <strong>Contact Person:</strong> ${app.contact_person} (📞 ${app.contact_phone})
+    `;
+
+    if (actionType === 'APPROVED') {
+      titleEl.innerText = `✅ Approve Pendaftaran: ${app.name}`;
+      submitBtn.innerText = '✅ Approve & Aktifkan Klub';
+      submitBtn.style.background = 'var(--primary-emerald)';
+      submitBtn.style.borderColor = 'var(--primary-emerald)';
+      reasonGroup.style.display = 'none';
+    } else if (actionType === 'REJECTED') {
+      titleEl.innerText = `❌ Reject Pendaftaran: ${app.name}`;
+      submitBtn.innerText = '❌ Tolak Pengajuan';
+      submitBtn.style.background = 'var(--accent-red)';
+      submitBtn.style.borderColor = 'var(--accent-red)';
+      reasonGroup.style.display = 'block';
+    } else {
+      titleEl.innerText = `🔍 Set Status Review: ${app.name}`;
+      submitBtn.innerText = 'Tandai Review';
+      submitBtn.style.background = 'var(--accent-gold)';
+      submitBtn.style.borderColor = 'var(--accent-gold)';
+      reasonGroup.style.display = 'none';
+    }
+
+    AuthEngine.openModal('modal-m4-review');
+  },
+
+  async processM4ReviewSubmit(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('m4-review-app-id').value;
+    const actionType = document.getElementById('m4-review-action-type').value;
+    const rejectionReason = document.getElementById('m4-rejection-reason').value.trim();
+    const notes = document.getElementById('m4-review-notes').value.trim();
+
+    if (actionType === 'REJECTED' && !rejectionReason) {
+      alert('⚠️ Alasan penolakan wajib diisi!');
+      return;
+    }
+
+    try {
+      const res = await fetch('api.php?action=update_club_application_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          status: actionType,
+          rejection_reason: rejectionReason,
+          notes,
+          reviewed_by: this.currentUser.id || 'usr_superadmin'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        AuthEngine.closeAllModals();
+        await this.fetchM4Data();
+        await this.fetchM2Data();
+        this.switchM4Subtab('pending');
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal memproses verifikasi pengajuan: ' + e.message);
+    }
+  },
+
+  async saveM4InternalNote(event, appId) {
+    event.preventDefault();
+    const note = document.getElementById('m4-add-note-text').value.trim();
+    if (!note) return;
+
+    try {
+      const res = await fetch('api.php?action=add_club_application_note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ application_id: appId, note, user_id: this.currentUser.id || 'usr_superadmin' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('m4-add-note-text').value = '';
+        await this.fetchM4Data();
+        this.renderM4DetailReview(appId);
+      }
+    } catch (e) {
+      alert('Gagal menambah catatan internal!');
+    }
+  },
+
+  renderM4ActiveClubs() {
+    const tableContainer = document.getElementById('m4-active-clubs-table-container');
+    const countBadge = document.getElementById('m4-active-clubs-count-badge');
+    if (!tableContainer) return;
+
+    const clubs = this.m2Data.clubs && this.m2Data.clubs.length ? this.m2Data.clubs : this.clubs;
+    if (countBadge) countBadge.innerText = `${clubs.length} KLUB AKTIF`;
+
+    const searchQuery = (document.getElementById('m4-active-search')?.value || '').toLowerCase().trim();
+    const regionFilter = document.getElementById('m4-active-region-filter')?.value || '';
+
+    let filtered = clubs;
+    if (searchQuery) {
+      filtered = filtered.filter(c =>
+        (c.name || '').toLowerCase().includes(searchQuery) ||
+        (c.code || '').toLowerCase().includes(searchQuery) ||
+        (c.city || '').toLowerCase().includes(searchQuery)
+      );
+    }
+    if (regionFilter) {
+      filtered = filtered.filter(c => c.region === regionFilter);
+    }
+
+    tableContainer.innerHTML = `
+      <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:10px 8px; white-space:nowrap;">KODE</th>
+            <th style="padding:10px 8px;">NAMA KLUB / CHAPTER</th>
+            <th style="padding:10px 8px;">REGION WILAYAH</th>
+            <th style="padding:10px 8px;">DOMISILI</th>
+            <th style="padding:10px 8px;">MEMBER</th>
+            <th style="padding:10px 8px; text-align:center;">SKOR KINERJA</th>
+            <th style="padding:10px 8px; text-align:center; width:130px;">EVALUASI</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.length === 0 ? `
+            <tr>
+              <td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted);">
+                Tidak ada klub aktif yang sesuai dengan filter pencarian.
+              </td>
+            </tr>
+          ` : filtered.map(c => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.85rem; padding:10px 8px; white-space:nowrap;">
+                ${c.code}
+              </td>
+              <td style="padding:10px 8px; font-weight:700; color:var(--text-main);">
+                ${c.name}
+              </td>
+              <td style="font-size:0.85rem; padding:10px 8px; color:var(--text-muted);">${c.region || 'Regional Metro DKI Jakarta'}</td>
+              <td style="font-size:0.85rem; padding:10px 8px;">${c.city || 'Jakarta'}</td>
+              <td style="font-weight:700; color:var(--accent-gold); font-size:0.85rem; padding:10px 8px;">${c.member_count || 50}</td>
+              <td style="padding:10px 8px; text-align:center; white-space:nowrap;">
+                <span class="tier-badge" style="background:${(c.evaluation_score || 85) >= 80 ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}; color:${(c.evaluation_score || 85) >= 80 ? 'var(--primary-emerald)' : 'var(--accent-gold)'}; border:1px solid ${(c.evaluation_score || 85) >= 80 ? 'var(--primary-emerald)' : 'var(--accent-gold)'}; font-weight:800;">
+                  🏆 ${c.evaluation_score || 85} / 100
+                </span>
+              </td>
+              <td style="padding:10px 8px; text-align:center; white-space:nowrap;">
+                <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openM4EvaluationModal('${c.id}')">📊 Evaluasi</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  openM4EvaluationModal(clubId) {
+    const clubs = this.m2Data.clubs && this.m2Data.clubs.length ? this.m2Data.clubs : this.clubs;
+    const c = clubs.find(x => x.id === clubId);
+    if (!c) return;
+
+    document.getElementById('m4-eval-club-id').value = c.id;
+    document.getElementById('modal-m4-eval-title').innerText = `📊 Evaluasi Kinerja: ${c.name}`;
+    document.getElementById('m4-eval-score').value = c.evaluation_score || 85;
+
+    AuthEngine.openModal('modal-m4-evaluation');
+  },
+
+  async saveM4EvaluationSubmit(event) {
+    event.preventDefault();
+    const club_id = document.getElementById('m4-eval-club-id').value;
+    const category = document.getElementById('m4-eval-category').value;
+    const score = parseInt(document.getElementById('m4-eval-score').value || 85);
+    const notes = document.getElementById('m4-eval-notes').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=save_club_evaluation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ club_id, category, score, notes, evaluator: this.currentUser.id || 'usr_superadmin' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        AuthEngine.closeAllModals();
+        await this.fetchM2Data();
+        this.renderM4ActiveClubs();
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal menyimpan evaluasi klub: ' + e.message);
+    }
+  }
+};

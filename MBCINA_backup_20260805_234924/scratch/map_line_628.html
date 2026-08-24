@@ -1,0 +1,103 @@
+  // 🗺️ INTERACTIVE REALISTIC MAP OF INDONESIA WITH JARUM PENTUL PINS
+  renderIndonesiaMap() {
+    const mapContainer = document.getElementById('admin-indonesia-map');
+    if (!mapContainer) return;
+
+    const clubs = this.m2Data.clubs;
+
+    // Group clubs by region
+    const regionMap = {
+      'Regional Sumatra': clubs.filter(c => c.region === 'Regional Sumatra'),
+      'Regional Banten': clubs.filter(c => c.region === 'Regional Banten'),
+      'Regional Metro DKI Jakarta': clubs.filter(c => c.region === 'Regional Metro DKI Jakarta'),
+      'Regional Jawa Barat': clubs.filter(c => c.region === 'Regional Jawa Barat'),
+      'Regional Jawa Tengah': clubs.filter(c => c.region === 'Regional Jawa Tengah'),
+      'Regional Yogyakarta': clubs.filter(c => c.region === 'Regional Yogyakarta'),
+      'Regional Jawa Timur & Bali': clubs.filter(c => c.region === 'Regional Jawa Timur & Bali'),
+      'Regional Kalimantan & Sulawesi': clubs.filter(c => c.region === 'Regional Kalimantan & Sulawesi')
+    };
+
+    // Hotspot Jarum Pentul Coordinates on SVG canvas (viewBox 0 0 760 320)
+    const pins = [
+      { key: 'Regional Sumatra', name: 'Regional Sumatra', x: 140, y: 135, color: '#f59e0b' },
+      { key: 'Regional Banten', name: 'Regional Banten', x: 260, y: 250, color: '#3b82f6' },
+      { key: 'Regional Metro DKI Jakarta', name: 'Regional Metro DKI Jakarta', x: 290, y: 252, color: '#10b981' },
+      { key: 'Regional Jawa Barat', name: 'Regional Jawa Barat', x: 325, y: 260, color: '#f59e0b' },
+      { key: 'Regional Jawa Tengah', name: 'Regional Jawa Tengah', x: 380, y: 265, color: '#ef4444' },
+      { key: 'Regional Yogyakarta', name: 'Regional Yogyakarta', x: 400, y: 275, color: '#8b5cf6' },
+      { key: 'Regional Jawa Timur & Bali', name: 'Regional Jawa Timur & Bali', x: 465, y: 272, color: '#ec4899' },
+      { key: 'Regional Kalimantan & Sulawesi', name: 'Regional Kalimantan & Sulawesi', x: 530, y: 170, color: '#06b6d4' }
+    ];
+
+    // Build Jarum Pentul Pins WITHOUT ANY TEXT LABELS OVERLAPPING THE MAP
+    const pinsSvg = pins.map(p => {
+      const cList = regionMap[p.key] || [];
+      const count = cList.length;
+
+      return `
+        <!-- JARUM PENTUL PIN: ${p.name} -->
+        <g class="jarum-pentul-group" cursor="pointer" onclick="AppEngine.switchM2Subtab('clubs')" title="📍 ${p.name}: ${count} Klub Terdaftar">
+          <!-- Soft glowing pulse behind pin -->
+          <circle cx="${p.x}" cy="${p.y + 14}" r="12" fill="${p.color}" opacity="0.3">
+            <animate attributeName="r" values="8;16;8" dur="2.2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.4;0.1;0.4" dur="2.2s" repeatCount="indefinite"/>
+          </circle>
+
+          <!-- Shadow beneath needle tip -->
+          <ellipse cx="${p.x}" cy="${p.y + 14}" rx="6" ry="2.5" fill="rgba(0,0,0,0.6)"/>
+
+          <!-- Needle Shaft -->
+          <line x1="${p.x}" y1="${p.y - 2}" x2="${p.x}" y2="${p.y + 14}" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+
+          <!-- Jarum Pentul Head Ball -->
+          <circle cx="${p.x}" cy="${p.y - 6}" r="7" fill="${p.color}" stroke="#ffffff" stroke-width="1.8"/>
+          <circle cx="${p.x - 2}" cy="${p.y - 8}" r="2" fill="#ffffff" opacity="0.75"/>
+        </g>
+      `;
+    }).join('');
+
+    mapContainer.innerHTML = `
+      <svg viewBox="0 0 760 320" style="width:100%; height:auto; display:block; filter:drop-shadow(0 4px 14px rgba(0,0,0,0.3));">
+        <defs>
+          <linearGradient id="mapOceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(11,14,20,0.9)"/>
+            <stop offset="100%" stop-color="rgba(19,25,36,0.95)"/>
+          </linearGradient>
+          <linearGradient id="islandFillGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(245,158,11,0.22)"/>
+            <stop offset="100%" stop-color="rgba(59,130,246,0.18)"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Background Ocean Canvas -->
+        <rect width="760" height="320" rx="12" fill="url(#mapOceanGrad)"/>
+
+        <!-- Grid Lines for Executive Map Surface -->
+        <path d="M 0 80 L 760 80 M 0 160 L 760 160 M 0 240 L 760 240 M 150 0 L 150 320 M 300 0 L 300 320 M 450 0 L 450 320 M 600 0 L 600 320" stroke="rgba(255,255,255,0.03)" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <!-- REALISTIC GEOGRAPHICAL INDONESIA ISLAND MAP PATHS -->
+        <g fill="url(#islandFillGrad)" stroke="var(--accent-gold)" stroke-width="1.6" stroke-linejoin="round" opacity="0.9">
+          <!-- 1. SUMATRA -->
+          <path d="M 40,195 L 70,150 L 105,115 L 145,80 L 185,55 L 205,70 L 190,110 L 160,155 L 120,200 L 80,225 L 50,215 Z"/>
+          
+          <!-- 2. JAWA & BALI -->
+          <path d="M 235,252 L 275,252 L 325,258 L 385,268 L 425,270 L 455,268 L 475,272 L 470,280 L 395,280 L 305,272 L 235,262 Z M 480,272 L 495,272 L 495,280 L 480,280 Z"/>
+
+          <!-- 3. KALIMANTAN -->
+          <path d="M 265,95 L 305,70 L 355,80 L 395,110 L 385,150 L 345,165 L 295,160 L 265,125 Z"/>
+
+          <!-- 4. SULAWESI -->
+          <path d="M 445,100 L 475,95 L 500,120 L 475,135 L 480,165 L 465,190 L 450,180 L 460,150 L 435,140 Z"/>
+
+          <!-- 5. NUSA TENGGARA (NTB/NTT) -->
+          <path d="M 498,274 L 520,272 L 550,277 L 590,280 L 590,287 L 545,285 L 498,282 Z"/>
+
+          <!-- 6. MALUKU & PAPUA -->
+          <path d="M 595,125 L 635,115 L 695,130 L 745,145 L 755,195 L 725,205 L 685,185 L 645,170 L 605,155 Z"/>
+        </g>
+
+        <!-- 📍 JARUM PENTUL MAP MARKERS -->
+        ${pinsSvg}
+      </svg>
+    `;
+  },

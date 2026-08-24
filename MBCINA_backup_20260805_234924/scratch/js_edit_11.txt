@@ -1,0 +1,78 @@
+  // 3.1.4.4 PAYMENT GATEWAY (BANK MANDIRI SPONSOR RESMI)
+  renderPaymentGateway() {
+    fetch('api.php?action=get_payment_settings')
+      .then(r => r.json())
+      .then(res => {
+        if (res.success && res.paymentGateway) {
+          const gw = res.paymentGateway;
+          const modeSelect = document.getElementById('mandiri-mode-select');
+          const accNum = document.getElementById('mandiri-account-number');
+          const accName = document.getElementById('mandiri-account-name');
+          const branch = document.getElementById('mandiri-branch');
+          const webhook = document.getElementById('mandiri-webhook-url');
+
+          if (modeSelect) modeSelect.value = gw.mode || 'production';
+          if (accNum) accNum.value = gw.accountNumber || '123-00-1234567-8';
+          if (accName) accName.value = gw.accountName || 'MB Club Indonesia';
+          if (branch) branch.value = gw.branch || 'KCU Jakarta Pusat';
+          if (webhook) webhook.value = gw.webhookUrl || 'https://mbina.or.id/api/webhook/payment-mandiri';
+
+          const methods = Array.isArray(gw.methods) ? gw.methods : ['transfer', 'va', 'qris'];
+          if (document.getElementById('mandiri-method-transfer')) document.getElementById('mandiri-method-transfer').checked = methods.includes('transfer');
+          if (document.getElementById('mandiri-method-va')) document.getElementById('mandiri-method-va').checked = methods.includes('va');
+          if (document.getElementById('mandiri-method-qris')) document.getElementById('mandiri-method-qris').checked = methods.includes('qris');
+        }
+      });
+  },
+
+  async savePaymentGateway() {
+    const mode = document.getElementById('mandiri-mode-select').value;
+    const accountNumber = document.getElementById('mandiri-account-number').value.trim();
+    const accountName = document.getElementById('mandiri-account-name').value.trim();
+    const branch = document.getElementById('mandiri-branch').value.trim();
+    const webhookUrl = document.getElementById('mandiri-webhook-url').value.trim();
+
+    if (!accountNumber || !accountName || !branch || !webhookUrl) {
+      alert('Lengkapi seluruh bidang wajib Bank Mandiri (*)!');
+      return;
+    }
+
+    const methods = [];
+    if (document.getElementById('mandiri-method-transfer').checked) methods.push('transfer');
+    if (document.getElementById('mandiri-method-va').checked) methods.push('va');
+    if (document.getElementById('mandiri-method-qris').checked) methods.push('qris');
+
+    try {
+      const res = await fetch('api.php?action=update_payment_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentGateway: {
+            provider: 'MANDIRI',
+            mode,
+            bankName: 'Bank Mandiri',
+            accountNumber,
+            accountName,
+            branch,
+            methods,
+            webhookUrl,
+            isActive: true
+          }
+        })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+    } catch (e) {
+      alert('Gagal menyimpan Payment Gateway Mandiri!');
+    }
+  },
+
+  async testPaymentConnection() {
+    try {
+      const res = await fetch('api.php?action=test_payment_connection', { method: 'POST' });
+      const data = await res.json();
+      alert(data.message);
+    } catch (e) {
+      alert('Gagal menguji koneksi Bank Mandiri API!');
+    }
+  },

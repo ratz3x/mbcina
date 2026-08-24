@@ -1,0 +1,2043 @@
+/* Main Web Application Engine & Dynamic RBAC Controller for MB INA - MODUL M2 MANAJEMEN ORGANISASI COMPLETE */
+
+const AppEngine = {
+  currentRole: 'SUPER_ADMIN',
+  currentUser: {
+    id: 'usr_superadmin',
+    name: 'Derist Touriano',
+    username: 'usr_superadmin',
+    email: 'dtouriano@gmail.com',
+    phone: '082129709595',
+    role: 'SUPER_ADMIN',
+    status: 'ACTIVE',
+    tier: 'PLATINUM',
+    city: 'Jambi',
+    isSystemArchitect: true,
+    isProtected: true
+  },
+  isLightMode: false,
+  activeAdminTab: 'dashboard',
+  activeSettingsSubtab: 'general',
+  activeM2Subtab: 'profile',
+  clubs: [],
+  events: [],
+  users: [],
+  provinces: [],
+  tiers: [],
+  emailTemplates: {},
+  backups: [],
+  m2Data: {
+    organization: null,
+    history: [],
+    founders: [],
+    visionMission: [],
+    presidents: [],
+    periods: [],
+    advisoryBoard: [],
+    honorCouncil: [],
+    structure: [],
+    clubs: []
+  },
+  testimonials: [
+    {
+      name: 'Derist Touriano',
+      role: 'Super Admin & System Architect',
+      city: 'Jambi',
+      avatar: 'DT',
+      quote: 'Platform MB INA menghubungkan ribuan pecinta motor dan klub resmi dengan sistem keanggotaan terintegrasi, transparan, dan sangat modern.'
+    },
+    {
+      name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
+      role: 'Presiden MB INA (2025-2027)',
+      city: 'Kota Bandung',
+      avatar: 'RH',
+      quote: 'MB INA berdiri kokoh sebagai simbol persaudaraan, ketertiban lalulintas, dan solidaritas antar pecinta otomotif motor se-Indonesia.'
+    },
+    {
+      name: 'Ir. Raymond Sanjaya',
+      role: 'Sekretaris Pusat MB INA',
+      city: 'Bandung',
+      avatar: 'RS',
+      quote: 'Proses verifikasi keanggotaan yang mudah tanpa perlu risau privasi dokumen fisik. Sangat mendukung operasional touring dan event jamnas.'
+    }
+  ],
+  adminStats: null,
+  auditLogs: [],
+  systemSettings: null,
+
+  async init() {
+    console.log("MB INA Platform Engine Initializing (M2 Organization Module Active)...");
+    this.initTheme();
+    await this.fetchData();
+    await this.fetchM2Data();
+    this.bindAdminTabs();
+    this.renderTestimonials();
+    this.renderView();
+  },
+
+  initTheme() {
+    const savedTheme = localStorage.getItem('mbina_theme');
+    if (savedTheme === 'light') {
+      this.isLightMode = true;
+      document.body.classList.add('light-mode');
+    }
+    this.updateThemeToggleUI();
+  },
+
+  toggleTheme() {
+    this.isLightMode = !this.isLightMode;
+    if (this.isLightMode) {
+      document.body.classList.add('light-mode');
+      localStorage.setItem('mbina_theme', 'light');
+    } else {
+      document.body.classList.remove('light-mode');
+      localStorage.setItem('mbina_theme', 'dark');
+    }
+    this.updateThemeToggleUI();
+  },
+
+  updateThemeToggleUI() {
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    if (themeBtn) {
+      themeBtn.innerHTML = this.isLightMode ? '🌙 Dark Mode' : '☀️ Light Mode';
+    }
+  },
+
+  async fetchData() {
+    try {
+      const [resClubs, resEvents, resUsers, resStats, resLogs, resSettings, resProv, resTiers, resTmpl, resBak] = await Promise.all([
+        fetch('api.php?action=get_clubs').then(r => r.json()),
+        fetch('api.php?action=get_events').then(r => r.json()),
+        fetch('api.php?action=get_users').then(r => r.json()),
+        fetch('api.php?action=get_admin_stats').then(r => r.json()),
+        fetch('api.php?action=get_audit_logs').then(r => r.json()),
+        fetch('api.php?action=get_system_settings').then(r => r.json()),
+        fetch('api.php?action=get_provinces_admin').then(r => r.json()),
+        fetch('api.php?action=get_tiers').then(r => r.json()),
+        fetch('api.php?action=get_email_templates').then(r => r.json()),
+        fetch('api.php?action=get_backups').then(r => r.json())
+      ]);
+
+      if (resClubs.success) this.clubs = resClubs.clubs;
+      if (resEvents.success) this.events = resEvents.events;
+      if (resUsers.success) this.users = resUsers.users;
+      if (resStats.success) this.adminStats = resStats;
+      if (resLogs.success) this.auditLogs = resLogs.auditLogs;
+      if (resSettings.success) this.systemSettings = resSettings.settings;
+      if (resProv.success) this.provinces = resProv.provinces;
+      if (resTiers.success) this.tiers = resTiers.tiers;
+      if (resTmpl.success) this.emailTemplates = resTmpl.templates;
+      if (resBak.success) this.backups = resBak.backups;
+
+      this.renderClubsList();
+      this.renderEventsList();
+      this.renderProvincesDropdown();
+    } catch (e) {
+      console.error("Error loading API data:", e);
+    }
+  },
+
+  async fetchM2Data() {
+    try {
+      const [rOrg, rHist, rFnd, rVM, rPres, rGp, rAb, rHc, rStr, rClb] = await Promise.all([
+        fetch('api.php?action=get_m2_organization').then(r => r.json()),
+        fetch('api.php?action=get_m2_history').then(r => r.json()),
+        fetch('api.php?action=get_m2_founders').then(r => r.json()),
+        fetch('api.php?action=get_m2_vision_mission').then(r => r.json()),
+        fetch('api.php?action=get_m2_presidents').then(r => r.json()),
+        fetch('api.php?action=get_m2_governance_periods').then(r => r.json()),
+        fetch('api.php?action=get_m2_advisory_board').then(r => r.json()),
+        fetch('api.php?action=get_m2_honor_council').then(r => r.json()),
+        fetch('api.php?action=get_m2_structure').then(r => r.json()),
+        fetch('api.php?action=get_m2_clubs').then(r => r.json())
+      ]);
+
+      if (rOrg.success) this.m2Data.organization = rOrg.organization;
+      if (rHist.success) this.m2Data.history = rHist.history;
+      if (rFnd.success) this.m2Data.founders = rFnd.founders;
+      if (rVM.success) this.m2Data.visionMission = rVM.visionMission;
+      if (rPres.success) this.m2Data.presidents = rPres.presidents;
+      if (rGp.success) this.m2Data.periods = rGp.periods;
+      if (rAb.success) this.m2Data.advisoryBoard = rAb.advisoryBoard;
+      if (rHc.success) this.m2Data.honorCouncil = rHc.honorCouncil;
+      if (rStr.success) this.m2Data.structure = rStr.structure;
+      if (rClb.success) this.m2Data.clubs = rClb.clubs;
+    } catch (e) {
+      console.error("Error fetching M2 Data:", e);
+    }
+  },
+
+  renderProvincesDropdown() {
+    const optionsHtml = this.provinces.map(p => `
+      <option value="${p.id}">${p.name} (${p.region})</option>
+    `).join('');
+
+    const regSelect = document.getElementById('reg-province-select');
+    if (regSelect) regSelect.innerHTML = optionsHtml;
+
+    const addSelect = document.getElementById('add-user-province');
+    if (addSelect) addSelect.innerHTML = optionsHtml;
+
+    const editSelect = document.getElementById('edit-user-province');
+    if (editSelect) editSelect.innerHTML = optionsHtml;
+  },
+
+  renderTestimonials() {
+    const container = document.getElementById('testimonials-grid-container');
+    if (!container) return;
+
+    container.innerHTML = this.testimonials.map(t => `
+      <div class="testimonial-card">
+        <p style="font-style:italic; font-size:0.9rem; color:var(--text-main); margin-bottom:16px;">
+          "${t.quote}"
+        </p>
+        <div style="display:flex; align-items:center; gap:12px; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <div style="width:40px; height:40px; border-radius:50%; background:var(--accent-gold); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:0.85rem;">
+            ${t.avatar}
+          </div>
+          <div>
+            <h4 style="font-size:0.95rem; line-height:1.2;">${t.name}</h4>
+            <span style="font-size:0.75rem; color:var(--accent-gold);">${t.role} (${t.city})</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  bindAdminTabs() {
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tab = e.currentTarget.getAttribute('data-admin-tab');
+        this.switchAdminTab(tab);
+      });
+    });
+  },
+
+  switchAdminTab(tab) {
+    this.activeAdminTab = tab;
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+      if (btn.getAttribute('data-admin-tab') === tab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const targetContent = document.getElementById(`admin-tab-${tab}`);
+    if (targetContent) targetContent.style.display = 'block';
+
+    if (tab === 'dashboard') this.renderAdminDashboard();
+    else if (tab === 'm2_org') this.renderM2Module();
+    else if (tab === 'users') this.renderUserManagement();
+    else if (tab === 'audit') this.renderAuditLogs();
+    else if (tab === 'settings') this.renderSystemSettings();
+  },
+
+  setRole(role, userData = null) {
+    this.currentRole = role;
+    this.currentUser = userData || this.getDefaultUserForRole(role);
+    this.renderView();
+  },
+
+  formatRoleName(role) {
+    const map = {
+      'SUPER_ADMIN': 'Super Admin',
+      'PRESIDEN': 'Presiden MB INA',
+      'SEKRETARIS_PUSAT': 'Sekretaris Pusat',
+      'BENDAHARA_PUSAT': 'Bendahara Pusat',
+      'ADMIN_ORGANISASI': 'Admin Organisasi',
+      'PENGURUS_PUSAT': 'Pengurus Pusat',
+      'PENGURUS_KLUB': 'Pengurus Klub',
+      'MEMBER': 'Member Terverifikasi',
+      'CALON_MEMBER': 'Calon Member (Pending)',
+      'GUEST': 'Guest (Pengunjung)'
+    };
+    return map[role] || role;
+  },
+
+  renderView() {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+
+    const userProfileWidget = document.getElementById('nav-user-profile');
+    if (userProfileWidget) {
+      userProfileWidget.style.display = 'flex';
+      document.getElementById('nav-user-name').innerText = this.currentUser.name;
+      document.getElementById('nav-user-role-badge').innerText = this.formatRoleName(this.currentRole);
+    }
+
+    const adminView = document.getElementById('view-admin-dashboard');
+    if (adminView) {
+      adminView.style.display = 'block';
+      this.switchAdminTab(this.activeAdminTab);
+    }
+  },
+
+  renderClubsList() {
+    const container = document.getElementById('clubs-grid-container');
+    if (!container) return;
+
+    container.innerHTML = this.clubs.map(c => `
+      <div class="glass-card" style="padding:20px;">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
+          <div style="width:48px; height:48px; border-radius:12px; background:rgba(245,158,11,0.15); border:1px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-weight:800;">
+            ${c.code ? c.code.substring(0, 3) : 'MB'}
+          </div>
+          <div>
+            <h4 style="font-size:1.05rem;">${c.name}</h4>
+            <span style="font-size:0.75rem; color:var(--text-muted);">${c.city || 'Indonesia'}</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">${c.description || 'Klub resmi terdaftar di bawah naungan MB INA.'}</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <span style="font-size:0.8rem; color:var(--accent-gold); font-weight:700;">👥 ${c.memberCount} Anggota</span>
+          <button class="role-pill-btn" style="border-color:var(--accent-gold);" onclick="alert('Mendaftar ke club ${c.name}')">Lihat Club</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderEventsList() {
+    const container = document.getElementById('events-grid-container');
+    if (!container) return;
+
+    container.innerHTML = this.events.map(e => `
+      <div class="glass-card" style="padding:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">UPCOMING</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${e.eventDate ? e.eventDate.split(' ')[0] : ''}</span>
+        </div>
+        <h4 style="font-size:1.1rem; margin-bottom:8px;">${e.title}</h4>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">📍 ${e.location}</p>
+        <p style="font-size:0.85rem; color:var(--text-main); margin-bottom:16px;">${e.description}</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <span style="font-size:0.8rem; color:var(--text-muted);">${e.registeredCount} / ${e.maxAttendees} Terdaftar</span>
+          <button class="btn-primary" style="padding:6px 16px; font-size:0.8rem;" onclick="AppEngine.handleRSVP('${e.id}')">RSVP Event</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderAdminDashboard() {
+    const stats = this.adminStats ? this.adminStats.stats : { totalMembers: this.users.length, activeClubs: this.clubs.length, monthlyTransactionRp: 'Rp 425.500.000', pendingApprovals: 0 };
+    
+    document.getElementById('stat-members-count').innerText = stats.totalMembers.toLocaleString();
+    document.getElementById('stat-clubs-count').innerText = stats.activeClubs;
+    document.getElementById('stat-revenue-amount').innerText = stats.monthlyTransactionRp;
+    document.getElementById('stat-pending-count').innerText = stats.pendingApprovals;
+
+    const growthData = (this.adminStats && this.adminStats.chartGrowth) ? this.adminStats.chartGrowth.weekly : { Sen: 42, Sel: 65, Rab: 58, Kam: 84, Jum: 96, Sab: 120, Ming: 110 };
+    const chartContainer = document.getElementById('admin-growth-chart');
+    if (chartContainer) {
+      const maxVal = Math.max(...Object.values(growthData));
+      chartContainer.innerHTML = Object.entries(growthData).map(([day, val]) => `
+        <div class="chart-bar-col">
+          <div class="chart-bar" style="height: ${(val / maxVal) * 100}%;" title="${val} Registrasi Baru"></div>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${day}</span>
+        </div>
+      `).join('');
+    }
+
+    const regData = (this.adminStats && this.adminStats.regionalDistribution) ? this.adminStats.regionalDistribution : [
+      { region: 'DKI Jakarta & Banten', count: 4820, percentage: 38 },
+      { region: 'Jawa Barat', count: 2950, percentage: 24 },
+      { region: 'Jawa Tengah & DIY', count: 1840, percentage: 15 },
+      { region: 'Jawa Timur & Bali', count: 1650, percentage: 13 },
+      { region: 'Sumatera & Kalimantan', count: 1280, percentage: 10 }
+    ];
+    const regionContainer = document.getElementById('admin-region-distribution');
+    if (regionContainer) {
+      regionContainer.innerHTML = regData.map(r => `
+        <div class="region-progress-row">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+            <span>${r.region}</span>
+            <strong style="color:var(--accent-gold);">${r.count} Anggota (${r.percentage}%)</strong>
+          </div>
+          <div class="region-progress-bar">
+            <div class="region-progress-fill" style="width:${r.percentage}%;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const alerts = (this.adminStats && this.adminStats.systemAlerts) ? this.adminStats.systemAlerts : [];
+    const alertsContainer = document.getElementById('admin-alerts-feed');
+    if (alertsContainer) {
+      alertsContainer.innerHTML = alerts.map(a => `
+        <div style="padding:12px; border-bottom:1px solid var(--chrome-border); display:flex; align-items:center; gap:12px; font-size:0.85rem;">
+          <span class="tier-badge" style="background:${a.level === 'WARNING' ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}; color:${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'}; border:1px solid ${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'};">
+            ${a.level}
+          </span>
+          <span style="flex:1;">${a.message}</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${a.time}</span>
+        </div>
+      `).join('');
+    }
+
+    this.renderVerificationQueue();
+  },
+
+  // ============================================
+  // MODUL M2 MANAJEMEN ORGANISASI RENDERERS
+  // ============================================
+  switchM2Subtab(subtab) {
+    this.activeM2Subtab = subtab;
+    document.querySelectorAll('[data-m2sub]').forEach(btn => {
+      if (btn.getAttribute('data-m2sub') === subtab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.m2-subtab-content').forEach(el => el.style.display = 'none');
+    const targetContent = document.getElementById(`m2sub-${subtab}`);
+    if (targetContent) targetContent.style.display = 'block';
+
+    if (subtab === 'profile') this.renderM2Profile();
+    else if (subtab === 'founders') this.renderM2Founders();
+    else if (subtab === 'vision') this.renderM2Vision();
+    else if (subtab === 'presidents') this.renderM2Presidents();
+    else if (subtab === 'structure') this.renderM2Structure();
+    else if (subtab === 'clubs') this.renderM2Clubs();
+  },
+
+  renderM2Module() {
+    this.switchM2Subtab(this.activeM2Subtab);
+  },
+
+  // 2.1.1 INFORMASI DASAR WITH CRUD
+  renderM2Profile() {
+    const container = document.getElementById('m2-profile-container');
+    if (!container) return;
+
+    const org = this.m2Data.organization || {
+      name: 'Mercedes-Benz Club Indonesia',
+      short_name: 'MB Club INA',
+      alias: 'MBINA',
+      tagline: '"One Club, One Family" / "Bersama Satu Bintang"',
+      founded_date: '2004-08-01',
+      founded_place: 'Jakarta',
+      website: 'www.mbclubina.com',
+      email: 'admin@mbina.or.id',
+      phone: '021-7890123'
+    };
+
+    container.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 2fr; gap:24px; align-items:start;">
+        <div class="glass-panel" style="padding:24px; text-align:center;">
+          <img src="assets/mb_badge.jpg" alt="Logo Emblem MB INA" style="width:140px; height:140px; border-radius:50%; border:3px solid var(--accent-gold); box-shadow:0 0 20px var(--accent-gold-glow); margin-bottom:16px;">
+          <h3 style="font-size:1.4rem;" class="text-gradient">${org.name}</h3>
+          <div style="margin-top:8px;">
+            <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+              ${org.alias} - ${org.short_name}
+            </span>
+          </div>
+          <p style="font-style:italic; font-weight:700; color:var(--accent-gold); margin-top:14px; font-size:0.95rem;">
+            "${org.tagline}"
+          </p>
+          <button class="btn-primary" style="width:100%; margin-top:20px; padding:10px;" onclick="AppEngine.openEditOrgProfileModal()">
+            ✏️ Edit Profil MB INA
+          </button>
+        </div>
+
+        <div class="glass-panel" style="padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h4 style="font-size:1.1rem; color:var(--accent-gold);">📊 2.1.1 Informasi Dasar Organisasi</h4>
+            <button class="btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="AppEngine.openEditOrgProfileModal()">✏️ Edit Profil</button>
+          </div>
+          <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+            <tbody>
+              <tr style="border-bottom:1px solid var(--chrome-border);"><td style="padding:10px; color:var(--text-muted); font-weight:700;">Nama Resmi</td><td style="padding:10px; font-weight:800;">${org.name}</td></tr>
+              <tr style="border-bottom:1px solid var(--chrome-border);"><td style="padding:10px; color:var(--text-muted); font-weight:700;">Nama Singkat</td><td style="padding:10px; font-weight:700;">${org.short_name}</td></tr>
+              <tr style="border-bottom:1px solid var(--chrome-border);"><td style="padding:10px; color:var(--text-muted); font-weight:700;">Alias / Kode</td><td style="padding:10px; font-family:monospace; color:var(--accent-gold); font-weight:800;">${org.alias}</td></tr>
+              <tr style="border-bottom:1px solid var(--chrome-border);"><td style="padding:10px; color:var(--text-muted); font-weight:700;">Tagline & Slogan</td><td style="padding:10px; font-style:italic; color:var(--accent-gold); font-weight:700;">"${org.tagline}"</td></tr>
+              <tr style="border-bottom:1px solid var(--chrome-border);"><td style="padding:10px; color:var(--text-muted); font-weight:700;">Tanggal & Tempat Berdiri</td><td style="padding:10px;">${org.founded_date} (${org.founded_place})</td></tr>
+              <tr style="border-bottom:1px solid var(--chrome-border);"><td style="padding:10px; color:var(--text-muted); font-weight:700;">Status Organisasi</td><td style="padding:10px;"><span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">Club Federasi</span></td></tr>
+              <tr style="border-bottom:1px solid var(--chrome-border);"><td style="padding:10px; color:var(--text-muted); font-weight:700;">Website Resmi</td><td style="padding:10px; font-weight:700; color:var(--accent-blue);"><a href="https://${org.website}" target="_blank" style="color:inherit; text-decoration:none;">🌐 ${org.website}</a></td></tr>
+              <tr style="border-bottom:1px solid var(--chrome-border);"><td style="padding:10px; color:var(--text-muted); font-weight:700;">Email Resmi</td><td style="padding:10px; font-weight:700;">✉️ ${org.email}</td></tr>
+              <tr><td style="padding:10px; color:var(--text-muted); font-weight:700;">Nomor Telepon</td><td style="padding:10px;">📞 ${org.phone || '021-7890123'}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  },
+
+  openEditOrgProfileModal() {
+    const org = this.m2Data.organization || {};
+    document.getElementById('edit-org-name').value = org.name || 'Mercedes-Benz Club Indonesia';
+    document.getElementById('edit-org-short-name').value = org.short_name || 'MB Club INA';
+    document.getElementById('edit-org-alias').value = org.alias || 'MBINA';
+    document.getElementById('edit-org-tagline').value = org.tagline || '"One Club, One Family" / "Bersama Satu Bintang"';
+    document.getElementById('edit-org-founded-date').value = org.founded_date || '2004-08-01';
+    document.getElementById('edit-org-founded-place').value = org.founded_place || 'Jakarta';
+    document.getElementById('edit-org-website').value = org.website || 'www.mbclubina.com';
+    document.getElementById('edit-org-email').value = org.email || 'admin@mbina.or.id';
+    document.getElementById('edit-org-phone').value = org.phone || '021-7890123';
+    document.getElementById('edit-org-description').value = org.description || 'Organisasi federasi yang menaungi seluruh club Mercedes-Benz di Indonesia.';
+
+    AuthEngine.openModal('modal-edit-org-profile');
+  },
+
+  async saveOrgProfileFromModal(event) {
+    event.preventDefault();
+    const name = document.getElementById('edit-org-name').value.trim();
+    const short_name = document.getElementById('edit-org-short-name').value.trim();
+    const alias = document.getElementById('edit-org-alias').value.trim();
+    const tagline = document.getElementById('edit-org-tagline').value.trim();
+    const founded_date = document.getElementById('edit-org-founded-date').value;
+    const founded_place = document.getElementById('edit-org-founded-place').value.trim();
+    const website = document.getElementById('edit-org-website').value.trim();
+    const email = document.getElementById('edit-org-email').value.trim();
+    const phone = document.getElementById('edit-org-phone').value.trim();
+    const description = document.getElementById('edit-org-description').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=update_m2_organization', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, short_name, alias, tagline, founded_date, founded_place, website, email, phone, description })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchM2Data();
+      this.renderM2Profile();
+    } catch (e) {
+      alert('Gagal memperbarui profil organisasi!');
+    }
+  },
+
+  // 2.1.2 SEJARAH & FOUNDERS (FULL RICH HISTORY + FOUNDERS + OFFICIAL ARCHIVE PHOTO AT EXACT LOCATION)
+  renderM2Founders() {
+    const container = document.getElementById('m2-founders-container');
+    if (!container) return;
+
+    const founders = this.m2Data.founders.length ? this.m2Data.founders : [
+      { name: 'BAMBANG HARIYADI', club_origin: 'MTC', position: 'Co-Founder & Public Relation', bio: 'Pendiri MB Club INA mewakili MTC (Mercedes-Benz Tiger Club).' },
+      { name: 'TUBAGUS SYAMSUL HIDAYAT', club_origin: 'MTC', position: 'Co-Founder & Vice President', bio: 'Pendiri MB Club INA mewakili MTC.' },
+      { name: 'RIDWAN POHAN', club_origin: 'MCCI', position: 'President (2004-2006) & Founder', bio: 'Pendiri utama & Presiden Pertama MB Club INA.' },
+      { name: 'DHARMA ADSASMUDA', club_origin: 'MCCI', position: 'Co-Founder & Treasury', bio: 'Pendiri MB Club INA mewakili MCCI.' }
+    ];
+
+    container.innerHTML = `
+      <div style="margin-bottom:28px;">
+        <h3 style="font-size:1.4rem; margin-bottom:16px;" class="text-gradient">📖 Sejarah Terbentuknya MB Club INA</h3>
+
+        <!-- 1. LATAR BELAKANG -->
+        <div class="glass-panel" style="padding:24px; margin-bottom:20px; border-left:4px solid var(--accent-gold);">
+          <h4 style="font-size:1.15rem; color:var(--accent-gold); margin-bottom:12px;">1. Latar Belakang</h4>
+          <p style="font-size:0.9rem; color:var(--text-main); line-height:1.7; white-space:pre-line;">Pada akhir dekade 1990-an sampai dengan awal 2000-an, di Jakarta telah terbentuk beberapa klub Mercedes-Benz, yaitu MCCI, MTC, dan MJI. Klub-klub tersebut meregistrasikan keberadaannya kepada pihak principal Daimler AG di Stuttgart melalui ATPM Mercedes-Benz di Indonesia saat itu, PT Daimler Chrysler Indonesia (PT DC INA), untuk mendapatkan sertifikasi atau legitimasi sebagai klub resmi yang terdaftar.
+
+Pemberian sertifikasi pun dikeluarkan kepada ketiga klub tersebut (MCCI, MTC, dan MJI) oleh principal yang pada waktu itu diserahkan melalui PT DC INA dan teregistrasi di bawah MCCCI (Mercedes-Benz Classic Car Club International) Regional Asia-Pasifik yang berkedudukan di Singapura.
+
+Pada tahun 2003, MBCI (W124) terbentuk di Jakarta dan langsung mengajukan permohonan sertifikasi kepada pihak principal. Pada saat pengajuan sertifikasi MBCI sedang berproses (biasanya proses ini berjalan sekitar satu tahun atau lebih), pihak principal mengusulkan kepada PT DC INA agar mewacanakan pembentukan klub holding untuk klub-klub Mercedes-Benz yang ada di Indonesia. Hal ini bertujuan untuk mengantisipasi perkembangan dan pertumbuhan jumlah klub Mercedes-Benz di Indonesia pada masa depan.</p>
+        </div>
+
+        <!-- 2. PROSES PEMBENTUKAN -->
+        <div class="glass-panel" style="padding:24px; margin-bottom:20px; border-left:4px solid var(--accent-blue);">
+          <h4 style="font-size:1.15rem; color:var(--accent-blue); margin-bottom:12px;">2. Proses Pembentukan</h4>
+          <p style="font-size:0.9rem; color:var(--text-main); line-height:1.7; white-space:pre-line;">Pada awal tahun 2004, PT DC INA melalui Bapak Yuniadi Hartono (Deputy Director Marketing & Communication saat itu) beserta Bapak Wim Ekel mulai berkomunikasi dengan tiga klub Mercedes-Benz yang sudah tersertifikasi—yaitu MCCI, MTC, dan MJI—untuk segera membentuk klub holding Mercedes-Benz di Indonesia yang dinamakan Mercedes-Benz Club Indonesia (MB Club Ina), dengan mengirimkan dua orang perwakilan dari masing-masing klub.
+
+Saat itu:
+- MCCI mengutus: Ridwan Pohan dan Dharma Adsasmuda.
+- MTC mengutus: Bambang Hariyadi dan Tubagus S. Hidayat (Didot).
+- MJI memutuskan untuk tidak mengirimkan perwakilan, tetapi tetap menyetujui dan mendukung rencana pembentukan MB Club Ina.
+
+Setelah melalui proses pembentukan lewat beberapa kali pertemuan, pada bulan Agustus 2004, Mercedes-Benz Club Indonesia (MB Club Ina) diresmikan oleh PT DC INA sebagai klub federasi yang beranggotakan klub-klub Mercedes-Benz di Indonesia.
+
+Salah satu fungsi MB Club Ina adalah mewakili Indonesia di forum dan kegiatan klub Mercedes-Benz internasional, di antaranya acara President Club Meeting yang diadakan setiap tahun pada bulan Oktober. Acara ini diselenggarakan oleh MB Museum, Club Management dan dihadiri oleh klub-klub Mercedes-Benz dari seluruh dunia.</p>
+        </div>
+
+        <!-- CATATAN TAMBAHAN & KONSEP 4 PILAR -->
+        <div class="glass-panel" style="padding:24px; margin-bottom:28px; border-left:4px solid var(--primary-emerald);">
+          <h4 style="font-size:1.15rem; color:var(--primary-emerald); margin-bottom:12px;">📌 Catatan Tambahan & Konsep 4 Pilar</h4>
+          <p style="font-size:0.9rem; color:var(--text-main); line-height:1.7; white-space:pre-line;">Pada saat Mercedes-Benz Museum di Stuttgart diresmikan pada tahun 2005, peran Mercedes-Benz Classic Club International (MCCCI) yang tadinya berfungsi membawahi klub-klub Mercedes-Benz di seluruh dunia digantikan oleh Mercedes-Benz Museum, Club Management yang berkedudukan di Stuttgart.
+
+Pada saat MB Club Ina diresmikan, PT DC INA menetapkan dan menunjuk secara langsung susunan kepengurusan pertama:
+• President: Ridwan Pohan
+• Vice President: Tubagus S. Hidayat
+• Treasurer: Dharma Adsasmuda
+• Public Relations: Bambang Haryadi
+
+Keempat orang perwakilan dari masing-masing klub inilah yang sekarang kita sebut sebagai pendiri atau founder MB Club Ina.
+
+Setelah MB Club Ina resmi terbentuk, masih pada tahun yang sama (2004), sertifikasi untuk MBCI dari principal/MCCCI dikeluarkan dan diserahkan langsung oleh PT DC INA. MBCI menjadi klub Mercedes-Benz terakhir di Indonesia yang tersertifikasi langsung dari MCCCI sekaligus otomatis menjadi klub anggota MB Club Ina.
+
+Sejak saat itu pula, Bapak Wim Ekel dari PT DC INA mengemukakan konsep 4 Pilar MB Club Ina, yaitu: MCCI, MTC, MJI, dan MBCI.</p>
+        </div>
+
+        <!-- 4 PILAR VISUAL CARDS -->
+        <h5 style="font-size:1rem; margin-bottom:14px; color:var(--accent-gold);">🏛️ 4 Pilar Pendiri MB Club INA:</h5>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:28px;">
+          <div class="glass-card" style="padding:16px; text-align:center;">
+            <div style="font-size:1.5rem; font-weight:900; color:var(--accent-gold);">MCCI</div>
+            <span style="font-size:0.78rem; color:var(--text-muted);">Mercedes-Benz Car Club Indonesia</span>
+          </div>
+          <div class="glass-card" style="padding:16px; text-align:center;">
+            <div style="font-size:1.5rem; font-weight:900; color:var(--accent-blue);">MTC</div>
+            <span style="font-size:0.78rem; color:var(--text-muted);">Mercedes-Benz Tiger Club</span>
+          </div>
+          <div class="glass-card" style="padding:16px; text-align:center;">
+            <div style="font-size:1.5rem; font-weight:900; color:var(--primary-emerald);">MJI</div>
+            <span style="font-size:0.78rem; color:var(--text-muted);">Mercedes-Benz Jip Club Indonesia</span>
+          </div>
+          <div class="glass-card" style="padding:16px; text-align:center;">
+            <div style="font-size:1.5rem; font-weight:900; color:var(--accent-red);">MBCI</div>
+            <span style="font-size:0.78rem; color:var(--text-muted);">W124 Mercedes-Benz Club Indonesia</span>
+          </div>
+        </div>
+
+        <!-- SUB BAGIAN: PENDIRI ORGANISASI (FOUNDERS) -->
+        <div style="border-top:2px solid var(--chrome-border); padding-top:24px; margin-bottom:20px;">
+          <h4 style="font-size:1.3rem; margin-bottom:14px; color:var(--accent-gold);">👥 Pendiri Organisasi (Founders)</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-bottom:24px;">
+            ${founders.map(f => `
+              <div class="glass-card" style="padding:20px; border-top:3px solid var(--accent-gold);">
+                <h4 style="font-size:1.15rem; font-weight:800; margin-bottom:4px; color:var(--text-main);">${f.name}</h4>
+                <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); margin-bottom:8px;">
+                  Asal Club: ${f.club_origin}
+                </span>
+                <p style="font-size:0.85rem; font-weight:700; color:var(--accent-blue); margin-top:6px;">${f.position}</p>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:8px;">${f.bio}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- DOKUMEN RESMI PENDIRI ORGANISASI (FOUNDERS) (TEPAT DI BAWAH SUB BAGIAN FOUNDERS) -->
+        <div class="glass-panel" style="padding:20px; text-align:center; border:2px solid var(--accent-gold);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:0 8px;">
+            <h4 style="font-size:1.1rem; color:var(--accent-gold); margin:0;">📸 DOKUMEN RESMI PENDIRI ORGANISASI (FOUNDERS)</h4>
+            <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">OFFICIAL ARCHIVE</span>
+          </div>
+          <img src="assets/mb_founders.jpg" alt="Foto Resmi Pendiri MB Club INA" style="width:100%; max-height:500px; object-fit:contain; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+        </div>
+
+      </div>
+    `;
+  },
+
+  // 2.1.3 VISI & MISI WITH FULL INTERACTIVE CRUD
+  renderM2Vision() {
+    const container = document.getElementById('m2-vision-container');
+    if (!container) return;
+
+    const list = this.m2Data.visionMission.length ? this.m2Data.visionMission : [
+      { id: 'vm_001', type: 'VISION', title: 'Visi MB Club INA', description: 'Menjadi wadah komunitas Mercedes-Benz terbesar, terbaik, dan paling solid di Indonesia serta menjadi kebanggaan bangsa.', icon: '🎯', sort_order: 1 },
+      { id: 'vm_002', type: 'MISSION', title: 'Misi 1 - Mempererat Persaudaraan', description: 'Mempererat tali persaudaraan antar anggota dan menciptakan lingkungan yang inklusif dan saling mendukung.', icon: '🤝', sort_order: 2 },
+      { id: 'vm_003', type: 'MISSION', title: 'Misi 2 - Berbagi Pengetahuan', description: 'Menyediakan platform edukasi tentang Mercedes-Benz dan berbagi pengalaman serta tips perawatan.', icon: '📚', sort_order: 3 },
+      { id: 'vm_004', type: 'MISSION', title: 'Misi 3 - Kegiatan Sosial', description: 'Aktif dalam kegiatan sosial dan bakti sosial serta memberikan kontribusi positif bagi masyarakat.', icon: '❤️', sort_order: 4 },
+      { id: 'vm_005', type: 'MISSION', title: 'Misi 4 - Pelestarian Budaya Otomotif', description: 'Melestarikan dan mengapresiasi warisan otomotif Mercedes-Benz serta mempromosikan budaya berkendara yang aman.', icon: '🏛️', sort_order: 5 },
+      { id: 'vm_006', type: 'MISSION', title: 'Misi 5 - Pengembangan Organisasi', description: 'Terus berkembang dan beradaptasi dengan zaman serta menjangkau lebih banyak anggota di seluruh Indonesia.', icon: '🚀', sort_order: 6 }
+    ];
+
+    const vision = list.find(x => x.type === 'VISION') || list[0];
+    const missions = list.filter(x => x.type === 'MISSION');
+
+    container.innerHTML = `
+      <div style="margin-bottom:28px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="font-size:1.3rem;" class="text-gradient">🎯 2.1.3 Visi & Misi MB INA</h3>
+            <p style="font-size:0.85rem; color:var(--text-muted);">Kelola Visi Utama dan 5 Misi Strategis (Supabase Cloud PostgreSQL Active)</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-outline" onclick="AppEngine.openEditVMModal('${vision.id}')">✏️ Edit Visi Utama</button>
+            <button class="btn-primary" onclick="AppEngine.openAddVMModal()">+ Tambah Misi Baru</button>
+          </div>
+        </div>
+
+        <!-- VISI UTAMA CARD -->
+        <div class="glass-panel" style="padding:28px; text-align:center; border-top:4px solid var(--accent-gold); margin-bottom:28px; position:relative;">
+          <div style="position:absolute; top:16px; right:16px;">
+            <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditVMModal('${vision.id}')">✏️ Edit Visi</button>
+          </div>
+          <div style="font-size:2.8rem; margin-bottom:8px;">${vision.icon || '🎯'}</div>
+          <h3 style="font-size:1.4rem; color:var(--accent-gold);">${vision.title}</h3>
+          <p style="font-size:1.1rem; font-weight:700; color:var(--text-main); margin-top:12px; max-width:800px; margin-left:auto; margin-right:auto; line-height:1.6;">
+            "${vision.description}"
+          </p>
+        </div>
+
+        <!-- MISI STRATEGIS GRID -->
+        <h4 style="font-size:1.1rem; margin-bottom:16px; color:var(--accent-gold);">🚀 Daftar Misi Strategis Organisasi (${missions.length}):</h4>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+          ${missions.map(m => `
+            <div class="glass-card" style="padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                  <div style="font-size:2rem;">${m.icon || '🚀'}</div>
+                  <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">MISI #${m.sort_order || 1}</span>
+                </div>
+                <h4 style="font-size:1.1rem; margin-bottom:8px; color:var(--text-main); font-weight:800;">${m.title}</h4>
+                <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.6;">${m.description}</p>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:12px;">
+                <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditVMModal('${m.id}')">✏️ Edit</button>
+                <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteVM('${m.id}')">🗑️ Hapus</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  },
+
+  openAddVMModal() {
+    document.getElementById('edit-vm-id').value = '';
+    document.getElementById('modal-vm-title').innerText = '🚀 Tambah Misi Baru';
+    document.getElementById('edit-vm-type').value = 'MISSION';
+    document.getElementById('edit-vm-icon').value = '🚀';
+    document.getElementById('edit-vm-item-title').value = '';
+    document.getElementById('edit-vm-description').value = '';
+    document.getElementById('edit-vm-sort').value = this.m2Data.visionMission.length + 1;
+
+    AuthEngine.openModal('modal-edit-vm');
+  },
+
+  openEditVMModal(id) {
+    const item = this.m2Data.visionMission.find(x => x.id === id);
+    if (!item) return;
+
+    document.getElementById('edit-vm-id').value = item.id;
+    document.getElementById('modal-vm-title').innerText = `✏️ Edit ${item.type === 'VISION' ? 'Visi Utama' : 'Misi'}`;
+    document.getElementById('edit-vm-type').value = item.type;
+    document.getElementById('edit-vm-icon').value = item.icon || '🚀';
+    document.getElementById('edit-vm-item-title').value = item.title;
+    document.getElementById('edit-vm-description').value = item.description;
+    document.getElementById('edit-vm-sort').value = item.sort_order || 1;
+
+    AuthEngine.openModal('modal-edit-vm');
+  },
+
+  async saveVMFromModal(event) {
+    event.preventDefault();
+    const id = document.getElementById('edit-vm-id').value;
+    const type = document.getElementById('edit-vm-type').value;
+    const icon = document.getElementById('edit-vm-icon').value.trim();
+    const title = document.getElementById('edit-vm-item-title').value.trim();
+    const description = document.getElementById('edit-vm-description').value.trim();
+    const sort_order = parseInt(document.getElementById('edit-vm-sort').value || 1);
+
+    const action = id ? 'update_m2_vision_mission' : 'create_m2_vision_mission';
+
+    try {
+      const res = await fetch(`api.php?action=${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, type, icon, title, description, sort_order })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchM2Data();
+      this.renderM2Vision();
+    } catch (e) {
+      alert('Gagal menyimpan Visi/Misi!');
+    }
+  },
+
+  async deleteVM(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus Misi ini dari Supabase Cloud Database?')) return;
+    try {
+      const res = await fetch('api.php?action=delete_m2_vision_mission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchM2Data();
+      this.renderM2Vision();
+    } catch (e) {
+      alert('Gagal menghapus Misi!');
+    }
+  },
+
+  // 2.1.4 DAFTAR PRESIDEN WITH FULL INTERACTIVE CRUD & UPLOAD PHOTO MANAGEMENT
+  renderM2Presidents() {
+    const container = document.getElementById('m2-presidents-container');
+    if (!container) return;
+
+    const presidents = this.m2Data.presidents;
+
+    container.innerHTML = `
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h4 style="font-size:1.2rem; color:var(--accent-gold);">📜 Timeline Daftar Presiden MB Club INA (2004 - 2027)</h4>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Kelola data, foto profil, biografi, & status presiden incumbent (Supabase PostgreSQL Active)</p>
+          </div>
+          <button class="btn-primary" onclick="AppEngine.openAddPresidentModal()">+ Tambah Presiden Baru</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
+          ${presidents.map(p => `
+            <div class="glass-card" style="padding:22px; border-left:4px solid ${p.is_current ? 'var(--primary-emerald)' : 'var(--accent-gold)'}; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                  <span style="font-weight:900; color:var(--accent-gold); font-size:1rem;">🗓️ Periode ${p.period_start} - ${p.period_end}</span>
+                  ${p.is_current ? '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">INCUMBENT</span>' : ''}
+                </div>
+
+                <div style="display:flex; gap:16px; align-items:center; margin-bottom:14px;">
+                  <div style="width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%); display:flex; align-items:center; justify-content:center; overflow:hidden; border:2px solid var(--accent-gold); flex-shrink:0;">
+                    ${p.photo_url ? `<img src="${p.photo_url}" style="width:100%; height:100%; object-fit:cover;">` : `<span style="font-size:1.5rem; font-weight:900; color:#fff;">${p.name.substring(0, 2)}</span>`}
+                  </div>
+                  <div>
+                    <h4 style="font-size:1.1rem; font-weight:800; color:var(--text-main); line-height:1.3;">${p.name}</h4>
+                    <span style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">Presiden #${p.sort_order || 1}</span>
+                  </div>
+                </div>
+
+                <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">${p.bio || 'Presiden Mercedes-Benz Club Indonesia'}</p>
+              </div>
+
+              <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:12px;">
+                <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditPresidentModal('${p.id}')">📷 Edit Data / Foto</button>
+                <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deletePresident('${p.id}')">🗑️ Hapus</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  },
+
+  openAddPresidentModal() {
+    document.getElementById('edit-pres-id').value = '';
+    document.getElementById('modal-president-title').innerText = '👤 Tambah Presiden MB INA Baru';
+    document.getElementById('edit-pres-name').value = '';
+    document.getElementById('edit-pres-start').value = 2027;
+    document.getElementById('edit-pres-end').value = 2029;
+    document.getElementById('edit-pres-photo').value = '';
+    document.getElementById('edit-pres-bio').value = '';
+    document.getElementById('edit-pres-sort').value = this.m2Data.presidents.length + 1;
+    document.getElementById('edit-pres-current').checked = false;
+
+    AuthEngine.openModal('modal-edit-president');
+  },
+
+  openEditPresidentModal(id) {
+    const p = this.m2Data.presidents.find(x => x.id === id);
+    if (!p) return;
+
+    document.getElementById('edit-pres-id').value = p.id;
+    document.getElementById('modal-president-title').innerText = `📷 Edit Data / Foto: ${p.name}`;
+    document.getElementById('edit-pres-name').value = p.name;
+    document.getElementById('edit-pres-start').value = p.period_start;
+    document.getElementById('edit-pres-end').value = p.period_end;
+    document.getElementById('edit-pres-photo').value = p.photo_url || '';
+    document.getElementById('edit-pres-bio').value = p.bio || '';
+    document.getElementById('edit-pres-sort').value = p.sort_order || 1;
+    document.getElementById('edit-pres-current').checked = p.is_current || false;
+
+    AuthEngine.openModal('modal-edit-president');
+  },
+
+  async savePresidentFromModal(event) {
+    event.preventDefault();
+    const id = document.getElementById('edit-pres-id').value;
+    const name = document.getElementById('edit-pres-name').value.trim();
+    const period_start = parseInt(document.getElementById('edit-pres-start').value || 2025);
+    const period_end = parseInt(document.getElementById('edit-pres-end').value || 2027);
+    const photo_url = document.getElementById('edit-pres-photo').value.trim();
+    const bio = document.getElementById('edit-pres-bio').value.trim();
+    const sort_order = parseInt(document.getElementById('edit-pres-sort').value || 1);
+    const is_current = document.getElementById('edit-pres-current').checked;
+
+    const action = id ? 'update_m2_president' : 'create_m2_president';
+
+    try {
+      const res = await fetch(`api.php?action=${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, period_start, period_end, photo_url, bio, sort_order, is_current })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchM2Data();
+      this.renderM2Presidents();
+    } catch (e) {
+      alert('Gagal menyimpan data Presiden!');
+    }
+  },
+
+  async deletePresident(id) {
+    if (!confirm('Hapus data Presiden ini dari Supabase Cloud Database?')) return;
+    try {
+      const res = await fetch('api.php?action=delete_m2_president', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchM2Data();
+      this.renderM2Presidents();
+    } catch (e) {
+      alert('Gagal menghapus Presiden!');
+    }
+  },
+
+  // 2.1.5 & 2.4 PENGURUS PUSAT (TREE VIEW & FULL INTERACTIVE CRUD)
+  renderM2Structure() {
+    const container = document.getElementById('m2-structure-container');
+    if (!container) return;
+
+    const advisory = this.m2Data.advisoryBoard;
+    const honor = this.m2Data.honorCouncil;
+    const structure = this.m2Data.structure;
+
+    container.innerHTML = `
+      <div>
+        <div style="background:linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(16,185,129,0.15) 100%); border:2px solid var(--accent-gold); border-radius:16px; padding:20px; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <span style="font-size:0.75rem; letter-spacing:2px; color:var(--accent-gold); font-weight:800;">PERIODISASI KEPENGURUSAN PUSAT</span>
+              <h3 style="font-size:1.4rem;" class="text-gradient">Kabinet MB INA Periode 2023 - 2025 / 2027</h3>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); padding:6px 14px;">PERIODE AKTIF</span>
+              <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.openAddStructureModal()">+ Tambah Jabatan Baru</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEWAN PEMBINA & DEWAN KEHORMATAN -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px;">
+          <div class="glass-panel" style="padding:20px;">
+            <h4 style="font-size:1.05rem; margin-bottom:12px; color:var(--accent-gold);">🏛️ Dewan Pembina</h4>
+            <ul style="font-size:0.85rem; color:var(--text-main); list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
+              ${advisory.map(a => `
+                <li style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; display:flex; justify-content:space-between;">
+                  <strong>${a.name}</strong>
+                  <span style="color:var(--text-muted); font-size:0.78rem;">${a.position} ${a.club_origin ? '(' + a.club_origin + ')' : ''}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+
+          <div class="glass-panel" style="padding:20px;">
+            <h4 style="font-size:1.05rem; margin-bottom:12px; color:var(--accent-gold);">🎖️ Dewan Kehormatan</h4>
+            <ul style="font-size:0.85rem; color:var(--text-main); list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
+              ${honor.map(h => `
+                <li style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; display:flex; justify-content:space-between;">
+                  <strong>${h.name}</strong>
+                  <span style="color:var(--text-muted); font-size:0.78rem;">${h.position}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <!-- STRUKTUR EKSEKUTIF TREE TABLE WITH CRUD -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h4 style="font-size:1.1rem; color:var(--accent-gold);">🌳 Tree View Struktur Kabinet Pengurus Pusat (${structure.length} Jabatan):</h4>
+          <button class="btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="AppEngine.openAddStructureModal()">+ Tambah Jabatan</button>
+        </div>
+
+        <div class="glass-panel" style="padding:24px; overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+                <th style="padding:12px;">Level</th>
+                <th style="padding:12px;">Nama Jabatan / Divisi</th>
+                <th style="padding:12px;">Pejabat & Asal Club</th>
+                <th style="padding:12px;">Periode</th>
+                <th style="padding:12px; text-align:right;">Aksi Management</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${structure.map(s => {
+                const isEVP = s.position_name.startsWith('EVP');
+                const isPres = s.position_level === 'PRESIDEN';
+                return `
+                  <tr style="border-bottom:1px solid var(--chrome-border); background:${isPres ? 'rgba(16,185,129,0.06)' : isEVP ? 'rgba(245,158,11,0.06)' : 'transparent'};">
+                    <td style="padding:12px;">
+                      <span class="tier-badge" style="background:${isPres ? 'rgba(16,185,129,0.2)' : isEVP ? 'rgba(245,158,11,0.2)' : 'rgba(59,130,246,0.15)'}; color:${isPres ? 'var(--primary-emerald)' : isEVP ? 'var(--accent-gold)' : 'var(--accent-blue)'}; border:1px solid ${isPres ? 'var(--primary-emerald)' : isEVP ? 'var(--accent-gold)' : 'var(--accent-blue)'};">
+                        ${s.position_level}
+                      </span>
+                    </td>
+                    <td style="padding:12px; font-weight:${isPres || isEVP ? '900' : '700'}; color:${isEVP ? 'var(--accent-gold)' : 'var(--text-main)'};">
+                      ${isEVP ? '👑 ' : isPres ? '🎖️ ' : '🔹 '} ${s.position_name}
+                    </td>
+                    <td style="padding:12px; font-weight:700; color:var(--text-main);">
+                      ${s.club_origin || s.user_name || 'Belum Ditunjuk'}
+                    </td>
+                    <td style="padding:12px; font-size:0.8rem; color:var(--text-muted);">${s.period_start} - ${s.period_end}</td>
+                    <td style="padding:12px; text-align:right;">
+                      <div style="display:inline-flex; gap:6px;">
+                        <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditStructureModal('${s.id}')">✏️ Edit</button>
+                        <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteStructure('${s.id}')">🗑️ Hapus</button>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  },
+
+  openAddStructureModal() {
+    document.getElementById('edit-struct-id').value = '';
+    document.getElementById('modal-struct-title').innerText = '🌳 Tambah Jabatan Pengurus Pusat Baru';
+    document.getElementById('edit-struct-name').value = '';
+    document.getElementById('edit-struct-level').value = 'PENGURUS_PUSAT';
+    document.getElementById('edit-struct-club').value = '';
+    document.getElementById('edit-struct-start').value = 2023;
+    document.getElementById('edit-struct-end').value = 2025;
+    document.getElementById('edit-struct-sort').value = this.m2Data.structure.length + 1;
+
+    AuthEngine.openModal('modal-edit-structure');
+  },
+
+  openEditStructureModal(id) {
+    const s = this.m2Data.structure.find(x => x.id === id);
+    if (!s) return;
+
+    document.getElementById('edit-struct-id').value = s.id;
+    document.getElementById('modal-struct-title').innerText = `✏️ Edit Jabatan: ${s.position_name}`;
+    document.getElementById('edit-struct-name').value = s.position_name;
+    document.getElementById('edit-struct-level').value = s.position_level || 'PENGURUS_PUSAT';
+    document.getElementById('edit-struct-club').value = s.club_origin || '';
+    document.getElementById('edit-struct-start').value = s.period_start || 2023;
+    document.getElementById('edit-struct-end').value = s.period_end || 2025;
+    document.getElementById('edit-struct-sort').value = s.sort_order || 1;
+
+    AuthEngine.openModal('modal-edit-structure');
+  },
+
+  async saveStructureFromModal(event) {
+    event.preventDefault();
+    const id = document.getElementById('edit-struct-id').value;
+    const position_name = document.getElementById('edit-struct-name').value.trim();
+    const position_level = document.getElementById('edit-struct-level').value;
+    const club_origin = document.getElementById('edit-struct-club').value.trim();
+    const period_start = parseInt(document.getElementById('edit-struct-start').value || 2023);
+    const period_end = parseInt(document.getElementById('edit-struct-end').value || 2025);
+    const sort_order = parseInt(document.getElementById('edit-struct-sort').value || 1);
+
+    const action = id ? 'update_m2_structure' : 'create_m2_structure';
+
+    try {
+      const res = await fetch(`api.php?action=${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, position_name, position_level, club_origin, period_start, period_end, sort_order })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchM2Data();
+      this.renderM2Structure();
+    } catch (e) {
+      alert('Gagal menyimpan Jabatan!');
+    }
+  },
+
+  async deleteStructure(id) {
+    if (!confirm('Hapus Jabatan ini dari Supabase Cloud Database?')) return;
+    try {
+      const res = await fetch('api.php?action=delete_m2_structure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchM2Data();
+      this.renderM2Structure();
+    } catch (e) {
+      alert('Gagal menghapus Jabatan!');
+    }
+  },
+
+  // 2.2 & 2.3 DAFTAR & DETAIL KLUB (113+ KLUB)
+  renderM2Clubs() {
+    const container = document.getElementById('m2-clubs-container');
+    if (!container) return;
+
+    const clubs = this.m2Data.clubs;
+
+    container.innerHTML = `
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h4 style="font-size:1.1rem; color:var(--accent-gold);">🚗 2.2 & 2.3 Daftar Klub Terdaftar MB INA (113+ Klub - 8 Region)</h4>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Federasi klub otomotif Mercedes-Benz seluruh Indonesia</p>
+          </div>
+          <input type="text" id="m2-club-search" class="form-input" placeholder="🔍 Cari Kode atau Nama Klub..." style="max-width:260px;" onkeyup="AppEngine.filterM2Clubs()">
+        </div>
+
+        <!-- 2.2.3 STATISTIK KLUB SUMMARY BAR -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon">🚗</div>
+            <div>
+              <div class="stat-value">113+</div>
+              <div class="stat-label">Total Klub Terdaftar</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(59,130,246,0.15); color:var(--accent-blue);">🗺️</div>
+            <div>
+              <div class="stat-value">8 Region</div>
+              <div class="stat-label">Cakupan Nusantara</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald);">📍</div>
+            <div>
+              <div class="stat-value">100+</div>
+              <div class="stat-label">Chapter Resmi</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:rgba(245,158,11,0.15); color:var(--accent-gold);">👥</div>
+            <div>
+              <div class="stat-value">15.000+</div>
+              <div class="stat-label">Member Terdaftar</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="m2-clubs-table-wrapper" style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+                <th style="padding:12px;">Kode</th>
+                <th style="padding:12px;">Nama Klub</th>
+                <th style="padding:12px;">Region Wilayah</th>
+                <th style="padding:12px;">Kota / Domisili</th>
+                <th style="padding:12px;">Tipe Klub</th>
+                <th style="padding:12px;">Jumlah Member</th>
+                <th style="padding:12px;">Status</th>
+                <th style="padding:12px; text-align:right;">Aksi Detail</th>
+              </tr>
+            </thead>
+            <tbody id="m2-clubs-table-body">
+              ${clubs.map(c => `
+                <tr style="border-bottom:1px solid var(--chrome-border);">
+                  <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${c.code}</td>
+                  <td style="padding:12px; font-weight:700;">${c.name}</td>
+                  <td style="padding:12px; color:var(--text-muted);">${c.region}</td>
+                  <td style="padding:12px;">${c.city}</td>
+                  <td style="padding:12px;">
+                    <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); border:1px solid var(--accent-blue);">
+                      ${c.type}
+                    </span>
+                  </td>
+                  <td style="padding:12px; font-weight:700;">👥 ${c.member_count}</td>
+                  <td style="padding:12px;">
+                    <span class="tier-badge" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">AKTIF</span>
+                  </td>
+                  <td style="padding:12px; text-align:right;">
+                    <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.showClubDetail('${c.id}')">🔍 Detail Klub</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  },
+
+  filterM2Clubs() {
+    const q = (document.getElementById('m2-club-search') ? document.getElementById('m2-club-search').value : '').toLowerCase();
+    const tbody = document.getElementById('m2-clubs-table-body');
+    if (!tbody) return;
+
+    const filtered = this.m2Data.clubs.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || c.region.toLowerCase().includes(q));
+
+    tbody.innerHTML = filtered.map(c => `
+      <tr style="border-bottom:1px solid var(--chrome-border);">
+        <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${c.code}</td>
+        <td style="padding:12px; font-weight:700;">${c.name}</td>
+        <td style="padding:12px; color:var(--text-muted);">${c.region}</td>
+        <td style="padding:12px;">${c.city}</td>
+        <td style="padding:12px;">
+          <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); border:1px solid var(--accent-blue);">
+            ${c.type}
+          </span>
+        </td>
+        <td style="padding:12px; font-weight:700;">👥 ${c.member_count}</td>
+        <td style="padding:12px;">
+          <span class="tier-badge" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">AKTIF</span>
+        </td>
+        <td style="padding:12px; text-align:right;">
+          <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.showClubDetail('${c.id}')">🔍 Detail Klub</button>
+        </td>
+      </tr>
+    `).join('');
+  },
+
+  async showClubDetail(clubId) {
+    try {
+      const res = await fetch(`api.php?action=get_m2_club_detail&club_id=${clubId}`).then(r => r.json());
+      if (res.success && res.club) {
+        const c = res.club;
+        const m = res.members || [];
+        alert(`ℹ️ DETAIL KLUB MB INA:\n\nNama Klub: ${c.name} (${c.code})\nRegion: ${c.region}\nDomisili: ${c.city}\nTipe: ${c.type}\nTotal Member: ${c.member_count} Anggota\nStatus: AKTIF / VERIFIED`);
+      }
+    } catch (e) {
+      alert('Gagal memuat detail klub!');
+    }
+  },
+
+  renderUserManagement() {
+    const tableContainer = document.getElementById('user-mgmt-table');
+    if (!tableContainer) return;
+
+    const searchTerm = (document.getElementById('user-mgmt-search') ? document.getElementById('user-mgmt-search').value : '').toLowerCase();
+    const roleFilter = document.getElementById('user-mgmt-role-filter') ? document.getElementById('user-mgmt-role-filter').value : '';
+    const statusFilter = document.getElementById('user-mgmt-status-filter') ? document.getElementById('user-mgmt-status-filter').value : '';
+
+    let filtered = this.users;
+
+    if (searchTerm) {
+      filtered = filtered.filter(u => u.name.toLowerCase().includes(searchTerm) || u.email.toLowerCase().includes(searchTerm) || (u.username && u.username.toLowerCase().includes(searchTerm)));
+    }
+    if (roleFilter) {
+      filtered = filtered.filter(u => u.role === roleFilter);
+    }
+    if (statusFilter) {
+      filtered = filtered.filter(u => u.status === statusFilter);
+    }
+
+    tableContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">ID & Username</th>
+            <th style="padding:12px;">Nama Lengkap</th>
+            <th style="padding:12px;">Email & WhatsApp</th>
+            <th style="padding:12px; white-space:nowrap;">Role</th>
+            <th style="padding:12px; white-space:nowrap;">Status</th>
+            <th style="padding:12px; text-align:right; white-space:nowrap; min-width:320px;">Aksi Manajemen</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(u => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:14px 12px; font-family:monospace; font-size:0.8rem;">
+                ${u.id}<br>
+                <span style="color:var(--accent-gold); font-weight:700;">@${u.username || 'user'}</span>
+                ${u.isSystemArchitect ? '<br><span style="color:var(--primary-emerald); font-size:0.7rem;">🔒 System Architect</span>' : ''}
+              </td>
+              <td style="padding:14px 12px; font-weight:600;">
+                ${u.name}
+                <div style="font-size:0.75rem; color:var(--text-muted);">${u.city || 'Indonesia'}</div>
+              </td>
+              <td style="padding:14px 12px; color:var(--text-muted);">
+                ${u.email}<br>${u.phone}
+              </td>
+              <td style="padding:14px 12px; white-space:nowrap;">
+                <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+                  ${this.formatRoleName(u.role)}
+                </span>
+              </td>
+              <td style="padding:14px 12px; white-space:nowrap;">
+                <span class="tier-badge" style="background:${u.status === 'ACTIVE' ? 'rgba(16,185,129,0.2)' : u.status === 'SUSPENDED' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)'}; color:${u.status === 'ACTIVE' ? 'var(--primary-emerald)' : u.status === 'SUSPENDED' ? 'var(--accent-red)' : 'var(--accent-gold)'};">
+                  ${u.status}
+                </span>
+              </td>
+              <td style="padding:14px 12px; text-align:right; white-space:nowrap;">
+                <div style="display:inline-flex; justify-content:flex-end; gap:6px; align-items:center; flex-wrap:nowrap;">
+                  <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold); white-space:nowrap;" onclick="AppEngine.openEditUserModal('${u.id}')" title="Edit Data User">
+                    ✏️ Edit
+                  </button>
+                  <button class="role-pill-btn" style="white-space:nowrap;" onclick="AppEngine.suspendUser('${u.id}')" title="Suspend/Activate User">
+                    ${u.status === 'SUSPENDED' ? '✅ Activate' : '⛔ Suspend'}
+                  </button>
+                  <button class="role-pill-btn" style="white-space:nowrap;" onclick="AppEngine.resetPassword('${u.id}')" title="Reset Password">
+                    🔑 Reset
+                  </button>
+                  ${u.isProtected ? '' : `
+                  <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red); white-space:nowrap;" onclick="AppEngine.deleteUser('${u.id}')" title="Hapus User">
+                    🗑️ Hapus
+                  </button>`}
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  openEditUserModal(userId) {
+    const u = this.users.find(x => x.id === userId);
+    if (!u) {
+      alert('Data user tidak ditemukan!');
+      return;
+    }
+
+    document.getElementById('edit-user-id').value = u.id;
+    document.getElementById('edit-user-name').value = u.name;
+    document.getElementById('edit-user-email').value = u.email;
+    document.getElementById('edit-user-phone').value = u.phone;
+    document.getElementById('edit-user-username').value = u.username || '';
+    document.getElementById('edit-user-role').value = u.role;
+    document.getElementById('edit-user-status').value = u.status;
+    document.getElementById('edit-user-city').value = u.city || '';
+    if (u.provinceId) {
+      document.getElementById('edit-user-province').value = u.provinceId;
+    }
+
+    AuthEngine.openModal('modal-edit-user');
+  },
+
+  async updateUserFromAdmin(event) {
+    event.preventDefault();
+    const userId = document.getElementById('edit-user-id').value;
+    const name = document.getElementById('edit-user-name').value.trim();
+    const email = document.getElementById('edit-user-email').value.trim();
+    const phone = document.getElementById('edit-user-phone').value.trim();
+    const username = document.getElementById('edit-user-username').value.trim();
+    const role = document.getElementById('edit-user-role').value;
+    const status = document.getElementById('edit-user-status').value;
+    const city = document.getElementById('edit-user-city').value.trim();
+    const provinceId = document.getElementById('edit-user-province').value;
+
+    if (!userId || !name || !email || !phone || !username) {
+      alert('Lengkapi seluruh bidang wajib pengeditan (*)!');
+      return;
+    }
+
+    try {
+      const res = await fetch('api.php?action=update_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, name, email, phone, username, role, status, city, provinceId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        AuthEngine.closeAllModals();
+        await this.fetchData();
+        this.renderUserManagement();
+      } else {
+        alert('Gagal mengedit user: ' + data.message);
+      }
+    } catch (e) {
+      alert('Terjadi kesalahan jaringan saat mengedit user!');
+    }
+  },
+
+  async createUserFromAdmin(event) {
+    event.preventDefault();
+    const name = document.getElementById('add-user-name').value.trim();
+    const email = document.getElementById('add-user-email').value.trim();
+    const phone = document.getElementById('add-user-phone').value.trim();
+    const username = document.getElementById('add-user-username').value.trim();
+    const password = document.getElementById('add-user-password').value || 'Pass123!';
+    const role = document.getElementById('add-user-role').value;
+    const status = document.getElementById('add-user-status').value;
+    const city = document.getElementById('add-user-city').value.trim() || 'Jakarta';
+    const provinceId = document.getElementById('add-user-province').value || 'prov_jkt';
+
+    if (!name || !email || !phone || !username) {
+      alert('Lengkapi seluruh bidang wajib (*)!');
+      return;
+    }
+
+    try {
+      const res = await fetch('api.php?action=create_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, username, password, role, status, city, provinceId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 User baru berhasil ditambahkan langsung ke Supabase Cloud Database!');
+        AuthEngine.closeAllModals();
+        document.getElementById('add-user-form').reset();
+        await this.fetchData();
+        this.renderUserManagement();
+      } else {
+        alert('Gagal menambah user: ' + data.message);
+      }
+    } catch (e) {
+      alert('Terjadi kesalahan jaringan saat menambah user!');
+    }
+  },
+
+  async suspendUser(userId) {
+    try {
+      const res = await fetch('api.php?action=suspend_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      this.renderUserManagement();
+    } catch (e) {
+      alert('Gagal mengaktifkan/mensuspend akun!');
+    }
+  },
+
+  async resetPassword(userId) {
+    if (!confirm(`Reset password untuk user ID ${userId}?`)) return;
+    try {
+      const res = await fetch('api.php?action=reset_password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      alert(data.message);
+    } catch (e) {
+      alert('Gagal me-reset password!');
+    }
+  },
+
+  async deleteUser(userId) {
+    if (!confirm(`Hapus permanen user ID ${userId} dari Supabase Cloud Database?`)) return;
+    try {
+      const res = await fetch('api.php?action=delete_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      this.renderUserManagement();
+    } catch (e) {
+      alert('Gagal menghapus user!');
+    }
+  },
+
+  simulateBulkImport() {
+    const fileInput = document.getElementById('csv-import-file');
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      alert('Pilih berkas CSV/Excel data member terlebih dahulu!');
+      return;
+    }
+    alert(`Bulk Import Berhasil! Data member baru telah di-import ke Supabase Cloud Database.`);
+    AuthEngine.closeAllModals();
+  },
+
+  simulateExport(format) {
+    alert(`Export data member dalam format ${format.toUpperCase()} telah diunduh: MB_INA_Members_2026.${format}`);
+  },
+
+  renderAuditLogs() {
+    const logContainer = document.getElementById('audit-logs-table');
+    if (!logContainer) return;
+
+    logContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">Log ID</th>
+            <th style="padding:12px;">User ID</th>
+            <th style="padding:12px;">Action</th>
+            <th style="padding:12px;">Module</th>
+            <th style="padding:12px;">Details JSON</th>
+            <th style="padding:12px;">IP Address</th>
+            <th style="padding:12px;">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.auditLogs.map(l => {
+            let detailStr = '';
+            try {
+              let parsed = (typeof l.details === 'string') ? JSON.parse(l.details) : l.details;
+              if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+              detailStr = JSON.stringify(parsed);
+            } catch (e) {
+              detailStr = String(l.details || '');
+            }
+            return `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:12px; font-family:monospace; color:var(--text-muted);">${l.id}</td>
+              <td style="padding:12px; font-weight:600;">${l.userId}</td>
+              <td style="padding:12px;">
+                <span class="tier-badge" style="background:${l.action === 'DELETE' || l.action === 'SUSPEND' ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}; color:${l.action === 'DELETE' || l.action === 'SUSPEND' ? 'var(--accent-red)' : 'var(--accent-blue)'}; font-size:0.7rem;">
+                  ${l.action}
+                </span>
+              </td>
+              <td style="padding:12px; font-weight:600; color:var(--accent-gold);">${l.module}</td>
+              <td style="padding:12px; font-family:monospace; font-size:0.78rem; color:var(--text-main);">${detailStr}</td>
+              <td style="padding:12px; font-size:0.8rem;">${l.ipAddress}</td>
+              <td style="padding:12px; font-size:0.8rem; color:var(--text-muted);">${l.timestamp}</td>
+            </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  // ============================================
+  // 3.1.4 PENGATURAN SISTEM ENGINE & SUB-MODULES
+  // ============================================
+  switchSettingsSubtab(subtab) {
+    this.activeSettingsSubtab = subtab;
+    document.querySelectorAll('[data-subtab]').forEach(btn => {
+      if (btn.getAttribute('data-subtab') === subtab) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.settings-subtab-content').forEach(el => el.style.display = 'none');
+    const targetContent = document.getElementById(`subtab-${subtab}`);
+    if (targetContent) targetContent.style.display = 'block';
+
+    if (subtab === 'tier') this.renderTierManagement();
+    else if (subtab === 'province') this.renderProvincesAdmin();
+    else if (subtab === 'payment') this.renderPaymentGateway();
+    else if (subtab === 'email') this.renderEmailTemplates();
+    else if (subtab === 'backup') this.renderBackupsAdmin();
+  },
+
+  renderSystemSettings() {
+    const s = this.systemSettings || {};
+    const themeSelect = document.getElementById('setting-theme-select');
+    const langSelect = document.getElementById('setting-language-select');
+    const tzSelect = document.getElementById('setting-timezone-select');
+    const maintSwitch = document.getElementById('setting-maint-switch');
+
+    if (themeSelect) themeSelect.value = s.defaultTheme || 'LIGHT';
+    if (langSelect) langSelect.value = s.language || 'ID';
+    if (tzSelect) tzSelect.value = s.timezone || 'Asia/Jakarta (WIB)';
+    if (maintSwitch) maintSwitch.checked = s.maintenanceMode || false;
+
+    this.switchSettingsSubtab(this.activeSettingsSubtab);
+  },
+
+  async saveSystemSettings() {
+    const defaultTheme = document.getElementById('setting-theme-select').value;
+    const language = document.getElementById('setting-language-select').value;
+    const timezone = document.getElementById('setting-timezone-select').value;
+    const maintenanceMode = document.getElementById('setting-maint-switch') ? document.getElementById('setting-maint-switch').checked : false;
+
+    try {
+      const res = await fetch('api.php?action=update_system_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ defaultTheme, language, timezone, maintenanceMode })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      await this.fetchData();
+    } catch (e) {
+      alert('Gagal menyimpan pengaturan sistem!');
+    }
+  },
+
+  // 3.1.4.2 MANAJEMEN TIER ⭐
+  renderTierManagement() {
+    const container = document.getElementById('tiers-grid-container');
+    if (!container) return;
+
+    const donationRanges = {
+      'BRONZE': 'Rp 0 - Rp 1.499.999',
+      'SILVER': 'Rp 1.500.000 - Rp 4.499.999',
+      'GOLD': 'Rp 4.500.000 - Rp 8.999.999',
+      'PLATINUM': '≥ Rp 9.000.000'
+    };
+
+    container.innerHTML = this.tiers.map(t => {
+      const bList = Array.isArray(t.benefits) ? t.benefits : [];
+      return `
+        <div class="glass-card" style="padding:22px; border-top:4px solid ${t.color || 'var(--accent-gold)'};">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:2rem;">${t.icon || '⭐'}</span>
+              <div>
+                <h4 style="font-size:1.2rem; color:var(--text-main);">${t.name}</h4>
+                <span style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">Level ${t.level}</span>
+              </div>
+            </div>
+            <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+              👥 ${t.member_count || 0} Member
+            </span>
+          </div>
+
+          <div style="background:rgba(0,0,0,0.03); border:1px solid var(--chrome-border); border-radius:10px; padding:12px; margin-bottom:14px;">
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Akumulasi Donasi / Tahun:</div>
+            <div style="font-size:0.95rem; font-weight:800; color:var(--accent-gold); margin-top:2px;">
+              ${donationRanges[t.code] || ('Rp ' + Number(t.fee).toLocaleString())}
+            </div>
+          </div>
+
+          <div style="margin-bottom:18px;">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--text-main); margin-bottom:6px;">Benefit Keanggotaan:</div>
+            <ul style="font-size:0.8rem; color:var(--text-muted); padding-left:16px; display:flex; flex-direction:column; gap:4px;">
+              ${bList.map(b => `<li>✅ ${b}</li>`).join('')}
+            </ul>
+          </div>
+
+          <button class="btn-outline" style="width:100%; padding:8px; font-size:0.85rem;" onclick="AppEngine.openEditTierModal('${t.id}')">
+            ✏️ Edit Tier ${t.name}
+          </button>
+        </div>
+      `;
+    }).join('');
+  },
+
+  openEditTierModal(tierId) {
+    const t = this.tiers.find(x => x.id === tierId);
+    if (!t) return;
+
+    document.getElementById('edit-tier-id').value = t.id;
+    document.getElementById('edit-tier-code').value = t.code;
+    document.getElementById('edit-tier-level').value = t.level;
+    document.getElementById('edit-tier-name').value = t.name;
+    document.getElementById('edit-tier-icon').value = t.icon || '⭐';
+    document.getElementById('edit-tier-color').value = t.color || '#D4AF37';
+    document.getElementById('edit-tier-fee').value = t.fee || 0;
+    
+    const bList = Array.isArray(t.benefits) ? t.benefits.join(', ') : '';
+    document.getElementById('edit-tier-benefits').value = bList;
+
+    AuthEngine.openModal('modal-edit-tier');
+  },
+
+  async saveTierFromModal(event) {
+    event.preventDefault();
+    const id = document.getElementById('edit-tier-id').value;
+    const name = document.getElementById('edit-tier-name').value.trim();
+    const icon = document.getElementById('edit-tier-icon').value.trim();
+    const color = document.getElementById('edit-tier-color').value;
+    const fee = parseFloat(document.getElementById('edit-tier-fee').value || 0);
+    const bRaw = document.getElementById('edit-tier-benefits').value;
+    const benefits = bRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+    try {
+      const res = await fetch('api.php?action=update_tier', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, icon, color, fee, benefits })
+      });
+      const data = await res.json();
+      alert(data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchData();
+      this.renderTierManagement();
+    } catch (e) {
+      alert('Gagal menyimpan Tier!');
+    }
+  },
+
+  // 3.1.4.3 MANAJEMEN PROVINSI (38 PROVINSI)
+  renderProvincesAdmin() {
+    const container = document.getElementById('provinces-admin-table');
+    if (!container) return;
+
+    container.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">Kode</th>
+            <th style="padding:12px;">Nama Provinsi</th>
+            <th style="padding:12px;">Region Wilayah</th>
+            <th style="padding:12px;">Klub Terdaftar</th>
+            <th style="padding:12px;">Status</th>
+            <th style="padding:12px; text-align:right;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.provinces.map(p => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${p.code}</td>
+              <td style="padding:12px; font-weight:700;">${p.name}</td>
+              <td style="padding:12px; color:var(--text-muted);">${p.region}</td>
+              <td style="padding:12px;">
+                <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); border:1px solid var(--accent-blue);">
+                  🚗 ${p.club_count || 0} Klub
+                </span>
+              </td>
+              <td style="padding:12px;">
+                <span class="tier-badge" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">AKTIF</span>
+              </td>
+              <td style="padding:12px; text-align:right;">
+                <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteProvince('${p.id}')">🗑️ Hapus</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  async createProvinceFromModal(event) {
+    event.preventDefault();
+    const code = document.getElementById('add-prov-code').value.trim();
+    const name = document.getElementById('add-prov-name').value.trim();
+    const region = document.getElementById('add-prov-region').value;
+
+    try {
+      const res = await fetch('api.php?action=create_province', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, name, region })
+      });
+      const data = await res.json();
+      alert(data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchData();
+      this.renderProvincesAdmin();
+    } catch (e) {
+      alert('Gagal menambah provinsi!');
+    }
+  },
+
+  async deleteProvince(id) {
+    if (!confirm('Hapus provinsi ini dari Supabase?')) return;
+    try {
+      const res = await fetch('api.php?action=delete_province', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      this.renderProvincesAdmin();
+    } catch (e) {
+      alert('Gagal menghapus provinsi!');
+    }
+  },
+
+  // 3.1.4.4 PAYMENT GATEWAY (BANK MANDIRI SPONSOR RESMI)
+  renderPaymentGateway() {
+    fetch('api.php?action=get_payment_settings')
+      .then(r => r.json())
+      .then(res => {
+        if (res.success && res.paymentGateway) {
+          const gw = res.paymentGateway;
+          const modeSelect = document.getElementById('mandiri-mode-select');
+          const accNum = document.getElementById('mandiri-account-number');
+          const accName = document.getElementById('mandiri-account-name');
+          const branch = document.getElementById('mandiri-branch');
+          const webhook = document.getElementById('mandiri-webhook-url');
+
+          if (modeSelect) modeSelect.value = gw.mode || 'production';
+          if (accNum) accNum.value = gw.accountNumber || '123-00-1234567-8';
+          if (accName) accName.value = gw.accountName || 'MB Club Indonesia';
+          if (branch) branch.value = gw.branch || 'KCU Jakarta Pusat';
+          if (webhook) webhook.value = gw.webhookUrl || 'https://mbina.or.id/api/webhook/payment-mandiri';
+
+          const methods = Array.isArray(gw.methods) ? gw.methods : ['transfer', 'va', 'qris'];
+          if (document.getElementById('mandiri-method-transfer')) document.getElementById('mandiri-method-transfer').checked = methods.includes('transfer');
+          if (document.getElementById('mandiri-method-va')) document.getElementById('mandiri-method-va').checked = methods.includes('va');
+          if (document.getElementById('mandiri-method-qris')) document.getElementById('mandiri-method-qris').checked = methods.includes('qris');
+        }
+      });
+  },
+
+  async savePaymentGateway() {
+    const mode = document.getElementById('mandiri-mode-select').value;
+    const accountNumber = document.getElementById('mandiri-account-number').value.trim();
+    const accountName = document.getElementById('mandiri-account-name').value.trim();
+    const branch = document.getElementById('mandiri-branch').value.trim();
+    const webhookUrl = document.getElementById('mandiri-webhook-url').value.trim();
+
+    if (!accountNumber || !accountName || !branch || !webhookUrl) {
+      alert('Lengkapi seluruh bidang wajib Bank Mandiri (*)!');
+      return;
+    }
+
+    const methods = [];
+    if (document.getElementById('mandiri-method-transfer').checked) methods.push('transfer');
+    if (document.getElementById('mandiri-method-va').checked) methods.push('va');
+    if (document.getElementById('mandiri-method-qris').checked) methods.push('qris');
+
+    try {
+      const res = await fetch('api.php?action=update_payment_settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentGateway: {
+            provider: 'MANDIRI',
+            mode,
+            bankName: 'Bank Mandiri',
+            accountNumber,
+            accountName,
+            branch,
+            methods,
+            webhookUrl,
+            isActive: true
+          }
+        })
+      });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+    } catch (e) {
+      alert('Gagal menyimpan Payment Gateway Mandiri!');
+    }
+  },
+
+  async testPaymentConnection() {
+    try {
+      const res = await fetch('api.php?action=test_payment_connection', { method: 'POST' });
+      const data = await res.json();
+      alert(data.message);
+    } catch (e) {
+      alert('Gagal menguji koneksi Bank Mandiri API!');
+    }
+  },
+
+  // 3.1.4.5 EMAIL TEMPLATES
+  renderEmailTemplates() {
+    const container = document.getElementById('email-templates-table');
+    if (!container) return;
+
+    const tmplEntries = Object.entries(this.emailTemplates);
+
+    container.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">Kode Template</th>
+            <th style="padding:12px;">Nama / Kegunaan</th>
+            <th style="padding:12px;">Subject Line Email</th>
+            <th style="padding:12px; text-align:right;">Aksi Edit & Test</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tmplEntries.map(([code, t]) => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${code}</td>
+              <td style="padding:12px; font-weight:700;">${t.name || code}</td>
+              <td style="padding:12px; color:var(--text-main);">${t.subject || ''}</td>
+              <td style="padding:12px; text-align:right;">
+                <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditTemplateModal('${code}')">✏️ Edit Template</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  openEditTemplateModal(code) {
+    const t = this.emailTemplates[code] || {};
+    document.getElementById('edit-tmpl-code').value = code;
+    document.getElementById('modal-edit-tmpl-title').innerText = `✏️ Edit Template: ${t.name || code}`;
+    document.getElementById('edit-tmpl-subject').value = t.subject || '';
+    document.getElementById('edit-tmpl-content').value = t.content || '';
+    AuthEngine.openModal('modal-edit-template');
+  },
+
+  async saveEmailTemplateFromModal(event) {
+    event.preventDefault();
+    const code = document.getElementById('edit-tmpl-code').value;
+    const subject = document.getElementById('edit-tmpl-subject').value.trim();
+    const content = document.getElementById('edit-tmpl-content').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=update_email_template', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subject, content })
+      });
+      const data = await res.json();
+      alert(data.message);
+      AuthEngine.closeAllModals();
+      await this.fetchData();
+      this.renderEmailTemplates();
+    } catch (e) {
+      alert('Gagal menyimpan template email!');
+    }
+  },
+
+  async testSendEmailFromModal() {
+    const code = document.getElementById('edit-tmpl-code').value;
+    const email = prompt('Masukkan Email Tujuan untuk Pengiriman Test:', 'dtouriano@gmail.com');
+    if (!email) return;
+
+    try {
+      const res = await fetch('api.php?action=test_send_email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetEmail: email, code })
+      });
+      const data = await res.json();
+      alert(data.message);
+    } catch (e) {
+      alert('Gagal mengirim test email!');
+    }
+  },
+
+  // 3.1.4.6 BACKUP & RESTORE
+  renderBackupsAdmin() {
+    const container = document.getElementById('backups-admin-table');
+    if (!container) return;
+
+    container.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">Backup ID</th>
+            <th style="padding:12px;">Nama Berkas SQL</th>
+            <th style="padding:12px;">Ukuran File</th>
+            <th style="padding:12px;">Tipe Backup</th>
+            <th style="padding:12px;">Waktu Backup</th>
+            <th style="padding:12px; text-align:right;">Aksi Restore</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.backups.map(b => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:12px; font-family:monospace; color:var(--text-muted);">${b.id}</td>
+              <td style="padding:12px; font-weight:700; font-family:monospace; color:var(--accent-gold);">${b.filename}</td>
+              <td style="padding:12px;">${b.size}</td>
+              <td style="padding:12px;">
+                <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); border:1px solid var(--accent-blue);">
+                  ${b.type}
+                </span>
+              </td>
+              <td style="padding:12px; color:var(--text-muted);">${b.timestamp}</td>
+              <td style="padding:12px; text-align:right;">
+                <button class="role-pill-btn" style="border-color:var(--primary-emerald); color:var(--primary-emerald);" onclick="AppEngine.restoreBackup('${b.id}')">🔄 Restore DB</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  async createBackupNow() {
+    try {
+      const res = await fetch('api.php?action=create_backup', { method: 'POST' });
+      const data = await res.json();
+      alert('🎉 ' + data.message);
+      if (data.backup) {
+        this.backups.unshift(data.backup);
+        this.renderBackupsAdmin();
+      }
+    } catch (e) {
+      alert('Gagal membuat backup!');
+    }
+  },
+
+  async restoreBackup(backupId) {
+    if (!confirm(`Apakah Anda yakin ingin memulihkan seluruh database Supabase ke backup ${backupId}?`)) return;
+    try {
+      const res = await fetch('api.php?action=restore_backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ backupId })
+      });
+      const data = await res.json();
+      alert(data.message);
+    } catch (e) {
+      alert('Gagal memulihkan database!');
+    }
+  },
+
+  renderVerificationQueue() {
+    const queueContainer = document.getElementById('admin-verification-table');
+    if (!queueContainer) return;
+
+    const pendingUsers = this.users.filter(u => u.status === 'PENDING' || u.role === 'CALON_MEMBER');
+
+    if (pendingUsers.length === 0) {
+      queueContainer.innerHTML = `<p style="padding:20px; color:var(--text-muted);">Tidak ada permohonan calon member baru saat ini.</p>`;
+      return;
+    }
+
+    queueContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">Nama & Username</th>
+            <th style="padding:12px;">Kontak & Email</th>
+            <th style="padding:12px;">Kota & Usia</th>
+            <th style="padding:12px;">Role Permohonan</th>
+            <th style="padding:12px; text-align:right;">Aksi Verifikasi</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pendingUsers.map(u => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:14px 12px; font-weight:600;">
+                ${u.name}<br>
+                <span style="font-size:0.75rem; color:var(--accent-gold);">@${u.username || 'user'}</span>
+              </td>
+              <td style="padding:14px 12px; color:var(--text-muted);">
+                ${u.email}<br>${u.phone}
+              </td>
+              <td style="padding:14px 12px;">
+                ${u.city || 'Indonesia'}
+              </td>
+              <td style="padding:14px 12px;">
+                <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+                  ${this.formatRoleName(u.role)}
+                </span>
+              </td>
+              <td style="padding:14px 12px; text-align:right;">
+                <button class="btn-primary" style="padding:6px 12px; font-size:0.75rem;" onclick="AppEngine.approveUser('${u.id}')">✓ Approve Member</button>
+                <button class="btn-outline" style="padding:6px 12px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="AppEngine.rejectUser('${u.id}')">✕ Reject</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  async approveUser(userId) {
+    if (!confirm('Apakah Anda yakin ingin menyetujui verifikasi keanggotaan calon member ini?')) return;
+
+    try {
+      const res = await fetch('api.php?action=update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, status: 'ACTIVE', role: 'MEMBER' })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+      else if (this.activeAdminTab === 'users') this.renderUserManagement();
+    } catch (e) {
+      alert('Gagal menyetujui member!');
+    }
+  },
+
+  async rejectUser(userId) {
+    if (!confirm('Tolak permohonan calon member ini?')) return;
+
+    try {
+      const res = await fetch('api.php?action=update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, status: 'REJECTED' })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchData();
+      if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+      else if (this.activeAdminTab === 'users') this.renderUserManagement();
+    } catch (e) {
+      alert('Gagal menolak permohonan!');
+    }
+  },
+
+  handleRSVP(eventId) {
+    alert('Terima kasih! RSVP Anda telah tercatat pada sistem event MB INA.');
+  }
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  AppEngine.init();
+});

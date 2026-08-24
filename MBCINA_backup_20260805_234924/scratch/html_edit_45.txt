@@ -1,0 +1,56 @@
+          <!-- 2.1 PROFIL MB INA -->
+          <div id="m2sub-profile" class="m2-subtab-content">
+            <div id="m2-profile-container">
+              <div style="display:grid; grid-template-columns:1fr 2fr; gap:24px; align-items:start;">
+                <div class="glass-panel" style="padding:24px; text-align:center;">
+                  <img src="assets/mb_badge.jpg" alt="Logo Emblem MB INA" style="width:140px; height:140px; border-radius:50%; border:3px solid var(--accent-gold); box-shadow:0 0 20px var(--accent-gold-glow); margin-bottom:16px;" onerror="this.onerror=null; this.src='images/indonesia_map.png';">
+                  <h3 style="font-size:1.4rem;" class="text-gradient">Mercedes-Benz Club Indonesia</h3>
+                  <div style="margin-top:8px;">
+                    <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+                      MBINA - MB Club INA
+                    </span>
+                  </div>
+                  <p style="font-style:italic; font-weight:700; color:var(--accent-gold); margin-top:14px; font-size:0.95rem;">
+                    "One Club, One Family" / "Bersama Satu Bintang"
+                  </p>
+                  <button class="btn-primary" style="width:100%; margin-top:20px; padding:10px;" onclick="AppEngine.openEditOrgProfileModal()">
+                    ✏️ Edit Profil Federasi
+                  </button>
+                </div>
+
+                <div class="glass-panel" style="padding:24px;">
+                  <h4 style="font-size:1.1rem; margin-bottom:16px;" class="text-gradient">📜 Informasi Umum Federasi</h4>
+                  <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                    <tr style="border-bottom:1px solid var(--chrome-border);">
+                      <td style="padding:12px; color:var(--text-muted); width:180px;">Nama Resmi</td>
+                      <td style="padding:12px; font-weight:700;">Mercedes-Benz Club Indonesia</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--chrome-border);">
+                      <td style="padding:12px; color:var(--text-muted);">Singkatan / Alias</td>
+                      <td style="padding:12px; font-weight:700;">MB Club INA / MBINA</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--chrome-border);">
+                      <td style="padding:12px; color:var(--text-muted);">Tanggal Pendirian</td>
+                      <td style="padding:12px; font-weight:700;">1 Agustus 2004 (Jakarta)</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--chrome-border);">
+                      <td style="padding:12px; color:var(--text-muted);">Website Resmi</td>
+                      <td style="padding:12px; font-weight:700; color:var(--accent-gold);">www.mbclubina.com</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--chrome-border);">
+                      <td style="padding:12px; color:var(--text-muted);">Email Sekretariat</td>
+                      <td style="padding:12px; font-weight:700;">admin@mbina.or.id</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid var(--chrome-border);">
+                      <td style="padding:12px; color:var(--text-muted);">Telepon / WhatsApp</td>
+                      <td style="padding:12px; font-weight:700;">021-7890123 / +62 821-2970-9595</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:12px; color:var(--text-muted);">Total Klub Terdaftar</td>
+                      <td style="padding:12px; font-weight:700; color:var(--primary-emerald);">110+ Klub & Chapter Resmi</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>

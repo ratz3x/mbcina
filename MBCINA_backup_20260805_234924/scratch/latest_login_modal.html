@@ -1,0 +1,223 @@
+  <!-- ============================================ -->
+  <!-- MODAL 1: LOGIN MEMBER & PENGURUS            -->
+  <!-- ============================================ -->
+  <div id="modal-login" class="modal-backdrop">
+    <div class="modal-container" style="max-width:440px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.3rem;" class="text-gradient">🔑 Login Member & Pengurus</h3>
+          <span style="font-size:0.78rem; color:var(--accent-gold);">Platform Resmi MB Club Indonesia (MB INA)</span>
+        </div>
+        <button class="modal-close-btn" onclick="AuthEngine.closeAllModals()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Security Lockout Alert -->
+        <div id="login-security-alert" style="display:none; background:rgba(239,68,68,0.15); border:1px solid var(--accent-red); padding:12px; border-radius:10px; margin-bottom:16px; align-items:center; gap:10px; font-size:0.85rem; color:var(--accent-red);">
+          <span>⚠️</span> <span id="login-security-msg">Brute force detected! Login diblokir sementara.</span>
+        </div>
+
+        <form id="login-form" onsubmit="event.preventDefault(); AuthEngine.handleLogin();">
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-size:0.85rem; font-weight:700;">Email / Username / ID Member *</label>
+            <input type="text" id="login-email" class="form-input" placeholder="contoh: dtouriano@gmail.com atau superadmin" required style="padding:10px 14px;">
+          </div>
+
+          <div class="form-group" style="margin-bottom:20px;">
+            <label class="form-label" style="font-size:0.85rem; font-weight:700;">Password *</label>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required style="padding:10px 14px;">
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%; padding:12px; font-size:0.95rem; font-weight:800;">
+            🚀 Masuk Ke Platform MB INA →
+          </button>
+        </form>
+
+        <div style="margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:16px; text-align:center; font-size:0.82rem; color:var(--text-muted);">
+          Belum punya akun member? 
+          <a href="#" style="color:var(--accent-gold); font-weight:700; text-decoration:none;" onclick="AuthEngine.openModal('modal-register')">Daftar Member Baru</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MODAL 2: PENDAFTARAN MEMBER BARU (WIZARD)   -->
+  <!-- ============================================ -->
+  <div id="modal-register" class="modal-backdrop">
+    <div class="modal-container" style="max-width:680px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.3rem;" class="text-gradient">📋 Form Pendaftaran Member Baru MB INA</h3>
+          <span style="font-size:0.78rem; color:var(--accent-gold);">Proses Pendaftaran & Verifikasi Otomatis</span>
+        </div>
+        <button class="modal-close-btn" onclick="AuthEngine.closeAllModals()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Step Indicators -->
+        <div style="display:flex; justify-content:space-between; margin-bottom:24px; position:relative; border-bottom:1px solid var(--chrome-border); padding-bottom:16px;">
+          <div id="step-ind-1" class="step-indicator active">1</div>
+          <div id="step-ind-2" class="step-indicator">2</div>
+          <div id="step-ind-3" class="step-indicator">3</div>
+          <div id="step-ind-4" class="step-indicator">4</div>
+          <div id="step-ind-5" class="step-indicator">5</div>
+          <div id="step-ind-6" class="step-indicator">6</div>
+          <div id="step-ind-7" class="step-indicator">7</div>
+        </div>
+
+        <form id="register-wizard-form" onsubmit="event.preventDefault(); AuthEngine.submitRegistration();">
+          <!-- STEP 1: INFORMASI AKUN & PERSONAL -->
+          <div id="wizard-step-1" class="wizard-step-content">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">Step 1: Informasi Personal & Akun</h4>
+            
+            <div class="form-group" style="margin-bottom:14px;">
+              <label class="form-label">Nama Lengkap (Sesuai Identitas) *</label>
+              <input type="text" id="reg-name" class="form-input" placeholder="contoh: Andi Pratama" required>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+              <div class="form-group">
+                <label class="form-label">Email Valid *</label>
+                <input type="email" id="reg-email" class="form-input" placeholder="andi@email.com" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nomor WhatsApp *</label>
+                <input type="tel" id="reg-phone" class="form-input" placeholder="081234567890" required>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="form-group">
+                <label class="form-label">Username *</label>
+                <input type="text" id="reg-username" class="form-input" placeholder="andi_pratama" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password *</label>
+                <input type="password" id="reg-password" class="form-input" placeholder="••••••••" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: VERIFIKASI OTP 6 DIGIT -->
+          <div id="wizard-step-2" class="wizard-step-content" style="display:none; text-align:center; padding:16px 0;">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:10px;">Step 2: Verifikasi Kode OTP 6 Digit</h4>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">
+              Kode OTP telah dikirimkan melalui WhatsApp / SMS ke nomor Anda. Masukkan kode <strong>123456</strong> untuk demo verifikasi:
+            </p>
+            <input type="text" id="otp-input-field" class="form-input" placeholder="123456" maxlength="6" style="width:200px; text-align:center; font-size:1.5rem; letter-spacing:8px; font-weight:800; font-family:monospace; margin:0 auto 20px auto;">
+            <div>
+              <button type="button" class="btn-primary" onclick="AuthEngine.verifyOtpCode()">✅ Verifikasi Kode OTP</button>
+            </div>
+          </div>
+
+          <!-- STEP 3: DEMOGRAFI & DOMISILI -->
+          <div id="wizard-step-3" class="wizard-step-content" style="display:none;">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">Step 3: Data Demografis & Domisili</h4>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+              <div class="form-group">
+                <label class="form-label">Tanggal Lahir *</label>
+                <input type="date" id="reg-bdate" class="form-input" value="1990-05-15" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Jenis Kelamin *</label>
+                <select id="reg-gender" class="form-input">
+                  <option value="PRIA">Pria</option>
+                  <option value="WANITA">Wanita</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="form-group">
+                <label class="form-label">Provinsi Domisili *</label>
+                <input type="text" id="reg-province" class="form-input" placeholder="DKI Jakarta" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kota / Kabupaten *</label>
+                <input type="text" id="reg-city" class="form-input" placeholder="Jakarta Selatan" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: PILIHAN ROLE KEANGGOTAAN -->
+          <div id="wizard-step-4" class="wizard-step-content" style="display:none;">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">Step 4: Pilihan Role Keanggotaan</h4>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+              <div class="glass-card role-select-card selected" data-role-choice="MEMBER" onclick="AuthEngine.selectRoleOption('MEMBER')" style="padding:20px; cursor:pointer; border:2px solid var(--accent-gold);">
+                <div style="font-size:1.5rem; margin-bottom:8px;">👤</div>
+                <h5 style="font-size:1rem;">Member Terdaftar</h5>
+                <p style="font-size:0.78rem; color:var(--text-muted);">Anggota pemilik / kawan pengemudi kendaraan Mercedes-Benz di seluruh Indonesia.</p>
+              </div>
+              <div class="glass-card role-select-card" data-role-choice="PENGURUS_KLUB" onclick="AuthEngine.selectRoleOption('PENGURUS_KLUB')" style="padding:20px; cursor:pointer; border:1px solid var(--chrome-border);">
+                <div style="font-size:1.5rem; margin-bottom:8px;">🏛️</div>
+                <h5 style="font-size:1rem;">Pengurus Klub / Chapter</h5>
+                <p style="font-size:0.78rem; color:var(--text-muted);">Pengurus resmi club/chapter yang berwenang mengelola data anggota lokal.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 5: PILIHAN TIER BERBASIS DONASI -->
+          <div id="wizard-step-5" class="wizard-step-content" style="display:none;">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">Step 5: Pilih Tier Keanggotaan Initial</h4>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="glass-card tier-select-card selected" data-tier-choice="BRONZE" onclick="AuthEngine.selectTierOption('BRONZE', 0)" style="padding:14px; cursor:pointer;">
+                <h5 style="font-size:0.95rem; color:#CD7F32;">🥉 BRONZE (Gratis)</h5>
+                <p style="font-size:0.75rem; color:var(--text-muted);">Kartu Member Digital + Akses Forum & Jamnas</p>
+              </div>
+              <div class="glass-card tier-select-card" data-tier-choice="SILVER" onclick="AuthEngine.selectTierOption('SILVER', 1500000)" style="padding:14px; cursor:pointer;">
+                <h5 style="font-size:0.95rem; color:#C0C0C0;">🥈 SILVER (Donasi Rp 1,5 Jt)</h5>
+                <p style="font-size:0.75rem; color:var(--text-muted);">Badge Silver + Diskon 10% Official Merch</p>
+              </div>
+              <div class="glass-card tier-select-card" data-tier-choice="GOLD" onclick="AuthEngine.selectTierOption('GOLD', 4500000)" style="padding:14px; cursor:pointer;">
+                <h5 style="font-size:0.95rem; color:var(--accent-gold);">🥇 GOLD (Donasi Rp 4,5 Jt)</h5>
+                <p style="font-size:0.75rem; color:var(--text-muted);">Badge Gold + VIP Event + Diskon 20%</p>
+              </div>
+              <div class="glass-card tier-select-card" data-tier-choice="PLATINUM" onclick="AuthEngine.selectTierOption('PLATINUM', 9000000)" style="padding:14px; cursor:pointer;">
+                <h5 style="font-size:0.95rem; color:#A855F7;">💎 PLATINUM (Donasi Rp 9 Jt)</h5>
+                <p style="font-size:0.75rem; color:var(--text-muted);">All Access VIP + Gala Dinner + Diskon 30%</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 6: RINGKASAN PEMBAYARAN DONASI TIER -->
+          <div id="wizard-step-6" class="wizard-step-content" style="display:none;">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">Step 6: Ringkasan & Konfirmasi Pendaftaran</h4>
+            
+            <div class="glass-card" style="padding:16px; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.88rem; margin-bottom:8px;">
+                <span>Biaya Donasi Tier Initial:</span>
+                <strong id="summary-tier-fee" style="color:var(--primary-emerald);">Rp 0</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:1rem; font-weight:800; border-top:1px solid var(--chrome-border); padding-top:8px;">
+                <span>Total Pendaftaran:</span>
+                <strong id="summary-total-fee" style="color:var(--accent-gold);">Rp 0</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 7: PENYELESAIAN & SUBMIT -->
+          <div id="wizard-step-7" class="wizard-step-content" style="display:none; text-align:center; padding:16px 0;">
+            <h4 style="font-size:1.2rem; color:var(--primary-emerald); margin-bottom:10px;">🎉 Siap Untuk Mengirimkan Pendaftaran!</h4>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:20px;">
+              Dengan mengklik tombol di bawah ini, data pendaftaran Anda akan langsung tersimpan di Supabase Cloud Database dan diverifikasi oleh Admin MB INA.
+            </p>
+            <button type="submit" class="btn-primary" style="padding:12px 32px; font-size:1rem; font-weight:800;">
+              🚀 Selesaikan & Ambil Member ID →
+            </button>
+          </div>
+
+          <!-- WIZARD NAVIGATION BUTTONS -->
+          <div style="display:flex; justify-content:space-between; margin-top:24px; border-top:1px solid var(--chrome-border); padding-top:16px;">
+            <button type="button" id="wizard-prev-btn" class="btn-outline" style="visibility:hidden;">← Kembali</button>
+            <button type="button" id="wizard-next-btn" class="btn-primary">Lanjut →</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Engine Scripts -->

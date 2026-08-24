@@ -1,0 +1,13 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MB CLUB INA - Mercedes-Benz Club Indonesia</title>
+  <meta name="description" content="Platform Resmi Mercedes-Benz Club Indonesia (MB CLUB INA). Wadah integrasi keanggotaan klub otomotif Mercedes-Benz se-Indonesia.">
+  
+  <!-- 100% Local Favicon & Styling -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="assets/mb_badge.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <meta name="theme-color" content="#0b0e14">
+</head>

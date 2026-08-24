@@ -1,0 +1,227 @@
+  <!-- MODAL M5: 5.2.1 BUAT THREAD BARU -->
+  <div id="modal-create-thread" class="modal-backdrop">
+    <div class="modal-container" style="max-width:680px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">📝 Buat Thread Baru</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Bagikan Informasi, Diskusi, & Tips Komunitas</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="create-thread-form" onsubmit="AppEngine.saveM5ThreadFromModal(event)">
+          <div class="form-group">
+            <label class="form-label">Judul Thread *</label>
+            <input type="text" id="m5-thread-title" class="form-input" placeholder="contoh: Tips Perawatan W124 untuk Pemula" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Kategori Diskusi *</label>
+              <select id="m5-thread-category" class="form-input" required>
+                <option value="cat_umum">🚗 Umum</option>
+                <option value="cat_teknis">🔧 Teknis</option>
+                <option value="cat_komunitas">🏍️ Komunitas</option>
+                <option value="cat_galeri">📸 Galeri</option>
+                <option value="cat_market">🛒 Marketplace</option>
+                <option value="cat_announcement">📢 Pengumuman</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tag Hashtag</label>
+              <input type="text" id="m5-thread-tags" class="form-input" placeholder="#W124 #Perawatan #Tips">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Isi Konten Thread *</label>
+            <div style="margin-bottom:6px; display:flex; gap:6px;">
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;"><b>B</b></button>
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;"><i>I</i></button>
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;"><u>U</u></button>
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;">🔗 Link</button>
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:2px 6px;">📷 Foto</button>
+            </div>
+            <textarea id="m5-thread-content" class="form-input" rows="6" placeholder="Tuliskan detail thread atau pertanyaan Anda di sini..." required></textarea>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.82rem; color:var(--text-main);">
+              <input type="checkbox" id="m5-thread-notify" checked style="width:16px; height:16px;">
+              🔔 Beri notifikasi balasan ke email saya
+            </label>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button type="button" class="btn-outline" onclick="AppEngine.closeModal('modal-create-thread')">Batal</button>
+            <button type="submit" class="btn-primary">💬 Posting Thread</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL M5: 5.2.4 SHARE THREAD -->
+  <div id="modal-share-thread" class="modal-backdrop">
+    <div class="modal-container" style="max-width:460px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">🔗 Share Thread Diskusi</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Bagikan link thread ke media sosial</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Copy Link Thread</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="m5-share-link-input" class="form-input" readonly value="https://mbina.or.id/forum/thread/th_001" style="font-size:0.8rem;">
+            <button class="btn-primary" style="padding:6px 12px; font-size:0.78rem; white-space:nowrap;" onclick="navigator.clipboard.writeText(document.getElementById('m5-share-link-input').value); alert('📋 Link thread telah disalin!');">📋 Copy</button>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <label class="form-label" style="margin-bottom:10px; display:block;">Share Langsung Ke:</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button type="button" class="btn-outline" style="font-size:0.8rem; justify-content:center;" onclick="alert('📲 Menghubungkan ke WhatsApp...')">💬 WhatsApp</button>
+            <button type="button" class="btn-outline" style="font-size:0.8rem; justify-content:center;" onclick="alert('📱 Menghubungkan ke Telegram...')">📱 Telegram</button>
+            <button type="button" class="btn-outline" style="font-size:0.8rem; justify-content:center;" onclick="alert('📧 Menghubungkan ke Email...')">📧 Email</button>
+            <button type="button" class="btn-outline" style="font-size:0.8rem; justify-content:center;" onclick="alert('🐦 Menghubungkan ke X/Twitter...')">🐦 Twitter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL M5: 5.2.5 REPORT SPAM -->
+  <div id="modal-report-thread" class="modal-backdrop">
+    <div class="modal-container" style="max-width:480px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem; color:var(--accent-red);">🚩 Laporkan Thread / Post</h3>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Laporkan pelanggaran ke Tim Moderasi MB INA</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="report-thread-form" onsubmit="AppEngine.saveM5ReportFromModal(event)">
+          <input type="hidden" id="m5-report-thread-id">
+          <input type="hidden" id="m5-report-reply-id">
+
+          <div class="form-group">
+            <label class="form-label">Pilih Alasan Pelaporan *</label>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:0.85rem;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="report_reason" value="Konten Tidak Pantas" checked> 🔞 Konten Tidak Pantas</label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="report_reason" value="Spam"> 📢 Spam / Promosi Berulang</label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="report_reason" value="Ujaran Kebencian"> 🚫 Ujaran Kebencian / SARA</label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="report_reason" value="Berita Bohong"> 📰 Berita Bohong / Hoax</label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="report_reason" value="Lainnya"> 💬 Lainnya</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Keterangan Tambahan</label>
+            <textarea id="m5-report-notes" class="form-input" rows="3" placeholder="Tuliskan catatan tambahan untuk moderator..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button type="button" class="btn-outline" onclick="AppEngine.closeModal('modal-report-thread')">Batal</button>
+            <button type="submit" class="btn-primary" style="background:var(--accent-red); border-color:var(--accent-red);">🚩 Kirim Laporan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL M5: 5.3.1 BUAT BROADCAST -->
+  <div id="modal-create-broadcast" class="modal-backdrop">
+    <div class="modal-container" style="max-width:580px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">📢 Buat Broadcast Resmi MB INA</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Kirim Pengumuman Massal ke Seluruh / Target Member</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="create-broadcast-form" onsubmit="AppEngine.saveM5BroadcastFromModal(event)">
+          <div class="form-group">
+            <label class="form-label">Judul Broadcast *</label>
+            <input type="text" id="m5-bc-title" class="form-input" placeholder="contoh: Pengumuman Jambore Nasional ke-19" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Isi Pesan Broadcast *</label>
+            <textarea id="m5-bc-content" class="form-input" rows="4" placeholder="Tuliskan isi pengumuman resmi..." required></textarea>
+          </div>
+
+          <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:12px; padding:14px; margin-bottom:16px;">
+            <h5 style="font-size:0.85rem; color:var(--accent-gold); margin-bottom:10px;">🎯 Target Audience</h5>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.82rem;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="bc_target" value="ALL" checked> Semua Member Aktif</label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="bc_target" value="TIER"> Berdasarkan Tier (Gold/Platinum)</label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="bc_target" value="CLUB"> Berdasarkan Klub Tertentu</label>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="radio" name="bc_target" value="REGION"> Berdasarkan Region Wilayah</label>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button type="button" class="btn-outline" onclick="AppEngine.closeModal('modal-create-broadcast')">Batal</button>
+            <button type="submit" class="btn-primary">📢 Kirim Broadcast Sekarang</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL M5: 5.4.3 WARN / BLOCK USER -->
+  <div id="modal-warn-user" class="modal-backdrop">
+    <div class="modal-container" style="max-width:480px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem; color:var(--accent-gold);">⚠️ Tindakan Moderasi User</h3>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Peringatan, Mute, atau Block User</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="warn-user-form" onsubmit="AppEngine.saveM5WarnFromModal(event)">
+          <input type="hidden" id="m5-warn-target-user">
+
+          <div class="form-group">
+            <label class="form-label">User Target</label>
+            <input type="text" id="m5-warn-user-display" class="form-input" readonly style="font-weight:700; color:var(--accent-gold);">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tindakan Moderasi *</label>
+            <select id="m5-warn-action-type" class="form-input">
+              <option value="WARN">⚠️ Beri Peringatan Resmi</option>
+              <option value="MUTE">🔇 Mute User (7 Hari)</option>
+              <option value="BLOCK">🚫 Block Permanent</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Alasan Pelanggaran *</label>
+            <input type="text" id="m5-warn-reason" class="form-input" placeholder="contoh: Spam di thread W124" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan Internal Moderasi</label>
+            <textarea id="m5-warn-notes" class="form-input" rows="2" placeholder="Catatan internal pengurus..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button type="button" class="btn-outline" onclick="AppEngine.closeModal('modal-warn-user')">Batal</button>
+            <button type="submit" class="btn-primary" style="background:var(--accent-red); border-color:var(--accent-red);">⚖️ Proses Moderasi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

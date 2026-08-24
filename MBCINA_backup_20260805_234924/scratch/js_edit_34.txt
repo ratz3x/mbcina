@@ -1,0 +1,34 @@
+  async init() {
+    console.log("MB INA Platform Engine Initializing (M2 & M3 Active)...");
+    this.initSession();
+    this.initTheme();
+    await this.fetchData();
+    await this.fetchM2Data();
+    this.bindAdminTabs();
+    this.renderTestimonials();
+    this.renderView();
+  },
+
+  initSession() {
+    const isLoggedOut = localStorage.getItem('mbina_logged_out') === 'true';
+    if (isLoggedOut) {
+      this.currentRole = 'GUEST';
+      this.currentUser = { name: 'Pengunjung', email: '' };
+      return;
+    }
+
+    const savedUser = localStorage.getItem('mbina_session_user');
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        this.currentRole = u.role || 'SUPER_ADMIN';
+        this.currentUser = u;
+      } catch (e) {
+        this.currentRole = 'SUPER_ADMIN';
+        this.currentUser = this.getDefaultUserForRole('SUPER_ADMIN');
+      }
+    } else {
+      this.currentRole = 'SUPER_ADMIN';
+      this.currentUser = this.getDefaultUserForRole('SUPER_ADMIN');
+    }
+  },

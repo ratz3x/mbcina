@@ -1,0 +1,59 @@
+    tableContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">ID & Username</th>
+            <th style="padding:12px;">Nama Lengkap</th>
+            <th style="padding:12px;">Email & WhatsApp</th>
+            <th style="padding:12px; white-space:nowrap;">Role</th>
+            <th style="padding:12px; white-space:nowrap;">Status</th>
+            <th style="padding:12px; text-align:right; white-space:nowrap; min-width:320px;">Aksi Manajemen</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(u => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:14px 12px; font-family:monospace; font-size:0.8rem;">
+                ${u.id}<br>
+                <span style="color:var(--accent-gold); font-weight:700;">@${u.username || 'user'}</span>
+                ${u.isSystemArchitect ? '<br><span style="color:var(--primary-emerald); font-size:0.7rem;">🔒 System Architect</span>' : ''}
+              </td>
+              <td style="padding:14px 12px; font-weight:600;">
+                ${u.name}
+                <div style="font-size:0.75rem; color:var(--text-muted);">${u.city || 'Indonesia'}</div>
+              </td>
+              <td style="padding:14px 12px; color:var(--text-muted);">
+                ${u.email}<br>${u.phone}
+              </td>
+              <td style="padding:14px 12px; white-space:nowrap;">
+                <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+                  ${this.formatRoleName(u.role)}
+                </span>
+              </td>
+              <td style="padding:14px 12px; white-space:nowrap;">
+                <span class="tier-badge" style="background:${u.status === 'ACTIVE' ? 'rgba(16,185,129,0.2)' : u.status === 'SUSPENDED' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)'}; color:${u.status === 'ACTIVE' ? 'var(--primary-emerald)' : u.status === 'SUSPENDED' ? 'var(--accent-red)' : 'var(--accent-gold)'};">
+                  ${u.status}
+                </span>
+              </td>
+              <td style="padding:14px 12px; text-align:right; white-space:nowrap;">
+                <div style="display:inline-flex; justify-content:flex-end; gap:6px; align-items:center; flex-wrap:nowrap;">
+                  <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold); white-space:nowrap;" onclick="AppEngine.openEditUserModal('${u.id}')" title="Edit Data User">
+                    ✏️ Edit
+                  </button>
+                  <button class="role-pill-btn" style="white-space:nowrap;" onclick="AppEngine.suspendUser('${u.id}')" title="Suspend/Activate User">
+                    ${u.status === 'SUSPENDED' ? '✅ Activate' : '⛔ Suspend'}
+                  </button>
+                  <button class="role-pill-btn" style="white-space:nowrap;" onclick="AppEngine.resetPassword('${u.id}')" title="Reset Password">
+                    🔑 Reset
+                  </button>
+                  ${u.isProtected ? '' : `
+                  <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red); white-space:nowrap;" onclick="AppEngine.deleteUser('${u.id}')" title="Hapus User">
+                    🗑️ Hapus
+                  </button>`}
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;

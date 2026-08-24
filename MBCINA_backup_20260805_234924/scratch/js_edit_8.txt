@@ -1,0 +1,47 @@
+  renderAuditLogs() {
+    const logContainer = document.getElementById('audit-logs-table');
+    if (!logContainer) return;
+
+    logContainer.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+            <th style="padding:12px;">Log ID</th>
+            <th style="padding:12px;">User ID</th>
+            <th style="padding:12px;">Action</th>
+            <th style="padding:12px;">Module</th>
+            <th style="padding:12px;">Details JSON</th>
+            <th style="padding:12px;">IP Address</th>
+            <th style="padding:12px;">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.auditLogs.map(l => {
+            let detailStr = '';
+            try {
+              let parsed = (typeof l.details === 'string') ? JSON.parse(l.details) : l.details;
+              if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+              detailStr = JSON.stringify(parsed);
+            } catch (e) {
+              detailStr = String(l.details || '');
+            }
+            return `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:12px; font-family:monospace; color:var(--text-muted);">${l.id}</td>
+              <td style="padding:12px; font-weight:600;">${l.userId}</td>
+              <td style="padding:12px;">
+                <span class="tier-badge" style="background:${l.action === 'DELETE' || l.action === 'SUSPEND' ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}; color:${l.action === 'DELETE' || l.action === 'SUSPEND' ? 'var(--accent-red)' : 'var(--accent-blue)'}; font-size:0.7rem;">
+                  ${l.action}
+                </span>
+              </td>
+              <td style="padding:12px; font-weight:600; color:var(--accent-gold);">${l.module}</td>
+              <td style="padding:12px; font-family:monospace; font-size:0.78rem; color:var(--text-main);">${detailStr}</td>
+              <td style="padding:12px; font-size:0.8rem;">${l.ipAddress}</td>
+              <td style="padding:12px; font-size:0.8rem; color:var(--text-muted);">${l.timestamp}</td>
+            </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  },

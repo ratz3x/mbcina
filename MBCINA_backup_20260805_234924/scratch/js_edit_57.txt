@@ -1,0 +1,55 @@
+  showLoader(message = 'Memuat Data (Supabase Cloud)...') {
+    const el = document.getElementById('global-app-loader');
+    const txt = document.getElementById('global-loader-text');
+    if (txt) txt.innerText = message;
+    if (el) el.style.display = 'flex';
+  },
+
+  hideLoader() {
+    const el = document.getElementById('global-app-loader');
+    if (el) el.style.display = 'none';
+  },
+
+  async fetchM2Data() {
+    this.showLoader('Memuat Data Organisasi, Klub & Keanggotaan (Supabase Cloud)...');
+    try {
+      const res = await fetch('api.php?action=get_app_init_data').then(r => r.json());
+      if (res.success) {
+        if (res.organization) this.m2Data.organization = res.organization;
+        if (res.founders) this.m2Data.founders = res.founders;
+        if (res.visionMission) this.m2Data.visionMission = res.visionMission;
+        if (res.presidents) this.m2Data.presidents = res.presidents;
+        if (res.advisoryBoard) this.m2Data.advisoryBoard = res.advisoryBoard;
+        if (res.honorCouncil) this.m2Data.honorCouncil = res.honorCouncil;
+        if (res.structure) this.m2Data.structure = res.structure;
+        if (res.periods) this.m2Data.periods = res.periods;
+        if (res.clubs) {
+          this.m2Data.clubs = res.clubs;
+          this.clubs = res.clubs;
+        }
+        if (res.members) {
+          this.m3Data.members = res.members;
+          this.users = res.members;
+        }
+        if (res.pendingCount !== undefined) {
+          this.m3Data.pendingCount = res.pendingCount;
+        }
+
+        // M4 Data Population
+        if (res.clubApplications) this.m4Data.applications = res.clubApplications;
+        if (res.clubApplicationNotes) this.m4Data.notes = res.clubApplicationNotes;
+        if (res.clubEvaluations) this.m4Data.evaluations = res.clubEvaluations;
+
+        this.renderClubsList();
+        this.renderLandingPageVisionMission();
+        if (this.activeAdminTab === 'm2_org') this.renderM2Module();
+        if (this.activeAdminTab === 'm3_membership') this.renderM3Module();
+        if (this.activeAdminTab === 'm4_registration') this.renderM4Module();
+        if (this.activeAdminTab === 'm1_portal' || this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+      }
+    } catch (e) {
+      console.error("Error fetching M2 Data:", e);
+    } finally {
+      this.hideLoader();
+    }
+  },

@@ -1,0 +1,17 @@
+  <!-- 1. HEADER (Logo + User Profile + Navigation) -->
+  <header class="app-header">
+    <div class="logo-container" onclick="AppEngine.navigateToHome()">
+      <img src="assets/mb_badge.jpg" alt="MB CLUB INA Logo">
+      <div>
+        <div class="brand-title text-gradient">MB CLUB INA</div>
+        <div class="brand-subtitle">Mercedes-Benz Club Indonesia</div>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li><a class="nav-link active" onclick="AppEngine.navigateToHome()">Home</a></li>
+      <li><a class="nav-link" href="#tentang-kami-section">Tentang Kami</a></li>
+      <li><a class="nav-link" href="#clubs-section">Klub Terdaftar</a></li>
+      <li><a class="nav-link" href="#events-section">Event Terbaru</a></li>
+      <li><a class="nav-link" onclick="AppEngine.openPortalAdmin()">Portal Admin</a></li>
+    </ul>

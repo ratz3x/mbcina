@@ -1,0 +1,84 @@
+    summaryBox.innerHTML = `
+      <div style="font-size:0.85rem; line-height:1.6;">
+        <strong>Klub:</strong> ${app.name} (${app.code}) | <strong>Wilayah:</strong> ${app.province_name || 'DKI Jakarta'}, ${app.city}<br>
+        <strong>CP:</strong> ${app.contact_person} (📞 ${app.contact_phone})
+      </div>
+
+      <div style="margin-top:12px; border-top:1px solid var(--chrome-border); padding-top:10px;">
+        <strong style="color:var(--accent-gold); font-size:0.85rem;">📁 Check-list Verifikasi Berkas Dokumen & Pembayaran:</strong>
+        <table style="width:100%; border-collapse:collapse; font-size:0.78rem; margin-top:6px;">
+          <thead>
+            <tr style="background:rgba(0,0,0,0.3); text-align:left; color:var(--text-muted);">
+              <th style="padding:5px;">Dokumen</th>
+              <th style="padding:5px; text-align:center;">Status</th>
+              <th style="padding:5px; text-align:center;">Validasi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">1. AD/ART Klub</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ Uploaded</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.ad_art_url || 'assets/docs/sample_ad_art.pdf'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[📄 Lihat File]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">2. Susunan Kepengurusan</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ Uploaded</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.management_structure_url || 'assets/docs/sample_pengurus.pdf'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[📄 Lihat File]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">3. Domisili Sekretariat</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ Uploaded</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.domicile_url || 'assets/docs/sample_domisili.pdf'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[📄 Lihat File]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">4. Logo Klub</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ Uploaded</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.logo_url || 'assets/mb_badge.jpg'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[🖼️ Lihat Logo]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">5. Stempel Resmi Klub</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ Uploaded</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.stamp_url || 'assets/docs/sample_stempel.png'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[🖼️ Lihat Stempel]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">6. Foto Kegiatan (min 3)</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ 3/3 Uploaded</td>
+              <td style="padding:5px; text-align:center;"><a href="assets/mb_hero.jpg" target="_blank" style="color:var(--accent-gold); font-weight:700;">[🖼️ Lihat Foto]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">7. List 15+ Anggota KTA IMI</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ ${app.total_members || 15}/15 Active</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.members_list_url || 'assets/docs/sample_daftar_anggota.xlsx'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[📊 Download List]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">8. Bukti Transfer Rp 350.000</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ ${app.payment_status || 'VERIFIED'}</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.payment_proof_url || 'assets/docs/sample_bukti_transfer.jpg'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[🧾 Lihat Bukti]</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    if (actionType === 'APPROVED') {
+      titleEl.innerText = `✅ Approve & Verifikasi Berkas: ${app.name}`;
+      submitBtn.innerText = '✅ Approve Semua & Aktifkan Klub';
+      submitBtn.style.background = 'var(--primary-emerald)';
+      submitBtn.style.borderColor = 'var(--primary-emerald)';
+      reasonGroup.style.display = 'none';
+    } else if (actionType === 'REJECTED') {
+      titleEl.innerText = `❌ Reject Pendaftaran: ${app.name}`;
+      submitBtn.innerText = '❌ Tolak Pengajuan';
+      submitBtn.style.background = 'var(--accent-red)';
+      submitBtn.style.borderColor = 'var(--accent-red)';
+      reasonGroup.style.display = 'block';
+    } else {
+      titleEl.innerText = `🔍 Set Status Review: ${app.name}`;
+      submitBtn.innerText = 'Tandai Review';
+      submitBtn.style.background = 'var(--accent-gold)';
+      submitBtn.style.borderColor = 'var(--accent-gold)';
+      reasonGroup.style.display = 'none';
+    }
+
+    AuthEngine.openModal('modal-m4-review');
+  },

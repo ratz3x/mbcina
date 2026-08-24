@@ -1,0 +1,71 @@
+  <!-- MODAL 4.4.3: EVALUASI KINERJA KLUB INTERAKTIF (4 KATEGORI BOBOT & RENTANG WAKTU PENILAIAN) -->
+  <div id="modal-m4-evaluation" class="modal-backdrop" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:820px; max-height:90vh; overflow-y:auto;">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 id="modal-m4-eval-title" style="font-size:1.2rem; color:var(--accent-gold); margin:0;">📊 Evaluasi Kinerja Klub</h3>
+          <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Penilaian Objektif 4 Pilar Kinerja Berdasarkan Kalender MB INA</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <select id="m4-eval-year-select" class="form-input" style="padding:4px 8px; font-size:0.85rem;" onchange="AppEngine.onM4PeriodTypeChange()">
+            <option value="2026">Tahun: 2026</option>
+            <option value="2025">Tahun: 2025</option>
+            <option value="2024">Tahun: 2024</option>
+          </select>
+          <button type="button" class="btn-outline" style="font-size:0.78rem; padding:4px 10px;" onclick="AppEngine.calculateM4EvaluationAuto()">🔄 Hitung Ulang</button>
+          <button class="modal-close" onclick="AuthEngine.closeAllModals()">✕</button>
+        </div>
+      </div>
+
+      <form onsubmit="AppEngine.saveM4EvaluationSubmit(event)">
+        <input type="hidden" id="m4-eval-club-id">
+
+        <div class="modal-body" style="font-size:0.88rem; padding-top:12px;">
+          
+          <!-- RENTANG WAKTU PENILAIAN & CUTOFF BOUNDARY CONTROL -->
+          <div class="glass-card" style="padding:14px; margin-bottom:16px; border-left:4px solid var(--accent-blue); background:rgba(59,130,246,0.06);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:10px;">
+              <div>
+                <strong style="color:var(--accent-blue); font-size:0.9rem;">📅 Rentang Waktu Penilaian (Batas Waktu Dateline)</strong>
+                <div style="font-size:0.75rem; color:var(--text-muted);">Mencegah bias penilaian dengan membatasi periode cut-off data events & anggota</div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <select id="m4-eval-period-type" class="form-input" style="padding:4px 10px; font-size:0.82rem;" onchange="AppEngine.onM4PeriodTypeChange()">
+                  <option value="ANNUAL">📅 Tahunan (1 Jan - 31 Des)</option>
+                  <option value="SEMESTER_1">🗓️ Semester I (1 Jan - 30 Jun)</option>
+                  <option value="SEMESTER_2">🗓️ Semester II (1 Jul - 31 Des)</option>
+                  <option value="CUSTOM">⚙️ Kustom Rentang Tanggal</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- CUSTOM DATE RANGE INPUTS -->
+            <div id="m4-eval-custom-dates-container" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+              <div style="flex:1;">
+                <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:2px;">Tanggal Mulai *</label>
+                <input type="date" id="m4-eval-start-date" class="form-input" style="padding:4px 8px; font-size:0.82rem;" value="2026-01-01" onchange="AppEngine.calculateM4EvaluationAuto()">
+              </div>
+              <span style="color:var(--text-muted); margin-top:16px;">s/d</span>
+              <div style="flex:1;">
+                <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:2px;">Tanggal Akhir (Cut-Off) *</label>
+                <input type="date" id="m4-eval-end-date" class="form-input" style="padding:4px 8px; font-size:0.82rem;" value="2026-12-31" onchange="AppEngine.calculateM4EvaluationAuto()">
+              </div>
+            </div>
+
+            <!-- VISUAL BADGE OF EXACT EVALUATION BOUNDARY -->
+            <div style="margin-top:10px; font-size:0.78rem; background:rgba(0,0,0,0.2); padding:6px 12px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+              <span><strong>Rentang Terkonfirmasi:</strong> <span id="m4-eval-date-range-badge" style="color:var(--accent-gold); font-weight:700;">01 Jan 2026 — 31 Des 2026</span></span>
+              <span style="color:var(--primary-emerald); font-weight:600;">⏳ Cut-Off Data: Strict Boundary Active</span>
+            </div>
+          </div>
+
+          <!-- BANNER SKOR AKHIR & GRADE -->
+          <div class="glass-card" style="padding:16px; margin-bottom:20px; text-align:center; background:linear-gradient(135deg, rgba(245,158,11,0.1), rgba(16,185,129,0.1)); border:1px solid var(--accent-gold);">
+            <div style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700;">📈 SKOR AKHIR KLUB</div>
+            <div style="font-size:2.2rem; font-weight:900; color:var(--accent-gold); margin:6px 0;" id="m4-eval-final-score-display">78.50 / 100</div>
+            <div style="display:inline-flex; align-items:center; gap:8px;">
+              <span id="m4-eval-grade-badge" class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-size:0.95rem; font-weight:800; padding:4px 14px;">
+                GRADE B • ✅ GOOD
+              </span>
+            </div>
+          </div>

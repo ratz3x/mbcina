@@ -1,0 +1,30 @@
+    <div style="display:flex; align-items:center; gap:16px;">
+      <!-- Light / Dark Theme Toggle Button -->
+      <button id="theme-toggle-btn" class="theme-toggle-btn" onclick="AppEngine.toggleTheme()">
+        ☀️ Light Mode
+      </button>
+
+      <!-- Clean Executive User Profile Header Badge -->
+      <div id="nav-user-profile" style="display:flex; align-items:center; gap:12px;">
+        <div style="text-align:right;">
+          <div id="nav-user-name" style="font-weight:800; font-size:0.9rem; color:var(--text-main);">Derist Touriano</div>
+          <div style="display:flex; align-items:center; justify-content:flex-end; gap:6px; font-size:0.75rem;">
+            <span id="nav-user-role-badge" style="color:var(--accent-gold); font-weight:700;">Super Admin</span>
+            <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); padding:2px 8px; font-size:0.68rem;">ACTIVE</span>
+          </div>
+        </div>
+        <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-gold-dark) 100%); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; border:2px solid var(--accent-gold); box-shadow:0 0 10px var(--accent-gold-glow);" id="nav-user-avatar">
+          DT
+        </div>
+      </div>
+
+      <!-- Tombol Login (Untuk Guest) -->
+      <button id="btn-login-nav" class="btn-primary" style="padding:8px 16px; font-size:0.82rem; display:none;" data-open-modal="modal-login">
+        🔑 Login / Masuk
+      </button>
+
+      <!-- Tombol Keluar (Logout) -->
+      <button id="btn-logout" class="btn-outline" style="padding:8px 16px; font-size:0.82rem; border-color:var(--accent-red); color:var(--accent-red); font-weight:700; cursor:pointer;" onclick="AuthEngine.logout()">
+        🚪 Keluar
+      </button>
+    </div>

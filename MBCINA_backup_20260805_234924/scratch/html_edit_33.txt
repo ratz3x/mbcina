@@ -1,0 +1,78 @@
+  <!-- MODAL 4.3.2: VERIFIKASI / REVIEW PENGAJUAN KLUB -->
+  <div id="modal-m4-review" class="modal-backdrop" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:550px;">
+      <div class="modal-header">
+        <h3 id="modal-m4-review-title" style="font-size:1.15rem; color:var(--accent-gold);">✅ Verifikasi Pengajuan Klub</h3>
+        <button class="modal-close" onclick="AuthEngine.closeAllModals()">✕</button>
+      </div>
+      <form onsubmit="AppEngine.processM4ReviewSubmit(event)">
+        <input type="hidden" id="m4-review-app-id">
+        <input type="hidden" id="m4-review-action-type">
+        
+        <div class="modal-body" style="font-size:0.88rem;">
+          <div class="glass-card" style="padding:16px; margin-bottom:16px;" id="m4-review-summary-box"></div>
+
+          <div class="form-group" id="m4-rejection-reason-group" style="display:none; margin-bottom:16px;">
+            <label class="form-label" style="color:var(--accent-red);">Alasan Penolakan (Wajib Diisi)</label>
+            <textarea id="m4-rejection-reason" class="form-input" rows="3" placeholder="Sebutkan alasan penolakan pengajuan ini..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan Admin Internal</label>
+            <textarea id="m4-review-notes" class="form-input" rows="2" placeholder="Catatan tambahan untuk tim verifikator..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+          <button type="button" class="btn-outline" onclick="AuthEngine.closeAllModals()">Batal</button>
+          <button type="submit" id="m4-review-submit-btn" class="btn-primary">Proses</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4.4.3: EVALUASI KINERJA KLUB -->
+  <div id="modal-m4-evaluation" class="modal-backdrop" style="display:none;">
+    <div class="modal-content glass-panel" style="max-width:500px;">
+      <div class="modal-header">
+        <h3 id="modal-m4-eval-title" style="font-size:1.15rem; color:var(--accent-gold);">📊 Evaluasi Kinerja Klub</h3>
+        <button class="modal-close" onclick="AuthEngine.closeAllModals()">✕</button>
+      </div>
+      <form onsubmit="AppEngine.saveM4EvaluationSubmit(event)">
+        <input type="hidden" id="m4-eval-club-id">
+
+        <div class="modal-body" style="font-size:0.88rem;">
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">Kategori Evaluasi *</label>
+            <select id="m4-eval-category" class="form-input" required>
+              <option value="ACTIVITY">🏃 ACTIVITY (Aktivitas Touring & Kopdar)</option>
+              <option value="MEMBERSHIP">👥 MEMBERSHIP (Pertumbuhan Anggota)</option>
+              <option value="EVENT">🏎️ EVENT (Partisipasi Jamnas & Event Official)</option>
+              <option value="REPORT">📜 REPORT (Kelengkapan Laporan Tahunan)</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">Skor Kinerja (0 - 100) *</label>
+            <input type="number" id="m4-eval-score" class="form-input" min="0" max="100" value="85" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Catatan Evaluator</label>
+            <textarea id="m4-eval-notes" class="form-input" rows="3" placeholder="Catatan evaluasi kinerja klub..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+          <button type="button" class="btn-outline" onclick="AuthEngine.closeAllModals()">Batal</button>
+          <button type="submit" class="btn-primary">💾 Simpan Evaluasi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JS Engine Scripts -->
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

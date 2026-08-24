@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mercedes-Benz Club Indonesia (MB INA) - Official Platform</title>
+  <meta name="description" content="Platform Manajemen Organisasi & Keanggotaan Resmi Mercedes-Benz Club Indonesia (MB INA). Kelola keanggotaan, klub, event, dan registrasi anggota.">
+  
+  <!-- CSS & Fonts -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0e14">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- 0. Interactive Role Switcher / Simulator Bar -->
+  <div class="role-simulator-bar">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); text-transform:uppercase; letter-spacing:1px;">
+        ⚙️ ROLE SIMULATOR (RBAC):
+      </span>
+    </div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+      <button class="role-pill-btn active" data-role="GUEST">1. Guest (Pengunjung)</button>
+      <button class="role-pill-btn" data-role="CALON_MEMBER">2. Calon Member (Pending)</button>
+      <button class="role-pill-btn" data-role="MEMBER">3. Member Terverifikasi</button>
+      <button class="role-pill-btn" data-role="PENGURUS_KLUB">4. Pengurus Klub</button>
+      <button class="role-pill-btn" data-role="PENGURUS_PUSAT">5. Pengurus Pusat</button>
+      <button class="role-pill-btn" data-role="ADMIN_ORGANISASI">6. Admin Organisasi</button>
+      <button class="role-pill-btn" data-role="SUPER_ADMIN">7. Super Admin</button>
+    </div>
+  </div>
+
+  <!-- 1. Header & Navigation -->
+  <header class="app-header">
+    <div class="logo-container" onclick="AppEngine.setRole('GUEST')">
+      <img src="assets/mb_badge.jpg" alt="MB INA Logo">
+      <div>
+        <div class="brand-title text-gradient">MB INA</div>
+        <div class="brand-subtitle">Mercedes-Benz Club Indonesia</div>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li><a class="nav-link active" onclick="AppEngine.setRole('GUEST')">Beranda</a></li>
+      <li><a class="nav-link" href="#clubs-section">Daftar Klub</a></li>
+      <li><a class="nav-link" href="#events-section">Agenda Event</a></li>
+      <li><a class="nav-link" href="#benefits-section">Fasilitas Anggota</a></li>
+    </ul>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <!-- Light / Dark Theme Toggle Button -->
+      <button id="theme-toggle-btn" class="theme-toggle-btn" onclick="AppEngine.toggleTheme()">
+        ☀️ Light Mode
+      </button>
+
+      <!-- Guest Auth Buttons -->
+      <button id="nav-login-btn" class="btn-outline" data-open-modal="modal-login" style="padding:8px 18px; font-size:0.85rem;">
+        Masuk Portal
+      </button>
+      <button id="nav-reg-btn" class="btn-primary" data-open-modal="modal-register" style="padding:8px 20px; font-size:0.85rem;">
+        Daftar Member
+      </button>
+
+      <!-- User Profile Header Widget (Active when logged in) -->
+      <div id="nav-user-profile" style="display:none; align-items:center; gap:10px;">
+        <div style="text-align:right;">
+          <div id="nav-user-name" style="font-weight:700; font-size:0.85rem; color:var(--text-main);">-</div>
+          <div id="nav-user-role-badge" style="font-size:0.7rem; color:var(--accent-gold); font-weight:700;">-</div>
+        </div>
+        <div style="width:36px; height:36px; border-radius:50%; background:var(--accent-gold); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800;">
+          MB
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Main Content Wrapper -->
+  <main class="main-wrapper">
+
+    <!-- VIEW A: LANDING PAGE (M0) -->
+    <div id="view-landing-page" class="view-container">
+      <div style="max-width:1440px; margin:0 auto; padding:24px;">
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+          <img src="assets/mb_hero.jpg" alt="Mercedes AMG" class="hero-bg-img">
+          <div class="hero-overlay"></div>
+          <div class="hero-content">
+            <div class="hero-badge">⭐ PLATFORM MANAJEMEN RESMI ORGANISASI</div>
+            <h1 class="hero-title text-gradient">The Best or Nothing: Komunitas Mercedes-Benz Terbesar di Indonesia</h1>
+            <p class="hero-description">
+              Wadah resmi integrasi keanggotaan klub otomotif Mercedes-Benz se-Indonesia. Nikmati pendaftaran minimal & aman, fasilitas kartu anggota digital terverifikasi, touring nusantara, dan jejaring pemilik Mercedes-Benz.
+            </p>
+            <div class="btn-group">
+              <button class="btn-primary" data-open-modal="modal-register">
+                Registrasi Keanggotaan (Form Minimal) →
+              </button>
+              <button class="btn-outline" data-open-modal="modal-login">
+                Login Anggota & Pengurus
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stats Grid -->
+        <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:40px;">
+          <div class="glass-panel" style="padding:20px; text-align:center;">
+            <div style="font-size:2.2rem; font-weight:900; color:var(--accent-gold);">30+</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">Klub Model & Regional</div>
+          </div>
+          <div class="glass-panel" style="padding:20px; text-align:center;">
+            <div style="font-size:2.2rem; font-weight:900; color:var(--accent-blue);">12.500+</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">Member Terdaftar</div>
+          </div>
+          <div class="glass-panel" style="padding:20px; text-align:center;">
+            <div style="font-size:2.2rem; font-weight:900; color:var(--primary-emerald);">XXI</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">Jambore Nasional MB INA</div>
+          </div>
+          <div class="glass-panel" style="padding:20px; text-align:center;">
+            <div style="font-size:2.2rem; font-weight:900; color:var(--text-main);">100%</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">Privasi Data Terproteksi</div>
+          </div>
+        </section>
+
+        <!-- Official Clubs Directory Section -->
+        <section id="clubs-section" style="margin-bottom:48px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
+            <div>
+              <h2 style="font-size:1.8rem;" class="text-gradient">Klub & Chapter Resmi MB INA</h2>
+              <p style="color:var(--text-muted); font-size:0.9rem;">Daftar klub otomotif Mercedes-Benz yang terdaftar di bawah naungan MB INA</p>
+            </div>
+            <button class="role-pill-btn" onclick="alert('Menampilkan seluruh 30+ klub resmi MB INA')">Lihat Semua Klub →</button>
+          </div>
+          <div id="clubs-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
+            <!-- Rendered by app.js -->
+          </div>
+        </section>
+
+        <!-- Events & Touring Section -->
+        <section id="events-section" style="margin-bottom:48px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
+            <div>
+              <h2 style="font-size:1.8rem;" class="text-gradient">Agenda Event & Jamnas MB INA</h2>
+              <p style="color:var(--text-muted); font-size:0.9rem;">Jadwal event touring, gathering, dan jambore nasional mendatang</p>
+            </div>
+          </div>
+          <div id="events-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:20px;">
+            <!-- Rendered by app.js -->
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- VIEW B: CALON MEMBER DASHBOARD (Pending Verification) -->
+    <div id="view-calon-member-dashboard" class="view-container" style="display:none; max-width:1000px; margin:0 auto; padding:24px;">
+      <div id="calon-status-card">
+        <!-- Dynamic rendering via app.js -->
+      </div>
+    </div>
+
+    <!-- VIEW C: MEMBER DASHBOARD (Verified Member Workspace) -->
+    <div id="view-member-dashboard" class="view-container" style="display:none; max-width:1200px; margin:0 auto; padding:24px;">
+      <h2 style="font-size:1.8rem; margin-bottom:20px;" class="text-gradient">Dashboard Anggota MB INA</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:24px;">
+        
+        <!-- Digital Card Slot -->
+        <div>
+          <h3 style="font-size:1.1rem; margin-bottom:12px;">Kartu Keanggotaan Digital (QR Code)</h3>
+          <div id="digital-member-card-wrapper">
+            <!-- Rendered via app.js -->
+          </div>
+        </div>
+
+        <!-- Garasi Kendaraan & Benefit -->
+        <div class="glass-panel" style="padding:24px;">
+          <h3 style="font-size:1.1rem; margin-bottom:16px;">🚗 Garasi Kendaraan Member</h3>
+          <div style="background:rgba(0,0,0,0.03); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:1rem; color:var(--text-main);">Mercedes-Benz E 300 (W212)</strong>
+              <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">TERDAFTAR</span>
+            </div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">No. Polisi: B 1926 MB | Tahun: 2012</div>
+          </div>
+          <button class="btn-outline" style="width:100%; font-size:0.85rem;" onclick="alert('Formulir Tambah Kendaraan Baru dibuka')">+ Tambah Unit Mercedes-Benz Lain</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- VIEW D: ADMIN ORGANISASI & SUPER ADMIN WORKSPACE -->
+    <div id="view-admin-dashboard" class="view-container" style="display:none; max-width:1440px; margin:0 auto; padding:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <div>
+          <h2 style="font-size:1.8rem;" class="text-gradient">Panel Antrean Verifikasi Member Baru</h2>
+          <p style="color:var(--text-muted); font-size:0.9rem;">Review data pendaftaran calon anggota MB INA</p>
+        </div>
+        <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.85rem; padding:6px 16px;">
+          RBAC: ADMIN ORGANISASI / SUPER ADMIN
+        </span>
+      </div>
+
+      <div class="glass-panel" style="padding:24px; overflow-x:auto;">
+        <div id="admin-verification-table">
+          <!-- Rendered via app.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW E: GENERAL DASHBOARD FOR OTHER ROLES -->
+    <div id="view-general-dashboard" class="view-container" style="display:none; max-width:1200px; margin:0 auto; padding:24px;">
+      <div class="glass-panel" style="padding:32px; text-align:center;">
+        <h2 style="font-size:1.8rem; margin-bottom:12px;" class="text-gradient">Workspace Pengurus MB INA</h2>
+        <p style="color:var(--text-muted); max-width:600px; margin:0 auto 24px;">
+          Anda sedang mengakses portal sebagai <strong id="active-role-display" style="color:var(--accent-gold);">-</strong>. Modul ini menyediakan analisis keanggotaan klub, pengelolaan event touring regional, dan pelaporan keuangan.
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 3. MODAL A: REVISED REGISTRATION FORM (M0.1 REVISED) -->
+  <div id="modal-register" class="modal-backdrop">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">Formulir Pendaftaran Keanggotaan MB INA</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Pendaftaran Aman & Minimal (Tanpa Foto KTP)</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Progress Bar -->
+        <div class="wizard-progress">
+          <div id="step-ind-1" class="step-indicator active">1</div>
+          <div id="step-ind-2" class="step-indicator">2</div>
+          <div id="step-ind-3" class="step-indicator">3</div>
+          <div id="step-ind-4" class="step-indicator">4</div>
+          <div id="step-ind-5" class="step-indicator">5</div>
+        </div>
+
+        <div id="wizard-error-msg" class="security-alert-box" style="display:none;"></div>
+
+        <!-- STEP 1: Data Utama & Login -->
+        <div id="wizard-step-1" class="wizard-step-content">
+          <h4 style="font-size:1rem; margin-bottom:16px; color:var(--accent-gold);">Langkah 1: Identitas & Akses Login</h4>
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap (Sesuai Identitas) *</label>
+            <input type="text" id="reg-name" class="form-input" placeholder="contoh: Budi Santoso">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Email Aktif *</label>
+              <input type="email" id="reg-email" class="form-input" placeholder="nama@email.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor WhatsApp *</label>
+              <input type="tel" id="reg-phone" class="form-input" placeholder="08123456789">
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Username Unique ID *</label>
+              <input type="text" id="reg-username" class="form-input" placeholder="contoh: budi_mb">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password * (Min. 8 karakter & angka)</label>
+              <input type="password" id="reg-password" class="form-input" placeholder="Kombinasi huruf & angka">
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Demografis & Personal -->
+        <div id="wizard-step-2" class="wizard-step-content" style="display:none;">
+          <h4 style="font-size:1rem; margin-bottom:16px; color:var(--accent-gold);">Langkah 2: Informasi Demografis Diri</h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Tanggal Lahir * (Min. 17 Tahun)</label>
+              <input type="date" id="reg-birthdate" class="form-input" value="1995-01-01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jenis Kelamin *</label>
+              <select id="reg-gender" class="form-input">
+                <option value="PRIA">Pria</option>
+                <option value="WANITA">Wanita</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alamat Domisili * (Kota / Kabupaten)</label>
+            <input type="text" id="reg-domicile" class="form-input" placeholder="contoh: Kota Jakarta Barat">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Pekerjaan (Opsional)</label>
+              <input type="text" id="reg-occupation" class="form-input" placeholder="contoh: Wiraswasta / Engineer">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hobi / Minat (Opsional)</label>
+              <input type="text" id="reg-hobbies" class="form-input" placeholder="contoh: Touring & Restorasi Mobil">
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Club & Vehicle Info -->
+        <div id="wizard-step-3" class="wizard-step-content" style="display:none;">
+          <h4 style="font-size:1rem; margin-bottom:16px; color:var(--accent-gold);">Langkah 3: Pilihan Klub MB INA & Kendaraan</h4>
+          <div class="form-group">
+            <label class="form-label">Pilih Chapter / Klub MB INA *</label>
+            <select id="reg-club-select" class="form-input">
+              <option value="clb_w204">Mercedes-Benz W204 Club Indonesia</option>
+              <option value="clb_w212">Mercedes-Benz W212 Club Indonesia</option>
+              <option value="clb_classic">MB Club Classic Indonesia</option>
+              <option value="clb_amg">Mercedes-AMG Owners Club Indonesia</option>
+            </select>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Model Mercedes-Benz *</label>
+              <input type="text" id="reg-vehicle-model" class="form-input" placeholder="contoh: E 300 (W212) 2012">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor Polisi (Plat Nomor) *</label>
+              <input type="text" id="reg-license-plate" class="form-input" placeholder="contoh: B 1926 MB">
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: OTP Verification -->
+        <div id="wizard-step-4" class="wizard-step-content" style="display:none;">
+          <h4 style="font-size:1rem; margin-bottom:16px; color:var(--accent-gold);">Langkah 4: Verifikasi OTP WhatsApp</h4>
+          <div id="otp-demo-hint" class="security-alert-box" style="background:rgba(245,158,11,0.1); border-color:rgba(245,158,11,0.3); color:var(--accent-gold);"></div>
+          <div class="form-group" style="text-align:center; margin-top:20px;">
+            <label class="form-label">Masukkan 6 Digit Kode OTP</label>
+            <input type="text" id="otp-input-field" class="form-input" placeholder="6 Digit Angka" maxlength="6" style="width:200px; text-align:center; font-size:1.4rem; letter-spacing:6px; margin:0 auto;">
+          </div>
+          <div style="text-align:center; margin-top:16px;">
+            <span style="font-size:0.8rem; color:var(--text-muted);">Kirim ulang OTP dalam: <strong id="otp-timer-count" style="color:var(--accent-gold);">60s</strong></span><br>
+            <button class="btn-primary" style="margin-top:16px;" onclick="AuthEngine.verifyOTP()">Verifikasi Kode OTP →</button>
+          </div>
+        </div>
+
+        <!-- STEP 5: Finalize -->
+        <div id="wizard-step-5" class="wizard-step-content" style="display:none;">
+          <h4 style="font-size:1rem; margin-bottom:16px; color:var(--accent-gold);">Langkah 5: Konfirmasi Pendaftaran Keanggotaan</h4>
+          <div style="background:rgba(0,0,0,0.03); border:1px solid var(--chrome-border); border-radius:14px; padding:20px; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span>Iuran Tahunan MB INA:</span>
+              <strong>Rp 500.000</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span>Cetak Kartu Member Digital & Kit:</span>
+              <strong>Rp 150.000</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-top:1px solid var(--chrome-border); padding-top:10px; font-weight:700; color:var(--accent-gold);">
+              <span>Total Pembayaran:</span>
+              <span>Rp 650.000</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Metode Pembayaran</label>
+            <select class="form-input">
+              <option>Transfer Bank BCA (Virtual Account)</option>
+              <option>QRIS Instant All Payment</option>
+              <option>Kartu Kredit / Debit Online</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Wizard Navigation Controls -->
+        <div style="display:flex; justify-content:space-between; margin-top:24px; border-top:1px solid var(--chrome-border); padding-top:16px;">
+          <button id="wizard-prev-btn" class="btn-outline" style="visibility:hidden;">← Kembali</button>
+          <button id="wizard-next-btn" class="btn-primary">Lanjut →</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL B: LOGIN & SECURITY LIMITER (M0.2) -->
+  <div id="modal-login" class="modal-backdrop">
+    <div class="modal-container" style="max-width:440px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:1.2rem;">Portal Login MB INA</h3>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Role-Based Authentication Engine</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div id="login-security-alert" class="security-alert-box" style="display:none;">
+          <span id="login-security-msg"></span>
+        </div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label">Email, No WhatsApp, atau Username</label>
+            <input type="text" id="login-email" class="form-input" placeholder="admin@mbina.or.id / budi_mb" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; font-size:0.8rem;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" checked> Ingat Saya (JWT Token)
+            </label>
+            <a href="#" style="color:var(--accent-gold); text-decoration:none;" onclick="alert('Instruksi reset password dikirim ke email.')">Lupa Password?</a>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;">Masuk ke Sistem →</button>
+        </form>
+
+        <div style="text-align:center; margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:16px; font-size:0.8rem; color:var(--text-muted);">
+          Demo Quick Login Credentials:<br>
+          <strong style="color:var(--text-main);">admin@mbina.or.id</strong> (Super Admin)<br>
+          <strong style="color:var(--text-main);">pengurus.pusat@mbina.or.id</strong> (Admin Org)<br>
+          <strong style="color:var(--text-main);">budi.santoso@example.com / budi_mb</strong> (Calon Member)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav">
+    <a href="#" class="mobile-nav-btn active" onclick="AppEngine.setRole('GUEST')">
+      🏠<span>Beranda</span>
+    </a>
+    <a href="#clubs-section" class="mobile-nav-btn">
+      👥<span>Klub</span>
+    </a>
+    <a href="#events-section" class="mobile-nav-btn">
+      📅<span>Event</span>
+    </a>
+    <a href="#" class="mobile-nav-btn" data-open-modal="modal-register">
+      📝<span>Daftar</span>
+    </a>
+    <a href="#" class="mobile-nav-btn" data-open-modal="modal-login">
+      🔑<span>Login</span>
+    </a>
+  </nav>
+
+  <!-- JS Engine Scripts -->
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

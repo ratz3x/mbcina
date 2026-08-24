@@ -1,0 +1,16 @@
+        <!-- TENTANG KAMI (Informasi Organisasi & Visi Misi Dynamic Container) -->
+        <section id="tentang-kami-section" style="margin-bottom:48px;">
+          <div class="glass-panel" style="padding:36px;">
+            <div style="max-width:800px; margin:0 auto; text-align:center; margin-bottom:32px;">
+              <span class="hero-badge">Tentang MB Club INA</span>
+              <h2 style="font-size:2rem; margin-top:8px;" class="text-gradient">Visi & Misi Mercedes-Benz Club Indonesia</h2>
+              <p style="color:var(--text-muted); font-size:1rem; margin-top:12px;" id="landing-org-description">
+                MB Club INA didirikan pada Agustus 2004 di Jakarta untuk menyatukan klub dan pengagum otomotif Mercedes-Benz dalam wadah organisasi yang solid, berasas solidaritas, serta menjunjung tinggi keselamatan berkendara di Indonesia.
+              </p>
+            </div>
+
+            <div id="landing-vm-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
+              <!-- Populated Dynamically from Supabase Cloud Database -->
+            </div>
+          </div>
+        </section>

@@ -1,0 +1,237 @@
+          <!-- 2.2 & 2.3 DAFTAR & DETAIL KLUB -->
+          <div id="m2sub-clubs" class="m2-subtab-content" style="display:none;">
+            <div id="m2-clubs-container"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB M3: MODUL M3 - MANAJEMEN KEANGGOTAAN -->
+      <div id="admin-tab-m3_membership" class="admin-tab-content" style="display:none;">
+        <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-size:1.3rem;" class="text-gradient">👥 MODUL M3 - MANAJEMEN KEANGGOTAAN</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Pusat pengelolaan seluruh data member MB INA, verifikasi pendaftaran, Member ID otomatis, & tier berbasis donasi</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span id="m3-pending-badge" class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); cursor:pointer;" onclick="AppEngine.switchM3Subtab('verify')">
+                ⏳ 0 PENDING VERIFIKASI
+              </span>
+              <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.openAddM3MemberModal()">+ Tambah Member Baru</button>
+            </div>
+          </div>
+
+          <!-- M3 Sub-Tab Navigation Pills -->
+          <div style="display:flex; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--chrome-border); padding-bottom:16px; margin-bottom:24px;">
+            <button class="sub-tab-btn active" data-m3sub="list" onclick="AppEngine.switchM3Subtab('list')">3.1 Daftar Member</button>
+            <button class="sub-tab-btn" data-m3sub="add" onclick="AppEngine.switchM3Subtab('add')">3.2 Tambah Member Baru</button>
+            <button class="sub-tab-btn" data-m3sub="verify" onclick="AppEngine.switchM3Subtab('verify')">3.3 Verifikasi Member <span id="m3-verify-pill-count" class="badge-counter">0</span></button>
+            <button class="sub-tab-btn" data-m3sub="tier" onclick="AppEngine.switchM3Subtab('tier')">3.5 Tier Member ⭐</button>
+          </div>
+
+          <!-- 3.1 DAFTAR MEMBER -->
+          <div id="m3sub-list" class="m3-subtab-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; gap:12px; flex-wrap:wrap; flex:1;">
+                <input type="text" id="m3-search-input" class="form-input" placeholder="🔍 Cari Nama, Email, Username, ID Member..." style="max-width:280px;" onkeyup="AppEngine.renderM3MemberList()">
+                <select id="m3-tier-filter" class="form-input" style="width:150px;" onchange="AppEngine.renderM3MemberList()">
+                  <option value="">Semua Tier</option>
+                  <option value="BRONZE">🥉 BRONZE</option>
+                  <option value="SILVER">🥈 SILVER</option>
+                  <option value="GOLD">🥇 GOLD</option>
+                  <option value="PLATINUM">💎 PLATINUM</option>
+                </select>
+                <select id="m3-status-filter" class="form-input" style="width:150px;" onchange="AppEngine.renderM3MemberList()">
+                  <option value="">Semua Status</option>
+                  <option value="ACTIVE">🟢 ACTIVE</option>
+                  <option value="PENDING">⏳ PENDING</option>
+                  <option value="REJECTED">❌ REJECTED</option>
+                </select>
+                <select id="m3-club-filter" class="form-input" style="width:200px;" onchange="AppEngine.renderM3MemberList()">
+                  <option value="">Semua Klub & Chapter</option>
+                </select>
+              </div>
+              <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.openM3ExportModal()">
+                📥 Export Data Member (PDF / Excel / CSV)
+              </button>
+            </div>
+            <div id="m3-member-table-container" style="overflow-x:auto;"></div>
+          </div>
+
+          <!-- 3.2 TAMBAH MEMBER (FORM DIRECT SUBTAB) -->
+          <div id="m3sub-add" class="m3-subtab-content" style="display:none;">
+            <div style="max-width:760px; margin:0 auto; background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:14px; padding:28px;">
+              <h4 style="font-size:1.2rem; margin-bottom:6px;" class="text-gradient">➕ Form Pendaftaran Member Baru MB INA</h4>
+              <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:20px;">
+                Member ID akan ter-generate otomatis dengan format <code style="color:var(--accent-gold);">MBINA-[CLUB]-[TAHUN]-[SEQUENCE]</code>
+              </p>
+
+              <form id="m3-add-member-form" onsubmit="AppEngine.saveM3MemberFromForm(event)">
+                <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:12px; margin-bottom:16px;">
+                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">─── Data Personal Member ───</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                  <div class="form-group">
+                    <label class="form-label">Nama Lengkap *</label>
+                    <input type="text" id="m3-add-name" class="form-input" placeholder="contoh: Andi Pratama" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Username (Opsional)</label>
+                    <input type="text" id="m3-add-username" class="form-input" placeholder="andi_pratama">
+                  </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                  <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" id="m3-add-email" class="form-input" placeholder="andi@email.com" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Nomor WhatsApp *</label>
+                    <input type="text" id="m3-add-phone" class="form-input" placeholder="081234567890" required>
+                  </div>
+                </div>
+
+                <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:12px; margin-bottom:16px; margin-top:16px;">
+                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">─── Data Demografis ───</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px;">
+                  <div class="form-group">
+                    <label class="form-label">Tanggal Lahir</label>
+                    <input type="date" id="m3-add-bdate" class="form-input">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Jenis Kelamin</label>
+                    <select id="m3-add-gender" class="form-input">
+                      <option value="PRIA">Pria</option>
+                      <option value="WANITA">Wanita</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Provinsi</label>
+                    <input type="text" id="m3-add-province" class="form-input" value="DKI Jakarta">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Kota</label>
+                    <input type="text" id="m3-add-city" class="form-input" value="Jakarta Selatan">
+                  </div>
+                </div>
+
+                <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:12px; margin-bottom:16px; margin-top:16px;">
+                  <span style="font-size:0.85rem; font-weight:800; color:var(--accent-gold);">─── Status Keanggotaan & Klub ───</span>
+                </div>
+                <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px;">
+                  <div class="form-group">
+                    <label class="form-label">Klub / Chapter *</label>
+                    <select id="m3-add-club" class="form-input" required></select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Tier Member</label>
+                    <select id="m3-add-tier" class="form-input">
+                      <option value="BRONZE">🥉 BRONZE</option>
+                      <option value="SILVER">🥈 SILVER</option>
+                      <option value="GOLD">🥇 GOLD</option>
+                      <option value="PLATINUM">💎 PLATINUM</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Status Initial</label>
+                    <select id="m3-add-status" class="form-input">
+                      <option value="ACTIVE">🟢 ACTIVE</option>
+                      <option value="PENDING">⏳ PENDING</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Catatan Admin</label>
+                  <textarea id="m3-add-notes" class="form-input" rows="2" placeholder="Catatan internal pengurus..."></textarea>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+                  <button type="button" class="btn-outline" onclick="AppEngine.switchM3Subtab('list')">Batal</button>
+                  <button type="submit" class="btn-primary">💾 Simpan & Generate Member ID</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- 3.3 VERIFIKASI MEMBER -->
+          <div id="m3sub-verify" class="m3-subtab-content" style="display:none;">
+            <div style="margin-bottom:20px;">
+              <h4 style="font-size:1.1rem; color:var(--accent-gold);">⏳ 3.3.1 Antrean Verifikasi Member Pending</h4>
+              <p style="font-size:0.82rem; color:var(--text-muted);">Setujui atau tolak pendaftaran calon anggota baru. Approval akan otomatis membuat Member ID resmi & notifikasi.</p>
+            </div>
+            <div id="m3-verify-table-container" style="overflow-x:auto;"></div>
+          </div>
+
+          <!-- 3.5 TIER MEMBER -->
+          <div id="m3sub-tier" class="m3-subtab-content" style="display:none;">
+            <div style="margin-bottom:24px;">
+              <h4 style="font-size:1.2rem;" class="text-gradient">⭐ 3.5.1 Sistem Tier Member Berbasis Donasi Pertahun</h4>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Akumulasi donasi sukses dalam 1 tahun kalender secara otomatis meng-upgrade tier keanggotaan member.</p>
+            </div>
+
+            <!-- TABEL SPEK TIER -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px; margin-bottom:32px;">
+              <div class="glass-card" style="padding:22px; border-top:4px solid #CD7F32;">
+                <div style="font-size:2.2rem; margin-bottom:8px;">🥉</div>
+                <h4 style="font-size:1.2rem; color:#CD7F32; margin-bottom:4px;">BRONZE TIER</h4>
+                <div style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-bottom:12px;">Rp 0 - Rp 1.499.999 / Thn</div>
+                <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:16px; display:flex; flex-direction:column; gap:6px;">
+                  <li>Akses Forum Diskusi</li>
+                  <li>Daftar Event Reguler</li>
+                  <li>Profil Member Digital</li>
+                </ul>
+              </div>
+
+              <div class="glass-card" style="padding:22px; border-top:4px solid #C0C0C0;">
+                <div style="font-size:2.2rem; margin-bottom:8px;">🥈</div>
+                <h4 style="font-size:1.2rem; color:#C0C0C0; margin-bottom:4px;">SILVER TIER</h4>
+                <div style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-bottom:12px;">Rp 1.500.000 - Rp 4.499.999 / Thn</div>
+                <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:16px; display:flex; flex-direction:column; gap:6px;">
+                  <li>Semua Benefit Bronze</li>
+                  <li>Badge Exclusive Silver</li>
+                  <li>Diskon 10% Event Official</li>
+                  <li>Prioritas Registrasi Event</li>
+                </ul>
+              </div>
+
+              <div class="glass-card" style="padding:22px; border-top:4px solid #D4AF37;">
+                <div style="font-size:2.2rem; margin-bottom:8px;">🥇</div>
+                <h4 style="font-size:1.2rem; color:#D4AF37; margin-bottom:4px;">GOLD TIER</h4>
+                <div style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-bottom:12px;">Rp 4.500.000 - Rp 8.999.999 / Thn</div>
+                <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:16px; display:flex; flex-direction:column; gap:6px;">
+                  <li>Semua Benefit Silver</li>
+                  <li>Badge Exclusive Gold</li>
+                  <li>Diskon 20% Event Official</li>
+                  <li>Akses Lounge Event VIP</li>
+                  <li>Merchandise Eksklusif MB INA</li>
+                </ul>
+              </div>
+
+              <div class="glass-card" style="padding:22px; border-top:4px solid #A855F7;">
+                <div style="font-size:2.2rem; margin-bottom:8px;">💎</div>
+                <h4 style="font-size:1.2rem; color:#A855F7; margin-bottom:4px;">PLATINUM TIER</h4>
+                <div style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-bottom:12px;">≥ Rp 9.000.000 / Thn</div>
+                <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:16px; display:flex; flex-direction:column; gap:6px;">
+                  <li>Semua Benefit Gold</li>
+                  <li>Badge Exclusive Platinum</li>
+                  <li>Diskon 30% All Events</li>
+                  <li>All Access VIP Treatment</li>
+                  <li>Undangan Special Gala Dinner</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- PENJELASAN UPGRADE OTOMATIS & DONASI -->
+            <div class="glass-panel" style="padding:24px;">
+              <h4 style="font-size:1.1rem; color:var(--accent-gold); margin-bottom:12px;">🔄 3.5.2 Mekanisme Auto Upgrade Tier Trigger</h4>
+              <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.6;">
+                Setiap kali transaksi donasi member dikonfirmasi <strong style="color:var(--primary-emerald);">SUCCESS</strong>, sistem secara otomatis menghitung ulang total donasi dalam tahun kalender berjalan. Jika ambang donasi melampaui batas tier, tier user otomatis dinaikkan, riwayat dicatat di <code style="color:var(--accent-gold);">tier_history</code>, dan notifikasi dikirimkan langsung ke user.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>

@@ -1,0 +1,12 @@
+      if (rOrg.success) this.m2Data.organization = rOrg.organization;
+      if (rHist.success) this.m2Data.history = rHist.history;
+      if (rFnd.success) this.m2Data.founders = rFnd.founders;
+      if (rVM.success) this.m2Data.visionMission = rVM.visionMission;
+      if (rPres.success) this.m2Data.presidents = rPres.presidents;
+      if (rGp.success) this.m2Data.periods = rGp.periods;
+      if (rAb.success) this.m2Data.advisoryBoard = rAb.advisoryBoard;
+      if (rHc.success) this.m2Data.honorCouncil = rHc.honorCouncil;
+      if (rStr.success) this.m2Data.structure = rStr.structure;
+      if (rClb.success) this.m2Data.clubs = rClb.clubs;
+
+      this.renderLandingPageVisionMission();

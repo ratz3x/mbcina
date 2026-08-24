@@ -1,0 +1,8 @@
+      <!-- Executive Styled Admin Tab Bar -->
+      <div class="admin-tab-bar">
+        <button class="admin-tab-btn active" data-admin-tab="m1_portal" onclick="AppEngine.switchAdminTab('m1_portal')">🛡️ M1 - Portal Admin</button>
+        <button class="admin-tab-btn" data-admin-tab="m2_org" onclick="AppEngine.switchAdminTab('m2_org')">🏛️ M2 - Manajemen Organisasi</button>
+        <button class="admin-tab-btn" data-admin-tab="m3_membership" onclick="AppEngine.switchAdminTab('m3_membership')">👥 M3 - Manajemen Keanggotaan</button>
+        <button class="admin-tab-btn" data-admin-tab="m4_registration" onclick="AppEngine.switchAdminTab('m4_registration')">📝 M4 - Pendaftaran Klub</button>
+        <button class="admin-tab-btn" data-admin-tab="m5_forum" onclick="AppEngine.switchAdminTab('m5_forum')">💬 M5 - Forum & Interaksi</button>
+      </div>

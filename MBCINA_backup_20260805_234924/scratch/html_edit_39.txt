@@ -1,0 +1,259 @@
+          <!-- 1.2 MANAJEMEN USER (RBAC) -->
+          <div id="m1sub-users" class="m1-subtab-content" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; gap:12px; flex-wrap:wrap; flex:1;">
+                <input type="text" id="user-mgmt-search" class="form-input" placeholder="🔍 Cari Nama, Email, atau Username..." style="max-width:280px;" onkeyup="AppEngine.renderUserManagement()">
+                <select id="user-mgmt-role-filter" class="form-input" style="width:180px;" onchange="AppEngine.renderUserManagement()">
+                  <option value="">Semua Role</option>
+                  <option value="SUPER_ADMIN">Super Admin</option>
+                  <option value="PRESIDEN">Presiden MB INA</option>
+                  <option value="SEKRETARIS_PUSAT">Sekretaris Pusat</option>
+                  <option value="BENDAHARA_PUSAT">Bendahara Pusat</option>
+                  <option value="ADMIN_ORGANISASI">Admin Organisasi</option>
+                  <option value="PENGURUS_PUSAT">Pengurus Pusat</option>
+                  <option value="PENGURUS_KLUB">Pengurus Klub</option>
+                  <option value="MEMBER">Member</option>
+                  <option value="CALON_MEMBER">Calon Member</option>
+                </select>
+                <select id="user-mgmt-status-filter" class="form-input" style="width:150px;" onchange="AppEngine.renderUserManagement()">
+                  <option value="">Semua Status</option>
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="PENDING">PENDING</option>
+                  <option value="SUSPENDED">SUSPENDED</option>
+                </select>
+              </div>
+              <div style="display:flex; gap:10px;">
+                <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" data-open-modal="modal-import-csv">
+                  📥 Bulk Import (CSV/Excel)
+                </button>
+                <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" data-open-modal="modal-add-user">
+                  + Tambah User Baru
+                </button>
+              </div>
+            </div>
+            <div id="user-mgmt-table" style="overflow-x:auto;"></div>
+          </div>
+
+          <!-- 1.3 AUDIT LOG -->
+          <div id="m1sub-audit" class="m1-subtab-content" style="display:none;">
+            <div style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h4 style="font-size:1.1rem; color:var(--accent-gold);">📜 1.3 Audit Log & Rekam Jejak Operasional System</h4>
+                <p style="font-size:0.82rem; color:var(--text-muted);">Log aktivitas aktivitas user, perizinan, dan perubahan data Supabase PostgreSQL real-time.</p>
+              </div>
+              <button class="btn-outline" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.simulateExport('audit_csv')">📄 Export Audit Log</button>
+            </div>
+            <div id="audit-logs-table" style="overflow-x:auto;"></div>
+          </div>
+
+          <!-- 1.4 PENGATURAN SISTEM (FULL SUB-MODULES) -->
+          <div id="m1sub-settings" class="m1-subtab-content" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h3 style="font-size:1.3rem;" class="text-gradient">⚙️ 1.4 PENGATURAN SISTEM</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted);">Pusat konfigurasi platform MB INA yang hanya dapat diakses oleh Super Admin (Derist Touriano)</p>
+              </div>
+              <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">🔒 FULL ACCESS SUPER ADMIN</span>
+            </div>
+
+            <!-- 3.1.4 Sub-Module Navigation Pills -->
+            <div style="display:flex; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--chrome-border); padding-bottom:16px; margin-bottom:24px;">
+              <button class="sub-tab-btn active" data-subtab="general" onclick="AppEngine.switchSettingsSubtab('general')">1.4.1 Konfigurasi Umum</button>
+              <button class="sub-tab-btn" data-subtab="tier" onclick="AppEngine.switchSettingsSubtab('tier')">1.4.2 Manajemen Tier ⭐</button>
+              <button class="sub-tab-btn" data-subtab="province" onclick="AppEngine.switchSettingsSubtab('province')">1.4.3 Manajemen Provinsi (38)</button>
+              <button class="sub-tab-btn" data-subtab="payment" onclick="AppEngine.switchSettingsSubtab('payment')">1.4.4 Payment Gateway (Mandiri)</button>
+              <button class="sub-tab-btn" data-subtab="email" onclick="AppEngine.switchSettingsSubtab('email')">1.4.5 Email Template</button>
+              <button class="sub-tab-btn" data-subtab="backup" onclick="AppEngine.switchSettingsSubtab('backup')">1.4.6 Backup & Restore</button>
+            </div>
+
+            <!-- 3.1.4.1 KONFIGURASI UMUM -->
+            <div id="subtab-general" class="settings-subtab-content">
+              <div style="max-width:680px;">
+                <h4 style="font-size:1.05rem; margin-bottom:16px; color:var(--accent-gold);">1.4.1 Konfigurasi Umum Platform</h4>
+                <div class="form-group">
+                  <label class="form-label">Application Theme (Dark / Light)</label>
+                  <select id="setting-theme-select" class="form-input">
+                    <option value="LIGHT">Light Mode (Pilihan Utama)</option>
+                    <option value="DARK">Dark Mode (Obsidian)</option>
+                  </select>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                  <div class="form-group">
+                    <label class="form-label">Bahasa Sistem</label>
+                    <select id="setting-language-select" class="form-input">
+                      <option value="ID">Bahasa Indonesia (Default)</option>
+                      <option value="EN">English</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Zona Waktu (Timezone)</label>
+                    <select id="setting-timezone-select" class="form-input">
+                      <option value="Asia/Jakarta (WIB)">Asia/Jakarta (WIB)</option>
+                      <option value="Asia/Makassar (WITA)">Asia/Makassar (WITA)</option>
+                      <option value="Asia/Jayapura (WIT)">Asia/Jayapura (WIT)</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="background:rgba(0,0,0,0.03); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                  <div>
+                    <strong style="font-size:0.95rem; display:block;">Maintenance Mode (On / Off)</strong>
+                    <span style="font-size:0.8rem; color:var(--text-muted);">Nonaktifkan akses publik sementara saat perbaikan sistem.</span>
+                  </div>
+                  <label class="switch-toggle">
+                    <input type="checkbox" id="setting-maint-switch">
+                    <span class="slider-round"></span>
+                  </label>
+                </div>
+                <button class="btn-primary" style="margin-top:24px;" onclick="AppEngine.saveSystemSettings()">💾 Simpan Konfigurasi Umum →</button>
+              </div>
+            </div>
+
+            <!-- 3.1.4.2 MANAJEMEN TIER ⭐ -->
+            <div id="subtab-tier" class="settings-subtab-content" style="display:none;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div>
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold);">1.4.2 Manajemen Tier Keanggotaan (Donasi per Tahun)</h4>
+                  <p style="font-size:0.8rem; color:var(--text-muted);">Kelola benefit, donasi minimum/maksimum, dan badge visual tiap level</p>
+                </div>
+              </div>
+              <div id="tiers-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px;"></div>
+            </div>
+
+            <!-- 3.1.4.3 MANAJEMEN PROVINSI -->
+            <div id="subtab-province" class="settings-subtab-content" style="display:none;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                <div>
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold);">1.4.3 Manajemen Data Provinsi (38 Provinsi Indonesia)</h4>
+                  <p style="font-size:0.8rem; color:var(--text-muted);">Master data wilayah operasional klub & pengurus se-Indonesia</p>
+                </div>
+                <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" data-open-modal="modal-add-province">+ Tambah Provinsi Baru</button>
+              </div>
+              <div id="provinces-admin-table" style="overflow-x:auto;"></div>
+            </div>
+
+            <!-- 3.1.4.4 PAYMENT GATEWAY (BANK MANDIRI OFFICIAL SPONSOR) -->
+            <div id="subtab-payment" class="settings-subtab-content" style="display:none;">
+              <div style="max-width:760px;">
+                <!-- 🏷️ Bank Mandiri Sponsor Badge Banner -->
+                <div style="background:linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(59,130,246,0.15) 100%); border:2px solid var(--accent-gold); border-radius:16px; padding:20px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                  <div style="display:flex; align-items:center; gap:16px;">
+                    <div style="font-size:2.4rem;">🏦</div>
+                    <div>
+                      <div style="font-size:0.75rem; letter-spacing:2px; color:var(--accent-gold); font-weight:800; text-transform:uppercase;">OFFICIAL PAYMENT PARTNER</div>
+                      <h3 style="font-size:1.3rem; margin-top:2px;" class="text-gradient">Bank Mandiri</h3>
+                      <p style="font-size:0.8rem; color:var(--text-muted);">Sponsor Resmi Transaksi Keanggotaan & Event MB INA</p>
+                    </div>
+                  </div>
+                  <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); padding:6px 14px; font-size:0.8rem;">
+                    ✅ MANDIRI EXCLUSIVE SPONSOR
+                  </span>
+                </div>
+
+                <h4 style="font-size:1.05rem; margin-bottom:16px; color:var(--accent-gold);">💳 1.4.4 Konfigurasi Payment Gateway Bank Mandiri</h4>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                  <div class="form-group">
+                    <label class="form-label">Payment Provider *</label>
+                    <input type="text" id="mandiri-provider-display" class="form-input" value="🏦 Bank Mandiri (Sponsor Resmi)" readonly style="font-weight:700; color:var(--accent-gold);">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Mode Transaksi *</label>
+                    <select id="mandiri-mode-select" class="form-input">
+                      <option value="production">⚙️ Production (Live Real Money)</option>
+                      <option value="sandbox">🧪 Sandbox (Testing Simulator)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:14px; padding:20px; margin-bottom:20px;">
+                  <h5 style="font-size:0.95rem; margin-bottom:14px; color:var(--accent-gold);">─── Konfigurasi Rekening Bank Mandiri ───</h5>
+                  
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                      <label class="form-label">Nama Bank</label>
+                      <input type="text" id="mandiri-bank-name" class="form-input" value="Bank Mandiri" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Nomor Rekening *</label>
+                      <input type="text" id="mandiri-account-number" class="form-input" value="123-00-1234567-8" placeholder="123-00-1234567-8" required>
+                    </div>
+                  </div>
+
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                      <label class="form-label">Nama Pemilik Rekening *</label>
+                      <input type="text" id="mandiri-account-name" class="form-input" value="MB Club Indonesia" placeholder="MB Club Indonesia" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">KCU / Kantor Cabang *</label>
+                      <input type="text" id="mandiri-branch" class="form-input" value="KCU Jakarta Pusat" placeholder="KCU Jakarta Pusat" required>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:14px; padding:20px; margin-bottom:20px;">
+                  <h5 style="font-size:0.95rem; margin-bottom:14px; color:var(--accent-gold);">─── Metode Pembayaran Tersedia ───</h5>
+                  
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:0.88rem;">
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                      <input type="checkbox" id="mandiri-method-transfer" checked style="width:18px; height:18px; accent-color:var(--accent-gold);">
+                      <span>✅ Transfer Bank Mandiri</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                      <input type="checkbox" id="mandiri-method-va" checked style="width:18px; height:18px; accent-color:var(--accent-gold);">
+                      <span>✅ Virtual Account Mandiri</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                      <input type="checkbox" id="mandiri-method-qris" checked style="width:18px; height:18px; accent-color:var(--accent-gold);">
+                      <span>✅ QRIS Mandiri</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; color:var(--text-muted); opacity:0.6;">
+                      <input type="checkbox" disabled style="width:18px; height:18px;">
+                      <span>❌ Kartu Kredit (Tidak Tersedia)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; color:var(--text-muted); opacity:0.6;">
+                      <input type="checkbox" disabled style="width:18px; height:18px;">
+                      <span>❌ E-Wallet (Tidak Tersedia)</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Webhook URL (Mandiri Payment Notification) *</label>
+                  <input type="text" id="mandiri-webhook-url" class="form-input" value="https://mbina.or.id/api/webhook/payment-mandiri" required>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; margin-top:24px; gap:12px;">
+                  <button class="btn-outline" onclick="AppEngine.testPaymentConnection()">🧪 Test Connection</button>
+                  <button class="btn-primary" onclick="AppEngine.savePaymentGateway()">Simpan Perubahan Mandiri →</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3.1.4.5 EMAIL TEMPLATE -->
+            <div id="subtab-email" class="settings-subtab-content" style="display:none;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div>
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold);">1.4.5 Manajemen Email & WhatsApp Template</h4>
+                  <p style="font-size:0.8rem; color:var(--text-muted);">Kelola subjek, pesan notifikasi, verifikasi OTP, dan surat konfirmasi</p>
+                </div>
+              </div>
+              <div id="email-templates-table" style="overflow-x:auto;"></div>
+            </div>
+
+            <!-- 3.1.4.6 BACKUP & RESTORE -->
+            <div id="subtab-backup" class="settings-subtab-content" style="display:none;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+                <div>
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold);">1.4.6 Backup & Restore Database Supabase</h4>
+                  <p style="font-size:0.8rem; color:var(--text-muted);">Unduh cadangan data PostgreSQL atau pulihkan database dari riwayat backup</p>
+                </div>
+                <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.createBackupNow()">💾 Backup Database Sekarang</button>
+              </div>
+              <div id="backups-admin-table" style="overflow-x:auto;"></div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>

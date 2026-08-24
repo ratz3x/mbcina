@@ -1,0 +1,565 @@
+    } catch (e) {
+      alert('Gagal menyimpan evaluasi klub: ' + e.message);
+    }
+  },
+
+  /* ==========================================================================
+     MODUL M5 - FORUM & INTERAKSI CONTROLLER & RENDERING ENGINE
+     ========================================================================== */
+  async fetchM5Data() {
+    try {
+      const res = await fetch('api.php?action=get_m5_data').then(r => r.json());
+      if (res.success) {
+        this.m5Data.categories = res.categories || [];
+        this.m5Data.threads = res.threads || [];
+        this.m5Data.replies = res.replies || [];
+        this.m5Data.broadcasts = res.broadcasts || [];
+        this.m5Data.reports = res.reports || [];
+        this.m5Data.rules = res.rules || [];
+        this.m5Data.trending = res.trending || [];
+      }
+    } catch (e) {
+      console.error("Error loading M5 Data:", e);
+    }
+  },
+
+  renderM5Module() {
+    this.renderM5Categories();
+    this.renderM5Threads();
+    this.renderM5Trending();
+    this.renderM5Broadcasts();
+    this.renderM5Reports();
+    this.renderM5Rules();
+    this.switchM5Subtab(this.m5Data.activeSubtab || 'forum');
+  },
+
+  switchM5Subtab(subtab) {
+    this.m5Data.activeSubtab = subtab;
+    document.querySelectorAll('[data-m5sub]').forEach(btn => {
+      if (btn.getAttribute('data-m5sub') === subtab) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+
+    document.querySelectorAll('.m5-subtab-content').forEach(el => el.style.display = 'none');
+    const target = document.getElementById(`m5sub-${subtab}`);
+    if (target) target.style.display = 'block';
+
+    if (subtab === 'thread' && this.m5Data.activeThreadId) {
+      this.renderM5ThreadDetail(this.m5Data.activeThreadId);
+    }
+  },
+
+  renderM5Categories() {
+    const grid = document.getElementById('m5-categories-grid');
+    if (!grid) return;
+
+    grid.innerHTML = this.m5Data.categories.map(c => `
+      <div class="glass-card" style="padding:16px; cursor:pointer; transition:transform 0.2s;" onclick="AppEngine.filterCategoryM5('${c.id}')" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+          <div style="font-size:1.8rem; width:44px; height:44px; border-radius:10px; background:rgba(245,158,11,0.15); display:flex; align-items:center; justify-content:center;">${c.icon}</div>
+          <div>
+            <h5 style="font-size:0.95rem; line-height:1.2;">${c.name}</h5>
+            <span style="font-size:0.75rem; color:var(--text-muted);">${c.thread_count || 0} Threads • ${c.post_count || 0} Posts</span>
+          </div>
+        </div>
+        <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.4;">${c.description}</p>
+      </div>
+    `).join('');
+
+    const sel = document.getElementById('m5-category-filter');
+    if (sel && sel.options.length <= 1) {
+      this.m5Data.categories.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.innerText = `${c.icon} ${c.name}`;
+        sel.appendChild(opt);
+      });
+    }
+  },
+
+  filterCategoryM5(catId) {
+    const sel = document.getElementById('m5-category-filter');
+    if (sel) sel.value = catId;
+    this.renderM5Threads();
+  },
+
+  renderM5Threads() {
+    const container = document.getElementById('m5-threads-list-container');
+    if (!container) return;
+
+    const q = (document.getElementById('m5-thread-search')?.value || '').toLowerCase();
+    const cat = document.getElementById('m5-category-filter')?.value || '';
+    const sort = document.getElementById('m5-sort-filter')?.value || 'NEWEST';
+
+    let list = [...this.m5Data.threads];
+    if (q) {
+      list = list.filter(t => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q) || (t.tags && t.tags.toLowerCase().includes(q)));
+    }
+    if (cat) {
+      list = list.filter(t => t.category_id === cat);
+    }
+    if (sort === 'POPULAR') {
+      list.sort((a, b) => b.replies_count - a.replies_count);
+    }
+
+    if (list.length === 0) {
+      container.innerHTML = `<div class="glass-card" style="padding:30px; text-align:center; color:var(--text-muted);">Tidak ada thread yang sesuai filter pencarian.</div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(t => `
+      <div class="glass-card" style="padding:16px; margin-bottom:12px; border-left:3px solid ${t.is_pinned ? 'var(--accent-gold)' : 'var(--chrome-border)'};">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              ${t.is_pinned ? '<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.68rem;">📌 PINNED</span>' : ''}
+              <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); font-size:0.68rem;">${t.category_icon || '🚗'} ${t.category_name || 'Umum'}</span>
+              <span style="font-size:0.75rem; color:var(--accent-gold); font-family:monospace;">${t.tags || ''}</span>
+            </div>
+            <h4 style="font-size:1.05rem; cursor:pointer;" onclick="AppEngine.openM5ThreadDetail('${t.id}')">${t.title}</h4>
+            <div style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">
+              Oleh <strong style="color:var(--text-main);">${t.author_name}</strong> (@${t.author_username}) • ${new Date(t.created_at || Date.now()).toLocaleDateString('id-ID')}
+            </div>
+          </div>
+          <div style="text-align:right; display:flex; gap:16px; align-items:center;">
+            <div>
+              <div style="font-size:1.1rem; font-weight:800; color:var(--accent-gold);">${t.replies_count || 0}</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Balasan</div>
+            </div>
+            <div>
+              <div style="font-size:1.1rem; font-weight:800; color:var(--text-muted);">${t.views_count || 0}</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">Dilihat</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; border-top:1px solid var(--chrome-border); padding-top:10px;">
+          <div style="font-size:0.78rem; color:var(--text-muted);">
+            Balasan terakhir: ${t.last_post_at ? new Date(t.last_post_at).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : 'Baru saja'}
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="AppEngine.likeM5Post('THREAD', '${t.id}')">👍 Like</button>
+            <button class="btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="AppEngine.openM5ShareModal('${t.id}')">🔗 Share</button>
+            <button class="btn-outline" style="font-size:0.75rem; padding:3px 8px; color:var(--accent-red);" onclick="AppEngine.openM5ReportModal('${t.id}')">🚩 Report</button>
+            <button class="btn-primary" style="font-size:0.75rem; padding:3px 10px;" onclick="AppEngine.openM5ThreadDetail('${t.id}')">💬 Baca & Reply ➔</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  renderM5Trending() {
+    const container = document.getElementById('m5-trending-container');
+    if (!container) return;
+
+    container.innerHTML = this.m5Data.trending.map(tr => `
+      <div style="padding:10px 0; border-bottom:1px solid var(--chrome-border); cursor:pointer;" onclick="AppEngine.openM5ThreadDetail('${tr.id}')">
+        <strong style="font-size:0.85rem; color:var(--text-main); display:block; line-height:1.3;">🔥 ${tr.title}</strong>
+        <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+          <span style="color:var(--accent-gold); font-weight:700;">${tr.replies_count} replies</span> • ${tr.category_name || 'Komunitas'}
+        </div>
+      </div>
+    `).join('');
+  },
+
+  openM5ThreadDetail(threadId) {
+    this.m5Data.activeThreadId = threadId;
+    this.switchM5Subtab('thread');
+    this.renderM5ThreadDetail(threadId);
+  },
+
+  renderM5ThreadDetail(threadId) {
+    const container = document.getElementById('m5-thread-detail-container');
+    if (!container) return;
+
+    const thread = this.m5Data.threads.find(t => t.id === threadId) || this.m5Data.threads[0];
+    if (!thread) {
+      container.innerHTML = `<div class="glass-card" style="padding:20px;">Thread tidak ditemukan.</div>`;
+      return;
+    }
+
+    const threadReplies = this.m5Data.replies.filter(r => r.thread_id === thread.id);
+
+    container.innerHTML = `
+      <div style="margin-bottom:16px;">
+        <button class="btn-outline" style="font-size:0.8rem; padding:4px 12px;" onclick="AppEngine.switchM5Subtab('forum')">⬅️ Kembali ke Daftar Thread</button>
+      </div>
+
+      <!-- MAIN THREAD HEADER CARD -->
+      <div class="glass-card" style="padding:24px; margin-bottom:20px; border-left:4px solid var(--accent-gold);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue);">${thread.category_icon || '🚗'} ${thread.category_name || 'Umum'}</span>
+          <span style="font-size:0.78rem; color:var(--text-muted);">${new Date(thread.created_at || Date.now()).toLocaleString('id-ID')}</span>
+        </div>
+        <h3 style="font-size:1.3rem; margin-bottom:8px;" class="text-gradient">${thread.title}</h3>
+        
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+          <div style="width:38px; height:38px; border-radius:50%; background:var(--accent-gold); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800;">${thread.author_avatar || 'AP'}</div>
+          <div>
+            <strong style="font-size:0.88rem; color:var(--text-main);">${thread.author_name}</strong>
+            <span style="font-size:0.75rem; color:var(--text-muted); display:block;">@${thread.author_username}</span>
+          </div>
+        </div>
+
+        <div style="font-size:0.92rem; color:var(--text-main); line-height:1.7; margin-bottom:16px; white-space:pre-line;">
+          ${thread.content}
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--chrome-border); padding-top:12px;">
+          <span style="font-size:0.8rem; color:var(--accent-gold); font-family:monospace;">${thread.tags || ''}</span>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-outline" style="font-size:0.78rem; padding:4px 10px;" onclick="AppEngine.likeM5Post('THREAD', '${thread.id}')">👍 Like (${thread.views_count || 12})</button>
+            <button class="btn-outline" style="font-size:0.78rem; padding:4px 10px;" onclick="AppEngine.openM5ShareModal('${thread.id}')">🔗 Share</button>
+            <button class="btn-outline" style="font-size:0.78rem; padding:4px 10px; color:var(--accent-red);" onclick="AppEngine.openM5ReportModal('${thread.id}')">🚩 Report</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPLIES LIST (5.2.2 REPLY & QUOTE) -->
+      <h4 style="font-size:1.1rem; color:var(--accent-gold); margin-bottom:14px;">💬 Balasan Diskusi (${threadReplies.length})</h4>
+      <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:24px;">
+        ${threadReplies.map(r => `
+          <div class="glass-card" style="padding:16px; border-left:3px solid var(--chrome-border);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:32px; height:32px; border-radius:50%; background:var(--accent-blue); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:0.78rem;">${r.author_avatar || 'US'}</div>
+                <div>
+                  <strong style="font-size:0.85rem;">${r.author_name}</strong>
+                  <span style="font-size:0.72rem; color:var(--text-muted); font-family:monospace;"> @${r.author_username}</span>
+                </div>
+              </div>
+              <span style="font-size:0.75rem; color:var(--text-muted);">${new Date(r.created_at || Date.now()).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}</span>
+            </div>
+            <p style="font-size:0.88rem; color:var(--text-main); line-height:1.6; margin-bottom:10px;">${r.content}</p>
+            <div style="display:flex; justify-content:flex-end; gap:8px; font-size:0.75rem;">
+              <button class="btn-outline" style="padding:2px 8px;" onclick="AppEngine.likeM5Post('REPLY', '${r.id}')">👍 Like (${r.likes_count || 0})</button>
+              <button class="btn-outline" style="padding:2px 8px; color:var(--accent-red);" onclick="AppEngine.openM5ReportModal('${thread.id}', '${r.id}')">🚩 Report</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- REPLY EDITOR BOX -->
+      <div class="glass-panel" style="padding:20px;">
+        <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:10px;">💬 Tulis Balasan Anda</h4>
+        <form onsubmit="AppEngine.submitM5Reply(event, '${thread.id}')">
+          <div style="margin-bottom:6px; display:flex; gap:6px;">
+            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px;"><b>B</b></button>
+            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px;"><i>I</i></button>
+            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px;"><u>U</u></button>
+            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px;">📷</button>
+          </div>
+          <textarea id="m5-reply-textarea" class="form-input" rows="3" placeholder="Tuliskan komentar atau tanggapan Anda..." required></textarea>
+          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+            <button type="submit" class="btn-primary" style="padding:8px 18px; font-size:0.85rem;">💬 Kirim Balasan</button>
+          </div>
+        </form>
+      </div>
+    `;
+  },
+
+  renderM5Broadcasts() {
+    const analytics = document.getElementById('m5-broadcast-analytics-container');
+    if (analytics) {
+      analytics.innerHTML = `
+        <div class="glass-card" style="padding:16px; border-top:3px solid var(--accent-gold);">
+          <div style="font-size:0.75rem; color:var(--text-muted);">Total Terkirim</div>
+          <div style="font-size:1.6rem; font-weight:900; color:var(--accent-gold);">1.234 Member</div>
+          <span style="font-size:0.72rem; color:var(--primary-emerald);">100% Delivered</span>
+        </div>
+        <div class="glass-card" style="padding:16px; border-top:3px solid var(--accent-blue);">
+          <div style="font-size:0.75rem; color:var(--text-muted);">👁️ Total Dilihat</div>
+          <div style="font-size:1.6rem; font-weight:900; color:var(--accent-blue);">890 Member</div>
+          <span style="font-size:0.72rem; color:var(--accent-blue);">72% Read Rate</span>
+        </div>
+        <div class="glass-card" style="padding:16px; border-top:3px solid var(--primary-emerald);">
+          <div style="font-size:0.75rem; color:var(--text-muted);">🔗 Total Clicks</div>
+          <div style="font-size:1.6rem; font-weight:900; color:var(--primary-emerald);">234 Clicks</div>
+          <span style="font-size:0.72rem; color:var(--primary-emerald);">19% CTR</span>
+        </div>
+        <div class="glass-card" style="padding:16px; border-top:3px solid #A855F7;">
+          <div style="font-size:0.75rem; color:var(--text-muted);">🔥 Engagement Rate</div>
+          <div style="font-size:1.6rem; font-weight:900; color:#A855F7;">19%</div>
+          <span style="font-size:0.72rem; color:#A855F7;">High Engagement</span>
+        </div>
+      `;
+    }
+
+    const container = document.getElementById('m5-broadcast-table-container');
+    if (!container) return;
+
+    container.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+        <thead>
+          <tr style="background:rgba(0,0,0,0.3); text-align:left; color:var(--text-muted);">
+            <th style="padding:10px;">Judul Broadcast</th>
+            <th style="padding:10px;">Target Audience</th>
+            <th style="padding:10px; text-align:center;">Terkirim</th>
+            <th style="padding:10px; text-align:center;">Dilihat</th>
+            <th style="padding:10px; text-align:center;">Diklik</th>
+            <th style="padding:10px; text-align:center;">Waktu Kirim</th>
+            <th style="padding:10px; text-align:center;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.m5Data.broadcasts.map(b => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:10px; font-weight:700; color:var(--text-main);">${b.title}</td>
+              <td style="padding:10px; color:var(--accent-gold);">${b.target_value || 'Semua Member'}</td>
+              <td style="padding:10px; text-align:center; font-weight:700;">${b.total_sent || 1234}</td>
+              <td style="padding:10px; text-align:center; color:var(--accent-blue);">${b.total_views || 890} (${Math.round((b.total_views || 890)/(b.total_sent || 1234)*100)}%)</td>
+              <td style="padding:10px; text-align:center; color:var(--primary-emerald);">${b.total_clicks || 234} (${Math.round((b.total_clicks || 234)/(b.total_sent || 1234)*100)}%)</td>
+              <td style="padding:10px; text-align:center; color:var(--text-muted);">${new Date(b.sent_at || Date.now()).toLocaleDateString('id-ID')}</td>
+              <td style="padding:10px; text-align:center;"><span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">${b.status}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  renderM5Reports() {
+    const container = document.getElementById('m5-reports-table-container');
+    if (!container) return;
+
+    container.innerHTML = `
+      <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+        <thead>
+          <tr style="background:rgba(0,0,0,0.3); text-align:left; color:var(--text-muted);">
+            <th style="padding:8px;">Thread / Target</th>
+            <th style="padding:8px;">Pelapor</th>
+            <th style="padding:8px;">Alasan</th>
+            <th style="padding:8px; text-align:center;">Status</th>
+            <th style="padding:8px; text-align:center;">Aksi Moderasi</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.m5Data.reports.map(r => `
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:8px; font-weight:700; color:var(--text-main);">${r.thread_title || 'Thread #' + r.thread_id}</td>
+              <td style="padding:8px; color:var(--accent-gold);">${r.reporter_name}</td>
+              <td style="padding:8px; color:var(--accent-red); font-weight:700;">${r.reason}</td>
+              <td style="padding:8px; text-align:center;"><span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold);">${r.status}</span></td>
+              <td style="padding:8px; text-align:center; display:flex; gap:6px; justify-content:center;">
+                <button class="btn-primary" style="font-size:0.72rem; padding:2px 6px; background:var(--primary-emerald); border-color:var(--primary-emerald);" onclick="AppEngine.resolveM5Report('${r.id}', 'RESOLVED')">✅ Selesai</button>
+                <button class="btn-outline" style="font-size:0.72rem; padding:2px 6px;" onclick="AppEngine.openM5WarnModal('${r.reporter_name}')">⚠️ Warn User</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  },
+
+  renderM5Rules() {
+    const container = document.getElementById('m5-rules-container');
+    if (!container) return;
+
+    container.innerHTML = this.m5Data.rules.map(rl => `
+      <div style="padding:8px 0; border-bottom:1px solid var(--chrome-border);">
+        <strong style="font-size:0.85rem; color:var(--accent-gold); display:block;">📜 ${rl.title}</strong>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">${rl.description}</p>
+      </div>
+    `).join('');
+  },
+
+  openM5CreateThreadModal() {
+    AuthEngine.openModal('modal-create-thread');
+  },
+
+  async saveM5ThreadFromModal(event) {
+    event.preventDefault();
+    const title = document.getElementById('m5-thread-title').value.trim();
+    const category_id = document.getElementById('m5-thread-category').value;
+    const tags = document.getElementById('m5-thread-tags').value.trim();
+    const content = document.getElementById('m5-thread-content').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=create_forum_thread', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title, category_id, tags, content,
+          author_name: this.currentUser.name || 'Admin MB INA',
+          author_username: this.currentUser.username || 'admin'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        AuthEngine.closeAllModals();
+        await this.fetchM5Data();
+        this.renderM5Threads();
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal membuat thread: ' + e.message);
+    }
+  },
+
+  openM5ShareModal(threadId) {
+    const linkInput = document.getElementById('m5-share-link-input');
+    if (linkInput) linkInput.value = `https://mbina.or.id/forum/thread/${threadId}`;
+    AuthEngine.openModal('modal-share-thread');
+  },
+
+  openM5ReportModal(threadId, replyId = null) {
+    document.getElementById('m5-report-thread-id').value = threadId;
+    document.getElementById('m5-report-reply-id').value = replyId || '';
+    AuthEngine.openModal('modal-report-thread');
+  },
+
+  async saveM5ReportFromModal(event) {
+    event.preventDefault();
+    const thread_id = document.getElementById('m5-report-thread-id').value;
+    const reply_id = document.getElementById('m5-report-reply-id').value;
+    const reason = document.querySelector('input[name="report_reason"]:checked')?.value || 'Spam';
+    const notes = document.getElementById('m5-report-notes').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=report_forum_post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ thread_id, reply_id, reason, notes, reporter_name: this.currentUser.name || 'Member MB INA' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        AuthEngine.closeAllModals();
+        await this.fetchM5Data();
+        this.renderM5Reports();
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal mengirim laporan: ' + e.message);
+    }
+  },
+
+  async submitM5Reply(event, threadId) {
+    event.preventDefault();
+    const content = document.getElementById('m5-reply-textarea').value.trim();
+    if (!content) return;
+
+    try {
+      const res = await fetch('api.php?action=reply_forum_thread', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          thread_id: threadId,
+          content,
+          author_name: this.currentUser.name || 'Member MB INA',
+          author_username: this.currentUser.username || 'member'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        await this.fetchM5Data();
+        this.renderM5ThreadDetail(threadId);
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal mengirim balasan: ' + e.message);
+    }
+  },
+
+  async likeM5Post(targetType, targetId) {
+    try {
+      const res = await fetch('api.php?action=like_forum_post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_type: targetType, target_id: targetId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('👍 ' + data.message);
+        await this.fetchM5Data();
+        if (targetType === 'THREAD') this.renderM5Threads();
+        else this.renderM5ThreadDetail(this.m5Data.activeThreadId);
+      }
+    } catch (e) {
+      console.error("Like error:", e);
+    }
+  },
+
+  openM5CreateBroadcastModal() {
+    AuthEngine.openModal('modal-create-broadcast');
+  },
+
+  async saveM5BroadcastFromModal(event) {
+    event.preventDefault();
+    const title = document.getElementById('m5-bc-title').value.trim();
+    const content = document.getElementById('m5-bc-content').value.trim();
+    const target_type = document.querySelector('input[name="bc_target"]:checked')?.value || 'ALL';
+
+    try {
+      const res = await fetch('api.php?action=create_broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, content, target_type, target_value: 'Semua Member Aktif' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        AuthEngine.closeAllModals();
+        await this.fetchM5Data();
+        this.renderM5Broadcasts();
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal membuat broadcast: ' + e.message);
+    }
+  },
+
+  openM5WarnModal(userName) {
+    document.getElementById('m5-warn-target-user').value = userName;
+    document.getElementById('m5-warn-user-display').value = userName;
+    AuthEngine.openModal('modal-warn-user');
+  },
+
+  async saveM5WarnFromModal(event) {
+    event.preventDefault();
+    const user_name = document.getElementById('m5-warn-target-user').value;
+    const action_type = document.getElementById('m5-warn-action-type').value;
+    const reason = document.getElementById('m5-warn-reason').value.trim();
+    const notes = document.getElementById('m5-warn-notes').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=warn_user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_name, action_type, reason, notes })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('⚖️ ' + data.message);
+        AuthEngine.closeAllModals();
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal memproses moderasi: ' + e.message);
+    }
+  },
+
+  async resolveM5Report(reportId, status) {
+    try {
+      const res = await fetch('api.php?action=moderate_report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report_id: reportId, status })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('✅ ' + data.message);
+        await this.fetchM5Data();
+        this.renderM5Reports();
+      }
+    } catch (e) {
+      alert('Gagal memperbarui status laporan: ' + e.message);
+    }
+  }
+};

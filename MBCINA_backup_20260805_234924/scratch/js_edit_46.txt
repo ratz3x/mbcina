@@ -1,0 +1,128 @@
+  openM4EvaluationModal(clubId) {
+    const clubs = this.m2Data.clubs && this.m2Data.clubs.length ? this.m2Data.clubs : this.clubs;
+    const c = clubs.find(x => x.id === clubId);
+    if (!c) return;
+
+    document.getElementById('m4-eval-club-id').value = c.id;
+    document.getElementById('modal-m4-eval-title').innerText = `📊 Evaluasi Kinerja Klub - ${c.name}`;
+    
+    AuthEngine.openModal('modal-m4-evaluation');
+    this.calculateM4EvaluationAuto();
+  },
+
+  async calculateM4EvaluationAuto() {
+    const clubId = document.getElementById('m4-eval-club-id').value;
+    const year = document.getElementById('m4-eval-year-select').value;
+    if (!clubId) return;
+
+    try {
+      const res = await fetch(`api.php?action=calculate_club_evaluation&club_id=${clubId}&year=${year}`).then(r => r.json());
+      if (res.success) {
+        document.getElementById('m4-range-act').value = res.activity_score;
+        document.getElementById('m4-range-mem').value = res.membership_score;
+        document.getElementById('m4-range-part').value = res.participation_score;
+        document.getElementById('m4-range-adm').value = res.administration_score;
+
+        this.updateM4EvaluationManualScore(res);
+      }
+    } catch (e) {
+      console.error("Auto calculation error:", e);
+    }
+  },
+
+  updateM4EvaluationManualScore(autoData = null) {
+    const act = parseInt(document.getElementById('m4-range-act').value || 70);
+    const mem = parseInt(document.getElementById('m4-range-mem').value || 85);
+    const part = parseInt(document.getElementById('m4-range-part').value || 75);
+    const adm = parseInt(document.getElementById('m4-range-adm').value || 90);
+
+    const wAct = (act * 0.35).toFixed(2);
+    const wMem = (mem * 0.25).toFixed(2);
+    const wPart = (part * 0.25).toFixed(2);
+    const wAdm = (adm * 0.15).toFixed(2);
+
+    const finalScore = (parseFloat(wAct) + parseFloat(wMem) + parseFloat(wPart) + parseFloat(wAdm)).toFixed(2);
+
+    document.getElementById('m4-card-score-act').innerText = `${act}/100`;
+    document.getElementById('m4-card-score-mem').innerText = `${mem}/100`;
+    document.getElementById('m4-card-score-part').innerText = `${part}/100`;
+    document.getElementById('m4-card-score-adm').innerText = `${adm}/100`;
+
+    document.getElementById('m4-weighted-act').innerText = wAct;
+    document.getElementById('m4-weighted-mem').innerText = wMem;
+    document.getElementById('m4-weighted-part').innerText = wPart;
+    document.getElementById('m4-weighted-adm').innerText = wAdm;
+
+    document.getElementById('m4-eval-final-score-display').innerText = `${finalScore} / 100`;
+
+    const badge = document.getElementById('m4-eval-grade-badge');
+    if (badge) {
+      if (finalScore >= 85) {
+        badge.innerHTML = 'GRADE A • ⭐ EXCELLENT';
+        badge.style.background = 'rgba(245,158,11,0.2)';
+        badge.style.color = 'var(--accent-gold)';
+        badge.style.borderColor = 'var(--accent-gold)';
+      } else if (finalScore >= 70) {
+        badge.innerHTML = 'GRADE B • ✅ GOOD';
+        badge.style.background = 'rgba(16,185,129,0.2)';
+        badge.style.color = 'var(--primary-emerald)';
+        badge.style.borderColor = 'var(--primary-emerald)';
+      } else if (finalScore >= 50) {
+        badge.innerHTML = 'GRADE C • ⚠️ FAIR';
+        badge.style.background = 'rgba(245,158,11,0.15)';
+        badge.style.color = '#f59e0b';
+        badge.style.borderColor = '#f59e0b';
+      } else {
+        badge.innerHTML = 'GRADE D • ❌ POOR';
+        badge.style.background = 'rgba(239,68,68,0.2)';
+        badge.style.color = 'var(--accent-red)';
+        badge.style.borderColor = 'var(--accent-red)';
+      }
+    }
+
+    if (autoData && autoData.recommendations) {
+      const recomBox = document.getElementById('m4-eval-recommendations-list');
+      if (recomBox) {
+        recomBox.innerHTML = autoData.recommendations.map(r => `<div>${r}</div>`).join('');
+      }
+    }
+  },
+
+  async saveM4EvaluationSubmit(event) {
+    event.preventDefault();
+    const club_id = document.getElementById('m4-eval-club-id').value;
+    const year = parseInt(document.getElementById('m4-eval-year-select').value || 2026);
+    const activity_score = parseInt(document.getElementById('m4-range-act').value || 70);
+    const membership_score = parseInt(document.getElementById('m4-range-mem').value || 85);
+    const participation_score = parseInt(document.getElementById('m4-range-part').value || 75);
+    const administration_score = parseInt(document.getElementById('m4-range-adm').value || 90);
+    const notes = document.getElementById('m4-eval-notes').value.trim();
+
+    try {
+      const res = await fetch('api.php?action=save_club_evaluation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          club_id,
+          year,
+          activity_score,
+          membership_score,
+          participation_score,
+          administration_score,
+          notes,
+          evaluator: this.currentUser.id || 'usr_superadmin'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 ' + data.message);
+        AuthEngine.closeAllModals();
+        await this.fetchM2Data();
+        this.renderM4ActiveClubs();
+      } else {
+        alert('❌ ' + data.message);
+      }
+    } catch (e) {
+      alert('Gagal menyimpan evaluasi klub: ' + e.message);
+    }
+  }

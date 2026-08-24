@@ -1,0 +1,71 @@
+  openAddPresidentModal() {
+    document.getElementById('edit-pres-id').value = '';
+    document.getElementById('modal-president-title').innerText = '👤 Tambah Presiden MB INA Baru';
+    document.getElementById('edit-pres-name').value = '';
+    document.getElementById('edit-pres-start').value = 2027;
+    document.getElementById('edit-pres-end').value = 2029;
+    document.getElementById('edit-pres-photo').value = '';
+    document.getElementById('edit-pres-bio').value = '';
+    document.getElementById('edit-pres-sort').value = this.m2Data.presidents.length + 1;
+    document.getElementById('edit-pres-current').checked = false;
+
+    const preview = document.getElementById('pres-photo-preview');
+    if (preview) preview.src = 'assets/presidents/default.jpg';
+    const statusEl = document.getElementById('pres-photo-status');
+    if (statusEl) statusEl.innerHTML = 'Format: JPG, PNG, WEBP. Klik \'Upload Foto Presiden\' untuk memilih file dari komputer.';
+
+    AuthEngine.openModal('modal-edit-president');
+  },
+
+  openEditPresidentModal(id) {
+    const p = this.m2Data.presidents.find(x => x.id === id);
+    if (!p) return;
+
+    document.getElementById('edit-pres-id').value = p.id;
+    document.getElementById('modal-president-title').innerText = `📷 Edit Data / Foto: ${p.name}`;
+    document.getElementById('edit-pres-name').value = p.name;
+    document.getElementById('edit-pres-start').value = p.period_start;
+    document.getElementById('edit-pres-end').value = p.period_end;
+    document.getElementById('edit-pres-photo').value = p.photo_url || '';
+    document.getElementById('edit-pres-bio').value = p.bio || '';
+    document.getElementById('edit-pres-sort').value = p.sort_order || 1;
+    document.getElementById('edit-pres-current').checked = p.is_current || false;
+
+    const preview = document.getElementById('pres-photo-preview');
+    if (preview) preview.src = p.photo_url || 'assets/presidents/default.jpg';
+    const statusEl = document.getElementById('pres-photo-status');
+    if (statusEl) statusEl.innerHTML = 'Foto aktif dari database. Klik tombol di atas jika ingin mengganti file foto.';
+
+    AuthEngine.openModal('modal-edit-president');
+  },
+
+  async handlePhotoFileUpload(event, targetInputId, previewImgId, statusSpanId) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const statusEl = document.getElementById(statusSpanId);
+    const inputEl = document.getElementById(targetInputId);
+    const previewEl = document.getElementById(previewImgId);
+
+    if (statusEl) statusEl.innerHTML = `⏳ <em>Mengunggah ${file.name} (${(file.size/1024).toFixed(1)} KB)...</em>`;
+
+    const formData = new FormData();
+    formData.append('photo_file', file);
+
+    try {
+      const res = await fetch('api.php?action=upload_image', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (inputEl) inputEl.value = data.url;
+        if (previewEl) previewEl.src = data.url + '?t=' + Date.now();
+        if (statusEl) statusEl.innerHTML = `✅ <strong style="color:var(--primary-emerald);">${data.message}</strong>`;
+      } else {
+        if (statusEl) statusEl.innerHTML = `❌ <strong style="color:var(--accent-red);">${data.message}</strong>`;
+      }
+    } catch (err) {
+      if (statusEl) statusEl.innerHTML = `❌ <strong style="color:var(--accent-red);">Gagal mengunggah file.</strong>`;
+    }
+  },

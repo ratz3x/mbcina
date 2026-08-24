@@ -1,0 +1,36 @@
+  renderView() {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+
+    const userProfileWidget = document.getElementById('nav-user-profile');
+    const btnLogout = document.getElementById('btn-logout');
+    const btnLogin = document.getElementById('btn-login-nav');
+    const navAvatar = document.getElementById('nav-user-avatar');
+    const adminView = document.getElementById('view-admin-dashboard');
+    const landingView = document.getElementById('view-landing-page');
+
+    if (this.currentRole === 'GUEST' || !this.currentRole) {
+      if (userProfileWidget) userProfileWidget.style.display = 'none';
+      if (btnLogout) btnLogout.style.display = 'none';
+      if (btnLogin) btnLogin.style.display = 'inline-flex';
+
+      if (adminView) adminView.style.display = 'none';
+      if (landingView) landingView.style.display = 'block';
+    } else {
+      if (userProfileWidget) {
+        userProfileWidget.style.display = 'flex';
+        document.getElementById('nav-user-name').innerText = this.currentUser.name;
+        document.getElementById('nav-user-role-badge').innerText = this.formatRoleName(this.currentRole);
+        if (navAvatar && this.currentUser && this.currentUser.name) {
+          navAvatar.innerText = this.currentUser.name.substring(0, 2).toUpperCase();
+        }
+      }
+      if (btnLogout) btnLogout.style.display = 'inline-flex';
+      if (btnLogin) btnLogin.style.display = 'none';
+
+      if (landingView) landingView.style.display = 'none';
+      if (adminView) {
+        adminView.style.display = 'block';
+        this.switchAdminTab(this.activeAdminTab);
+      }
+    }
+  },

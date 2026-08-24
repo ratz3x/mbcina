@@ -1,0 +1,195 @@
+  renderAdminDashboard() {
+    const totalClubs = this.m2Data.clubs.length || this.clubs.length;
+    const stats = this.adminStats ? this.adminStats.stats : { totalMembers: this.users.length, activeClubs: totalClubs, monthlyTransactionRp: 'Rp 425.500.000', pendingApprovals: 0 };
+    
+    document.getElementById('stat-members-count').innerText = stats.totalMembers.toLocaleString();
+    document.getElementById('stat-clubs-count').innerText = totalClubs;
+    document.getElementById('stat-revenue-amount').innerText = stats.monthlyTransactionRp;
+    document.getElementById('stat-pending-count').innerText = stats.pendingApprovals;
+
+    const badgeTotal = document.getElementById('map-total-clubs-badge');
+    if (badgeTotal) badgeTotal.innerText = `${totalClubs} KLUB TERDAFTAR`;
+
+    // Render Interactive Indonesia SVG Map
+    this.renderIndonesiaMap();
+
+    const growthData = (this.adminStats && this.adminStats.chartGrowth) ? this.adminStats.chartGrowth.weekly : { Sen: 42, Sel: 65, Rab: 58, Kam: 84, Jum: 96, Sab: 120, Ming: 110 };
+    const chartContainer = document.getElementById('admin-growth-chart');
+    if (chartContainer) {
+      const maxVal = Math.max(...Object.values(growthData));
+      chartContainer.innerHTML = Object.entries(growthData).map(([day, val]) => `
+        <div class="chart-bar-col">
+          <div class="chart-bar" style="height: ${(val / maxVal) * 100}%;" title="${val} Registrasi Baru"></div>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${day}</span>
+        </div>
+      `).join('');
+    }
+
+    const regData = (this.adminStats && this.adminStats.regionalDistribution) ? this.adminStats.regionalDistribution : [
+      { region: 'DKI Jakarta & Banten', count: 4820, percentage: 38 },
+      { region: 'Jawa Barat', count: 2950, percentage: 24 },
+      { region: 'Jawa Tengah & DIY', count: 1840, percentage: 15 },
+      { region: 'Jawa Timur & Bali', count: 1650, percentage: 13 },
+      { region: 'Sumatera & Kalimantan', count: 1280, percentage: 10 }
+    ];
+    const regionContainer = document.getElementById('admin-region-distribution');
+    if (regionContainer) {
+      regionContainer.innerHTML = regData.map(r => `
+        <div class="region-progress-row">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+            <span>${r.region}</span>
+            <strong style="color:var(--accent-gold);">${r.count} Anggota (${r.percentage}%)</strong>
+          </div>
+          <div class="region-progress-bar">
+            <div class="region-progress-fill" style="width:${r.percentage}%;"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const alerts = (this.adminStats && this.adminStats.systemAlerts) ? this.adminStats.systemAlerts : [];
+    const alertsContainer = document.getElementById('admin-alerts-feed');
+    if (alertsContainer) {
+      alertsContainer.innerHTML = alerts.map(a => `
+        <div style="padding:12px; border-bottom:1px solid var(--chrome-border); display:flex; align-items:center; gap:12px; font-size:0.85rem;">
+          <span class="tier-badge" style="background:${a.level === 'WARNING' ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}; color:${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'}; border:1px solid ${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'};">
+            ${a.level}
+          </span>
+          <span style="flex:1;">${a.message}</span>
+          <span style="font-size:0.75rem; color:var(--text-muted);">${a.time}</span>
+        </div>
+      `).join('');
+    }
+
+    this.renderVerificationQueue();
+  },
+
+  // 🗺️ INTERACTIVE MAP OF INDONESIA WITH 110 CLUBS INTEGRATION
+  renderIndonesiaMap() {
+    const mapContainer = document.getElementById('admin-indonesia-map');
+    if (!mapContainer) return;
+
+    const clubs = this.m2Data.clubs;
+
+    // Group clubs by region
+    const regionMap = {
+      'Regional Sumatra': clubs.filter(c => c.region === 'Regional Sumatra'),
+      'Regional Banten': clubs.filter(c => c.region === 'Regional Banten'),
+      'Regional Metro DKI Jakarta': clubs.filter(c => c.region === 'Regional Metro DKI Jakarta'),
+      'Regional Jawa Barat': clubs.filter(c => c.region === 'Regional Jawa Barat'),
+      'Regional Jawa Tengah': clubs.filter(c => c.region === 'Regional Jawa Tengah'),
+      'Regional Yogyakarta': clubs.filter(c => c.region === 'Regional Yogyakarta'),
+      'Regional Jawa Timur & Bali': clubs.filter(c => c.region === 'Regional Jawa Timur & Bali'),
+      'Regional Kalimantan & Sulawesi': clubs.filter(c => c.region === 'Regional Kalimantan & Sulawesi')
+    };
+
+    // Hotspot Pin Coordinates on SVG canvas (viewBox 0 0 760 300)
+    const pins = [
+      { key: 'Regional Sumatra', name: '1. Sumatra', x: 130, y: 135, color: '#f59e0b' },
+      { key: 'Regional Banten', name: '2. Banten', x: 230, y: 240, color: '#3b82f6' },
+      { key: 'Regional Metro DKI Jakarta', name: '3. DKI Jakarta', x: 260, y: 245, color: '#10b981' },
+      { key: 'Regional Jawa Barat', name: '4. Jawa Barat', x: 295, y: 255, color: '#f59e0b' },
+      { key: 'Regional Jawa Tengah', name: '5. Jawa Tengah', x: 345, y: 260, color: '#ef4444' },
+      { key: 'Regional Yogyakarta', name: '6. Yogyakarta', x: 365, y: 275, color: '#8b5cf6' },
+      { key: 'Regional Jawa Timur & Bali', name: '7. Jatim & Bali', x: 425, y: 270, color: '#ec4899' },
+      { key: 'Regional Kalimantan & Sulawesi', name: '8. Kalsul', x: 510, y: 180, color: '#06b6d4' }
+    ];
+
+    const pinsSvg = pins.map(p => {
+      const cList = regionMap[p.key] || [];
+      const count = cList.length;
+
+      return `
+        <!-- PIN MARKER: ${p.name} -->
+        <g class="map-pin-group" cursor="pointer" onclick="AppEngine.selectMapRegion('${p.key}')" onmouseenter="AppEngine.selectMapRegion('${p.key}')">
+          <!-- Pulse animation ring -->
+          <circle cx="${p.x}" cy="${p.y}" r="18" fill="${p.color}" opacity="0.25">
+            <animate attributeName="r" values="12;22;12" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.4;0.1;0.4" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <!-- Pin Body -->
+          <circle cx="${p.x}" cy="${p.y}" r="12" fill="${p.color}" stroke="#ffffff" stroke-width="2" box-shadow="0 0 10px ${p.color}"/>
+          <!-- Count Label -->
+          <text x="${p.x}" y="${p.y + 4}" text-anchor="middle" fill="#ffffff" font-size="10px" font-weight="900" font-family="Outfit, sans-serif">${count}</text>
+          <!-- Region Tooltip Title -->
+          <text x="${p.x}" y="${p.y - 16}" text-anchor="middle" fill="var(--text-main)" font-size="11px" font-weight="800" font-family="Outfit, sans-serif" stroke="var(--bg-card)" stroke-width="3" paint-order="stroke fill">${p.name}</text>
+        </g>
+      `;
+    }).join('');
+
+    mapContainer.innerHTML = `
+      <svg viewBox="0 0 760 320" style="width:100%; height:auto; display:block; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.2));">
+        <defs>
+          <linearGradient id="mapOceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(15,23,42,0.6)"/>
+            <stop offset="100%" stop-color="rgba(30,41,59,0.8)"/>
+          </linearGradient>
+          <linearGradient id="islandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="rgba(245,158,11,0.2)"/>
+            <stop offset="100%" stop-color="rgba(59,130,246,0.15)"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Background ocean grid canvas -->
+        <rect width="760" height="320" rx="10" fill="url(#mapOceanGrad)"/>
+        
+        <!-- Grid lines for executive map background -->
+        <path d="M 0 80 L 760 80 M 0 160 L 760 160 M 0 240 L 760 240 M 150 0 L 150 320 M 300 0 L 300 320 M 450 0 L 450 320 M 600 0 L 600 320" stroke="rgba(255,255,255,0.04)" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <!-- INDONESIA ISLAND VECTOR PATH OUTLINES -->
+        <g fill="url(#islandGrad)" stroke="var(--accent-gold)" stroke-width="1.5" stroke-linejoin="round" opacity="0.85">
+          <!-- SUMATRA -->
+          <path d="M 50,210 L 90,160 L 130,120 L 170,90 L 195,105 L 180,140 L 150,180 L 110,220 L 75,235 Z"/>
+          <!-- JAWA & BALI -->
+          <path d="M 220,250 L 260,250 L 310,255 L 370,265 L 410,268 L 440,266 L 450,264 L 465,270 L 455,278 L 380,278 L 290,270 L 220,260 Z"/>
+          <!-- KALIMANTAN -->
+          <path d="M 250,90 L 290,65 L 340,75 L 380,105 L 370,145 L 330,160 L 280,155 L 250,120 Z"/>
+          <!-- SULAWESI -->
+          <path d="M 430,95 L 460,90 L 485,115 L 460,130 L 465,160 L 450,185 L 435,175 L 445,145 L 420,135 Z"/>
+          <!-- NUSA TENGGARA (NTB/NTT) -->
+          <path d="M 470,272 L 490,270 L 520,275 L 560,278 L 560,285 L 515,283 L 470,280 Z"/>
+          <!-- MALUKU & PAPUA -->
+          <path d="M 570,120 L 610,110 L 670,125 L 720,140 L 730,190 L 700,200 L 660,180 L 620,165 L 580,150 Z"/>
+        </g>
+
+        <!-- MAP MARKERS & HOTSPOTS -->
+        ${pinsSvg}
+      </svg>
+    `;
+
+    // Initialize with Sumatra or first available region
+    this.selectMapRegion('Regional Sumatra');
+  },
+
+  selectMapRegion(regionName) {
+    const detailContainer = document.getElementById('admin-map-region-detail');
+    if (!detailContainer) return;
+
+    const clubs = this.m2Data.clubs.filter(c => c.region === regionName);
+    const totalMembers = clubs.reduce((acc, c) => acc + (parseInt(c.member_count) || 0), 0);
+
+    detailContainer.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <div>
+          <span style="font-size:0.75rem; color:var(--accent-gold); font-weight:800; letter-spacing:1px; text-transform:uppercase;">DETAIL WILAYAH MAP</span>
+          <h4 style="font-size:1.15rem; color:var(--text-main); margin-top:2px;">📍 ${regionName} (${clubs.length} Klub & Chapter)</h4>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+            👥 ${totalMembers.toLocaleString()} Total Member
+          </span>
+          <button class="btn-outline" style="padding:4px 12px; font-size:0.75rem;" onclick="AppEngine.switchM2Subtab('clubs')">📂 Buka Modul 2.2 & 2.3 →</button>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:8px; max-height:160px; overflow-y:auto; padding:4px;">
+        ${clubs.map(c => `
+          <div class="selectable-card" style="padding:8px 12px; display:inline-flex; align-items:center; gap:8px; background:rgba(0,0,0,0.04); border-color:var(--chrome-border);" onclick="AppEngine.showClubHoverModal('${c.id}')" title="Klik untuk lihat Sejarah, Ketua, & CP">
+            <span style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.75rem;">${c.code}</span>
+            <span style="font-weight:700; font-size:0.82rem; color:var(--text-main);">${c.name}</span>
+            <span style="font-size:0.7rem; color:var(--text-muted);">(${c.city})</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  },

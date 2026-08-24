@@ -1,0 +1,19 @@
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">4. Logo Klub</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ Uploaded</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.logo_url || 'assets/mb_badge.jpg'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[🖼️ Lihat Logo]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">5. List 15+ Anggota Aktif</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ ${app.total_members || 15}/15 Active</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.members_list_url || 'assets/docs/sample_daftar_anggota.xlsx'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[📊 Download List]</a></td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--chrome-border);">
+              <td style="padding:5px;">6. Bukti Transfer Rp 350.000</td>
+              <td style="padding:5px; text-align:center; color:var(--primary-emerald);">✅ ${app.payment_status || 'VERIFIED'}</td>
+              <td style="padding:5px; text-align:center;"><a href="${app.payment_proof_url || 'assets/docs/sample_bukti_transfer.jpg'}" target="_blank" style="color:var(--accent-gold); font-weight:700;">[🧾 Lihat Bukti]</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;

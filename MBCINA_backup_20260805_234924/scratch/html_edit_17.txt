@@ -1,0 +1,97 @@
+  <!-- MODAL: EDIT / TAMBAH KLUB (2.2 & 2.3 COMPLETE FIELDS) -->
+  <div id="modal-edit-club" class="modal-backdrop">
+    <div class="modal-container" style="max-width:640px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-club-title" style="font-size:1.2rem;">🚗 Edit Data Klub / Chapter</h3>
+          <span style="font-size:0.75rem; color:var(--accent-gold);">Kelola Seluruh Detail Data Klub Terdaftar di Supabase Cloud</span>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="edit-club-form" onsubmit="AppEngine.saveClubFromModal(event)">
+          <input type="hidden" id="edit-club-id">
+
+          <!-- 1. IDENTITAS KLUB -->
+          <div class="form-group">
+            <label class="form-label">Nama Resmi Klub / Chapter *</label>
+            <input type="text" id="edit-club-name" class="form-input" placeholder="contoh: MBC Aceh atau W124MBCI Jakarta Chapter" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+            <div class="form-group">
+              <label class="form-label">Kode Unik Klub *</label>
+              <input type="text" id="edit-club-code" class="form-input" placeholder="MBCACEH" required style="font-family:monospace;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipe Organisasi *</label>
+              <select id="edit-club-type" class="form-input">
+                <option value="CLUB">CLUB Utama</option>
+                <option value="CHAPTER">CHAPTER / District / Region</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jumlah Member *</label>
+              <input type="number" id="edit-club-member-count" class="form-input" value="85" required>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label class="form-label">Region Wilayah *</label>
+              <select id="edit-club-region" class="form-input">
+                <option value="Regional Sumatra">1. Regional Sumatra</option>
+                <option value="Regional Banten">2. Regional Banten</option>
+                <option value="Regional Metro DKI Jakarta">3. Regional Metro DKI Jakarta</option>
+                <option value="Regional Jawa Barat">4. Regional Jawa Barat</option>
+                <option value="Regional Jawa Tengah">5. Regional Jawa Tengah</option>
+                <option value="Regional Yogyakarta">6. Regional Yogyakarta</option>
+                <option value="Regional Jawa Timur & Bali">7. Regional Jawa Timur & Bali</option>
+                <option value="Regional Kalimantan & Sulawesi">8. Regional Kalimantan & Sulawesi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kota Domisili *</label>
+              <input type="text" id="edit-club-city" class="form-input" placeholder="contoh: Medan, Bandung, Surabaya" required>
+            </div>
+          </div>
+
+          <!-- 2. KETUA UMUM & CONTACT PERSON -->
+          <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; margin-bottom:16px;">
+            <h5 style="font-size:0.9rem; color:var(--accent-gold); margin-bottom:12px;">👑 Kepengurusan & Kontak Resmi</h5>
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap & Gelar Ketua Umum *</label>
+              <input type="text" id="edit-club-ketua" class="form-input" placeholder="contoh: H. Ahmad Fauzi, S.E." required>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+              <div class="form-group">
+                <label class="form-label">Nama Contact Person (Sekretariat/Humas) *</label>
+                <input type="text" id="edit-club-cp" class="form-input" placeholder="contoh: Hendra (Sekretaris Club)" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nomor WhatsApp Contact Person *</label>
+                <input type="text" id="edit-club-phone" class="form-input" placeholder="contoh: 0812-3456-7890" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. SEJARAH RINGKAS & TAHUN BERDIRI -->
+          <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; margin-bottom:16px;">
+            <h5 style="font-size:0.9rem; color:var(--accent-gold); margin-bottom:12px;">📖 Sejarah & Tahun Berdiri</h5>
+            <div class="form-group">
+              <label class="form-label">Tahun Berdiri (Founded Year) *</label>
+              <input type="number" id="edit-club-year" class="form-input" value="2004" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sejarah Ringkas Club *</label>
+              <textarea id="edit-club-desc" class="form-input" rows="4" placeholder="Tuliskan latar belakang singkat pendirian klub, peran di regional, dan kegiatan rutin..." required></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width:100%;">💾 Simpan Perubahan Data Klub ke Supabase Cloud</button>
+        </form>
+      </div>
+    </div>
+  </div>

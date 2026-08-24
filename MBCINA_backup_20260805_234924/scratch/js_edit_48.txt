@@ -1,0 +1,17 @@
+  openM4EvaluationModal(clubId) {
+    const clubs = (this.m2Data.clubs && this.m2Data.clubs.length > 0) ? this.m2Data.clubs : (this.clubs && this.clubs.length > 0 ? this.clubs : []);
+    let c = clubs.find(x => x.id === clubId);
+
+    if (!c) {
+      c = { id: clubId, name: 'Klub MB INA', evaluation_score: 85 };
+    }
+
+    const inputClubId = document.getElementById('m4-eval-club-id');
+    const titleEl = document.getElementById('modal-m4-eval-title');
+
+    if (inputClubId) inputClubId.value = c.id;
+    if (titleEl) titleEl.innerText = `📊 Evaluasi Kinerja Klub - ${c.name}`;
+    
+    AuthEngine.openModal('modal-m4-evaluation');
+    this.calculateM4EvaluationAuto();
+  },

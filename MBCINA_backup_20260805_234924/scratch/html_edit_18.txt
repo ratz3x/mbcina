@@ -1,0 +1,36 @@
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:24px; margin-bottom:28px;">
+          <!-- LEFT PANEL: INTERACTIVE MAP OF INDONESIA WITH 110 CLUBS INTEGRATED -->
+          <div class="glass-panel" style="padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+              <div>
+                <h3 style="font-size:1.2rem;" class="text-gradient">🗺️ Peta Persebaran 110+ Klub & Chapter MB INA</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Peta Interaktif Indonesia Terintegrasi Data Realtime 2.2 & 2.3 Supabase Cloud</p>
+              </div>
+              <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); padding:6px 12px;" id="map-total-clubs-badge">
+                110 KLUB TERDAFTAR
+              </span>
+            </div>
+
+            <!-- SVG INDONESIA MAP CONTAINER -->
+            <div id="admin-indonesia-map" style="width:100%; border:1px solid var(--chrome-border); border-radius:14px; background:rgba(0,0,0,0.15); padding:16px; overflow:hidden; position:relative;"></div>
+
+            <!-- REGION DETAIL DRAWER BELOW MAP -->
+            <div id="admin-map-region-detail" style="margin-top:16px; background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:12px; padding:16px;"></div>
+          </div>
+
+          <!-- RIGHT PANEL: GRAFIK PERTUMBUHAN REGISTRASI MEMBER & STATISTIK -->
+          <div class="glass-panel" style="padding:24px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3 style="font-size:1.1rem;" class="text-gradient">📊 Grafik Pertumbuhan Registrasi Member</h3>
+                <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-size:0.7rem;">+18.4% BULAN INI</span>
+              </div>
+              <div id="admin-growth-chart" class="chart-bar-container"></div>
+            </div>
+
+            <div style="margin-top:24px; border-top:1px solid var(--chrome-border); padding-top:16px;">
+              <h4 style="font-size:0.9rem; margin-bottom:12px; color:var(--accent-gold);">🏛️ Ringkasan Member per Wilayah:</h4>
+              <div id="admin-region-distribution"></div>
+            </div>
+          </div>
+        </div>

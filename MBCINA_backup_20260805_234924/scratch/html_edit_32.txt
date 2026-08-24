@@ -1,0 +1,241 @@
+        </div>
+      </div>
+
+      <!-- TAB M4: MODUL M4 - PENDAFTARAN KLUB -->
+      <div id="admin-tab-m4_registration" class="admin-tab-content" style="display:none;">
+        <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-size:1.3rem;" class="text-gradient">📝 MODUL M4 - PENDAFTARAN KLUB BARU</h3>
+              <p style="font-size:0.85rem; color:var(--text-muted);">Sistem pengelolaan pendaftaran klub baru, pengajuan formulir, verifikasi, approval, dan evaluasi kinerja klub</p>
+            </div>
+            <span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">REGISTRATION ENGINE ACTIVE</span>
+          </div>
+
+          <!-- M4 Sub-Tab Navigation Pills -->
+          <div style="display:flex; gap:8px; flex-wrap:wrap; border-bottom:1px solid var(--chrome-border); padding-bottom:16px; margin-bottom:24px;">
+            <button class="sub-tab-btn active" data-m4sub="form" onclick="AppEngine.switchM4Subtab('form')">4.1 Formulir Pendaftaran</button>
+            <button class="sub-tab-btn" data-m4sub="pending" onclick="AppEngine.switchM4Subtab('pending')">4.2 Daftar Pending & Status</button>
+            <button class="sub-tab-btn" data-m4sub="detail" onclick="AppEngine.switchM4Subtab('detail')">4.3 Detail Review Pengajuan</button>
+            <button class="sub-tab-btn" data-m4sub="active_clubs" onclick="AppEngine.switchM4Subtab('active_clubs')">4.4 Klub Aktif & Evaluasi</button>
+          </div>
+
+          <!-- 4.1 FORMULIR PENDAFTARAN KLUB BARU (MULTI-STEP) -->
+          <div id="m4sub-form" class="m4-subtab-content">
+            <div class="glass-panel" style="padding:24px; max-width:850px; margin:0 auto;">
+              <!-- Wizard Progress Bar -->
+              <div style="display:flex; justify-content:space-around; align-items:center; margin-bottom:28px; border-bottom:1px solid var(--chrome-border); padding-bottom:16px;">
+                <div id="m4-step-indicator-1" style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:700; color:var(--accent-gold);">
+                  <span style="width:28px; height:28px; border-radius:50%; background:var(--accent-gold); color:#000; display:inline-flex; align-items:center; justify-content:center;">1</span> Data Klub
+                </div>
+                <div style="height:2px; width:40px; background:var(--chrome-border);"></div>
+                <div id="m4-step-indicator-2" style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:700; color:var(--text-muted);">
+                  <span style="width:28px; height:28px; border-radius:50%; background:var(--chrome-border); color:var(--text-muted); display:inline-flex; align-items:center; justify-content:center;">2</span> Dokumen & Kontak
+                </div>
+                <div style="height:2px; width:40px; background:var(--chrome-border);"></div>
+                <div id="m4-step-indicator-3" style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:700; color:var(--text-muted);">
+                  <span style="width:28px; height:28px; border-radius:50%; background:var(--chrome-border); color:var(--text-muted); display:inline-flex; align-items:center; justify-content:center;">3</span> Preview & Submit
+                </div>
+              </div>
+
+              <form id="m4-club-reg-form" onsubmit="AppEngine.handleM4FormSubmit(event)">
+                <!-- STEP 1: DATA KLUB -->
+                <div id="m4-step-1-content">
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">── Identitas Klub ──</h4>
+                  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                      <label class="form-label">Nama Klub *</label>
+                      <input type="text" id="m4-form-name" class="form-input" placeholder="contoh: MBC Tegal Raya" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Kode Unik (3-5 Huruf) *</label>
+                      <input type="text" id="m4-form-code" class="form-input" placeholder="TGL" maxlength="10" required style="text-transform:uppercase;">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Alias Klub</label>
+                      <input type="text" id="m4-form-alias" class="form-input" placeholder="MTR">
+                    </div>
+                  </div>
+
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-top:20px; margin-bottom:16px;">── Lokasi Domisili ──</h4>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                      <label class="form-label">Provinsi Wilayah *</label>
+                      <select id="m4-form-province" class="form-input" required>
+                        <option value="Jawa Tengah">Jawa Tengah</option>
+                        <option value="DKI Jakarta">DKI Jakarta</option>
+                        <option value="Jawa Barat">Jawa Barat</option>
+                        <option value="Jawa Timur & Bali">Jawa Timur & Bali</option>
+                        <option value="Sumatra">Sumatra</option>
+                        <option value="Banten">Banten</option>
+                        <option value="Yogyakarta">Yogyakarta</option>
+                        <option value="Kalimantan & Sulawesi">Kalimantan & Sulawesi</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Kota / Kabupaten *</label>
+                      <input type="text" id="m4-form-city" class="form-input" placeholder="Tegal" required>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Alamat Lengkap Sekretariat *</label>
+                    <textarea id="m4-form-address" class="form-input" rows="2" placeholder="Jl. Raya Tegal No. 1..." required></textarea>
+                  </div>
+
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-top:20px; margin-bottom:16px;">── Informasi Klub ──</h4>
+                  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                      <label class="form-label">Tahun Berdiri *</label>
+                      <input type="number" id="m4-form-year" class="form-input" value="2015" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Perkiraan Jumlah Member *</label>
+                      <input type="number" id="m4-form-member-est" class="form-input" value="35" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Jenis Klub *</label>
+                      <select id="m4-form-type" class="form-input" required>
+                        <option value="CLUB">CLUB</option>
+                        <option value="CHAPTER">CHAPTER</option>
+                        <option value="DISTRIK">DISTRIK</option>
+                        <option value="REGION">REGION</option>
+                        <option value="COMMUNITY">COMMUNITY</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Deskripsi & Profil Singkat Klub *</label>
+                    <textarea id="m4-form-desc" class="form-input" rows="3" placeholder="Komunitas pecinta Mercedes-Benz di Tegal dan sekitarnya..." required></textarea>
+                  </div>
+
+                  <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                    <button type="button" class="btn-primary" onclick="AppEngine.goToM4Step(2)">Selanjutnya ➔</button>
+                  </div>
+                </div>
+
+                <!-- STEP 2: DOKUMEN & KONTAK -->
+                <div id="m4-step-2-content" style="display:none;">
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">── Upload Dokumen & Foto ──</h4>
+                  <div class="form-group">
+                    <label class="form-label">URL / Path Logo Klub</label>
+                    <input type="text" id="m4-form-logo" class="form-input" value="assets/mb_badge.jpg" placeholder="Format: PNG, JPG, SVG">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">URL Foto Kegiatan (Pisahkan dengan koma)</label>
+                    <input type="text" id="m4-form-photos" class="form-input" value="assets/mb_hero.jpg, assets/mb_badge.jpg" placeholder="assets/photo1.jpg, assets/photo2.jpg">
+                  </div>
+
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-top:20px; margin-bottom:16px;">── Kontak Penanggung Jawab ──</h4>
+                  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                      <label class="form-label">Contact Person (Ketua/Pengurus) *</label>
+                      <input type="text" id="m4-form-cp" class="form-input" placeholder="Budi Santoso" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">No. WhatsApp *</label>
+                      <input type="text" id="m4-form-phone" class="form-input" placeholder="081234567890" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Email Official</label>
+                      <input type="email" id="m4-form-email" class="form-input" placeholder="mbctegal@example.com">
+                    </div>
+                  </div>
+
+                  <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-top:20px; margin-bottom:16px;">── Media Sosial ──</h4>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                      <label class="form-label">Instagram</label>
+                      <input type="text" id="m4-form-ig" class="form-input" placeholder="@mbctegal">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Facebook Page</label>
+                      <input type="text" id="m4-form-fb" class="form-input" placeholder="MBC Tegal Raya">
+                    </div>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between; margin-top:20px;">
+                    <button type="button" class="btn-outline" onclick="AppEngine.goToM4Step(1)">⬅️ Kembali</button>
+                    <button type="button" class="btn-primary" onclick="AppEngine.goToM4Step(3)">Preview & Submit ➔</button>
+                  </div>
+                </div>
+
+                <!-- STEP 3: PREVIEW & SUBMIT -->
+                <div id="m4-step-3-content" style="display:none;">
+                  <div class="glass-card" style="padding:20px; margin-bottom:20px; border-left:4px solid var(--accent-gold);">
+                    <h4 style="font-size:1.1rem; color:var(--accent-gold); margin-bottom:12px;">⚠️ Periksa Kembali Data Pengajuan Klub Anda</h4>
+                    <div id="m4-preview-summary-container" style="font-size:0.88rem; line-height:1.8;"></div>
+                  </div>
+
+                  <div class="form-group" style="display:flex; gap:10px; align-items:center; margin-bottom:20px;">
+                    <input type="checkbox" id="m4-form-agree" style="width:18px; height:18px;">
+                    <label for="m4-form-agree" style="font-size:0.85rem; color:var(--text-main); cursor:pointer;">
+                      Saya menyatakan bahwa seluruh data yang diisikan adalah benar dan bersedia mematuhi AD/ART MB Club Indonesia.
+                    </label>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between;">
+                    <button type="button" class="btn-outline" onclick="AppEngine.goToM4Step(2)">⬅️ Kembali</button>
+                    <button type="submit" class="btn-primary" style="background:var(--primary-emerald); border-color:var(--primary-emerald);">🚀 Submit Pengajuan Klub</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- 4.2 DAFTAR PENDING & STATUS TRACKING -->
+          <div id="m4sub-pending" class="m4-subtab-content" style="display:none;">
+            <!-- STATISTIK PENGAJUAN -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px;" id="m4-stats-container"></div>
+
+            <!-- SEARCH & FILTER -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <input type="text" id="m4-pending-search" class="form-input" placeholder="🔍 Cari Nama / Kode / Kota..." style="width:240px;" onkeyup="AppEngine.renderM4PendingList()">
+                <select id="m4-pending-status-filter" class="form-input" style="width:160px;" onchange="AppEngine.renderM4PendingList()">
+                  <option value="">Semua Status</option>
+                  <option value="PENDING">⏳ PENDING</option>
+                  <option value="REVIEW">🔍 REVIEW</option>
+                  <option value="APPROVED">✅ APPROVED</option>
+                  <option value="REJECTED">❌ REJECTED</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="m4-pending-table-container"></div>
+          </div>
+
+          <!-- 4.3 DETAIL REVIEW PENGAJUAN & CATATAN INTERNAL -->
+          <div id="m4sub-detail" class="m4-subtab-content" style="display:none;">
+            <div id="m4-detail-review-container"></div>
+          </div>
+
+          <!-- 4.4 KLUB AKTIF & EVALUASI KINERJA -->
+          <div id="m4sub-active_clubs" class="m4-subtab-content" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <input type="text" id="m4-active-search" class="form-input" placeholder="🔍 Cari Klub Aktif..." style="width:240px;" onkeyup="AppEngine.renderM4ActiveClubs()">
+                <select id="m4-active-region-filter" class="form-input" style="width:220px;" onchange="AppEngine.renderM4ActiveClubs()">
+                  <option value="">Semua Region</option>
+                  <option value="Regional Metro DKI Jakarta">Regional Metro DKI Jakarta</option>
+                  <option value="Regional Jawa Barat">Regional Jawa Barat</option>
+                  <option value="Regional Jawa Tengah">Regional Jawa Tengah</option>
+                  <option value="Regional Jawa Timur & Bali">Regional Jawa Timur & Bali</option>
+                  <option value="Regional Sumatra">Regional Sumatra</option>
+                  <option value="Regional Banten">Regional Banten</option>
+                  <option value="Regional Yogyakarta">Regional Yogyakarta</option>
+                  <option value="Regional Kalimantan & Sulawesi">Regional Kalimantan & Sulawesi</option>
+                </select>
+              </div>
+              <span id="m4-active-clubs-count-badge" class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">
+                113 KLUB AKTIF
+              </span>
+            </div>
+
+            <div id="m4-active-clubs-table-container"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 2: MANAJEMEN USER -->
+      <div id="admin-tab-users" class="admin-tab-content" style="display:none;">

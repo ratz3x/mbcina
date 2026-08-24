@@ -1,0 +1,25 @@
+  <title>MB CLUB INA - Mercedes-Benz Club Indonesia</title>
+  <meta name="description" content="Platform Resmi Mercedes-Benz Club Indonesia (MB CLUB INA). Wadah integrasi keanggotaan klub otomotif Mercedes-Benz se-Indonesia.">
+  
+  <!-- Explicit Favicon & Manifest -->
+  <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
+  <link rel="shortcut icon" href="assets/mb_badge.jpg">
+  <link rel="apple-touch-icon" href="assets/mb_badge.jpg">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0e14">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+</head>
+<body>
+
+  <!-- 1. HEADER (Logo + User Profile + Navigation) -->
+  <header class="app-header">
+    <div class="logo-container" onclick="AppEngine.setRole('SUPER_ADMIN')">
+      <img src="assets/mb_badge.jpg" alt="MB CLUB INA Logo">
+      <div>
+        <div class="brand-title text-gradient">MB CLUB INA</div>
+        <div class="brand-subtitle">Mercedes-Benz Club Indonesia</div>
+      </div>
+    </div>

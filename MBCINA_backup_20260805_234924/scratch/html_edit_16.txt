@@ -1,0 +1,53 @@
+  <!-- MODAL: HOVER INFO SEJARAH, KETUA UMUM & CP KLUB (2.2 & 2.3) -->
+  <div id="modal-club-hover-info" class="modal-backdrop">
+    <div class="modal-container" style="max-width:540px; border-top:4px solid var(--accent-gold);">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:42px; height:42px; border-radius:10px; background:rgba(245,158,11,0.15); border:1px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-weight:800; font-size:1.1rem;" id="hover-club-badge">
+            MB
+          </div>
+          <div>
+            <h3 id="hover-club-name" style="font-size:1.2rem; margin:0; line-height:1.2;">Nama Klub</h3>
+            <span id="hover-club-region" style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">Region Wilayah</span>
+          </div>
+        </div>
+        <button class="modal-close-btn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- 1. SEJARAH RINGKAS CLUB -->
+        <div style="background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.2); border-radius:12px; padding:16px; margin-bottom:16px;">
+          <h4 style="font-size:0.95rem; color:var(--accent-gold); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+            📖 Sejarah Ringkas Club
+          </h4>
+          <p id="hover-club-history" style="font-size:0.85rem; color:var(--text-main); line-height:1.6; margin:0;">
+            Klub ini didirikan pada tahun...
+          </p>
+          <div style="margin-top:10px; font-size:0.78rem; color:var(--text-muted); font-weight:700;">
+            🗓️ Berdiri Sejak Tahun: <span id="hover-club-year" style="color:var(--accent-gold);">2004</span> | Domisili: <span id="hover-club-city">Jakarta</span>
+          </div>
+        </div>
+
+        <!-- 2. KETUA UMUM & 3. CONTACT PERSON GRID -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:12px; padding:14px;">
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; margin-bottom:4px;">👑 KETUA UMUM</div>
+            <div id="hover-club-ketua" style="font-size:0.95rem; font-weight:800; color:var(--text-main);">H. Ahmad Fauzi</div>
+            <span style="font-size:0.72rem; color:var(--accent-blue); font-weight:700; margin-top:4px; display:block;">Periode Jabatan Aktif</span>
+          </div>
+
+          <div style="background:var(--bg-card); border:1px solid var(--chrome-border); border-radius:12px; padding:14px;">
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; margin-bottom:4px;">📞 CONTACT PERSON</div>
+            <div id="hover-club-cp" style="font-size:0.9rem; font-weight:800; color:var(--text-main);">Hendra (Sekretaris)</div>
+            <div id="hover-club-phone" style="font-size:0.85rem; font-weight:700; color:var(--primary-emerald); margin-top:4px;">0812-3456-7890</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; text-align:right;">
+          <button class="btn-outline" onclick="AuthEngine.closeAllModals()" style="padding:6px 16px; font-size:0.8rem;">Tutup Detail</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT / TAMBAH KLUB (2.2 & 2.3) -->

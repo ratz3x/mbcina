@@ -1,0 +1,75 @@
+      AuthEngine.closeAllModals();
+      await this.fetchM2Data();
+      this.renderM2Vision();
+      this.renderLandingPageVisionMission();
+    } catch (e) {
+      alert('Gagal menyimpan Visi/Misi!');
+    }
+  },
+
+  async deleteVM(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus Misi ini dari Supabase Cloud Database?')) return;
+    try {
+      const res = await fetch('api.php?action=delete_m2_vision_mission', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      const data = await res.json();
+      alert(data.message);
+      await this.fetchM2Data();
+      this.renderM2Vision();
+      this.renderLandingPageVisionMission();
+    } catch (e) {
+      alert('Gagal menghapus Misi!');
+    }
+  },
+
+  renderLandingPageVisionMission() {
+    const container = document.getElementById('landing-vm-container');
+    if (!container) return;
+
+    const list = this.m2Data.visionMission || [];
+    const vision = list.find(x => x.type === 'VISION') || {
+      icon: '🎯',
+      title: 'Visi MB Club INA',
+      description: 'Menjadi wadah komunitas Mercedes-Benz terbesar, terbaik, dan paling solid di Indonesia serta menjadi kebanggaan bangsa.'
+    };
+
+    const missions = list.filter(x => x.type === 'MISSION');
+
+    container.innerHTML = `
+      <!-- VISI UTAMA CARD -->
+      <div class="glass-card" style="padding:28px; border-top:4px solid var(--accent-gold); display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <div style="font-size:2.6rem; margin-bottom:12px;">${vision.icon || '🎯'}</div>
+          <h3 style="font-size:1.3rem; margin-bottom:12px; color:var(--accent-gold); font-weight:800;">${vision.title}</h3>
+          <p style="font-size:1.02rem; color:var(--text-main); line-height:1.65; font-style:italic;">
+            "${vision.description}"
+          </p>
+        </div>
+        <div style="margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:12px; font-size:0.8rem; color:var(--accent-gold); font-weight:700;">
+          ⭐ Visi Resmi Organisasi MB Club INA
+        </div>
+      </div>
+
+      <!-- MISI STRATEGIS CARD -->
+      <div class="glass-card" style="padding:28px; border-top:4px solid var(--accent-blue);">
+        <div style="font-size:2.6rem; margin-bottom:12px;">🚀</div>
+        <h3 style="font-size:1.3rem; margin-bottom:14px; color:var(--accent-gold); font-weight:800;">
+          Daftar Misi Strategis Organisasi (${missions.length})
+        </h3>
+        <ul style="font-size:0.9rem; color:var(--text-main); padding:0; list-style:none; display:flex; flex-direction:column; gap:12px;">
+          ${missions.map(m => `
+            <li style="display:flex; align-items:flex-start; gap:12px; background:rgba(0,0,0,0.03); padding:12px 16px; border-radius:10px; border:1px solid var(--chrome-border);">
+              <span style="font-size:1.4rem; line-height:1;">${m.icon || '🚀'}</span>
+              <div>
+                <strong style="color:var(--accent-gold); font-size:0.95rem; display:block; margin-bottom:2px;">${m.title}</strong>
+                <span style="color:var(--text-muted); font-size:0.88rem; line-height:1.5;">${m.description}</span>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `;
+  },
