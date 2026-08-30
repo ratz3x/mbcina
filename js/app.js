@@ -18432,43 +18432,82 @@ window.M7Engine = {
     }
 
     grid.innerHTML = prods.map(p => {
-      let imgUrl = 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600';
+      let imgUrl = 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80';
       if (p.images) {
         try {
           const parsed = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
           if (Array.isArray(parsed) && parsed[0]) imgUrl = parsed[0];
           else if (typeof parsed === 'string') imgUrl = parsed;
         } catch (e) { if (typeof p.images === 'string') imgUrl = p.images; }
-      } else if (p.img) {
-        imgUrl = p.img;
+      } else if (p.img || p.image_url) {
+        imgUrl = p.img || p.image_url;
       }
 
       const storeName = p.lapak_name || p.store || 'Lapak Resmi MB INA';
       const sellerName = p.seller_name || p.seller || 'Member MB INA';
-      const statusBadge = `<span style="font-size:0.7rem; padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.2); color:var(--primary-emerald); font-weight:700;">APPROVED</span>`;
-      const priceFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price || 0);
-      const condBadge = p.condition === 'NEW' ? 'BARU' : 'BEKAS';
+      const priceFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price || p.harga || 0);
+      const isNew = (p.condition === 'NEW' || p.item_condition === 'NEW');
       const phone = (p.contact_whatsapp || p.phone || '081234567890').replace(/[^0-9]/g,'');
+      const pName = p.name || p.title || 'Produk MB INA';
+      const location = p.location || 'Indonesia';
 
       return `
-        <div class="glass-card" style="padding:16px; border:1px solid var(--chrome-border); border-radius:14px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;">
-          <div style="position:relative; margin-bottom:12px;">
-            <img src="${imgUrl}" style="width:100%; height:160px; object-fit:cover; border-radius:10px;" onerror="this.src='https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600';">
-            <div style="position:absolute; top:8px; left:8px;">${statusBadge}</div>
-            <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.7); color:#fff; font-size:0.7rem; padding:3px 8px; border-radius:4px; font-weight:700;">${condBadge}</div>
+        <div class="group" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden; transition:all 0.3s ease; display:flex; flex-direction:column; justify-content:space-between;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(255,255,255,0.05)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.background='rgba(255,255,255,0.03)';">
+          
+          <!-- Aspect Ratio 16/10 Image Container -->
+          <div style="position:relative; aspect-ratio:16/10; width:100%; overflow:hidden; background:#0f172a;">
+            <img src="${imgUrl}" alt="${pName}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" onerror="this.src='https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80';">
+            
+            <!-- Status APPROVED (Kiri Atas) -->
+            <span style="position:absolute; top:10px; left:10px; background:rgba(16,185,129,0.2); backdrop-filter:blur(8px); color:#6ee7b7; border:1px solid rgba(16,185,129,0.3); font-size:10px; font-weight:600; letter-spacing:0.05em; padding:2px 8px; border-radius:9999px; text-transform:uppercase;">
+              APPROVED
+            </span>
+            
+            <!-- Kondisi BARU / BEKAS (Kanan Atas) -->
+            ${isNew
+              ? '<span style="position:absolute; top:10px; right:10px; background:rgba(14,165,233,0.2); backdrop-filter:blur(8px); color:#7dd3fc; border:1px solid rgba(14,165,233,0.3); font-size:10px; font-weight:600; padding:2px 8px; border-radius:9999px; text-transform:uppercase;">BARU</span>'
+              : '<span style="position:absolute; top:10px; right:10px; background:rgba(30,41,59,0.8); backdrop-filter:blur(8px); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); font-size:10px; font-weight:600; padding:2px 8px; border-radius:9999px; text-transform:uppercase;">BEKAS</span>'
+            }
           </div>
-          <div>
-            <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">🏪 ${storeName}</div>
-            <h5 style="font-size:0.95rem; color:#fff; margin:4px 0 6px 0; font-weight:800; line-height:1.3;">${p.name || p.title}</h5>
-            <div style="font-size:1.1rem; font-weight:900; color:var(--accent-gold); margin-bottom:6px;">${priceFormatted}</div>
-            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px; display:flex; justify-content:space-between;">
-              <span>📍 ${p.location || 'Indonesia'}</span>
-              <span>👤 ${sellerName}</span>
+
+          <!-- Content Body -->
+          <div style="padding:16px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <!-- Store Label -->
+              <span style="font-size:10px; font-weight:500; letter-spacing:0.04em; color:rgba(251,191,36,0.9); text-transform:uppercase; display:inline-flex; align-items:center; gap:5px; margin-bottom:6px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
+                ${storeName}
+              </span>
+
+              <!-- Title -->
+              <h4 style="font-size:0.875rem; font-weight:600; color:#ffffff; margin:0 0 4px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${pName}</h4>
+
+              <!-- Price -->
+              <div style="font-size:1rem; font-weight:700; color:#fbbf24; font-family:monospace; margin-top:6px;">${priceFormatted}</div>
+
+              <!-- Metadata Lokasi & Penjual -->
+              <div style="font-size:11px; color:#94a3b8; display:flex; align-items:center; justify-content:space-between; margin-top:10px; gap:8px;">
+                <span style="display:inline-flex; align-items:center; gap:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  ${location}
+                </span>
+                <span style="display:inline-flex; align-items:center; gap:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  ${sellerName}
+                </span>
+              </div>
             </div>
-          </div>
-          <div style="display:flex; gap:6px; margin-top:auto; padding-top:10px; border-top:1px dashed var(--chrome-border);">
-            <a href="https://wa.me/${phone}?text=Halo%20${encodeURIComponent(storeName)},%20saya%20tertarik%20dengan%20produk%20'${encodeURIComponent(p.name || p.title)}'%20di%20Portal%20MB%20INA" target="_blank" class="btn-primary" style="flex:1; text-align:center; font-size:0.78rem; padding:7px 10px; background:#25D366; color:#fff; text-decoration:none; font-weight:800; border-radius:6px;">📞 HUBUNGI WA</a>
-            <button class="btn-outline" style="padding:6px 10px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M7Engine.deleteProduct('${p.id}')">🗑️</button>
+
+            <!-- Action Button -->
+            <div style="margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06); display:flex; gap:8px; align-items:center;">
+              <a href="https://wa.me/${phone}?text=Halo%20${encodeURIComponent(storeName)},%20saya%20tertarik%20dengan%20produk%20'${encodeURIComponent(pName)}'%20di%20Portal%20MB%20INA" target="_blank" style="flex:1; padding:8px 12px; border-radius:12px; background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.3); font-size:0.75rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(16,185,129,0.2)'; this.style.color='#6ee7b7';" onmouseout="this.style.background='rgba(16,185,129,0.1)'; this.style.color='#34d399';">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span>Hubungi via WA</span>
+              </a>
+              <button type="button" style="padding:8px 10px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#94a3b8; cursor:pointer; font-size:0.75rem; transition:all 0.2s;" title="Detail Produk" onmouseover="this.style.color='#fff'; this.style.background='rgba(255,255,255,0.08)';" onmouseout="this.style.color='#94a3b8'; this.style.background='rgba(255,255,255,0.04)';" onclick="if(window.M7Engine && typeof window.M7Engine.openAdminVerifyIklanModal === 'function'){window.M7Engine.openAdminVerifyIklanModal('${p.id}');}else{alert('Detail Produk: ${encodeURIComponent(pName)}');}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -23187,36 +23226,68 @@ window.SponsorPortalEngine = {
       const store    = p.store || p.lapak_name || 'Shell Official Store';
       const seller   = p.seller || p.pemilik || 'Sponsor MB INA';
       const price    = p.price || p.harga || 150000;
-      const cond     = p.condition || p.item_condition || 'NEW';
-      const rating   = p.rating || 4.9;
-      const sold     = p.sold || 45;
-      const img      = p.img || p.image_url || p.photo_url || 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=500';
+      const isNew    = (p.condition === 'NEW' || p.item_condition === 'NEW');
+      const img      = p.img || p.image_url || p.photo_url || 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80';
       const location = p.location || 'Jakarta';
+      const phone    = (p.contact_whatsapp || p.phone || '081234567890').replace(/[^0-9]/g,'');
+      const priceFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(price);
 
       return `
-        <div class="glass-card" style="padding:14px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); border-radius:14px; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='rgba(212,175,55,0.4)'" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(255,255,255,0.08)'">
-          <div>
-            <div style="position:relative; margin-bottom:12px; overflow:hidden; border-radius:10px; height:150px; background:#000;">
-              <img src="${img}" alt="${title}" style="width:100%; height:100%; object-fit:cover;">
-              <span style="position:absolute; top:8px; left:8px; font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:6px; background:${cond === 'NEW' ? 'rgba(16,185,129,0.9)' : 'rgba(245,158,11,0.9)'}; color:#000;">
-                ${cond === 'NEW' ? 'BARU' : 'BEKAS'}
-              </span>
-            </div>
-
-            <div style="font-size:0.72rem; color:var(--accent-gold); font-weight:600; margin-bottom:4px;">${store}</div>
-            <h4 style="font-size:0.85rem; font-weight:700; color:#fff; margin:0 0 8px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${title}</h4>
-            <div style="font-size:1rem; font-weight:800; color:var(--primary-emerald); margin-bottom:8px;">Rp ${new Intl.NumberFormat('id-ID').format(price)}</div>
+        <div class="group" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden; transition:all 0.3s ease; display:flex; flex-direction:column; justify-content:space-between;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(255,255,255,0.05)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.background='rgba(255,255,255,0.03)';">
+          
+          <!-- Aspect Ratio 16/10 Image Container -->
+          <div style="position:relative; aspect-ratio:16/10; width:100%; overflow:hidden; background:#0f172a;">
+            <img src="${img}" alt="${title}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" onerror="this.src='https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80';">
+            
+            <!-- Status APPROVED (Kiri Atas) -->
+            <span style="position:absolute; top:10px; left:10px; background:rgba(16,185,129,0.2); backdrop-filter:blur(8px); color:#6ee7b7; border:1px solid rgba(16,185,129,0.3); font-size:10px; font-weight:600; letter-spacing:0.05em; padding:2px 8px; border-radius:9999px; text-transform:uppercase;">
+              APPROVED
+            </span>
+            
+            <!-- Kondisi BARU / BEKAS (Kanan Atas) -->
+            ${isNew
+              ? '<span style="position:absolute; top:10px; right:10px; background:rgba(14,165,233,0.2); backdrop-filter:blur(8px); color:#7dd3fc; border:1px solid rgba(14,165,233,0.3); font-size:10px; font-weight:600; padding:2px 8px; border-radius:9999px; text-transform:uppercase;">BARU</span>'
+              : '<span style="position:absolute; top:10px; right:10px; background:rgba(30,41,59,0.8); backdrop-filter:blur(8px); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); font-size:10px; font-weight:600; padding:2px 8px; border-radius:9999px; text-transform:uppercase;">BEKAS</span>'
+            }
           </div>
 
-          <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; margin-bottom:10px;">
-              <span>${location}</span>
-              <span>Skor: ${rating} (${sold} terjual)</span>
+          <!-- Content Body -->
+          <div style="padding:16px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <!-- Store Label -->
+              <span style="font-size:10px; font-weight:500; letter-spacing:0.04em; color:rgba(251,191,36,0.9); text-transform:uppercase; display:inline-flex; align-items:center; gap:5px; margin-bottom:6px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
+                ${store}
+              </span>
+
+              <!-- Title -->
+              <h4 style="font-size:0.875rem; font-weight:600; color:#ffffff; margin:0 0 4px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${title}</h4>
+
+              <!-- Price -->
+              <div style="font-size:1rem; font-weight:700; color:#fbbf24; font-family:monospace; margin-top:6px;">${priceFormatted}</div>
+
+              <!-- Metadata Lokasi & Penjual -->
+              <div style="font-size:11px; color:#94a3b8; display:flex; align-items:center; justify-content:space-between; margin-top:10px; gap:8px;">
+                <span style="display:inline-flex; align-items:center; gap:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  ${location}
+                </span>
+                <span style="display:inline-flex; align-items:center; gap:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  ${seller}
+                </span>
+              </div>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-              <button class="btn-primary" style="font-size:0.72rem; padding:6px; font-weight:700;" onclick="alert('Hubungi Penjual (${seller}) via WhatsApp...')">Chat WA</button>
-              <button class="btn-outline" style="font-size:0.72rem; padding:6px; font-weight:600; color:#cbd5e1;" onclick="alert('Membuka Detail Produk: ${title}')">Detail</button>
+            <!-- Action Button -->
+            <div style="margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06); display:flex; gap:8px; align-items:center;">
+              <a href="https://wa.me/${phone}?text=Halo%20${encodeURIComponent(store)},%20saya%20tertarik%20dengan%20produk%20'${encodeURIComponent(title)}'%20di%20Portal%20MB%20INA" target="_blank" style="flex:1; padding:8px 12px; border-radius:12px; background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.3); font-size:0.75rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(16,185,129,0.2)'; this.style.color='#6ee7b7';" onmouseout="this.style.background='rgba(16,185,129,0.1)'; this.style.color='#34d399';">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span>Hubungi via WA</span>
+              </a>
+              <button type="button" style="padding:8px 10px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#94a3b8; cursor:pointer; font-size:0.75rem; transition:all 0.2s;" title="Detail Produk" onmouseover="this.style.color='#fff'; this.style.background='rgba(255,255,255,0.08)';" onmouseout="this.style.color='#94a3b8'; this.style.background='rgba(255,255,255,0.04)';" onclick="alert('Membuka Detail Produk: ${encodeURIComponent(title)}');">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </button>
             </div>
           </div>
         </div>
