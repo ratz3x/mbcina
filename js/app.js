@@ -5210,6 +5210,54 @@ const AppEngine = {
     }
   },
 
+  formatHistoryContent(desc) {
+    if (!desc) return '';
+    
+    // Split into paragraphs by double newlines
+    const paras = desc.split(/\n\s*\n/);
+    
+    return paras.map(p => {
+      p = p.trim();
+      if (!p) return '';
+      
+      // If paragraph contains bullet points with '-'
+      if (p.includes('\n-') || p.startsWith('-')) {
+        const lines = p.split('\n');
+        const headerLines = [];
+        const bulletItems = [];
+        
+        lines.forEach(l => {
+          const trimmed = l.trim();
+          if (trimmed.startsWith('-')) {
+            bulletItems.push(trimmed.substring(1).trim());
+          } else if (trimmed) {
+            headerLines.push(trimmed);
+          }
+        });
+        
+        let html = '';
+        if (headerLines.length > 0) {
+          html += `<p style="margin:0 0 8px 0; color:#e2e8f0; font-size:0.875rem; line-height:1.7;">${headerLines.join('<br>')}</p>`;
+        }
+        if (bulletItems.length > 0) {
+          html += `
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:8px; margin:8px 0 14px 0;">
+              ${bulletItems.map(item => `
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); padding:8px 12px; border-radius:10px; display:flex; align-items:center; gap:8px; font-size:0.8125rem; color:#cbd5e1;">
+                  <span style="width:6px; height:6px; border-radius:50%; background:#fbbf24; box-shadow:0 0 6px rgba(245,158,11,0.5); flex-shrink:0;"></span>
+                  <span>${item}</span>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+        return html;
+      }
+      
+      return `<p style="margin:0 0 12px 0; color:#cbd5e1; font-size:0.875rem; line-height:1.75;">${p}</p>`;
+    }).join('');
+  },
+
   // 2.1.2 SEJARAH & FOUNDERS
   renderM2Founders() {
     const container = document.getElementById('m2-founders-container');
@@ -5222,64 +5270,125 @@ const AppEngine = {
       { name: 'DHARMA ADSASMUDA', club_origin: 'MCCI', position: 'Co-Founder & Treasury', bio: 'Pendiri MB Club INA mewakili MCCI.' }
     ];
 
-    const historyList = (this.m2Data.history && this.m2Data.history.length) ? this.m2Data.history : [{"id":"hist_001","organization_id":"org_001","year":2000,"title":"1. Latar Belakang Pembentukan","description":"Pada akhir dekade 1990-an sampai dengan awal 2000-an, di Jakarta telah terbentuk beberapa klub Mercedes-Benz, yaitu MCCI, MTC, dan MJI. Klub-klub tersebut meregistrasikan keberadaannya kepada pihak principal Daimler AG di Stuttgart melalui ATPM Mercedes-Benz di Indonesia saat itu, PT Daimler Chrysler Indonesia (PT DC INA), untuk mendapatkan sertifikasi atau legitimasi sebagai klub resmi yang terdaftar.\n\nPemberian sertifikasi pun dikeluarkan kepada ketiga klub tersebut (MCCI, MTC, dan MJI) oleh principal yang pada waktu itu diserahkan melalui PT DC INA dan teregistrasi di bawah MCCCI (Mercedes-Benz Classic Car Club International) Regional Asia-Pasifik yang berkedudukan di Singapura.\n\nPada tahun 2003, MBCI (W124) terbentuk di Jakarta dan langsung mengajukan permohonan sertifikasi kepada pihak principal. Pada saat pengajuan sertifikasi MBCI sedang berproses (biasanya proses ini berjalan sekitar satu tahun atau lebih), pihak principal mengusulkan kepada PT DC INA agar mewacanakan pembentukan klub holding untuk klub-klub Mercedes-Benz yang ada di Indonesia. Hal ini bertujuan untuk mengantisipasi perkembangan dan pertumbuhan jumlah klub Mercedes-Benz di Indonesia pada masa depan.","icon":"📜","color":"#D4AF37","sort_order":1,"created_at":"2026-08-02 10:48:43.2353+00"},{"id":"hist_002","organization_id":"org_001","year":2004,"title":"2. Proses Pembentukan & Peresmian Federasi","description":"Pada awal tahun 2004, PT DC INA melalui Bapak Yuniadi Hartono (Deputy Director Marketing & Communication saat itu) beserta Bapak Wim Ekel mulai berkomunikasi dengan tiga klub Mercedes-Benz yang sudah tersertifikasi—yaitu MCCI, MTC, dan MJI—untuk segera membentuk klub holding Mercedes-Benz di Indonesia yang dinamakan Mercedes-Benz Club Indonesia (MB Club Ina), dengan mengirimkan dua orang perwakilan dari masing-masing klub.\n\nUtusan perwakilan klub pendiri saat itu:\n- MCCI mengutus: Ridwan Pohan dan Dharma Adsasmuda.\n- MTC mengutus: Bambang Hariyadi dan Tubagus S. Hidayat (Didot).\n- MJI memutuskan untuk tidak mengirimkan perwakilan, tetapi tetap menyetujui dan mendukung rencana pembentukan MB Club Ina.\n\nSetelah melalui proses pembentukan lewat beberapa kali pertemuan, pada bulan Agustus 2004, Mercedes-Benz Club Indonesia (MB Club Ina) diresmikan oleh PT DC INA sebagai klub federasi yang beranggotakan klub-klub Mercedes-Benz di Indonesia.\n\nSalah satu fungsi MB Club Ina adalah mewakili Indonesia di forum dan kegiatan klub Mercedes-Benz internasional, di antaranya acara President Club Meeting yang diadakan setiap tahun pada bulan Oktober oleh MB Museum, Club Management di Stuttgart.","icon":"🤝","color":"#3B82F6","sort_order":2,"created_at":"2026-08-02 10:48:43.336732+00"},{"id":"hist_003","organization_id":"org_001","year":2005,"title":"3. Catatan Tambahan & Konsep 4 Pilar","description":"Pada saat Mercedes-Benz Museum di Stuttgart diresmikan pada tahun 2005, peran Mercedes-Benz Classic Club International (MCCCI) yang tadinya berfungsi membawahi klub-klub Mercedes-Benz di seluruh dunia digantikan oleh Mercedes-Benz Museum, Club Management yang berkedudukan di Stuttgart.\n\nPada saat MB Club Ina diresmikan, PT DC INA menetapkan dan menunjuk secara langsung susunan kepengurusan pertama yang terdiri dari empat orang perwakilan MCCI dan MTC:\n- President: Ridwan Pohan\n- Vice President: Tubagus S. Hidayat\n- Treasurer: Dharma Adsasmuda\n- Public Relations: Bambang Haryadi\n\nKeempat orang perwakilan dari masing-masing klub inilah yang sekarang kita sebut sebagai pendiri atau founder MB Club Ina.\n\nSetelah MB Club Ina resmi terbentuk, masih pada tahun yang sama (2004), sertifikasi untuk MBCI dari principal\/MCCCI dikeluarkan dan diserahkan langsung oleh PT DC INA. MBCI menjadi klub Mercedes-Benz terakhir di Indonesia yang tersertifikasi langsung dari MCCCI sekaligus otomatis menjadi klub anggota MB Club Ina.\n\nSejak saat itu pula, Bapak Wim Ekel dari PT DC INA mengemukakan konsep 4 Pilar MB Club Ina, yaitu: MCCI, MTC, MJI, dan MBCI.","icon":"🏛️","color":"#10B981","sort_order":3,"created_at":"2026-08-02 10:48:43.437335+00"}];
+    const historyList = (this.m2Data.history && this.m2Data.history.length) ? this.m2Data.history : [
+      {
+        id: "hist_001",
+        organization_id: "org_001",
+        year: 2000,
+        title: "Latar Belakang Pembentukan",
+        description: "Pada akhir dekade 1990-an sampai dengan awal 2000-an, di Jakarta telah terbentuk beberapa klub Mercedes-Benz, yaitu MCCI, MTC, dan MJI. Klub-klub tersebut meregistrasikan keberadaannya kepada pihak principal Daimler AG di Stuttgart melalui ATPM Mercedes-Benz di Indonesia saat itu, PT Daimler Chrysler Indonesia (PT DC INA), untuk mendapatkan sertifikasi atau legitimasi sebagai klub resmi yang terdaftar.\n\nPemberian sertifikasi pun dikeluarkan kepada ketiga klub tersebut (MCCI, MTC, dan MJI) oleh principal yang pada waktu itu diserahkan melalui PT DC INA dan teregistrasi di bawah MCCCI (Mercedes-Benz Classic Car Club International) Regional Asia-Pasifik yang berkedudukan di Singapura.\n\nPada tahun 2003, MBCI (W124) terbentuk di Jakarta dan langsung mengajukan permohonan sertifikasi kepada pihak principal. Pada saat pengajuan sertifikasi MBCI sedang berproses (biasanya proses ini berjalan sekitar satu tahun atau lebih), pihak principal mengusulkan kepada PT DC INA agar mewacanakan pembentukan klub holding untuk klub-klub Mercedes-Benz yang ada di Indonesia. Hal ini bertujuan untuk mengantisipasi perkembangan dan pertumbuhan jumlah klub Mercedes-Benz di Indonesia pada masa depan.",
+        sort_order: 1
+      },
+      {
+        id: "hist_002",
+        organization_id: "org_001",
+        year: 2004,
+        title: "Proses Pembentukan & Peresmian",
+        description: "Pada awal tahun 2004, PT DC INA melalui Bapak Yuniadi Hartono (Deputy Director Marketing & Communication saat itu) beserta Bapak Wim Ekel mulai berkomunikasi dengan tiga klub Mercedes-Benz yang sudah tersertifikasi—yaitu MCCI, MTC, dan MJI—untuk segera membentuk klub holding Mercedes-Benz di Indonesia yang dinamakan Mercedes-Benz Club Indonesia (MB Club Ina), dengan mengirimkan dua orang perwakilan dari masing-masing klub.\n\nUtusan perwakilan klub pendiri saat itu:\n- MCCI mengutus: Ridwan Pohan dan Dharma Adsasmuda\n- MTC mengutus: Bambang Hariyadi dan Tubagus S. Hidayat (Didot)\n- MJI memutuskan untuk tidak mengirimkan perwakilan, tetapi tetap menyetujui dan mendukung rencana pembentukan MB Club Ina\n\nSetelah melalui proses pembentukan lewat beberapa kali pertemuan, pada bulan Agustus 2004, Mercedes-Benz Club Indonesia (MB Club Ina) diresmikan oleh PT DC INA sebagai klub federasi yang beranggotakan klub-klub Mercedes-Benz di Indonesia.\n\nSalah satu fungsi MB Club Ina adalah mewakili Indonesia di forum dan kegiatan klub Mercedes-Benz internasional, di antaranya acara President Club Meeting yang diadakan setiap tahun pada bulan Oktober oleh MB Museum, Club Management di Stuttgart.",
+        sort_order: 2
+      },
+      {
+        id: "hist_003",
+        organization_id: "org_001",
+        year: 2005,
+        title: "Konsep 4 Pilar & Kepengurusan Awal",
+        description: "Pada saat Mercedes-Benz Museum di Stuttgart diresmikan pada tahun 2005, peran Mercedes-Benz Classic Club International (MCCCI) yang tadinya berfungsi membawahi klub-klub Mercedes-Benz di seluruh dunia digantikan oleh Mercedes-Benz Museum, Club Management yang berkedudukan di Stuttgart.\n\nPada saat MB Club Ina diresmikan, PT DC INA menetapkan dan menunjuk secara langsung susunan kepengurusan pertama yang terdiri dari empat orang perwakilan MCCI dan MTC:\n- President: Ridwan Pohan\n- Vice President: Tubagus S. Hidayat\n- Treasurer: Dharma Adsasmuda\n- Public Relations: Bambang Haryadi\n\nKeempat orang perwakilan dari masing-masing klub inilah yang sekarang kita sebut sebagai pendiri atau founder MB Club Ina.\n\nSetelah MB Club Ina resmi terbentuk, masih pada tahun yang sama (2004), sertifikasi untuk MBCI dari principal/MCCCI dikeluarkan dan diserahkan langsung oleh PT DC INA. MBCI menjadi klub Mercedes-Benz terakhir di Indonesia yang tersertifikasi langsung dari MCCCI sekaligus otomatis menjadi klub anggota MB Club Ina.\n\nSejak saat itu pula, Bapak Wim Ekel dari PT DC INA mengemukakan konsep 4 Pilar MB Club Ina, yaitu: MCCI, MTC, MJI, dan MBCI.",
+        sort_order: 3
+      }
+    ];
 
     container.innerHTML = `
       <div style="margin-bottom:28px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
-          <h3 style="font-size:1.4rem; margin:0;" class="text-gradient">📖 Sejarah Terbentuknya MB Club INA</h3>
-          <button class="btn-primary" style="font-size:0.85rem; padding:8px 18px; font-weight:700; background:var(--accent-gold); border-color:var(--accent-gold); color:#000; border-radius:6px; cursor:pointer;" onclick="AppEngine.openM2HistoryModal()">
-            ➕ Tambah Pasal Sejarah Baru
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:14px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:40px; height:40px; border-radius:12px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size:1.25rem; margin:0; color:#fff; font-weight:700;">Sejarah & Tonggak Sejarah MB Club INA</h3>
+              <p style="font-size:0.78rem; color:#94a3b8; margin:2px 0 0 0;">Kronologi pembentukan, peresmian federasi, dan tonggak sejarah komunitas Mercedes-Benz Indonesia</p>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:8px 16px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="AppEngine.openM2HistoryModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Tambah Pasal Sejarah Baru</span>
           </button>
         </div>
 
-        <!-- DYNAMIC HISTORY SECTIONS FROM SUPABASE CLOUD -->
-        <div id="m2-history-sections-list">
-          ${historyList.map(h => `
-            <div class="glass-panel" style="padding:24px; margin-bottom:20px; border-left:4px solid ${h.color || 'var(--accent-gold)'}; position:relative;">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-                <h4 style="font-size:1.15rem; color:${h.color || 'var(--accent-gold)'}; margin:0; display:flex; align-items:center; gap:8px;">
-                  <span>${h.icon || '📜'}</span> ${h.title}
-                </h4>
-                <div style="display:flex; align-items:center; gap:8px;">
-                  ${h.year ? `<span class="tier-badge" style="background:rgba(212,175,55,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.75rem;">EST. ${h.year}</span>` : ''}
-                  <button class="role-pill-btn" style="border-color:var(--accent-blue); color:var(--accent-blue); padding:3px 10px; font-size:0.78rem; border-radius:4px; cursor:pointer;" onclick="AppEngine.openM2HistoryModal('${h.id}')" title="Edit Pasal Sejarah">✏️ Edit</button>
-                  <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red); padding:3px 10px; font-size:0.78rem; border-radius:4px; cursor:pointer;" onclick="AppEngine.deleteM2HistorySection('${h.id}')" title="Hapus Pasal Sejarah">🗑️ Hapus</button>
+        <!-- HERITAGE TIMELINE CONTAINER WITH VERTICAL ACCENT LINE -->
+        <div id="m2-history-sections-list" style="position:relative; padding-left:24px; border-left:2px solid rgba(245,158,11,0.25); margin-left:12px;">
+          ${historyList.map(h => {
+            let cleanTitle = (h.title || '').replace(/^[0-9]+[\.\)]\s*/, '').replace(/[📜🤝🏛️]/g, '').trim();
+            return `
+              <div class="heritage-timeline-card" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:24px; margin-bottom:24px; transition:all 0.3s ease; position:relative; backdrop-filter:blur(12px);" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+                
+                <!-- Timeline Node Indicator -->
+                <div style="position:absolute; left:-31px; top:28px; width:12px; height:12px; border-radius:50%; background:#090d16; border:2px solid #fbbf24; box-shadow:0 0 8px rgba(245,158,11,0.6);"></div>
+
+                <!-- Header Row -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                  <h4 style="font-size:1.05rem; color:#ffffff; font-weight:700; margin:0;">
+                    ${cleanTitle}
+                  </h4>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    ${h.year ? `<span style="font-family:monospace; font-size:0.75rem; font-weight:700; letter-spacing:0.1em; color:#fbbf24; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:3px 10px; border-radius:9999px; text-transform:uppercase;">EST. ${h.year}</span>` : ''}
+                    <button type="button" style="padding:6px 10px; border-radius:8px; color:#94a3b8; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.75rem; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94a3b8';" onclick="AppEngine.openM2HistoryModal('${h.id}')" title="Edit Pasal Sejarah">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                      <span>Edit</span>
+                    </button>
+                    <button type="button" style="padding:6px 10px; border-radius:8px; color:#94a3b8; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); font-size:0.75rem; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(244,63,94,0.15)'; this.style.color='#fb7185'; this.style.borderColor='rgba(244,63,94,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94a3b8'; this.style.borderColor='rgba(255,255,255,0.1)';" onclick="AppEngine.deleteM2HistorySection('${h.id}')" title="Hapus Pasal Sejarah">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                      <span>Hapus</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Formatted Narrative Text -->
+                <div style="font-size:0.875rem; color:#cbd5e1; line-height:1.75;">
+                  ${this.formatHistoryContent(h.description)}
                 </div>
               </div>
-              <p style="font-size:0.9rem; color:var(--text-main); line-height:1.7; white-space:pre-line; margin:0;">${h.description}</p>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
 
         <!-- 4 PILAR VISUAL CARDS -->
-        <h5 style="font-size:1rem; margin-bottom:14px; color:var(--accent-gold); margin-top:28px;">🏛️ 4 Pilar Pendiri MB Club INA:</h5>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:28px;">
-          <div class="glass-card" style="padding:16px; text-align:center;">
-            <div style="font-size:1.5rem; font-weight:900; color:var(--accent-gold);">MCCI</div>
-            <span style="font-size:0.78rem; color:var(--text-muted);">Mercedes-Benz Car Club Indonesia</span>
+        <div style="display:flex; align-items:center; gap:10px; margin-top:36px; margin-bottom:16px;">
+          <div style="width:32px; height:32px; border-radius:10px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
           </div>
-          <div class="glass-card" style="padding:16px; text-align:center;">
-            <div style="font-size:1.5rem; font-weight:900; color:var(--accent-blue);">MTC</div>
-            <span style="font-size:0.78rem; color:var(--text-muted);">Mercedes-Benz Tiger Club</span>
+          <h4 style="font-size:1rem; color:#ffffff; font-weight:700; margin:0;">4 Pilar Pendiri MB Club INA</h4>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:32px;">
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; text-align:center; transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+            <div style="font-size:1.35rem; font-weight:800; color:#fbbf24; margin-bottom:4px;">MCCI</div>
+            <span style="font-size:0.78rem; color:#94a3b8;">Mercedes-Benz Car Club Indonesia</span>
           </div>
-          <div class="glass-card" style="padding:16px; text-align:center;">
-            <div style="font-size:1.5rem; font-weight:900; color:var(--primary-emerald);">MJI</div>
-            <span style="font-size:0.78rem; color:var(--text-muted);">Mercedes-Benz Jip Indonesia</span>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; text-align:center; transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(56,189,248,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+            <div style="font-size:1.35rem; font-weight:800; color:#38bdf8; margin-bottom:4px;">MTC</div>
+            <span style="font-size:0.78rem; color:#94a3b8;">Mercedes-Benz Tiger Club</span>
           </div>
-          <div class="glass-card" style="padding:16px; text-align:center;">
-            <div style="font-size:1.5rem; font-weight:900; color:#A855F7;">MBCI</div>
-            <span style="font-size:0.78rem; color:var(--text-muted);">Mercedes-Benz Boxer Club Indonesia (W124)</span>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; text-align:center; transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(16,185,129,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+            <div style="font-size:1.35rem; font-weight:800; color:#34d399; margin-bottom:4px;">MJI</div>
+            <span style="font-size:0.78rem; color:#94a3b8;">Mercedes-Benz Jip Indonesia</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; text-align:center; transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(168,85,247,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+            <div style="font-size:1.35rem; font-weight:800; color:#c084fc; margin-bottom:4px;">MBCI</div>
+            <span style="font-size:0.78rem; color:#94a3b8;">Mercedes-Benz Boxer Club Indonesia (W124)</span>
           </div>
         </div>
 
         <!-- DOKUMEN RESMI PENDIRI ORGANISASI (FOUNDERS) -->
-        <div class="glass-panel" style="padding:20px; text-align:center; border:2px solid var(--accent-gold);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:0 8px;">
-            <h4 style="font-size:1.1rem; color:var(--accent-gold); margin:0;">📸 DOKUMEN RESMI PENDIRI ORGANISASI (FOUNDERS)</h4>
-            <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">OFFICIAL ARCHIVE</span>
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:24px; text-align:center;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding:0 4px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+              <h4 style="font-size:0.95rem; color:#ffffff; font-weight:700; margin:0;">Dokumen Resmi Pendiri Organisasi (Founders)</h4>
+            </div>
+            <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.75rem; font-weight:600; padding:3px 10px; border-radius:9999px;">OFFICIAL ARCHIVE</span>
           </div>
-          <img src="assets/mb_founders.jpg" alt="Foto Resmi Pendiri MB Club INA" style="width:100%; max-height:500px; object-fit:contain; border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+          <img src="assets/mb_founders.jpg" alt="Foto Resmi Pendiri MB Club INA" style="width:100%; max-height:500px; object-fit:contain; border-radius:14px; box-shadow:0 12px 32px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.08);">
         </div>
 
       </div>
@@ -5287,7 +5396,7 @@ const AppEngine = {
   },
 
   openM2HistoryModal(id = null) {
-    let item = { id: '', title: '', description: '', year: 2000, color: '#D4AF37', icon: '📜', sort_order: (this.m2Data.history || []).length + 1 };
+    let item = { id: '', title: '', description: '', year: 2000, color: '#D4AF37', icon: '', sort_order: (this.m2Data.history || []).length + 1 };
     if (id) {
       const found = (this.m2Data.history || []).find(h => h.id === id);
       if (found) item = found;
@@ -5301,13 +5410,11 @@ const AppEngine = {
     setValue('m2-hist-id', item.id || '');
     setValue('m2-hist-title', item.title || '');
     setValue('m2-hist-year', item.year || 2000);
-    setValue('m2-hist-color', item.color || '#D4AF37');
-    setValue('m2-hist-icon', item.icon || '📜');
     setValue('m2-hist-sort', item.sort_order || 1);
     setValue('m2-hist-desc', item.description || '');
 
     const modalTitle = document.querySelector('#modal-m2-history h3');
-    if (modalTitle) modalTitle.textContent = item.id ? '✏️ Edit Pasal Sejarah Organisasi' : '➕ Tambah Pasal Sejarah Organisasi Baru';
+    if (modalTitle) modalTitle.textContent = item.id ? 'Edit Pasal Sejarah Organisasi' : 'Tambah Pasal Sejarah Baru';
 
     AuthEngine.openModal('modal-m2-history');
   },
@@ -5319,94 +5426,6 @@ const AppEngine = {
       id: document.getElementById('m2-hist-id')?.value || '',
       title: document.getElementById('m2-hist-title')?.value.trim() || '',
       year: parseInt(document.getElementById('m2-hist-year')?.value || 2000),
-      color: document.getElementById('m2-hist-color')?.value || '#D4AF37',
-      icon: document.getElementById('m2-hist-icon')?.value || '📜',
-      sort_order: parseInt(document.getElementById('m2-hist-sort')?.value || 1),
-      description: document.getElementById('m2-hist-desc')?.value.trim() || ''
-    };
-
-    if (!payload.title || !payload.description) {
-      alert('⚠️ Judul Pasal dan Isi Deskripsi Sejarah wajib diisi!');
-      return;
-    }
-
-    try {
-      const res = await fetch('api.php?action=save_m2_history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('✅ ' + data.message);
-        AuthEngine.closeModal('modal-m2-history');
-        await this.fetchM2Data();
-        this.renderM2Founders();
-      } else {
-        alert('❌ Gagal: ' + data.message);
-      }
-    } catch (e) {
-      alert('❌ Error: ' + e.message);
-    }
-  },
-
-  async deleteM2HistorySection(id) {
-    if (!confirm('⚠️ Apakah Anda yakin ingin menghapus pasal sejarah ini dari database Supabase Cloud?')) return;
-
-    try {
-      const res = await fetch('api.php?action=delete_m2_history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('✅ ' + data.message);
-        await this.fetchM2Data();
-        this.renderM2Founders();
-      } else {
-        alert('❌ Gagal: ' + data.message);
-      }
-    } catch (e) {
-      alert('❌ Error: ' + e.message);
-    }
-  },
-
-  openM2HistoryModal(id = null) {
-    let item = { id: '', title: '', description: '', year: 2000, color: '#D4AF37', icon: '📜', sort_order: (this.m2Data.history || []).length + 1 };
-    if (id) {
-      const found = (this.m2Data.history || []).find(h => h.id === id);
-      if (found) item = found;
-    }
-
-    const setValue = (elementId, val) => {
-      const el = document.getElementById(elementId);
-      if (el) el.value = val;
-    };
-
-    setValue('m2-hist-id', item.id || '');
-    setValue('m2-hist-title', item.title || '');
-    setValue('m2-hist-year', item.year || 2000);
-    setValue('m2-hist-color', item.color || '#D4AF37');
-    setValue('m2-hist-icon', item.icon || '📜');
-    setValue('m2-hist-sort', item.sort_order || 1);
-    setValue('m2-hist-desc', item.description || '');
-
-    const modalTitle = document.querySelector('#modal-m2-history h3');
-    if (modalTitle) modalTitle.textContent = item.id ? '✏️ Edit Pasal Sejarah Organisasi' : '➕ Tambah Pasal Sejarah Organisasi Baru';
-
-    AuthEngine.openModal('modal-m2-history');
-  },
-
-  async saveM2HistorySection(event) {
-    if (event) event.preventDefault();
-
-    const payload = {
-      id: document.getElementById('m2-hist-id')?.value || '',
-      title: document.getElementById('m2-hist-title')?.value.trim() || '',
-      year: parseInt(document.getElementById('m2-hist-year')?.value || 2000),
-      color: document.getElementById('m2-hist-color')?.value || '#D4AF37',
-      icon: document.getElementById('m2-hist-icon')?.value || '📜',
       sort_order: parseInt(document.getElementById('m2-hist-sort')?.value || 1),
       description: document.getElementById('m2-hist-desc')?.value.trim() || ''
     };
@@ -5424,7 +5443,7 @@ const AppEngine = {
       });
       const data = await res.json();
       if (data.success) {
-        alert(data.message);
+        alert(data.message || 'Pasal sejarah berhasil disimpan.');
         AuthEngine.closeModal('modal-m2-history');
         await this.fetchM2Data();
         this.renderM2Founders();
@@ -5437,7 +5456,7 @@ const AppEngine = {
   },
 
   async deleteM2HistorySection(id) {
-    if (!confirm('Apakah Anda yakin ingin menghapus pasal sejarah ini?')) return;
+    if (!confirm('Apakah Anda yakin ingin menghapus pasal sejarah ini dari database?')) return;
 
     try {
       const res = await fetch('api.php?action=delete_m2_history', {
@@ -5447,7 +5466,7 @@ const AppEngine = {
       });
       const data = await res.json();
       if (data.success) {
-        alert(data.message);
+        alert(data.message || 'Pasal sejarah berhasil dihapus.');
         await this.fetchM2Data();
         this.renderM2Founders();
       } else {

@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v31">
+  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v32">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -9541,52 +9541,51 @@
 
   <!-- MODAL M2: KELOLA PASAL SEJARAH ORGANISASI -->
   <div id="modal-m2-history" class="modal-backdrop">
-    <div class="modal-container" style="max-width:680px;">
-      <div class="modal-header">
-        <div>
-          <h3 style="font-size:1.2rem; margin:0;" class="text-gradient">✏️ Edit Pasal Sejarah Organisasi</h3>
-          <span style="font-size:0.78rem; color:var(--accent-gold);">Kelola Latar Belakang, Proses Pembentukan, & 4 Pilar Sejarah MB INA di Supabase Cloud</span>
+    <div class="modal-container" style="max-width:680px; border-radius:24px; background:rgba(9,13,22,0.95); border:1px solid rgba(255,255,255,0.08); box-shadow:0 20px 50px rgba(0,0,0,0.8);">
+      <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.06); padding:20px 24px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+          </div>
+          <div>
+            <h3 style="font-size:1.15rem; margin:0; color:#fff; font-weight:700;">Kelola Pasal Sejarah Organisasi</h3>
+            <span style="font-size:0.75rem; color:#94a3b8;">Latar Belakang, Kronologi Pembentukan, & Tonggak Sejarah MB INA</span>
+          </div>
         </div>
-        <button class="modal-close-btn" onclick="AuthEngine.closeModal('modal-m2-history')">✕</button>
+        <button class="modal-close-btn" onclick="AuthEngine.closeModal('modal-m2-history')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
 
-      <div class="modal-body" style="padding:20px;">
+      <div class="modal-body" style="padding:24px;">
         <form id="form-m2-history" onsubmit="AppEngine.saveM2HistorySection(event)">
           <input type="hidden" id="m2-hist-id" value="">
 
-          <div class="form-group" style="margin-bottom:14px;">
-            <label class="form-label" style="font-size:0.85rem; font-weight:700;">Judul Pasal Sejarah *</label>
-            <input type="text" id="m2-hist-title" class="form-input" placeholder="contoh: 1. Latar Belakang Pembentukan" required>
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Judul Pasal Sejarah *</label>
+            <input type="text" id="m2-hist-title" class="form-input" placeholder="contoh: Latar Belakang Pembentukan" required style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:14px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
             <div class="form-group">
-              <label class="form-label" style="font-size:0.82rem;">Tahun (EST.)</label>
-              <input type="number" id="m2-hist-year" class="form-input" placeholder="2004" value="2000">
+              <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Tahun Sejarah (EST.)</label>
+              <input type="number" id="m2-hist-year" class="form-input" placeholder="2004" value="2000" style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
             </div>
             <div class="form-group">
-              <label class="form-label" style="font-size:0.82rem;">Ikon Emoji</label>
-              <input type="text" id="m2-hist-icon" class="form-input" placeholder="📜" value="📜">
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.82rem;">Warna Accent</label>
-              <input type="color" id="m2-hist-color" class="form-input" value="#D4AF37" style="height:38px; padding:2px; cursor:pointer;">
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.82rem;">Urutan (Order)</label>
-              <input type="number" id="m2-hist-sort" class="form-input" value="1" min="1">
+              <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Urutan Tampilan (Sort Order)</label>
+              <input type="number" id="m2-hist-sort" class="form-input" value="1" min="1" style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
             </div>
           </div>
 
-          <div class="form-group" style="margin-bottom:18px;">
-            <label class="form-label" style="font-size:0.85rem; font-weight:700;">Isi Uraian / Deskripsi Sejarah *</label>
-            <textarea id="m2-hist-desc" class="form-input" rows="8" placeholder="Tuliskan ulasan rincian latar belakang, kronologi, atau catatan 4 pilar di sini..." required style="line-height:1.6;"></textarea>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Isi Uraian / Narasi Sejarah *</label>
+            <textarea id="m2-hist-desc" class="form-input" rows="8" placeholder="Tuliskan ulasan rincian latar belakang, kronologi, utusan, atau catatan 4 pilar di sini..." required style="width:100%; padding:12px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem; line-height:1.6;"></textarea>
           </div>
 
-          <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid var(--chrome-border); padding-top:16px;">
-            <button type="button" class="btn-outline" onclick="AuthEngine.closeModal('modal-m2-history')">Batal</button>
-            <button type="submit" class="btn-primary" style="background:var(--accent-gold); border-color:var(--accent-gold); color:#000; font-weight:800;">
-              💾 Simpan Ke Supabase Cloud
+          <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:18px;">
+            <button type="button" class="btn-outline" style="padding:8px 18px; border-radius:12px; font-size:0.8125rem;" onclick="AuthEngine.closeModal('modal-m2-history')">Batal</button>
+            <button type="submit" class="btn-primary" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.8125rem; padding:8px 20px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              <span>Simpan Pasal Sejarah</span>
             </button>
           </div>
         </form>
@@ -10450,8 +10449,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260830_luxury_v31"></script>
-  <script src="js/app.js?v=20260830_luxury_v31"></script>
+  <script src="js/auth.js?v=20260830_luxury_v32"></script>
+  <script src="js/app.js?v=20260830_luxury_v32"></script>
   <script>
     lucide.createIcons();
     try {
