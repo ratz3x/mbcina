@@ -5884,7 +5884,7 @@ const AppEngine = {
               </div>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
-              <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.75rem; font-weight:600; padding:5px 14px; border-radius:9999px;">PERIODE AKTIF</span>
+              <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.75rem; font-weight:500; padding:4px 12px; border-radius:9999px;">PERIODE AKTIF</span>
               <button type="button" class="btn-primary" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:8px 16px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="AppEngine.openAddStructureModal()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 <span>Tambah Jabatan</span>
@@ -5893,41 +5893,41 @@ const AppEngine = {
           </div>
         </div>
 
-        <!-- DEWAN PEMBINA & DEWAN KEHORMATAN -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin-bottom:28px;">
+        <!-- DEWAN PEMBINA & DEWAN KEHORMATAN (SYMMETRICAL AUTO-HEIGHT NO SCROLLBAR) -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:24px; align-items:start; margin-bottom:28px;">
           <!-- Dewan Pembina -->
-          <div class="glass-panel" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:22px; backdrop-filter:blur(12px);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+          <div class="glass-panel" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:24px; transition:all 0.3s ease; backdrop-filter:blur(12px);" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:12px;">
               <div style="display:flex; align-items:center; gap:8px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <h4 style="font-size:0.95rem; margin:0; color:#ffffff; font-weight:700;">Dewan Pembina</h4>
+                <h4 style="font-size:0.875rem; margin:0; color:#ffffff; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">Dewan Pembina</h4>
               </div>
-              <span style="font-size:0.75rem; color:#94a3b8; font-family:monospace;">${advisory.length} Anggota</span>
+              <span style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; font-size:0.75rem; font-family:monospace; padding:2px 10px; border-radius:9999px;">${advisory.length} Anggota</span>
             </div>
-            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:4px;">
               ${advisory.map(a => `
-                <li style="border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                  <strong style="color:#ffffff; font-weight:600; font-size:0.8125rem;">${a.name}</strong>
-                  <span style="color:#94a3b8; font-size:0.75rem;">${a.position} ${a.club_origin ? '· ' + a.club_origin : ''}</span>
+                <li style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:12px; border-bottom:1px solid rgba(255,255,255,0.03); transition:background 0.2s ease; gap:12px;" onmouseover="this.style.background='rgba(255,255,255,0.02)';" onmouseout="this.style.background='transparent';">
+                  <strong style="color:#ffffff; font-weight:600; font-size:0.8125rem; letter-spacing:-0.01em;">${a.name}</strong>
+                  <span style="color:#94a3b8; font-size:0.75rem; text-align:right; font-medium:500; flex-shrink:0;">${a.position} ${a.club_origin ? '· ' + a.club_origin : ''}</span>
                 </li>
               `).join('')}
             </ul>
           </div>
 
           <!-- Dewan Kehormatan -->
-          <div class="glass-panel" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:22px; backdrop-filter:blur(12px);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+          <div class="glass-panel" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:24px; transition:all 0.3s ease; backdrop-filter:blur(12px);" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:12px;">
               <div style="display:flex; align-items:center; gap:8px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-                <h4 style="font-size:0.95rem; margin:0; color:#ffffff; font-weight:700;">Dewan Kehormatan</h4>
+                <h4 style="font-size:0.875rem; margin:0; color:#ffffff; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">Dewan Kehormatan</h4>
               </div>
-              <span style="font-size:0.75rem; color:#94a3b8; font-family:monospace;">${honor.length} Anggota</span>
+              <span style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; font-size:0.75rem; font-family:monospace; padding:2px 10px; border-radius:9999px;">${honor.length} Anggota</span>
             </div>
-            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto;">
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:4px;">
               ${honor.map(h => `
-                <li style="border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                  <strong style="color:#ffffff; font-weight:600; font-size:0.8125rem;">${h.name}</strong>
-                  <span style="color:#94a3b8; font-size:0.75rem;">${h.position}</span>
+                <li style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:12px; border-bottom:1px solid rgba(255,255,255,0.03); transition:background 0.2s ease; gap:12px;" onmouseover="this.style.background='rgba(255,255,255,0.02)';" onmouseout="this.style.background='transparent';">
+                  <strong style="color:#ffffff; font-weight:600; font-size:0.8125rem; letter-spacing:-0.01em;">${h.name}</strong>
+                  <span style="color:#94a3b8; font-size:0.75rem; text-align:right; font-medium:500; flex-shrink:0;">${h.position}</span>
                 </li>
               `).join('')}
             </ul>
