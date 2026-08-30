@@ -4799,13 +4799,13 @@ const AppEngine = {
     const regionContainer = document.getElementById('admin-region-distribution');
     if (regionContainer) {
       regionContainer.innerHTML = regData.map(r => `
-        <div class="region-progress-row">
-          <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
-            <span style="color:#e2e8f0; font-weight:600;">${r.region}</span>
-            <strong style="color:var(--accent-gold); font-size:0.85rem;">${r.count} Anggota (${r.percentage}%)</strong>
+        <div class="region-progress-row" style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <span style="font-size:0.75rem; font-weight:500; color:#cbd5e1;">${r.region}</span>
+            <span style="font-size:0.75rem; font-weight:600; color:#fbbf24; font-family:monospace;">${r.count.toLocaleString('id-ID')} Anggota (${r.percentage}%)</span>
           </div>
-          <div class="region-progress-bar" style="background:rgba(255,255,255,0.06); height:6px; border-radius:4px;">
-            <div class="region-progress-fill" style="width:${r.percentage}%; background:linear-gradient(90deg, #d4af37 0%, #38bdf8 100%); border-radius:4px;"></div>
+          <div class="region-progress-bar" style="background:rgba(255,255,255,0.08); height:6px; border-radius:9999px; overflow:hidden;">
+            <div class="region-progress-fill" style="width:${r.percentage}%; height:100%; background:linear-gradient(90deg, #f59e0b 0%, #fcd34d 100%); border-radius:9999px; transition:width 0.6s ease;"></div>
           </div>
         </div>
       `).join('');
@@ -4952,6 +4952,28 @@ const AppEngine = {
     `;
   },
 
+  showMapTooltip(evt, text) {
+    let tt = document.getElementById('map-floating-tooltip');
+    if (!tt) {
+      tt = document.createElement('div');
+      tt.id = 'map-floating-tooltip';
+      tt.style.cssText = 'position:fixed; z-index:99999; pointer-events:none; padding:6px 14px; border-radius:10px; background:rgba(9,13,22,0.95); border:1px solid rgba(245,158,11,0.3); box-shadow:0 10px 25px rgba(0,0,0,0.6), 0 0 15px rgba(245,158,11,0.2); color:#ffffff; font-size:12px; font-weight:600; font-family:Inter, sans-serif; backdrop-filter:blur(10px); transition:opacity 0.15s ease, transform 0.15s ease; opacity:0; transform:translate(-50%, -130%); display:flex; align-items:center; gap:6px;';
+      document.body.appendChild(tt);
+    }
+    tt.innerHTML = `<span style="width:6px; height:6px; border-radius:50%; background:#fbbf24; box-shadow:0 0 6px #fbbf24;"></span><span>${text}</span>`;
+    tt.style.left = `${evt.clientX}px`;
+    tt.style.top = `${evt.clientY}px`;
+    tt.style.opacity = '1';
+    tt.style.transform = 'translate(-50%, -140%)';
+  },
+
+  hideMapTooltip() {
+    const tt = document.getElementById('map-floating-tooltip');
+    if (!tt) return;
+    tt.style.opacity = '0';
+    tt.style.transform = 'translate(-50%, -130%)';
+  },
+
   // 🗺️ DARK MODE VECTOR MAP OF INDONESIA WITH MINIMALIST GLOWING PULSE PINS
   renderIndonesiaMap(targetContainerId = null) {
     const containers = targetContainerId
@@ -4975,41 +4997,58 @@ const AppEngine = {
 
     // Hotspot Coordinates mapped over dark mode vector map (viewBox 0 0 1000 480)
     const pins = [
-      { key: 'Regional Sumatra', name: 'Regional Sumatra', x: 170, y: 182, color: '#d4af37' },
-      { key: 'Regional Banten', name: 'Regional Banten', x: 260, y: 315, color: '#38bdf8' },
-      { key: 'Regional Metro DKI Jakarta', name: 'Regional Metro DKI Jakarta', x: 288, y: 314, color: '#d4af37' },
-      { key: 'Regional Jawa Barat', name: 'Regional Jawa Barat', x: 318, y: 322, color: '#38bdf8' },
-      { key: 'Regional Jawa Tengah', name: 'Regional Jawa Tengah', x: 365, y: 326, color: '#d4af37' },
-      { key: 'Regional Yogyakarta', name: 'Regional Yogyakarta', x: 385, y: 334, color: '#38bdf8' },
-      { key: 'Regional Jawa Timur & Bali', name: 'Regional Jawa Timur & Bali', x: 425, y: 335, color: '#d4af37' },
-      { key: 'Regional Kalimantan & Sulawesi', name: 'Regional Kalimantan', x: 395, y: 195, color: '#38bdf8' },
-      { key: 'Regional Kalimantan & Sulawesi', name: 'Regional Sulawesi', x: 525, y: 225, color: '#d4af37' }
+      { key: 'Regional Sumatra', name: 'Sumatra', fullName: 'Regional Sumatra', x: 170, y: 182, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' },
+      { key: 'Regional Banten', name: 'Banten', fullName: 'Regional Banten', x: 260, y: 315, color: '#38bdf8', glow: 'rgba(56,189,248,0.8)' },
+      { key: 'Regional Metro DKI Jakarta', name: 'DKI Jakarta', fullName: 'Regional Metro DKI Jakarta', x: 288, y: 314, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' },
+      { key: 'Regional Jawa Barat', name: 'Jawa Barat', fullName: 'Regional Jawa Barat', x: 318, y: 322, color: '#38bdf8', glow: 'rgba(56,189,248,0.8)' },
+      { key: 'Regional Jawa Tengah', name: 'Jawa Tengah', fullName: 'Regional Jawa Tengah', x: 365, y: 326, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' },
+      { key: 'Regional Yogyakarta', name: 'DI Yogyakarta', fullName: 'Regional Yogyakarta', x: 385, y: 334, color: '#38bdf8', glow: 'rgba(56,189,248,0.8)' },
+      { key: 'Regional Jawa Timur & Bali', name: 'Jawa Timur & Bali', fullName: 'Regional Jawa Timur & Bali', x: 425, y: 335, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' },
+      { key: 'Regional Kalimantan & Sulawesi', name: 'Kalimantan', fullName: 'Regional Kalimantan', x: 395, y: 195, color: '#38bdf8', glow: 'rgba(56,189,248,0.8)' },
+      { key: 'Regional Kalimantan & Sulawesi', name: 'Sulawesi', fullName: 'Regional Sulawesi', x: 525, y: 225, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' }
     ];
 
-    // Build Glowing Pulse Halo Pins
+    const defaultCounts = {
+      'Sumatra': 16,
+      'Banten': 10,
+      'DKI Jakarta': 22,
+      'Jawa Barat': 18,
+      'Jawa Tengah': 14,
+      'DI Yogyakarta': 3,
+      'Jawa Timur & Bali': 15,
+      'Kalimantan': 8,
+      'Sulawesi': 5
+    };
+
+    // Build Minimalist Glowing Map Pins without numbers, with interactive hover tooltips
     const pinsSvg = pins.map(p => {
       const cList = regionMap[p.key] || [];
-      const count = cList.length || 12;
+      const count = cList.length || defaultCounts[p.name] || 12;
+      const tooltipText = `${p.name}: ${count} Klub`;
 
       return `
-        <!-- GLOWING PULSE PIN: ${p.name} -->
-        <g class="jarum-pentul-group" cursor="pointer" title="📍 ${p.name}: ${count} Klub Terdaftar">
-          <!-- Animated Outer Glowing Pulse Wave -->
-          <circle cx="${p.x}" cy="${p.y}" r="6" fill="${p.color}" opacity="0.25">
-            <animate attributeName="r" values="6;24;6" dur="2.4s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.45;0.0;0.45" dur="2.4s" repeatCount="indefinite"/>
+        <!-- GLOWING MAP PIN: ${p.name} -->
+        <g class="map-pin-hotspot group" cursor="pointer" onmousemove="AppEngine.showMapTooltip(event, '${tooltipText}')" onmouseleave="AppEngine.hideMapTooltip()">
+          <title>${tooltipText}</title>
+
+          <!-- Outer Soft Ambient Glow Halo (Pulsing) -->
+          <circle cx="${p.x}" cy="${p.y}" r="8" fill="${p.color}" opacity="0.15">
+            <animate attributeName="r" values="8;24;8" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.35;0.0;0.35" dur="2.6s" repeatCount="indefinite"/>
           </circle>
-          <circle cx="${p.x}" cy="${p.y}" r="4" stroke="${p.color}" stroke-width="1.5" fill="none" opacity="0.8">
-            <animate attributeName="r" values="4;16;4" dur="2.4s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.9;0.1;0.9" dur="2.4s" repeatCount="indefinite"/>
+          
+          <!-- Mid Pulse Wave Ring -->
+          <circle cx="${p.x}" cy="${p.y}" r="5" stroke="${p.color}" stroke-width="1.2" fill="none" opacity="0.7">
+            <animate attributeName="r" values="5;16;5" dur="2.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0.05;0.8" dur="2.6s" repeatCount="indefinite"/>
           </circle>
 
-          <!-- Core Dot (Champagne Gold / Cyan Accent) -->
-          <circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.color}" stroke="#ffffff" stroke-width="1.5" style="filter:drop-shadow(0 0 8px ${p.color});"/>
+          <!-- Outer Soft Blur -->
+          <circle cx="${p.x}" cy="${p.y - 7}" r="7" fill="${p.color}" opacity="0.25" style="filter:blur(3px);"/>
 
-          <!-- Sleek Mini Count Badge Floating Above Pin -->
-          <rect x="${p.x - 10}" y="${p.y - 20}" width="20" height="12" rx="6" fill="#07090e" stroke="${p.color}" stroke-width="1" opacity="0.95"/>
-          <text x="${p.x}" y="${p.y - 12}" font-size="7.5" font-weight="900" fill="#ffffff" text-anchor="middle" dominant-baseline="central">${count}</text>
+          <!-- Map Pin Icon Shape (Sleek Minimalist Outline + Central Dot) -->
+          <path d="M ${p.x} ${p.y} m 0 -14 c -4 0 -7 3 -7 7 c 0 5 7 11 7 11 s 7 -6 7 -11 c 0 -4 -3 -7 -7 -7 z" fill="#090d16" stroke="${p.color}" stroke-width="1.5" style="filter:drop-shadow(0 0 8px ${p.glow});"/>
+          <circle cx="${p.x}" cy="${p.y - 7}" r="2.5" fill="${p.color}" style="filter:drop-shadow(0 0 6px ${p.color});"/>
         </g>
       `;
     }).join('');
@@ -5028,7 +5067,7 @@ const AppEngine = {
         <!-- REAL INDONESIA GEOGRAPHICAL MAP IMAGE (DARK LUXURY PRESENTATION) -->
         <image href="images/indonesia_map.png" xlink:href="images/indonesia_map.png" x="0" y="0" width="1000" height="480" preserveAspectRatio="xMidYMid meet" opacity="0.94" style="filter: drop-shadow(0 4px 14px rgba(0,0,0,0.7));"/>
 
-        <!-- 📍 SLEEK GLOWING PULSE PINS -->
+        <!-- SLEEK GLOWING PULSE MAP PINS -->
         ${pinsSvg}
       </svg>
     `;
