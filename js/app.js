@@ -4814,15 +4814,19 @@ const AppEngine = {
     const alerts = (this.adminStats && this.adminStats.systemAlerts) ? this.adminStats.systemAlerts : [];
     const alertsContainer = document.getElementById('admin-alerts-feed');
     if (alertsContainer) {
-      alertsContainer.innerHTML = alerts.map(a => `
-        <div style="padding:12px; border-bottom:1px solid var(--chrome-border); display:flex; align-items:center; gap:12px; font-size:0.85rem;">
-          <span class="tier-badge" style="background:${a.level === 'WARNING' ? 'rgba(244,63,94,0.15)' : 'rgba(56,189,248,0.15)'}; color:${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'}; border:1px solid currentColor;">
-            ${a.level}
-          </span>
-          <span style="flex:1; color:#f8fafc;">${a.message}</span>
-          <span style="font-size:0.75rem; color:var(--text-muted);">${a.time}</span>
-        </div>
-      `).join('');
+      if (alerts.length === 0) {
+        alertsContainer.innerHTML = `<div style="padding:14px; text-align:center; color:#94a3b8; font-size:0.75rem;">Semua sistem berjalan normal (100% Operational)</div>`;
+      } else {
+        alertsContainer.innerHTML = alerts.map(a => `
+          <div style="padding:10px 12px; margin-bottom:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; display:flex; align-items:center; gap:10px; font-size:0.75rem;">
+            <span style="font-size:10px; font-weight:600; padding:2px 8px; border-radius:6px; background:${a.level === 'WARNING' ? 'rgba(244,63,94,0.1)' : 'rgba(56,189,248,0.1)'}; color:${a.level === 'WARNING' ? '#fb7185' : '#38bdf8'}; border:1px solid ${a.level === 'WARNING' ? 'rgba(244,63,94,0.2)' : 'rgba(56,189,248,0.2)'}; text-transform:uppercase;">
+              ${a.level}
+            </span>
+            <span style="flex:1; color:#e2e8f0; line-height:1.4;">${a.message}</span>
+            <span style="font-size:10px; color:#64748b; font-family:monospace; flex-shrink:0;">${a.time}</span>
+          </div>
+        `).join('');
+      }
     }
 
     this.renderVerificationQueue();
@@ -4860,42 +4864,36 @@ const AppEngine = {
           code: 'EVT-2026-001',
           title: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026',
           description: 'Touring tahunan komunitas Mercedes-Benz INA menyusuri rute budaya Yogyakarta, dilanjutkan dengan acara Jambore Nusantara, Gala Dinner, dan Bakti Sosial penyerahan bantuan Panti Asuhan.',
-          start_formatted: '12 September 2026, 08:00 WIB',
-          end_formatted: '14 September 2026, 18:00 WIB',
+          start_formatted: '12 - 14 September 2026',
+          end_formatted: '08:00 WIB',
           location: 'Candi Prambanan & Malioboro, Yogyakarta',
           capacity: 150,
           registered_count: 45,
-          status: 'PUBLISHED',
-          badge_color: 'rgba(16,185,129,0.2)',
-          badge_text: '🟢 PUBLISHED (DISETUJUI PRESIDEN)'
+          status: 'PUBLISHED'
         },
         {
           id: 'EVT-2026-002',
           code: 'EVT-2026-002',
           title: 'Jamnas MB INA XXV & Musyawarah Nasional 2026',
           description: 'Jambore Nasional perayaan HUT Mercedes-Benz Club Indonesia ke-22 dengan pameran mobil klasik W108, W114, W123, W124, W140, W202, W210 dan kontes modifikasi.',
-          start_formatted: '20 November 2026, 09:00 WIB',
-          end_formatted: '22 November 2026, 21:00 WIB',
+          start_formatted: '20 - 22 November 2026',
+          end_formatted: '09:00 WIB',
           location: 'ICE BSD City, Tangerang',
           capacity: 500,
           registered_count: 120,
-          status: 'PUBLISHED',
-          badge_color: 'rgba(16,185,129,0.2)',
-          badge_text: '🟢 PUBLISHED (DISETUJUI PRESIDEN)'
+          status: 'PUBLISHED'
         },
         {
           id: 'EVT-2026-003',
           code: 'EVT-2026-003',
           title: 'Grand Touring Trans Sumatra & Celebes Rally 2026',
           description: 'Petualangan lintas pulau menyusuri rute spektakuler Sumatra & Sulawesi, bakti sosial antar chapter, serta temu kangen komunitas nasional.',
-          start_formatted: '05 Desember 2026, 07:00 WIB',
-          end_formatted: '10 Desember 2026, 17:00 WIB',
+          start_formatted: '05 - 10 Desember 2026',
+          end_formatted: '07:00 WIB',
           location: 'Medan - Danau Toba - Bukittinggi',
           capacity: 100,
           registered_count: 32,
-          status: 'PUBLISHED',
-          badge_color: 'rgba(16,185,129,0.2)',
-          badge_text: '🟢 PUBLISHED (DISETUJUI PRESIDEN)'
+          status: 'PUBLISHED'
         }
       ];
     }
@@ -4903,31 +4901,48 @@ const AppEngine = {
     container.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:16px;">
         ${events.map(ev => `
-          <div class="glass-panel" style="padding:18px; border:1px solid var(--chrome-border); border-radius:12px; background:rgba(0,0,0,0.3); position:relative;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+          <div class="group" style="padding:20px; border:1px solid rgba(255,255,255,0.08); border-radius:16px; background:rgba(255,255,255,0.03); backdrop-filter:blur(12px); transition:all 0.3s ease; position:relative;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(255,255,255,0.05)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.background='rgba(255,255,255,0.03)';">
+            
+            <!-- HEADER EVENT ROW -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
               <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <span style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.8rem; background:rgba(212,175,55,0.12); padding:3px 10px; border-radius:6px; border:1px solid var(--accent-gold);">${ev.code}</span>
-                <strong style="color:#fff; font-size:1rem;">${ev.title}</strong>
-                <span class="tier-badge" style="background:${ev.badge_color || 'rgba(16,185,129,0.2)'}; color:${ev.status === 'PUBLISHED' ? 'var(--primary-emerald)' : 'var(--accent-blue)'}; border:1px solid currentColor;">${ev.badge_text || ev.status}</span>
+                <span style="font-family:monospace; font-size:0.75rem; color:#94a3b8; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:4px 10px; border-radius:8px;">${ev.code || ev.id}</span>
+                <h4 style="color:#ffffff; font-size:1rem; font-weight:700; margin:0;">${ev.title}</h4>
+                <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.75rem; font-weight:500; padding:3px 10px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
+                  <span style="width:6px; height:6px; border-radius:50%; background:#34d399;"></span>
+                  <span>PUBLISHED</span>
+                </span>
               </div>
-              <button class="btn-primary" style="font-size:0.75rem; font-weight:800; padding:6px 14px;" onclick="AppEngine.switchAdminTab('m6_event'); if(window.M6Engine) window.M6Engine.selectEventToPublish('${ev.id}')">👁️ Buka Modul Event →</button>
+              <button type="button" style="background:rgba(255,255,255,0.05); color:#e2e8f0; border:1px solid rgba(255,255,255,0.1); font-size:0.75rem; font-weight:500; padding:6px 14px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#e2e8f0';" onclick="AppEngine.switchAdminTab('m6_event'); if(window.M6Engine) window.M6Engine.selectEventToPublish('${ev.id}')">
+                <span>Buka Detail Event</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </button>
             </div>
 
             <!-- DESKRIPSI EVENT -->
-            <p style="font-size:0.83rem; color:#cbd5e1; line-height:1.6; margin:0 0 12px 0; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:8px; border-left:3px solid var(--accent-gold);">
+            <p style="font-size:0.8125rem; color:#94a3b8; line-height:1.6; margin:0 0 16px 0; background:rgba(255,255,255,0.02); padding:12px 16px; border-radius:12px; border-left:3px solid #fbbf24;">
               ${ev.description}
             </p>
 
-            <!-- WAKTU & METADATA -->
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; font-size:0.8rem; border-top:1px solid var(--chrome-border); padding-top:10px;">
-              <div style="display:flex; gap:20px; flex-wrap:wrap;">
-                <span style="color:var(--primary-emerald); font-weight:700;">🗓️ <strong>Mulai:</strong> ${ev.start_formatted}</span>
-                <span style="color:var(--accent-red); font-weight:700;">🏁 <strong>Selesai:</strong> ${ev.end_formatted}</span>
-                <span style="color:var(--text-muted);">📍 <strong>Lokasi:</strong> <strong style="color:#fff;">${ev.location}</strong></span>
+            <!-- WAKTU, LOKASI & KUOTA PESERTA -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; font-size:0.75rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+              <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+                <!-- Waktu Pelaksanaan -->
+                <span style="color:#cbd5e1; display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                  <span>${ev.start_formatted} • ${ev.end_formatted}</span>
+                </span>
+                <!-- Lokasi -->
+                <span style="color:#cbd5e1; display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>${ev.location}</span>
+                </span>
               </div>
               <div>
-                <span class="tier-badge" style="background:rgba(212,175,55,0.12); color:var(--accent-gold); border:1px solid var(--accent-gold);">
-                  👥 ${ev.registered_count} / ${ev.capacity} Peserta Terdaftar
+                <!-- Kuota Peserta -->
+                <span style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; font-size:0.75rem; font-weight:500; padding:4px 12px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <span>${ev.registered_count} / ${ev.capacity} Peserta Terdaftar</span>
                 </span>
               </div>
             </div>
@@ -7915,8 +7930,8 @@ const AppEngine = {
       items.push({
         id: u.id,
         mod: 'M1',
-        modName: '👥 M1',
-        modColor: '#3b82f6',
+        modName: 'Member Baru',
+        modColor: '#38bdf8',
         title: u.name,
         subtitle: `@${u.username || 'user'} · ${u.email}`,
         detail: `${u.city || 'Indonesia'} · ${u.phone || '-'}`,
@@ -7933,8 +7948,8 @@ const AppEngine = {
       items.push({
         id: c.id,
         mod: 'M2',
-        modName: '🚗 M2',
-        modColor: '#10b981',
+        modName: 'Klub / Chapter',
+        modColor: '#34d399',
         title: c.name,
         subtitle: `Regional: ${c.region || 'Nasional'} · Pendiri: ${c.founder || '-'}`,
         detail: `Pengajuan Registrasi Klub Baru (${c.total_members || 10} Anggota)`,
@@ -7951,8 +7966,8 @@ const AppEngine = {
       items.push({
         id: m.id,
         mod: 'M3',
-        modName: '🎟️ M3',
-        modColor: '#8b5cf6',
+        modName: 'Tiket Event',
+        modColor: '#a78bfa',
         title: m.name,
         subtitle: `Klub: ${m.club || 'MB INA'} · ${m.email}`,
         detail: `Pendaftaran Jamnas XXI / Event Regional (${m.city || 'Indonesia'})`,
@@ -7969,8 +7984,8 @@ const AppEngine = {
       items.push({
         id: i.id,
         mod: 'M4',
-        modName: '💳 M4',
-        modColor: '#f59e0b',
+        modName: 'Iuran Tahunan',
+        modColor: '#fbbf24',
         title: i.member_name || 'Member MB INA',
         subtitle: `Periode: ${i.period || '2026'} · Nominal: Rp ${Number(i.amount || 150000).toLocaleString('id-ID')}`,
         detail: `Bukti Transfer Pembayaran Iuran Tahunan`,
@@ -7987,8 +8002,8 @@ const AppEngine = {
       items.push({
         id: r.id,
         mod: 'M5',
-        modName: '💬 M5',
-        modColor: '#ef4444',
+        modName: 'Laporan Forum',
+        modColor: '#fb7185',
         title: `Thread: "${r.thread_title || 'Diskusi Forum'}"`,
         subtitle: `Pelapor: ${r.reporter || 'Member'} · Alasan: ${r.reason || 'SARA / Spam'}`,
         detail: `Laporan konten dari member forum`,
@@ -8003,15 +8018,16 @@ const AppEngine = {
     const m6List = window.M6Engine?.sampleSponsors || this.m6Data?.sponsors || [];
     const pendingM6 = m6List.filter(s => s.status !== 'CONFIRMED' && s.status !== 'APPROVED' && s.status !== 'REJECTED');
     pendingM6.forEach(s => {
+      const cleanPkg = (s.pkg || 'Gold').replace(/[^\w\s]/gi, '').trim();
       items.push({
         id: s.id,
         mod: 'M6',
-        modName: '📦 M6',
-        modColor: '#f59e0b',
+        modName: 'Sponsorship',
+        modColor: '#fbbf24',
         title: s.name || s.company,
         subtitle: `Email: ${s.email} · Phone: ${s.phone || '-'}`,
-        detail: `Pengajuan Kontrak Paket ${s.pkg} (Nilai: Rp ${Number(s.value || s.price || 0).toLocaleString('id-ID')})`,
-        badge: s.status === 'WAITING_BENDAHARA' ? 'Verifikasi Bendahara' : (s.status === 'WAITING_PRESIDEN' ? 'Verifikasi Presiden' : 'Pending Verifikasi Admin'),
+        detail: `Pengajuan Kontrak Paket ${cleanPkg} (Nilai: Rp ${Number(s.value || s.price || 0).toLocaleString('id-ID')})`,
+        badge: s.status === 'WAITING_BENDAHARA' ? 'Verifikasi Bendahara' : (s.status === 'WAITING_PRESIDEN' ? 'Verifikasi Presiden' : 'Pending Admin'),
         date: s.submitDate || s.createdAt || 'Terbaru',
         actionApprove: `AppEngine.approveSponsorContract('${s.id}')`,
         actionReject: `AppEngine.rejectSponsorContract('${s.id}')`
@@ -8024,12 +8040,12 @@ const AppEngine = {
       items.push({
         id: a.id,
         mod: 'M7',
-        modName: '🏪 M7',
-        modColor: '#ec4899',
+        modName: 'Iklan Lapak',
+        modColor: '#f472b6',
         title: a.name || a.title,
         subtitle: `Penjual: ${a.seller || 'Member'} · Rp ${Number(a.price || 0).toLocaleString('id-ID')}`,
         detail: `Pemasangan Iklan Baru (${a.category || 'SPAREPART'})`,
-        badge: 'Pending Verifikasi Iklan',
+        badge: 'Pending Iklan',
         date: 'Terbaru',
         actionApprove: `AppEngine.approveMemberAd('${a.id}')`,
         actionReject: `AppEngine.rejectMemberAd('${a.id}')`
@@ -8042,12 +8058,12 @@ const AppEngine = {
       items.push({
         id: c.id,
         mod: 'M8',
-        modName: '💰 M8',
-        modColor: '#10b981',
+        modName: 'Kontrak Endorse',
+        modColor: '#34d399',
         title: c.partner_name,
         subtitle: `No. Kontrak: ${c.contract_number} · ${c.contact_person || 'PIC Sponsor'}`,
         detail: `Permohonan Kontrak Endorse ${c.package_name || 'Endorse'} (Nilai: Rp ${Number(c.total_amount || 0).toLocaleString('id-ID')})`,
-        badge: c.status === 'WAITLIST' ? 'Waitlist Queue #3' : 'Verifikasi Keuangan Admin',
+        badge: c.status === 'WAITLIST' ? 'Waitlist #3' : 'Verifikasi Keuangan',
         date: c.start_date || 'Terbaru',
         actionApprove: `AppEngine.approveSponsorContract('${c.id}')`,
         actionReject: `AppEngine.rejectSponsorContract('${c.id}')`
@@ -8060,59 +8076,66 @@ const AppEngine = {
 
     const pillsContainer = document.getElementById('unified-queue-pills');
     if (pillsContainer) {
+      const activeStyle = 'background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-size:0.75rem; font-weight:600; padding:6px 12px; border-radius:12px; cursor:pointer;';
+      const inactiveStyle = 'background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); font-size:0.75rem; padding:6px 12px; border-radius:12px; cursor:pointer; transition:all 0.2s;';
+
       pillsContainer.innerHTML = `
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='ALL'?'background:rgba(245,158,11,0.2); border-color:var(--accent-gold); color:var(--accent-gold);':''}" onclick="AppEngine.renderVerificationQueue('ALL')">🌐 Semua (${counts.ALL})</button>
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='M1'?'background:rgba(59,130,246,0.2); border-color:#3b82f6; color:#3b82f6;':''}" onclick="AppEngine.renderVerificationQueue('M1')">👥 M1 (${counts.M1})</button>
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='M2'?'background:rgba(16,185,129,0.2); border-color:#10b981; color:#10b981;':''}" onclick="AppEngine.renderVerificationQueue('M2')">🚗 M2 (${counts.M2})</button>
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='M3'?'background:rgba(139,92,246,0.2); border-color:#8b5cf6; color:#8b5cf6;':''}" onclick="AppEngine.renderVerificationQueue('M3')">🎟️ M3 (${counts.M3})</button>
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='M4'?'background:rgba(245,158,11,0.2); border-color:#f59e0b; color:#f59e0b;':''}" onclick="AppEngine.renderVerificationQueue('M4')">💳 M4 (${counts.M4})</button>
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='M5'?'background:rgba(239,68,68,0.2); border-color:#ef4444; color:#ef4444;':''}" onclick="AppEngine.renderVerificationQueue('M5')">💬 M5 (${counts.M5})</button>
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='M6'?'background:rgba(245,158,11,0.2); border-color:var(--accent-gold); color:var(--accent-gold);':''}" onclick="AppEngine.renderVerificationQueue('M6')">📦 M6 (${counts.M6})</button>
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='M7'?'background:rgba(236,72,153,0.2); border-color:#ec4899; color:#ec4899;':''}" onclick="AppEngine.renderVerificationQueue('M7')">🏪 M7 (${counts.M7})</button>
-        <button class="btn-outline" style="font-size:0.75rem; padding:4px 10px; font-weight:800; ${modFilter==='M8'?'background:rgba(16,185,129,0.2); border-color:#10b981; color:#10b981;':''}" onclick="AppEngine.renderVerificationQueue('M8')">💰 M8 (${counts.M8})</button>
+        <button style="${modFilter==='ALL'?activeStyle:inactiveStyle}" onclick="AppEngine.renderVerificationQueue('ALL')">Semua (${counts.ALL})</button>
+        <button style="${modFilter==='M6'?activeStyle:inactiveStyle}" onclick="AppEngine.renderVerificationQueue('M6')">Sponsor (${counts.M6})</button>
+        <button style="${modFilter==='M1'?activeStyle:inactiveStyle}" onclick="AppEngine.renderVerificationQueue('M1')">Member (${counts.M1})</button>
+        <button style="${modFilter==='M2'?activeStyle:inactiveStyle}" onclick="AppEngine.renderVerificationQueue('M2')">Klub (${counts.M2})</button>
+        <button style="${modFilter==='M3'?activeStyle:inactiveStyle}" onclick="AppEngine.renderVerificationQueue('M3')">Event (${counts.M3})</button>
+        <button style="${modFilter==='M4'?activeStyle:inactiveStyle}" onclick="AppEngine.renderVerificationQueue('M4')">Iuran (${counts.M4})</button>
+        <button style="${modFilter==='M7'?activeStyle:inactiveStyle}" onclick="AppEngine.renderVerificationQueue('M7')">Lapak (${counts.M7})</button>
+        <button style="${modFilter==='M8'?activeStyle:inactiveStyle}" onclick="AppEngine.renderVerificationQueue('M8')">Kontrak (${counts.M8})</button>
       `;
     }
 
     const filteredItems = modFilter === 'ALL' ? items : items.filter(it => it.mod === modFilter);
 
     if (filteredItems.length === 0) {
-      queueContainer.innerHTML = `<div style="text-align:center; padding:32px; color:var(--primary-emerald); font-weight:800; font-size:0.9rem;">🎉 Tidak ada antrean verifikasi pending pada kategori ini! Seluruh permohonan telah selesai diproses.</div>`;
+      queueContainer.innerHTML = `<div style="text-align:center; padding:32px; color:#34d399; font-weight:600; font-size:0.875rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:14px;">Tidak ada antrean verifikasi pending pada kategori ini. Seluruh permohonan telah selesai diproses.</div>`;
       return;
     }
 
     queueContainer.innerHTML = `
-      <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+      <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
         <thead>
-          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
-            <th style="padding:12px; width:90px; text-align:center;">Modul</th>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; color:#94a3b8;">
+            <th style="padding:12px; width:120px; text-align:center;">Modul</th>
             <th style="padding:12px;">Nama / Item Permohonan</th>
             <th style="padding:12px;">Rincian / Catatan</th>
-            <th style="padding:12px;">Status Badge</th>
-            <th style="padding:12px; text-align:center; width:110px;">Aksi</th>
+            <th style="padding:12px;">Status</th>
+            <th style="padding:12px; text-align:center; width:90px;">Aksi</th>
           </tr>
         </thead>
         <tbody>
           ${filteredItems.map(it => `
-            <tr style="border-bottom:1px solid var(--chrome-border);">
-              <td style="padding:14px 12px; text-align:center;">
-                <span style="font-size:0.78rem; font-weight:900; padding:4px 10px; border-radius:6px; background:${it.modColor}20; color:${it.modColor}; border:1px solid ${it.modColor}50;">${it.modName}</span>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+              <td style="padding:12px; text-align:center;">
+                <span style="font-size:10px; font-weight:600; padding:3px 10px; border-radius:9999px; background:${it.modColor}15; color:${it.modColor}; border:1px solid ${it.modColor}30; display:inline-block;">${it.modName}</span>
               </td>
-              <td style="padding:14px 12px; font-weight:700;">
-                <div style="color:#fff; font-size:0.92rem;">${it.title}</div>
-                <div style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">${it.subtitle}</div>
+              <td style="padding:12px;">
+                <div style="color:#ffffff; font-weight:600; font-size:0.875rem;">${it.title}</div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">${it.subtitle}</div>
               </td>
-              <td style="padding:14px 12px; font-size:0.82rem; color:var(--text-main);">
+              <td style="padding:12px; font-size:0.8125rem; color:#cbd5e1;">
                 ${it.detail}
               </td>
-              <td style="padding:14px 12px;">
-                <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">
-                  ⏳ ${it.badge}
+              <td style="padding:12px;">
+                <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-size:0.75rem; font-weight:500; padding:3px 10px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
+                  <span style="width:5px; height:5px; border-radius:50%; background:#fbbf24;"></span>
+                  <span>${it.badge}</span>
                 </span>
               </td>
-              <td style="padding:14px 12px; text-align:center;">
-                <div style="display:flex; gap:6px; justify-content:center;">
-                  <button class="btn-primary" style="padding:6px 12px; font-size:0.85rem; font-weight:900; background:#22c55e; color:#000; border-radius:6px; cursor:pointer;" onclick="${it.actionApprove}" title="✓ Setujui (Approve)">✓</button>
-                  <button class="btn-outline" style="padding:6px 12px; font-size:0.85rem; font-weight:900; color:#ef4444; border-color:#ef4444; background:rgba(239,68,68,0.15); border-radius:6px; cursor:pointer;" onclick="${it.actionReject}" title="✕ Tolak (Reject)">✕</button>
+              <td style="padding:12px; text-align:center;">
+                <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+                  <button type="button" style="width:32px; height:32px; border-radius:10px; background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.3); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(16,185,129,0.2)';" onmouseout="this.style.background='rgba(16,185,129,0.1)';" onclick="${it.actionApprove}" title="Setujui (Approve)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </button>
+                  <button type="button" style="width:32px; height:32px; border-radius:10px; background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.3); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.background='rgba(244,63,94,0.2)';" onmouseout="this.style.background='rgba(244,63,94,0.1)';" onclick="${it.actionReject}" title="Tolak (Reject)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
                 </div>
               </td>
             </tr>

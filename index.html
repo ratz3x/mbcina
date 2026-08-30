@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v29">
+  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v30">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -1467,15 +1467,23 @@
 
         </div>
 
-        <!-- 📅 SEKSI KALENDER & AGENDA EVENT MB INA -->
-        <div class="glass-panel" style="padding:22px; margin-bottom:28px; border:1px solid rgba(212,175,55,0.3);">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-            <div>
-              <h3 style="font-size:1.15rem; margin:0;" class="text-gradient">📅 Agenda & Kalender Event Resmi MB INA</h3>
-              <p style="font-size:0.8rem; color:var(--text-muted); margin:2px 0 0;">Daftar kegiatan, touring, jambore, dan agenda resmi MB INA yang telah dipublish beserta deskripsi & waktu pelaksanaan.</p>
+        <!-- SEKSI KALENDER & AGENDA EVENT MB INA -->
+        <div class="glass-panel" style="padding:24px; margin-bottom:28px; border:1px solid rgba(255,255,255,0.08); border-radius:20px; background:rgba(255,255,255,0.02);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:36px; height:36px; border-radius:12px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+              </div>
+              <div>
+                <h3 style="font-size:1.15rem; margin:0; color:#fff; font-weight:700;">Agenda & Kalender Event Resmi</h3>
+                <p style="font-size:0.8rem; color:#94a3b8; margin:2px 0 0;">Daftar kegiatan, touring, jambore, dan agenda resmi MB INA yang telah dipublish beserta deskripsi & waktu pelaksanaan.</p>
+              </div>
             </div>
             <div style="display:flex; gap:8px;">
-              <button class="btn-primary" style="font-size:0.8rem; font-weight:800;" onclick="AppEngine.switchAdminTab('m6_event')">⚙️ Kelola Event →</button>
+              <button type="button" class="btn-primary" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:8px 16px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="AppEngine.switchAdminTab('m6_event')">
+                <span>Kelola Event</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </button>
             </div>
           </div>
 
@@ -1485,15 +1493,29 @@
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 2fr; gap:24px;">
-          <div class="glass-panel" style="padding:20px;">
-            <h4 style="font-size:1rem; margin-bottom:12px; color:var(--accent-gold);">🔔 Peringatan Sistem & Notifikasi</h4>
+          <!-- STATUS SISTEM -->
+          <div class="glass-panel" style="padding:20px; border:1px solid rgba(255,255,255,0.08); border-radius:20px; background:rgba(255,255,255,0.02);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#34d399; box-shadow:0 0 8px #34d399;"></span>
+                <h4 style="font-size:0.95rem; margin:0; color:#ffffff; font-weight:700;">Status Sistem</h4>
+              </div>
+              <span style="font-size:10px; color:#94a3b8; font-family:monospace; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:2px 8px; border-radius:6px;">Realtime</span>
+            </div>
             <div id="admin-alerts-feed"></div>
           </div>
-          <div class="glass-panel" style="padding:20px; overflow-x:auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
-              <div>
-                <h4 style="font-size:1.05rem; margin:0 0 2px 0; color:var(--accent-gold);">📋 Pusat Antrean Verifikasi Terpadu</h4>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">Kelola & verifikasi permohonan pending seluruh modul MB INA</p>
+
+          <!-- PUSAT ANTREAN VERIFIKASI -->
+          <div class="glass-panel" style="padding:20px; overflow-x:auto; border:1px solid rgba(255,255,255,0.08); border-radius:20px; background:rgba(255,255,255,0.02);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:32px; height:32px; border-radius:10px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <div>
+                  <h4 style="font-size:0.95rem; margin:0; color:#ffffff; font-weight:700;">Pusat Antrean Verifikasi</h4>
+                  <p style="font-size:0.75rem; color:#94a3b8; margin:2px 0 0;">Kelola & verifikasi permohonan pending seluruh modul MB INA</p>
+                </div>
               </div>
               <div id="unified-queue-pills" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
             </div>
@@ -10420,8 +10442,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260830_luxury_v29"></script>
-  <script src="js/app.js?v=20260830_luxury_v29"></script>
+  <script src="js/auth.js?v=20260830_luxury_v30"></script>
+  <script src="js/app.js?v=20260830_luxury_v30"></script>
   <script>
     lucide.createIcons();
     try {
