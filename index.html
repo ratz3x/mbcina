@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v28">
+  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v29">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -5498,117 +5498,128 @@
     <!-- MODUL 11: KOPERASI BERSAMA SATU BINTANG                           -->
     <!-- ================================================================= -->
     <div id="admin-tab-m11_koperasi" class="admin-tab-content" style="display:none; padding: 20px 0;">
-      <div class="glass-panel" style="background: linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(30,41,59,0.95) 100%); border: 1px solid rgba(245,158,11,0.35); border-radius: 24px; padding: 36px 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); position: relative; overflow: hidden;">
+      <div class="glass-panel" style="background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 36px 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); position: relative; overflow: hidden;">
         
         <!-- Ambient Decorative Glow -->
-        <div style="position: absolute; top: -120px; left: 50%; transform: translateX(-50%); width: 450px; height: 450px; background: radial-gradient(circle, rgba(245,158,11,0.18) 0%, rgba(0,0,0,0) 70%); pointer-events: none;"></div>
+        <div style="position: absolute; top: -120px; left: 50%; transform: translateX(-50%); width: 450px; height: 450px; background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%); pointer-events: none;"></div>
 
         <!-- Top Navigation & Return Bar -->
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:28px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:18px;">
-          <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(245,158,11,0.12); border:1px solid var(--accent-gold); padding:6px 18px; border-radius:50px;">
-            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent-gold); box-shadow:0 0 10px var(--accent-gold);"></span>
-            <span style="color:var(--accent-gold); font-size:0.82rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;">MODUL 11 — KOPERASI BERSAMA SATU BINTANG</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:28px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:18px; position:relative; z-index:1;">
+          <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); padding:6px 16px; border-radius:9999px;">
+            <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#fbbf24; box-shadow:0 0 8px #fbbf24;"></span>
+            <span style="color:#fbbf24; font-size:0.75rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;">Badan Usaha Resmi</span>
           </div>
 
           <div style="display:flex; gap:10px; align-items:center;">
-            <button id="btn-kop-return-admin" type="button" class="btn-primary" onclick="AppEngine.switchAdminTab('m1_portal')" style="background:var(--accent-gold); color:#000; font-weight:800; font-size:0.82rem; padding:8px 20px; border-radius:10px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-              <span>🏠</span> Kembali ke Dashboard Admin
+            <button id="btn-kop-return-admin" type="button" onclick="AppEngine.switchAdminTab('m1_portal')" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:8px 18px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Kembali ke Dashboard Admin</span>
             </button>
-            <button id="btn-kop-return-member" type="button" class="btn-primary" onclick="AppEngine.openPortalMember()" style="background:var(--accent-gold); color:#000; font-weight:800; font-size:0.82rem; padding:8px 20px; border-radius:10px; border:none; cursor:pointer; display:none; align-items:center; gap:6px;">
-              <span>🔙</span> Kembali ke Dashboard Member
+            <button id="btn-kop-return-member" type="button" onclick="AppEngine.openPortalMember()" style="background:rgba(255,255,255,0.05); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); font-weight:500; font-size:0.75rem; padding:8px 18px; border-radius:12px; cursor:pointer; display:none; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#cbd5e1';">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <span>Kembali ke Dashboard Member</span>
             </button>
           </div>
         </div>
 
         <!-- Official Koperasi Hero Visual & Header -->
-        <div style="text-align:center; max-width:850px; margin:0 auto 36px auto;">
-          <div style="margin:0 auto 20px auto; width:130px; height:130px; border-radius:50%; background:#000; border:3px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; box-shadow:0 0 35px rgba(245,158,11,0.4); position:relative; overflow:hidden;">
+        <div style="text-align:center; max-width:850px; margin:0 auto 36px auto; position:relative; z-index:1;">
+          <div style="margin:0 auto 16px auto; width:80px; height:80px; border-radius:50%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; box-shadow:0 0 30px rgba(245,158,11,0.12); padding:8px; position:relative;">
             <img src="assets/logo_koperasi.jpg" alt="Logo Koperasi Bersama Satu Bintang" style="width:100%; height:100%; object-fit:contain; border-radius:50%;">
           </div>
 
-          <h1 style="font-size:2.2rem; font-weight:900; color:#fff; margin:0 0 6px 0; letter-spacing:-0.5px; text-transform:uppercase;">
+          <h1 style="font-size:1.75rem; font-weight:700; color:#ffffff; margin:0 0 4px 0; letter-spacing:0.02em; text-transform:uppercase; line-height:1.2;">
             Koperasi Bersama Satu Bintang
           </h1>
-          <div style="color:var(--accent-gold); font-size:1.05rem; font-weight:800; margin-bottom:14px; letter-spacing:0.5px;">
+          <div style="color:#fbbf24; font-size:0.85rem; font-weight:600; margin-bottom:14px; letter-spacing:0.1em; text-transform:uppercase;">
             Mercedes-Benz Club Indonesia (MB Club INA)
           </div>
-          <p style="color:#cbd5e1; font-size:0.95rem; margin:0 auto 24px auto; line-height:1.65; max-width:760px;">
-            Wadah ekonomi gotong royong resmi komunitas Mercedes-Benz Club Indonesia untuk mewadahi potensi ekonomi lebih dari <strong>15.000 anggota dari 111 klub (117 klub/chapter)</strong> di seluruh penjuru nusantara.
+          <p style="color:#94a3b8; font-size:0.875rem; margin:0 auto 24px auto; line-height:1.65; max-width:760px;">
+            Wadah ekonomi gotong royong resmi komunitas Mercedes-Benz Club Indonesia untuk mewadahi potensi ekonomi lebih dari <strong style="color:#fff;">15.000 anggota dari 111 klub (117 klub/chapter)</strong> di seluruh penjuru nusantara.
           </p>
 
           <!-- Quick Info Chips -->
-          <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; font-size:0.84rem;">
-            <span style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); padding:8px 16px; border-radius:20px; color:#cbd5e1; display:inline-flex; align-items:center; gap:6px;">
-              📍 Office 88 Kota Kasablanka Unit 16B, Jakarta Selatan
+          <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; font-size:0.75rem;">
+            <span style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:6px 14px; border-radius:9999px; color:#cbd5e1; display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Office 88 Kota Kasablanka Unit 16B, Jakarta Selatan</span>
             </span>
-            <a href="mailto:bsbkoperasi20@gmail.com" style="background:rgba(245,158,11,0.1); border:1px solid var(--accent-gold); padding:8px 16px; border-radius:20px; color:var(--accent-gold); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
-              ✉️ bsbkoperasi20@gmail.com
+            <a href="mailto:bsbkoperasi20@gmail.com" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:6px 14px; border-radius:9999px; color:#fbbf24; text-decoration:none; font-weight:500; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.1)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(255,255,255,0.08)';">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <span>bsbkoperasi20@gmail.com</span>
             </a>
-            <span style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); padding:8px 16px; border-radius:20px; color:#38bdf8; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
-              🏛️ Didukung Kementerian Koperasi RI
+            <span style="background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.2); padding:6px 14px; border-radius:9999px; color:#38bdf8; font-weight:500; display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Didukung Kementerian Koperasi RI</span>
             </span>
           </div>
         </div>
 
         <!-- 2. Visi & Misi Box -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; max-width:1050px; margin:0 auto 36px auto; text-align:left;">
-          <div style="background:linear-gradient(145deg, rgba(30,41,59,0.75), rgba(15,23,42,0.85)); border:1.5px solid rgba(245,158,11,0.35); border-radius:18px; padding:24px; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-              <span style="font-size:1.6rem; background:rgba(245,158,11,0.15); width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; border:1px solid var(--accent-gold);">🎯</span>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px; transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+              <div style="width:40px; height:40px; border-radius:12px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              </div>
               <div>
-                <strong style="color:var(--accent-gold); font-size:1.15rem; letter-spacing:0.5px; display:block;">VISI UTAMA</strong>
-                <span style="font-size:0.75rem; color:var(--text-muted);">Arah & Komitmen Jangka Panjang</span>
+                <strong style="color:#ffffff; font-size:1rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; display:block;">Visi Utama</strong>
+                <span style="font-size:0.75rem; color:#94a3b8;">Arah & Komitmen Jangka Panjang</span>
               </div>
             </div>
-            <p style="font-size:0.9rem; color:#e2e8f0; line-height:1.6; margin:0;">
+            <p style="font-size:0.875rem; color:#cbd5e1; line-height:1.65; margin:0;">
               Menjadi koperasi komunitas otomotif yang profesional, terpercaya, mandiri, dan mampu memberikan manfaat ekonomi maksimal berkelanjutan bagi seluruh anggota Mercedes-Benz Club Indonesia.
             </p>
           </div>
 
-          <div style="background:linear-gradient(145deg, rgba(30,41,59,0.75), rgba(15,23,42,0.85)); border:1.5px solid rgba(245,158,11,0.35); border-radius:18px; padding:24px; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-              <span style="font-size:1.6rem; background:rgba(245,158,11,0.15); width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; border:1px solid var(--accent-gold);">🚀</span>
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:24px; transition:all 0.3s;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+              <div style="width:40px; height:40px; border-radius:12px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              </div>
               <div>
-                <strong style="color:var(--accent-gold); font-size:1.15rem; letter-spacing:0.5px; display:block;">MISI STRATEGIS</strong>
-                <span style="font-size:0.75rem; color:var(--text-muted);">Langkah Nyata Pemberdayaan</span>
+                <strong style="color:#ffffff; font-size:1rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; display:block;">Misi Strategis</strong>
+                <span style="font-size:0.75rem; color:#94a3b8;">Langkah Nyata Pemberdayaan</span>
               </div>
             </div>
-            <p style="font-size:0.9rem; color:#e2e8f0; line-height:1.6; margin:0;">
+            <p style="font-size:0.875rem; color:#cbd5e1; line-height:1.65; margin:0;">
               Meningkatkan kesejahteraan anggota melalui tata kelola modern, layanan simpan pinjam terpercaya, unit usaha pengadaan suku cadang resmi, bengkel rekanan, dan pembagian Sisa Hasil Usaha (SHU) yang transparan.
             </p>
           </div>
         </div>
 
         <!-- 3. Latar Belakang & Sejarah Pendirian -->
-        <div style="max-width:1050px; margin:0 auto 36px auto; text-align:left; background:rgba(15,23,42,0.75); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:28px; box-shadow:0 10px 30px rgba(0,0,0,0.35);">
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(245,158,11,0.25); padding-bottom:12px;">
-            <span style="font-size:1.4rem; color:var(--accent-gold);">📜</span>
-            <h3 style="margin:0; color:var(--accent-gold); font-size:1.15rem; font-weight:900; letter-spacing:0.5px;">
-              AWAL MULA & GAGASAN PENDIRIAN
+        <div style="max-width:1050px; margin:0 auto 36px auto; text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:28px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+            <div style="width:32px; height:32px; border-radius:10px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <h3 style="margin:0; color:#ffffff; font-size:1.05rem; font-weight:700; letter-spacing:0.03em;">
+              Gagasan & Latar Belakang Pendirian
             </h3>
           </div>
 
-          <p style="font-size:0.9rem; color:#cbd5e1; line-height:1.7; margin:0 0 16px 0;">
-            <strong>Koperasi Bersama Satu Bintang</strong> diinisiasi dan diluncurkan pada awal Desember 2025 berkat dorongan langsung <strong>Menteri Koperasi Republik Indonesia Ferry Juliantono</strong> (sekaligus Ketua Dewan Kehormatan Mercedes-Benz Club Indonesia). Keberadaan koperasi ini bertujuan untuk mengkonsolidasikan kekuatan perputaran ekonomi dan daya beli dari lebih dari <strong>15.000 anggota dari 111 klub (total 117 klub/chapter)</strong> di bawah naungan MB Club INA.
+          <p style="font-size:0.875rem; color:#94a3b8; line-height:1.7; margin:0 0 18px 0;">
+            <strong style="color:#ffffff;">Koperasi Bersama Satu Bintang</strong> diinisiasi dan diluncurkan pada awal Desember 2025 berkat dorongan langsung <strong style="color:#fbbf24;">Menteri Koperasi Republik Indonesia Ferry Juliantono</strong> (sekaligus Ketua Dewan Kehormatan Mercedes-Benz Club Indonesia). Keberadaan koperasi ini bertujuan untuk mengkonsolidasikan kekuatan perputaran ekonomi dan daya beli dari lebih dari <strong style="color:#ffffff;">15.000 anggota dari 111 klub (total 117 klub/chapter)</strong> di bawah naungan MB Club INA.
           </p>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:14px; margin-top:18px;">
-            <div style="background:rgba(15,23,42,0.9); padding:16px; border-radius:12px; border-left:4px solid var(--accent-gold); border-top:1px solid rgba(255,255,255,0.05); border-right:1px solid rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.05);">
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                <span style="font-size:1.1rem;">🏛️</span>
-                <strong style="color:#fff; font-size:0.92rem;">Momen Bersejarah Peluncuran:</strong>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:14px;">
+            <div style="background:rgba(255,255,255,0.02); padding:18px; border-radius:14px; border:1px solid rgba(255,255,255,0.06); border-left:3px solid #fbbf24;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <strong style="color:#fff; font-size:0.875rem;">Momen Bersejarah Peluncuran:</strong>
               </div>
-              <p style="font-size:0.83rem; color:#94a3b8; line-height:1.55; margin:0;">
+              <p style="font-size:0.8125rem; color:#94a3b8; line-height:1.6; margin:0;">
                 Ide pendirian koperasi ini diumumkan secara resmi menjelang perhelatan akbar <strong>Jambore Nasional (Jamnas) ke-20 Mercedes-Benz Club Indonesia</strong> di Bandung, Jawa Barat, pada awal Desember 2025 dengan dukungan penuh Kementerian Koperasi sebagai <em>role model</em> koperasi komunitas otomotif nasional berbadan hukum legal.
               </p>
             </div>
 
-            <div style="background:rgba(15,23,42,0.9); padding:16px; border-radius:12px; border-left:4px solid #38bdf8; border-top:1px solid rgba(255,255,255,0.05); border-right:1px solid rgba(255,255,255,0.05); border-bottom:1px solid rgba(255,255,255,0.05);">
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                <span style="font-size:1.1rem;">⚙️</span>
-                <strong style="color:#fff; font-size:0.92rem;">Rencana & Fokus Pengembangan Usaha:</strong>
+            <div style="background:rgba(255,255,255,0.02); padding:18px; border-radius:14px; border:1px solid rgba(255,255,255,0.06); border-left:3px solid #38bdf8;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                <strong style="color:#fff; font-size:0.875rem;">Rencana & Fokus Pengembangan Usaha:</strong>
               </div>
-              <p style="font-size:0.83rem; color:#94a3b8; line-height:1.55; margin:0;">
+              <p style="font-size:0.8125rem; color:#94a3b8; line-height:1.6; margin:0;">
                 Fokus pengembangan usaha diarahkan pada kebutuhan riil anggota komunitas, meliputi pengadaan <strong>bengkel khusus</strong>, penyediaan <strong>suku cadang (spare part) resmi</strong> atau pendukung Mercedes-Benz berdiskon, oli perawatan, serta dana talangan perbaikan mendesak.
               </p>
             </div>
@@ -5616,63 +5627,65 @@
         </div>
 
         <!-- 4. Daftar 11 Pendiri Koperasi -->
-        <div style="max-width:1050px; margin:0 auto 36px auto; text-align:left; background:rgba(245,158,11,0.04); border:1px solid rgba(245,158,11,0.25); border-radius:20px; padding:26px; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; border-bottom:1px solid rgba(245,158,11,0.2); padding-bottom:10px;">
+        <div style="max-width:1050px; margin:0 auto 36px auto; text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:26px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
             <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:1.3rem; color:var(--accent-gold);">👥</span>
-              <strong style="color:var(--accent-gold); font-size:1.05rem; letter-spacing:0.5px; text-transform:uppercase;">
-                11 Pendiri Koperasi (Member Mercedes-Benz Club Indonesia)
+              <div style="width:32px; height:32px; border-radius:10px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <strong style="color:#ffffff; font-size:1.05rem; font-weight:700; letter-spacing:0.03em;">
+                Dewan Pendiri Koperasi
               </strong>
             </div>
-            <span style="font-size:0.75rem; color:#94a3b8; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+            <span style="font-size:0.75rem; color:#94a3b8; background:rgba(255,255,255,0.04); padding:4px 12px; border-radius:9999px; border:1px solid rgba(255,255,255,0.08);">
               Perwakilan Member Resmi MB Club INA
             </span>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">1</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Doddy Moedjito</span>
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px;">
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">1</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Doddy Moedjito</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">2</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Raditya Girindra W</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">2</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Raditya Girindra W</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">3</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Rochady Hendra Setyawan</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">3</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Rochady Hendra Setyawan</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">4</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Cecep Fajar</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">4</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Cecep Fajar</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">5</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Dharma Adsas Muda</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">5</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Dharma Adsas Muda</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">6</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Herry Priyono</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">6</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Herry Priyono</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">7</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Muhammad Zamzami</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">7</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Muhammad Zamzami</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">8</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">James Ibrahim</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">8</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">James Ibrahim</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">9</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Mukhwan Hariri</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">9</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Mukhwan Hariri</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">10</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Ady Bhakti Ginandjar</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">10</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Ady Bhakti Ginandjar</span>
             </div>
-            <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(245,158,11,0.2); border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
-              <span style="background:var(--accent-gold); color:#000; font-weight:900; font-size:0.75rem; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">11</span>
-              <span style="color:#fff; font-size:0.86rem; font-weight:700;">Wendi Kuswandi</span>
+            <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='rgba(255,255,255,0.06)';">
+              <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-weight:700; font-size:0.75rem; font-family:monospace; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">11</span>
+              <span style="color:#e2e8f0; font-size:0.8125rem; font-weight:500;">Wendi Kuswandi</span>
             </div>
           </div>
         </div>
@@ -5680,82 +5693,103 @@
         <!-- 5. 4 Core Pillars Preview Grid -->
         <div style="max-width:1050px; margin:0 auto 36px auto; text-align:left;">
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
-            <span style="font-size:1.4rem; color:var(--accent-gold);">💎</span>
-            <h3 style="margin:0; color:#fff; font-size:1.15rem; font-weight:900; letter-spacing:0.5px;">
-              4 PILAR UTAMA LAYANAN & UNIT USAHA
+            <div style="width:32px; height:32px; border-radius:10px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            </div>
+            <h3 style="margin:0; color:#ffffff; font-size:1.05rem; font-weight:700; letter-spacing:0.03em;">
+              Pilar Layanan & Unit Usaha
             </h3>
           </div>
 
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:18px;">
             <!-- Pillar 1 -->
-            <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(245,158,11,0.25); border-radius:16px; padding:22px; transition:transform 0.2s, border-color 0.2s; box-shadow:0 6px 20px rgba(0,0,0,0.25);" onmouseover="this.style.borderColor='var(--accent-gold)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)'; this.style.transform='translateY(0)'">
-              <div style="font-size:2rem; margin-bottom:12px;">💰</div>
-              <h4 style="color:var(--accent-gold); margin:0 0 8px 0; font-size:1.05rem; font-weight:800;">Simpan Pinjam Anggota</h4>
-              <p style="color:#cbd5e1; font-size:0.84rem; margin:0; line-height:1.55;">
-                Tabungan sukarela, simpanan pokok & wajib, dana talangan darurat servis/touring, dan pinjaman lunak khusus member resmi ber-MID.
-              </p>
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:22px; transition:all 0.3s; display:flex; flex-direction:column; justify-content:space-between;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+              <div>
+                <div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fbbf24; display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+                </div>
+                <h4 style="color:#ffffff; margin:0 0 6px 0; font-size:0.95rem; font-weight:600;">Simpan Pinjam Anggota</h4>
+                <p style="color:#94a3b8; font-size:0.8125rem; margin:0; line-height:1.6;">
+                  Tabungan sukarela, simpanan pokok & wajib, dana talangan darurat servis/touring, dan pinjaman lunak khusus member resmi ber-MID.
+                </p>
+              </div>
             </div>
 
             <!-- Pillar 2 -->
-            <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(245,158,11,0.25); border-radius:16px; padding:22px; transition:transform 0.2s, border-color 0.2s; box-shadow:0 6px 20px rgba(0,0,0,0.25);" onmouseover="this.style.borderColor='var(--accent-gold)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)'; this.style.transform='translateY(0)'">
-              <div style="font-size:2rem; margin-bottom:12px;">🛒</div>
-              <h4 style="color:var(--accent-gold); margin:0 0 8px 0; font-size:1.05rem; font-weight:800;">Unit Usaha & Pengadaan</h4>
-              <p style="color:#cbd5e1; font-size:0.84rem; margin:0; line-height:1.55;">
-                Bengkel khusus rekanan & penyediaan suku cadang (spare part) resmi atau pendukung kendaraan Mercedes-Benz berdiskon khusus.
-              </p>
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:22px; transition:all 0.3s; display:flex; flex-direction:column; justify-content:space-between;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+              <div>
+                <div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fbbf24; display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </div>
+                <h4 style="color:#ffffff; margin:0 0 6px 0; font-size:0.95rem; font-weight:600;">Unit Usaha & Pengadaan</h4>
+                <p style="color:#94a3b8; font-size:0.8125rem; margin:0; line-height:1.6;">
+                  Bengkel khusus rekanan & penyediaan suku cadang (spare part) resmi atau pendukung kendaraan Mercedes-Benz berdiskon khusus.
+                </p>
+              </div>
             </div>
 
             <!-- Pillar 3 -->
-            <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(245,158,11,0.25); border-radius:16px; padding:22px; transition:transform 0.2s, border-color 0.2s; box-shadow:0 6px 20px rgba(0,0,0,0.25);" onmouseover="this.style.borderColor='var(--accent-gold)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)'; this.style.transform='translateY(0)'">
-              <div style="font-size:2rem; margin-bottom:12px;">📊</div>
-              <h4 style="color:var(--accent-gold); margin:0 0 8px 0; font-size:1.05rem; font-weight:800;">Iuran Pokok & Wajib</h4>
-              <p style="color:#cbd5e1; font-size:0.84rem; margin:0; line-height:1.55;">
-                Pencatatan otomatis mutasi iuran berkala anggota komunitas, riwayat setoran, e-statement, dan bukti potong elektronik terintegrasi MID.
-              </p>
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:22px; transition:all 0.3s; display:flex; flex-direction:column; justify-content:space-between;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+              <div>
+                <div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fbbf24; display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" x2="10"/></svg>
+                </div>
+                <h4 style="color:#ffffff; margin:0 0 6px 0; font-size:0.95rem; font-weight:600;">Iuran Pokok & Wajib</h4>
+                <p style="color:#94a3b8; font-size:0.8125rem; margin:0; line-height:1.6;">
+                  Pencatatan otomatis mutasi iuran berkala anggota komunitas, riwayat setoran, e-statement, dan bukti potong elektronik terintegrasi MID.
+                </p>
+              </div>
             </div>
 
             <!-- Pillar 4 -->
-            <div style="background:rgba(15,23,42,0.75); border:1px solid rgba(245,158,11,0.25); border-radius:16px; padding:22px; transition:transform 0.2s, border-color 0.2s; box-shadow:0 6px 20px rgba(0,0,0,0.25);" onmouseover="this.style.borderColor='var(--accent-gold)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)'; this.style.transform='translateY(0)'">
-              <div style="font-size:2rem; margin-bottom:12px;">🎁</div>
-              <h4 style="color:var(--accent-gold); margin:0 0 8px 0; font-size:1.05rem; font-weight:800;">Sisa Hasil Usaha (SHU)</h4>
-              <p style="color:#cbd5e1; font-size:0.84rem; margin:0; line-height:1.55;">
-                Kalkulasi dan distribusi SHU tahunan transparan berbasis persentase modal simpanan dan keaktifan transaksi anggota.
-              </p>
+            <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:22px; transition:all 0.3s; display:flex; flex-direction:column; justify-content:space-between;" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';">
+              <div>
+                <div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fbbf24; display:flex; align-items:center; justify-content:center; margin-bottom:14px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </div>
+                <h4 style="color:#ffffff; margin:0 0 6px 0; font-size:0.95rem; font-weight:600;">Sisa Hasil Usaha (SHU)</h4>
+                <p style="color:#94a3b8; font-size:0.8125rem; margin:0; line-height:1.6;">
+                  Kalkulasi dan distribusi SHU tahunan transparan berbasis persentase modal simpanan dan keaktifan transaksi anggota.
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- 6. Progress & Status Timeline -->
-        <div style="max-width:640px; margin:0 auto 36px auto; background:rgba(15,23,42,0.85); padding:22px 28px; border-radius:18px; border:1px solid rgba(245,158,11,0.3); box-shadow:0 8px 24px rgba(0,0,0,0.3);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:0.88rem;">
-            <span style="color:#fff; font-weight:700;">Status Pengembangan & Legalitas:</span>
-            <span style="color:var(--accent-gold); font-weight:900;">Tahap Desain & Regulasi (35%)</span>
+        <div style="max-width:640px; margin:0 auto 36px auto; background:rgba(255,255,255,0.02); padding:22px 28px; border-radius:18px; border:1px solid rgba(255,255,255,0.08);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:0.85rem;">
+            <span style="color:#cbd5e1; font-weight:500;">Status Pengembangan & Legalitas:</span>
+            <span style="color:#fbbf24; font-weight:700;">Tahap Desain & Regulasi (35%)</span>
           </div>
-          <div style="width:100%; height:10px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden;">
-            <div style="width:35%; height:100%; background:linear-gradient(90deg, var(--accent-gold), #fbbf24); border-radius:10px; box-shadow:0 0 10px var(--accent-gold);"></div>
+          <div style="width:100%; height:6px; background:rgba(255,255,255,0.06); border-radius:9999px; overflow:hidden;">
+            <div style="width:35%; height:100%; background:linear-gradient(90deg, #f59e0b, #fbbf24); border-radius:9999px;"></div>
           </div>
-          <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.78rem; color:#94a3b8;">
-            <span>Target Rilis Modul Digital: <strong>Q4 2026</strong></span>
-            <span>Platform: <strong>MB INA SuperApp</strong></span>
+          <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.75rem; color:#94a3b8;">
+            <span>Target Rilis Modul Digital: <strong style="color:#fff;">Q4 2026</strong></span>
+            <span>Platform: <strong style="color:#fff;">MB INA SuperApp</strong></span>
           </div>
         </div>
 
         <!-- 7. Sekretariat & Hubungi Kami -->
-        <div style="max-width:1050px; margin:0 auto 32px auto; background:linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.9)); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:24px; text-align:left; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+        <div style="max-width:1050px; margin:0 auto 32px auto; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:24px; text-align:left;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
             <div style="display:flex; align-items:flex-start; gap:14px; max-width:650px;">
-              <span style="font-size:1.8rem; color:var(--accent-gold); background:rgba(245,158,11,0.15); width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1px solid var(--accent-gold);">🏢</span>
+              <div style="width:44px; height:44px; border-radius:12px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+              </div>
               <div>
-                <strong style="color:#fff; font-size:0.98rem; display:block; margin-bottom:4px;">Sekretariat Resmi Koperasi Bersama Satu Bintang:</strong>
-                <span style="color:#cbd5e1; font-size:0.85rem; line-height:1.5; display:block;">
+                <strong style="color:#fff; font-size:0.92rem; display:block; margin-bottom:4px;">Sekretariat Resmi Koperasi Bersama Satu Bintang:</strong>
+                <span style="color:#94a3b8; font-size:0.8125rem; line-height:1.5; display:block;">
                   Office 88, Tower A, 16th Floor, Unit 16B, Kota Kasablanka, Jl. Casablanca Raya Kav. 88, Jakarta Selatan 12870
                 </span>
               </div>
             </div>
 
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <a href="mailto:bsbkoperasi20@gmail.com" class="btn-outline" style="border:1px solid var(--accent-gold); color:var(--accent-gold); padding:10px 20px; border-radius:10px; font-weight:800; font-size:0.82rem; background:rgba(245,158,11,0.08); text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
-                <span>✉️</span> Hubungi via Email
+              <a href="mailto:bsbkoperasi20@gmail.com" class="btn-outline" style="border:1px solid rgba(245,158,11,0.3); color:#fbbf24; padding:10px 20px; border-radius:12px; font-weight:600; font-size:0.75rem; background:rgba(245,158,11,0.08); text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.15)';" onmouseout="this.style.background='rgba(245,158,11,0.08)';">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <span>Hubungi via Email</span>
               </a>
             </div>
           </div>
@@ -5763,11 +5797,13 @@
 
         <!-- 8. Bottom Action Bar -->
         <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.08); padding-top:24px;">
-          <button type="button" class="btn-primary" onclick="AppEngine.switchAdminTab('m1_portal')" style="background:var(--accent-gold); color:#000; font-weight:800; padding:12px 28px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
-            <span>🏠</span> Kembali ke Dashboard Admin
+          <button type="button" onclick="AppEngine.switchAdminTab('m1_portal')" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:10px 24px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Kembali ke Dashboard Admin</span>
           </button>
-          <button type="button" class="btn-primary" onclick="AppEngine.openPortalMember()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; font-weight:800; padding:12px 28px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
-            <span>🔙</span> Kembali ke Dashboard Member
+          <button type="button" onclick="AppEngine.openPortalMember()" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#cbd5e1; font-weight:500; font-size:0.75rem; padding:10px 24px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#cbd5e1';">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <span>Kembali ke Dashboard Member</span>
           </button>
         </div>
 
@@ -10384,8 +10420,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260830_luxury_v28"></script>
-  <script src="js/app.js?v=20260830_luxury_v28"></script>
+  <script src="js/auth.js?v=20260830_luxury_v29"></script>
+  <script src="js/app.js?v=20260830_luxury_v29"></script>
   <script>
     lucide.createIcons();
     try {
