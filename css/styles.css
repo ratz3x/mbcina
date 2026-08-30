@@ -1425,13 +1425,13 @@ body.light-mode {
 }
 
 .yt-nav-logout {
-  color: rgba(251, 113, 133, 0.85);
+  color: #94a3b8;
 }
 
 .yt-nav-logout:hover {
-  color: #fb7185;
-  background: rgba(244, 63, 94, 0.1);
-  border-color: rgba(244, 63, 94, 0.2);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: transparent;
 }
 
 /* Sidebar Toggle Hamburger Button */
