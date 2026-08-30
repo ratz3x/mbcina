@@ -5871,40 +5871,63 @@ const AppEngine = {
 
     container.innerHTML = `
       <div>
-        <div style="background:linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(16,185,129,0.15) 100%); border:2px solid var(--accent-gold); border-radius:16px; padding:20px; margin-bottom:24px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-            <div>
-              <span style="font-size:0.75rem; letter-spacing:2px; color:var(--accent-gold); font-weight:800;">PERIODISASI KEPENGURUSAN PUSAT</span>
-              <h3 style="font-size:1.4rem;" class="text-gradient">Kabinet MB INA Periode 2025 - 2027</h3>
+        <!-- TOP PERIODISASI BANNER -->
+        <div style="background:linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(255,255,255,0.02) 100%); border:1px solid rgba(245,158,11,0.25); border-radius:20px; padding:22px 26px; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; border-radius:12px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div>
+                <span style="font-size:0.75rem; letter-spacing:1.5px; color:#fbbf24; font-weight:700; text-transform:uppercase;">Periodisasi Kepengurusan Pusat</span>
+                <h3 style="font-size:1.25rem; color:#ffffff; font-weight:700; margin:2px 0 0 0;">Kabinet MB INA Periode 2025 - 2027</h3>
+              </div>
             </div>
             <div style="display:flex; gap:10px; align-items:center;">
-              <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); padding:6px 14px;">PERIODE AKTIF</span>
-              <button class="btn-primary" style="padding:8px 16px; font-size:0.85rem;" onclick="AppEngine.openAddStructureModal()">+ Tambah Jabatan Baru</button>
+              <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.75rem; font-weight:600; padding:5px 14px; border-radius:9999px;">PERIODE AKTIF</span>
+              <button type="button" class="btn-primary" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:8px 16px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="AppEngine.openAddStructureModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Tambah Jabatan</span>
+              </button>
             </div>
           </div>
         </div>
 
         <!-- DEWAN PEMBINA & DEWAN KEHORMATAN -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin-bottom:28px;">
-          <div class="glass-panel" style="padding:20px;">
-            <h4 style="font-size:1.05rem; margin-bottom:12px; color:var(--accent-gold);">🏛️ Dewan Pembina (${advisory.length})</h4>
-            <ul style="font-size:0.85rem; color:var(--text-main); list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
+          <!-- Dewan Pembina -->
+          <div class="glass-panel" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:22px; backdrop-filter:blur(12px);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <h4 style="font-size:0.95rem; margin:0; color:#ffffff; font-weight:700;">Dewan Pembina</h4>
+              </div>
+              <span style="font-size:0.75rem; color:#94a3b8; font-family:monospace;">${advisory.length} Anggota</span>
+            </div>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">
               ${advisory.map(a => `
-                <li style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                  <strong>${a.name}</strong>
-                  <span style="color:var(--text-muted); font-size:0.78rem;">${a.position} ${a.club_origin ? '(' + a.club_origin + ')' : ''}</span>
+                <li style="border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                  <strong style="color:#ffffff; font-weight:600; font-size:0.8125rem;">${a.name}</strong>
+                  <span style="color:#94a3b8; font-size:0.75rem;">${a.position} ${a.club_origin ? '· ' + a.club_origin : ''}</span>
                 </li>
               `).join('')}
             </ul>
           </div>
 
-          <div class="glass-panel" style="padding:20px;">
-            <h4 style="font-size:1.05rem; margin-bottom:12px; color:var(--accent-gold);">🎖️ Dewan Kehormatan (${honor.length})</h4>
-            <ul style="font-size:0.85rem; color:var(--text-main); list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
+          <!-- Dewan Kehormatan -->
+          <div class="glass-panel" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:22px; backdrop-filter:blur(12px);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                <h4 style="font-size:0.95rem; margin:0; color:#ffffff; font-weight:700;">Dewan Kehormatan</h4>
+              </div>
+              <span style="font-size:0.75rem; color:#94a3b8; font-family:monospace;">${honor.length} Anggota</span>
+            </div>
+            <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto;">
               ${honor.map(h => `
-                <li style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                  <strong>${h.name}</strong>
-                  <span style="color:var(--text-muted); font-size:0.78rem;">${h.position}</span>
+                <li style="border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                  <strong style="color:#ffffff; font-weight:600; font-size:0.8125rem;">${h.name}</strong>
+                  <span style="color:#94a3b8; font-size:0.75rem;">${h.position}</span>
                 </li>
               `).join('')}
             </ul>
@@ -5912,48 +5935,71 @@ const AppEngine = {
         </div>
 
         <!-- STRUKTUR EKSEKUTIF TREE TABLE WITH CRUD -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <h4 style="font-size:1.1rem; color:var(--accent-gold);">🌳 Tree View Struktur Kabinet Pengurus Pusat (${structure.length} Jabatan):</h4>
-          <button class="btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="AppEngine.openAddStructureModal()">+ Tambah Jabatan</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:34px; height:34px; border-radius:10px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/></svg>
+            </div>
+            <div>
+              <h4 style="font-size:1.05rem; color:#ffffff; font-weight:700; margin:0;">Struktur Kepengurusan & Kabinet Pusat</h4>
+              <p style="font-size:0.75rem; color:#94a3b8; margin:2px 0 0 0;">Daftar pengurus inti, vice president, dan koordinator bidang pusat</p>
+            </div>
+          </div>
+          <button type="button" class="btn-primary" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:8px 16px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="AppEngine.openAddStructureModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Tambah Jabatan</span>
+          </button>
         </div>
 
-        <div class="glass-panel" style="padding:24px; overflow-x:auto;">
-          <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+        <div class="glass-panel" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:12px 20px; overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
             <thead>
-              <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
-                <th style="padding:12px;">Level</th>
-                <th style="padding:12px;">Nama Jabatan / Divisi</th>
-                <th style="padding:12px;">Pejabat & Asal Club</th>
-                <th style="padding:12px;">Periode</th>
-                <th style="padding:12px; text-align:right;">Aksi Management</th>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; color:#94a3b8;">
+                <th style="padding:14px 16px; width:140px;">Level</th>
+                <th style="padding:14px 16px;">Nama Jabatan / Divisi</th>
+                <th style="padding:14px 16px;">Pejabat & Asal Klub</th>
+                <th style="padding:14px 16px; width:120px;">Periode</th>
+                <th style="padding:14px 16px; text-align:right; width:90px;">Aksi</th>
               </tr>
             </thead>
             <tbody>
               ${structure.map(s => {
-                const role = s.role_name || s.position_name || 'Pengurus';
+                const role = (s.role_name || s.position_name || 'Pengurus').replace(/[👑🎖️🔹]/g, '').trim();
                 const name = s.full_name || s.user_name || 'Pejabat Organisasi';
                 const club = s.club_name || s.club_origin || 'Pusat MBClubINA';
-                const isPres = role.toLowerCase().includes('president');
-                const isVP = role.toLowerCase().includes('vp');
+                const roleLower = role.toLowerCase();
+                const isPres = roleLower.includes('presiden') || roleLower.includes('president');
+                const isVP = roleLower.includes('vp') || roleLower.includes('vice president');
+                const isSekjen = roleLower.includes('sekretaris') || roleLower.includes('sekjen');
+                const isBendum = roleLower.includes('bendahara') || roleLower.includes('bendum');
 
                 return `
-                  <tr style="border-bottom:1px solid var(--chrome-border); background:${isPres ? 'rgba(16,185,129,0.06)' : isVP ? 'rgba(245,158,11,0.06)' : 'transparent'};">
-                    <td style="padding:12px;">
-                      <span class="tier-badge" style="background:${isPres ? 'rgba(16,185,129,0.2)' : isVP ? 'rgba(245,158,11,0.2)' : 'rgba(59,130,246,0.15)'}; color:${isPres ? 'var(--primary-emerald)' : isVP ? 'var(--accent-gold)' : 'var(--accent-blue)'}; border:1px solid ${isPres ? 'var(--primary-emerald)' : isVP ? 'var(--accent-gold)' : 'var(--accent-blue)'};">
-                        ${isPres ? 'PRESIDEN' : isVP ? 'VICE PRESIDENT' : 'PENGURUS'}
-                      </span>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.02)';" onmouseout="this.style.background='transparent';">
+                    <td style="padding:14px 16px;">
+                      ${isVP ? `
+                        <span style="font-size:10px; font-weight:600; letter-spacing:0.05em; color:#fbbf24; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); padding:3px 10px; border-radius:9999px; text-transform:uppercase; display:inline-block;">VICE PRESIDENT</span>
+                      ` : `
+                        <span style="font-size:10px; font-weight:600; letter-spacing:0.05em; color:#38bdf8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2); padding:3px 10px; border-radius:9999px; text-transform:uppercase; display:inline-block;">${isPres ? 'PRESIDEN' : isSekjen ? 'SEKJEN' : isBendum ? 'BENDUM' : 'PENGURUS INTI'}</span>
+                      `}
                     </td>
-                    <td style="padding:12px; font-weight:${isPres || isVP ? '900' : '700'}; color:${isVP ? 'var(--accent-gold)' : 'var(--text-main)'};">
-                      ${isPres ? '🎖️ ' : isVP ? '👑 ' : '🔹 '} ${role}
+                    <td style="padding:14px 16px;">
+                      <span style="font-size:0.875rem; font-weight:600; color:#ffffff;">${role}</span>
                     </td>
-                    <td style="padding:12px; font-weight:700; color:var(--text-main);">
-                      ${name} <span style="font-size:0.78rem; font-weight:400; color:var(--text-muted);">(${club})</span>
+                    <td style="padding:14px 16px;">
+                      <div style="font-size:0.875rem; font-weight:500; color:#e2e8f0;">${name}</div>
+                      <div style="font-size:0.72rem; color:#94a3b8; font-weight:400; margin-top:2px;">${club}</div>
                     </td>
-                    <td style="padding:12px; font-size:0.8rem; color:var(--text-muted);">2025 - 2027</td>
-                    <td style="padding:12px; text-align:right;">
-                      <div style="display:inline-flex; gap:6px;">
-                        <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditStructureModal('${s.id}')">✏️ Edit</button>
-                        <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteStructure('${s.id}')">🗑️ Hapus</button>
+                    <td style="padding:14px 16px;">
+                      <span style="font-family:monospace; font-size:0.75rem; color:#94a3b8; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); padding:3px 8px; border-radius:6px; display:inline-block;">${s.period_start || 2025} - ${s.period_end || 2027}</span>
+                    </td>
+                    <td style="padding:14px 16px; text-align:right;">
+                      <div style="display:inline-flex; gap:6px; justify-content:flex-end;">
+                        <button type="button" style="padding:6px; border-radius:8px; color:#94a3b8; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; justify-content:center;" onmouseover="this.style.background='rgba(245,158,11,0.15)'; this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94a3b8'; this.style.borderColor='rgba(255,255,255,0.1)';" onclick="AppEngine.openEditStructureModal('${s.id}')" title="Edit Jabatan">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        </button>
+                        <button type="button" style="padding:6px; border-radius:8px; color:#94a3b8; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; justify-content:center;" onmouseover="this.style.background='rgba(244,63,94,0.15)'; this.style.color='#fb7185'; this.style.borderColor='rgba(244,63,94,0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#94a3b8'; this.style.borderColor='rgba(255,255,255,0.1)';" onclick="AppEngine.deleteStructure('${s.id}')" title="Hapus Jabatan">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -5968,7 +6014,8 @@ const AppEngine = {
 
   openAddStructureModal() {
     document.getElementById('edit-struct-id').value = '';
-    document.getElementById('modal-struct-title').innerText = '🌳 Tambah Jabatan Pengurus Pusat Baru';
+    const titleEl = document.getElementById('modal-struct-title');
+    if (titleEl) titleEl.innerText = 'Tambah Jabatan Pengurus Pusat Baru';
     document.getElementById('edit-struct-name').value = '';
     if (document.getElementById('edit-struct-official')) document.getElementById('edit-struct-official').value = '';
     document.getElementById('edit-struct-level').value = 'PENGURUS_PUSAT';
@@ -5983,16 +6030,17 @@ const AppEngine = {
   openEditStructureModal(id) {
     const s = (this.m2Data.structure || []).find(x => String(x.id) === String(id));
     if (!s) {
-      alert('⚠️ Data Jabatan tidak ditemukan!');
+      alert('Data Jabatan tidak ditemukan!');
       return;
     }
 
-    const role = s.role_name || s.position_name || '';
+    const role = (s.role_name || s.position_name || '').replace(/[👑🎖️🔹]/g, '').trim();
     const official = s.full_name || s.user_name || '';
     const club = s.club_name || s.club_origin || 'Pusat MBClubINA';
 
     document.getElementById('edit-struct-id').value = s.id;
-    document.getElementById('modal-struct-title').innerText = `✏️ Edit Jabatan: ${role}`;
+    const titleEl = document.getElementById('modal-struct-title');
+    if (titleEl) titleEl.innerText = `Edit Jabatan: ${role}`;
     document.getElementById('edit-struct-name').value = role;
     if (document.getElementById('edit-struct-official')) document.getElementById('edit-struct-official').value = official;
     document.getElementById('edit-struct-level').value = s.position_level || (role.toLowerCase().includes('presiden') ? 'PRESIDEN' : role.toLowerCase().includes('evp') ? 'EVP' : 'PENGURUS_PUSAT');
@@ -6016,7 +6064,7 @@ const AppEngine = {
     const sort_order = parseInt(document.getElementById('edit-struct-sort').value || 1);
 
     if (!role_name || !full_name) {
-      alert('⚠️ Nama Jabatan dan Nama Pejabat wajib diisi!');
+      alert('Nama Jabatan dan Nama Pejabat wajib diisi!');
       return;
     }
 
@@ -6030,20 +6078,21 @@ const AppEngine = {
       });
       const data = await res.json();
       if (data.success) {
-        alert('🎉 ' + data.message);
+        alert(data.message || 'Jabatan berhasil disimpan.');
         AuthEngine.closeModal('modal-edit-structure');
         await this.fetchM2Data();
         this.renderM2Structure();
       } else {
-        alert('❌ Gagal: ' + data.message);
+        alert('Gagal: ' + data.message);
       }
     } catch (e) {
-      alert('❌ Error: ' + e.message);
+      alert('Error: ' + e.message);
     }
   },
 
   async deleteStructure(id) {
-    if (!confirm('⚠️ Apakah Anda yakin ingin menghapus Jabatan Pengurus ini dari database Supabase Cloud?')) return;
+    if (!confirm('Apakah Anda yakin ingin menghapus jabatan pengurus ini?')) return;
+
     try {
       const res = await fetch('api.php?action=delete_m2_structure', {
         method: 'POST',
@@ -6052,14 +6101,14 @@ const AppEngine = {
       });
       const data = await res.json();
       if (data.success) {
-        alert('✅ ' + data.message);
+        alert(data.message || 'Jabatan berhasil dihapus.');
         await this.fetchM2Data();
         this.renderM2Structure();
       } else {
-        alert('❌ Gagal: ' + data.message);
+        alert('Gagal: ' + data.message);
       }
     } catch (e) {
-      alert('❌ Error: ' + e.message);
+      alert('Error: ' + e.message);
     }
   },
 

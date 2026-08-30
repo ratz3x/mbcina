@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v32">
+  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v33">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -8744,62 +8744,75 @@
 
 
   <!-- MODAL: EDIT / TAMBAH JABATAN PENGURUS PUSAT (2.1.5 & 2.4) -->
+  <!-- MODAL: EDIT / TAMBAH JABATAN PENGURUS PUSAT (2.1.5 & 2.4) -->
   <div id="modal-edit-structure" class="modal-backdrop">
-    <div class="modal-container" style="max-width:560px;">
-      <div class="modal-header">
-        <div>
-          <h3 id="modal-struct-title" style="font-size:1.2rem;">🌳 Edit Jabatan Pengurus Pusat</h3>
-          <span style="font-size:0.75rem; color:var(--accent-gold);">Kelola Tree Kabinet Pengurus Pusat di Supabase</span>
+    <div class="modal-container" style="max-width:560px; border-radius:24px; background:rgba(9,13,22,0.95); border:1px solid rgba(255,255,255,0.08); box-shadow:0 20px 50px rgba(0,0,0,0.8);">
+      <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.06); padding:20px 24px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h3 id="modal-struct-title" style="font-size:1.15rem; margin:0; color:#fff; font-weight:700;">Kelola Jabatan Pengurus Pusat</h3>
+            <span style="font-size:0.75rem; color:#94a3b8;">Kelola Struktur Kabinet Pengurus Pusat MB Club INA</span>
+          </div>
         </div>
-        <button class="modal-close-btn">✕</button>
+        <button class="modal-close-btn" onclick="AuthEngine.closeModal('modal-edit-structure')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
 
-      <div class="modal-body">
+      <div class="modal-body" style="padding:24px;">
         <form id="edit-structure-form" onsubmit="AppEngine.saveStructureFromModal(event)">
           <input type="hidden" id="edit-struct-id">
 
-          <div class="form-group">
-            <label class="form-label">Nama Jabatan / Divisi *</label>
-            <input type="text" id="edit-struct-name" class="form-input" placeholder="contoh: Presiden MB Club INA / Sekjen / VP IT" required>
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Nama Jabatan / Divisi *</label>
+            <input type="text" id="edit-struct-name" class="form-input" placeholder="contoh: Presiden MB Club INA / Sekjen / VP IT" required style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Nama Pejabat / Pengurus *</label>
-            <input type="text" id="edit-struct-official" class="form-input" placeholder="contoh: Dr. Rochady Hendra Setya Wibawa, Sp.OG." required>
+          <div class="form-group" style="margin-bottom:16px;">
+            <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Nama Pejabat / Pengurus *</label>
+            <input type="text" id="edit-struct-official" class="form-input" placeholder="contoh: Dr. Rochady Hendra Setya Wibawa, Sp.OG." required style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
             <div class="form-group">
-              <label class="form-label">Level Jabatan *</label>
-              <select id="edit-struct-level" class="form-input">
+              <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Level Jabatan *</label>
+              <select id="edit-struct-level" class="form-input" style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
                 <option value="PRESIDEN">PRESIDEN</option>
                 <option value="EVP">EVP (Executive VP)</option>
                 <option value="PENGURUS_PUSAT">VP / DEPARTEMEN / VPR</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Asal Club & Pejabat</label>
-              <input type="text" id="edit-struct-club" class="form-input" placeholder="contoh: W124 MBCI (Tb NAUDY TS)">
+              <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Asal Club & Pejabat</label>
+              <input type="text" id="edit-struct-club" class="form-input" placeholder="contoh: W124 MBCI (Tb NAUDY TS)" style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
             <div class="form-group">
-              <label class="form-label">Tahun Mulai Periode</label>
-              <input type="number" id="edit-struct-start" class="form-input" value="2023" required>
+              <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Tahun Mulai Periode</label>
+              <input type="number" id="edit-struct-start" class="form-input" value="2025" required style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
             </div>
             <div class="form-group">
-              <label class="form-label">Tahun Akhir Periode</label>
-              <input type="number" id="edit-struct-end" class="form-input" value="2025" required>
+              <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Tahun Akhir Periode</label>
+              <input type="number" id="edit-struct-end" class="form-input" value="2027" required style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Urutan Tampil (Sort Order)</label>
-            <input type="number" id="edit-struct-sort" class="form-input" value="1" required>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label class="form-label" style="font-size:0.8125rem; font-weight:600; color:#e2e8f0; margin-bottom:6px; display:block;">Urutan Tampil (Sort Order)</label>
+            <input type="number" id="edit-struct-sort" class="form-input" value="1" required style="width:100%; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff; font-size:0.875rem;">
           </div>
 
-          <button type="submit" class="btn-primary" style="width:100%;">💾 Simpan Jabatan ke Supabase Cloud</button>
+          <div style="display:flex; justify-content:flex-end; gap:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:18px;">
+            <button type="button" class="btn-outline" style="padding:8px 18px; border-radius:12px; font-size:0.8125rem;" onclick="AuthEngine.closeModal('modal-edit-structure')">Batal</button>
+            <button type="submit" class="btn-primary" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.8125rem; padding:8px 20px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              <span>Simpan Jabatan</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -10449,8 +10462,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260830_luxury_v32"></script>
-  <script src="js/app.js?v=20260830_luxury_v32"></script>
+  <script src="js/auth.js?v=20260830_luxury_v33"></script>
+  <script src="js/app.js?v=20260830_luxury_v33"></script>
   <script>
     lucide.createIcons();
     try {
