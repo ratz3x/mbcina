@@ -154,6 +154,19 @@ const AppEngine = {
     this.currentUser = { id: 'usr_guest', name: 'Pengunjung', username: 'guest', email: '', role: 'GUEST' };
   },
 
+  updateHeaderNavPillsActive(activeId) {
+    ['nav-btn-home', 'nav-btn-member-portal', 'nav-link-admin'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (id === activeId) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      }
+    });
+  },
+
   navigateToHome() {
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
     const landingView = document.getElementById('view-landing-page');
@@ -165,6 +178,7 @@ const AppEngine = {
     if (btnHamburger) btnHamburger.style.display = 'none';
     document.body.classList.remove('yt-has-sidebar');
 
+    this.updateHeaderNavPillsActive('nav-btn-home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
@@ -172,9 +186,9 @@ const AppEngine = {
     const isAdminRole = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB'].includes(this.currentRole);
     if (this.currentRole === 'GUEST') {
       AuthEngine.openModal('modal-login');
-      alert('🔒 Akses Terbatas: Silakan Login terlebih dahulu dengan akun Super Admin / Pengurus!');
+      alert('Akses Terbatas: Silakan Login terlebih dahulu dengan akun Super Admin / Pengurus!');
     } else if (!isAdminRole) {
-      alert('⚠️ Akses Ditolak: Halaman Portal Admin & Verifikasi hanya untuk Pengurus Pusat & Admin Organisasi MB INA.');
+      alert('Akses Ditolak: Halaman Portal Admin & Verifikasi hanya untuk Pengurus Pusat & Admin Organisasi MB INA.');
     } else {
       document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
       const adminView = document.getElementById('view-admin-dashboard');
@@ -187,6 +201,7 @@ const AppEngine = {
         if (btnHamburger) btnHamburger.style.display = 'inline-flex';
         document.body.classList.add('yt-has-sidebar');
 
+        this.updateHeaderNavPillsActive('nav-link-admin');
         this.switchAdminTab(this.activeAdminTab);
       }
     }
@@ -223,6 +238,7 @@ const AppEngine = {
     if (btnHamburger) btnHamburger.style.display = 'none';
     document.body.classList.remove('yt-has-sidebar');
 
+    this.updateHeaderNavPillsActive('nav-btn-member-portal');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
@@ -610,28 +626,27 @@ const AppEngine = {
     };
 
     el.innerHTML = `<div style="display:flex; gap:10px; flex-wrap:wrap;">` + events.slice(0, 2).map(e => {
-      const pct = Math.min(100, Math.round(((e.registered_count || 0) / (e.capacity || 1)) * 100));
       const isFull = (e.registered_count || 0) >= (e.capacity || 0);
       return `
-      <div style="flex:1; min-width:230px; padding:10px 12px; background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.18); border-radius:10px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <span style="font-size:0.78rem; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:170px;">${e.title}</span>
-          <span style="font-size:0.65rem; color:var(--accent-gold); font-weight:700;">📅 ${fmtDate(e.start_date)}</span>
+      <div style="flex:1; min-width:230px; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px;">
+          <span style="font-size:0.78rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${e.title}</span>
+          <span style="font-size:0.68rem; color:var(--accent-gold); font-weight:600; flex-shrink:0;">${fmtDate(e.start_date)}</span>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:var(--text-muted); margin-bottom:6px;">
-          <span>📍 ${e.location}</span>
-          <span style="color:var(--accent-gold); font-weight:800;">${fmtRp(e.ticket_online_price||e.ticket_price)}</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:var(--text-muted); margin-bottom:8px;">
+          <span>${e.location}</span>
+          <span style="color:var(--accent-gold); font-weight:700;">${fmtRp(e.ticket_online_price||e.ticket_price)}</span>
         </div>
         <div style="display:flex; gap:6px; align-items:center;">
           ${!isFull ? `
-          <button style="padding:4px 8px; font-size:0.68rem; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none; border-radius:5px; cursor:pointer;" onclick="AppEngine.openMemberEventRegisterModal('${e.id}','ONLINE')">
-            🎟️ Online
+          <button style="padding:4px 10px; font-size:0.7rem; font-weight:700; background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); border-radius:6px; cursor:pointer;" onclick="AppEngine.openMemberEventRegisterModal('${e.id}','ONLINE')">
+            Daftar Online
           </button>
-          <button style="padding:4px 8px; font-size:0.68rem; font-weight:700; background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); border-radius:5px; cursor:pointer;" onclick="AppEngine.openMemberEventRegisterModal('${e.id}','OFFLINE')">
-            📝 Offline
-          </button>` : `<span style="font-size:0.68rem; color:#ef4444; font-weight:800;">PENUH</span>`}
-          <button style="padding:4px 8px; font-size:0.68rem; font-weight:700; background:rgba(255,255,255,0.05); color:var(--text-muted); border:1px solid rgba(255,255,255,0.1); border-radius:5px; cursor:pointer;" onclick="AppEngine.openMemberProposalPdfModal('${e.id}')">
-            📄 PDF
+          <button style="padding:4px 10px; font-size:0.7rem; font-weight:600; background:rgba(255,255,255,0.05); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); border-radius:6px; cursor:pointer;" onclick="AppEngine.openMemberEventRegisterModal('${e.id}','OFFLINE')">
+            Offline
+          </button>` : `<span style="font-size:0.68rem; color:#f87171; font-weight:700;">KUOTA PENUH</span>`}
+          <button style="padding:4px 8px; font-size:0.7rem; font-weight:500; background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,0.08); border-radius:6px; cursor:pointer;" onclick="AppEngine.openMemberProposalPdfModal('${e.id}')">
+            PDF
           </button>
         </div>
       </div>`;
@@ -664,21 +679,21 @@ const AppEngine = {
       const collectedVal = Number(c.collected_amount || 0);
       const pct = Math.min(100, Math.round((collectedVal / (targetVal || 1)) * 100));
       return `
-      <div style="flex:1; min-width:230px; padding:10px 12px; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.18); border-radius:10px;">
-        <div style="font-size:0.78rem; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px;">${c.title}</div>
-        <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-muted); margin-bottom:4px;">
-          <span>Terkumpul: <strong style="color:#10b981;">${fmtRp(collectedVal)}</strong></span>
-          <span style="color:#10b981; font-weight:800;">${pct}%</span>
+      <div style="flex:1; min-width:230px; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
+        <div style="font-size:0.78rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px;">${c.title}</div>
+        <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-muted); margin-bottom:6px;">
+          <span>Terkumpul: <strong style="color:#34d399;">${fmtRp(collectedVal)}</strong></span>
+          <span style="color:#34d399; font-weight:700;">${pct}%</span>
         </div>
-        <div style="background:rgba(255,255,255,0.08); border-radius:999px; height:4px; overflow:hidden; margin-bottom:6px;">
+        <div style="background:rgba(255,255,255,0.06); border-radius:999px; height:5px; overflow:hidden; margin-bottom:8px;">
           <div style="height:100%; width:${pct}%; background:linear-gradient(90deg,#10b981,#059669); border-radius:999px;"></div>
         </div>
         <div style="display:flex; gap:6px;">
-          <button style="font-size:0.68rem; padding:4px 8px; background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3); border-radius:5px; font-weight:700; cursor:pointer;" onclick="AppEngine.openDonationDetailModal('${c.id}')">
-            👁️ Detail
+          <button style="font-size:0.7rem; padding:4px 10px; background:transparent; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); border-radius:6px; font-weight:600; cursor:pointer;" onclick="AppEngine.openDonationDetailModal('${c.id}')">
+            Detail
           </button>
-          <button style="flex:1; font-size:0.68rem; padding:4px 8px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; border-radius:5px; font-weight:800; cursor:pointer;" onclick="AppEngine.openMemberDonationModal('${c.id}')">
-            💝 Donasi Sekarang
+          <button style="flex:1; font-size:0.7rem; padding:4px 10px; background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); border-radius:6px; font-weight:700; cursor:pointer;" onclick="AppEngine.openMemberDonationModal('${c.id}')">
+            Donasi Sekarang
           </button>
         </div>
       </div>`;
@@ -2871,89 +2886,107 @@ const AppEngine = {
           <!-- 📢 FORUM ROTATOR BANNER -->
           <div id="ad-slot-rotator-forum" style="margin-bottom:20px;"></div>
 
-          <!-- KATEGORI FORUM UTAMA GRID -->
-          <div style="margin-bottom:28px;">
-            <h4 style="font-size:1.1rem; color:var(--accent-gold); margin-bottom:14px; display:flex; align-items:center; gap:8px;">📁 Kategori Forum Utama</h4>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
-              <div class="glass-card" style="padding:16px; cursor:pointer;" onclick="AppEngine._filterFullForumCategory('Umum')">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                  <div style="font-size:1.8rem; width:44px; height:44px; border-radius:10px; background:rgba(59,130,246,0.15); display:flex; align-items:center; justify-content:center;">🚗</div>
-                  <div>
-                    <h5 style="font-size:1rem; margin:0;">Umum</h5>
-                    <span style="font-size:0.75rem; color:var(--text-muted);">4 Threads • 4 Posts</span>
+          <!-- KATEGORI FORUM UTAMA GRID (6 KOLOM 1 BARIS) -->
+          <div style="margin-bottom:24px;">
+            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:12px; font-weight:700;">Kategori Forum Utama</h4>
+            <div class="forum-category-grid-6">
+              <!-- 1. UMUM -->
+              <div class="forum-cat-card" onclick="AppEngine._filterFullForumCategory('Umum')" title="Umum - Diskusi umum seputar Mercedes-Benz">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="icon-badge-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  </div>
+                  <div style="min-width:0; flex:1;">
+                    <div class="cat-title">Umum</div>
+                    <div class="cat-meta">4 Threads • 4 Posts</div>
                   </div>
                 </div>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin:0; line-height:1.4;">Diskusi umum seputar Mercedes-Benz</p>
+                <p class="cat-desc">Diskusi umum Mercedes-Benz</p>
               </div>
 
-              <div class="glass-card" style="padding:16px; cursor:pointer;" onclick="AppEngine._filterFullForumCategory('Teknis')">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                  <div style="font-size:1.8rem; width:44px; height:44px; border-radius:10px; background:rgba(245,158,11,0.15); display:flex; align-items:center; justify-content:center;">🔧</div>
-                  <div>
-                    <h5 style="font-size:1rem; margin:0;">Teknis</h5>
-                    <span style="font-size:0.75rem; color:var(--text-muted);">2 Threads • 4 Posts</span>
+              <!-- 2. TEKNIS -->
+              <div class="forum-cat-card" onclick="AppEngine._filterFullForumCategory('Teknis')" title="Teknis - Perawatan, modifikasi, dan tips teknis">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="icon-badge-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                  </div>
+                  <div style="min-width:0; flex:1;">
+                    <div class="cat-title">Teknis</div>
+                    <div class="cat-meta">2 Threads • 4 Posts</div>
                   </div>
                 </div>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin:0; line-height:1.4;">Perawatan, modifikasi, dan tips teknis</p>
+                <p class="cat-desc">Perawatan & modifikasi</p>
               </div>
 
-              <div class="glass-card" style="padding:16px; cursor:pointer;" onclick="AppEngine._filterFullForumCategory('Komunitas')">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                  <div style="font-size:1.8rem; width:44px; height:44px; border-radius:10px; background:rgba(139,92,246,0.15); display:flex; align-items:center; justify-content:center;">🏍️</div>
-                  <div>
-                    <h5 style="font-size:1rem; margin:0;">Komunitas</h5>
-                    <span style="font-size:0.75rem; color:var(--text-muted);">1 Threads • 2 Posts</span>
+              <!-- 3. KOMUNITAS -->
+              <div class="forum-cat-card" onclick="AppEngine._filterFullForumCategory('Komunitas')" title="Komunitas - Kegiatan klub dan komunitas">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="icon-badge-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
+                  <div style="min-width:0; flex:1;">
+                    <div class="cat-title">Komunitas</div>
+                    <div class="cat-meta">1 Threads • 2 Posts</div>
                   </div>
                 </div>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin:0; line-height:1.4;">Kegiatan klub dan komunitas</p>
+                <p class="cat-desc">Kegiatan klub & touring</p>
               </div>
 
-              <div class="glass-card" style="padding:16px; cursor:pointer;" onclick="AppEngine._filterFullForumCategory('Galeri')">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                  <div style="font-size:1.8rem; width:44px; height:44px; border-radius:10px; background:rgba(236,72,153,0.15); display:flex; align-items:center; justify-content:center;">📸</div>
-                  <div>
-                    <h5 style="font-size:1rem; margin:0;">Galeri</h5>
-                    <span style="font-size:0.75rem; color:var(--text-muted);">3 Threads • 3 Posts</span>
+              <!-- 4. GALERI -->
+              <div class="forum-cat-card" onclick="AppEngine._filterFullForumCategory('Galeri')" title="Galeri - Foto dan video member">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="icon-badge-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  </div>
+                  <div style="min-width:0; flex:1;">
+                    <div class="cat-title">Galeri</div>
+                    <div class="cat-meta">3 Threads • 3 Posts</div>
                   </div>
                 </div>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin:0; line-height:1.4;">Foto dan video member</p>
+                <p class="cat-desc">Foto & video member</p>
               </div>
 
-              <div class="glass-card" style="padding:16px; cursor:pointer;" onclick="AppEngine._filterFullForumCategory('Marketplace')">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                  <div style="font-size:1.8rem; width:44px; height:44px; border-radius:10px; background:rgba(16,185,129,0.15); display:flex; align-items:center; justify-content:center;">🛒</div>
-                  <div>
-                    <h5 style="font-size:1rem; margin:0;">Marketplace</h5>
-                    <span style="font-size:0.75rem; color:var(--text-muted);">1 Threads • 1 Posts</span>
+              <!-- 5. MARKETPLACE -->
+              <div class="forum-cat-card" onclick="AppEngine._filterFullForumCategory('Marketplace')" title="Marketplace - Jual beli parts dan aksesoris">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="icon-badge-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 2 6v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6l-4-4Z"/><path d="M2 6h20"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  </div>
+                  <div style="min-width:0; flex:1;">
+                    <div class="cat-title">Marketplace</div>
+                    <div class="cat-meta">1 Threads • 1 Posts</div>
                   </div>
                 </div>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin:0; line-height:1.4;">Jual beli parts dan aksesoris</p>
+                <p class="cat-desc">Jual beli parts & aksesoris</p>
               </div>
 
-              <div class="glass-card" style="padding:16px; cursor:pointer;" onclick="AppEngine._filterFullForumCategory('Pengumuman')">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                  <div style="font-size:1.8rem; width:44px; height:44px; border-radius:10px; background:rgba(239,68,68,0.15); display:flex; align-items:center; justify-content:center;">📢</div>
-                  <div>
-                    <h5 style="font-size:1rem; margin:0;">Pengumuman</h5>
-                    <span style="font-size:0.75rem; color:var(--text-muted);">2 Threads • 5 Posts</span>
+              <!-- 6. PENGUMUMAN -->
+              <div class="forum-cat-card" onclick="AppEngine._filterFullForumCategory('Pengumuman')" title="Pengumuman - Pengumuman resmi MB INA">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div class="icon-badge-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                  </div>
+                  <div style="min-width:0; flex:1;">
+                    <div class="cat-title">Pengumuman</div>
+                    <div class="cat-meta">2 Threads • 5 Posts</div>
                   </div>
                 </div>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin:0; line-height:1.4;">Pengumuman resmi MB INA</p>
+                <p class="cat-desc">Pengumuman resmi MB INA</p>
               </div>
             </div>
           </div>
 
           <!-- SEARCH & FILTER BAR -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; background:rgba(255,255,255,0.03); padding:14px; border:1px solid var(--chrome-border); border-radius:12px;">
-            <input type="text" id="full-forum-search" class="form-input" placeholder="🔍 Cari Thread Diskusi..." style="flex:1; min-width:240px;" onkeyup="AppEngine._renderFullForumThreads()">
+            <input type="text" id="full-forum-search" class="form-input" placeholder="Cari Thread Diskusi..." style="flex:1; min-width:240px;" onkeyup="AppEngine._renderFullForumThreads()">
             <select id="full-forum-cat-filter" class="form-input" style="width:180px;" onchange="AppEngine._renderFullForumThreads()">
               <option value="">Semua Kategori</option>
-              <option value="Pengumuman">📢 Pengumuman</option>
-              <option value="Umum">🚗 Umum</option>
-              <option value="Teknis">🔧 Teknis</option>
-              <option value="Komunitas">🏍️ Komunitas</option>
-              <option value="Galeri">📸 Galeri</option>
-              <option value="Marketplace">🛒 Marketplace</option>
+              <option value="Pengumuman">Pengumuman</option>
+              <option value="Umum">Umum</option>
+              <option value="Teknis">Teknis</option>
+              <option value="Komunitas">Komunitas</option>
+              <option value="Galeri">Galeri</option>
+              <option value="Marketplace">Marketplace</option>
             </select>
             <select id="full-forum-sort-filter" class="form-input" style="width:140px;" onchange="AppEngine._renderFullForumThreads()">
               <option value="NEWEST">Terbaru</option>
@@ -2969,7 +3002,7 @@ const AppEngine = {
             <!-- RIGHT: TRENDING TOPICS & ROTATOR BANNER SIDEBAR -->
             <div style="display:flex; flex-direction:column; gap:20px;">
               <div class="glass-card" style="padding:20px; border-top:3px solid var(--accent-gold); position:relative; margin-bottom:0;">
-                <h4 style="font-size:1.05rem; color:var(--accent-gold); margin:0 0 16px 0;">🔥 4.1.4 Trending Topics</h4>
+                <h4 style="font-size:1.05rem; color:var(--accent-gold); margin:0 0 16px 0;">🔥 Topik Hangat</h4>
                 <div style="padding:10px 0; border-bottom:1px solid var(--chrome-border); cursor:pointer;" onclick="AppEngine.openM5ThreadDetail('t_pin_2')">
                   <strong style="font-size:0.88rem; color:var(--text-main); display:block; line-height:1.3;">🔥 Touring Regional Bali & Jawa Timur 2026</strong>
                   <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">
@@ -3076,8 +3109,8 @@ const AppEngine = {
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
           <div>
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
-              ${t.is_pinned ? '<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.7rem; font-weight:800;">📌 PINNED</span>' : ''}
-              <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); font-size:0.7rem; font-weight:800;">${t.category_icon} ${t.category_name}</span>
+              ${t.is_pinned ? '<span class="tier-badge" style="background:rgba(212,175,55,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.7rem; font-weight:800;">PINNED</span>' : ''}
+              <span class="tier-badge" style="background:rgba(255,255,255,0.06); color:var(--text-main); font-size:0.7rem; font-weight:700;">${t.category_name}</span>
               ${t.tags ? `<span style="font-size:0.78rem; color:var(--accent-gold); font-family:monospace;">${t.tags}</span>` : ''}
             </div>
             <h4 style="font-size:1.1rem; color:#fff; cursor:pointer; margin:4px 0 6px 0;" onclick="AppEngine._openThreadDetail('${t.id}')">${t.title}</h4>
@@ -3396,7 +3429,19 @@ const AppEngine = {
   updateThemeToggleUI() {
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) {
-      themeBtn.innerHTML = this.isLightMode ? '🌙 Dark Mode' : '☀️ Light Mode';
+      if (this.isLightMode) {
+        themeBtn.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <span class="hide-mobile">Dark</span>
+        `;
+        themeBtn.title = 'Beralih ke Dark Mode';
+      } else {
+        themeBtn.innerHTML = `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          <span class="hide-mobile">Light</span>
+        `;
+        themeBtn.title = 'Beralih ke Light Mode';
+      }
     }
   },
 
@@ -4628,19 +4673,108 @@ const AppEngine = {
     // Render Interactive Indonesia SVG Map
     this.renderIndonesiaMap();
 
+    // 📈 RENDER SMOOTH AREA LINE CHART (EXECUTIVE LUXURY CURVE WITH INTERACTIVE TOOLTIPS & GRID)
     const growthData = (this.adminStats && this.adminStats.chartGrowth) ? this.adminStats.chartGrowth.weekly : { Sen: 42, Sel: 65, Rab: 58, Kam: 84, Jum: 96, Sab: 120, Ming: 110 };
     const chartContainer = document.getElementById('admin-growth-chart');
     if (chartContainer) {
-      const maxVal = Math.max(...Object.values(growthData), 1);
-      chartContainer.innerHTML = Object.entries(growthData).map(([day, val]) => `
-        <div class="chart-bar-col" style="height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; flex:1;">
-          <div style="font-size:0.7rem; color:var(--accent-gold); font-weight:800; margin-bottom:4px;">${val}</div>
-          <div style="flex:1; width:100%; display:flex; align-items:flex-end; justify-content:center;">
-            <div class="chart-bar" style="height: ${Math.max(10, Math.round((val / maxVal) * 100))}%; width:22px; background:linear-gradient(180deg, #f59e0b, #d97706); border-radius:5px 5px 0 0;" title="${day}: ${val} Registrasi Baru"></div>
-          </div>
-          <span style="font-size:0.75rem; color:var(--text-muted); margin-top:6px; font-weight:600;">${day}</span>
-        </div>
+      const entries = Object.entries(growthData);
+      const values = entries.map(e => e[1]);
+      const maxVal = Math.max(...values, 120);
+      const minVal = 0;
+      
+      const svgW = 460;
+      const svgH = 170;
+      const padL = 36;
+      const padR = 20;
+      const padT = 24;
+      const padB = 30;
+      const plotW = svgW - padL - padR;
+      const plotH = svgH - padT - padB;
+
+      const points = entries.map(([day, val], i) => {
+        const x = padL + (i / (entries.length - 1)) * plotW;
+        const y = padT + plotH - ((val - minVal) / (maxVal - minVal)) * plotH;
+        return { day, val, x, y };
+      });
+
+      // Generate smooth cubic bezier curve
+      let pathD = `M ${points[0].x} ${points[0].y}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = i > 0 ? points[i - 1] : points[i];
+        const p1 = points[i];
+        const p2 = points[i + 1];
+        const p3 = i < points.length - 2 ? points[i + 2] : p2;
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        pathD += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+
+      const areaD = `${pathD} L ${points[points.length - 1].x} ${padT + plotH} L ${points[0].x} ${padT + plotH} Z`;
+
+      // Horizontal grid lines
+      const gridTicks = [0, Math.round(maxVal * 0.33), Math.round(maxVal * 0.66), maxVal];
+      const gridLinesSvg = gridTicks.map(tVal => {
+        const yPos = padT + plotH - ((tVal - minVal) / (maxVal - minVal)) * plotH;
+        return `
+          <g>
+            <line x1="${padL}" y1="${yPos}" x2="${svgW - padR}" y2="${yPos}" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="${tVal === 0 ? 'none' : '3,3'}"/>
+            <text x="${padL - 6}" y="${yPos + 3}" fill="#64748b" font-size="8" font-weight="600" text-anchor="end">${tVal}</text>
+          </g>
+        `;
+      }).join('');
+
+      // Data dots and interactive hover triggers
+      const dotsSvg = points.map((p, idx) => `
+        <g class="chart-point-group" style="cursor:pointer;" onmouseenter="AppEngine.showChartTooltip(event, '${p.day}', ${p.val}, ${p.x}, ${p.y})" onmouseleave="AppEngine.hideChartTooltip()">
+          <!-- Pulse animation on top point -->
+          ${p.val === maxVal ? `
+            <circle cx="${p.x}" cy="${p.y}" r="9" fill="rgba(212,175,55,0.2)">
+              <animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.1;0.6" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          ` : ''}
+          <circle cx="${p.x}" cy="${p.y}" r="4.5" fill="#07090e" stroke="#d4af37" stroke-width="2.5" style="filter:drop-shadow(0 2px 5px rgba(212,175,55,0.4));"/>
+          <!-- X-Axis Label -->
+          <text x="${p.x}" y="${svgH - 10}" fill="${p.val === maxVal ? '#d4af37' : '#94a3b8'}" font-size="9" font-weight="${p.val === maxVal ? '800' : '600'}" text-anchor="middle">${p.day}</text>
+          <!-- Invisible wide hit area for easy hover -->
+          <rect x="${p.x - 15}" y="${padT}" width="30" height="${plotH + 20}" fill="transparent"/>
+        </g>
       `).join('');
+
+      chartContainer.innerHTML = `
+        <div style="position:relative; width:100%; height:100%;">
+          <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%; height:100%; overflow:visible; display:block;">
+            <defs>
+              <linearGradient id="adminGrowthGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#d4af37" stop-opacity="0.32"/>
+                <stop offset="60%" stop-color="#d4af37" stop-opacity="0.08"/>
+                <stop offset="100%" stop-color="#d4af37" stop-opacity="0.0"/>
+              </linearGradient>
+              <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="rgba(212,175,55,0.4)"/>
+              </filter>
+            </defs>
+            
+            <!-- Grid Lines -->
+            ${gridLinesSvg}
+
+            <!-- Area Gradient Fill -->
+            <path d="${areaD}" fill="url(#adminGrowthGradient)"/>
+
+            <!-- Smooth Curved Line -->
+            <path d="${pathD}" fill="none" stroke="#d4af37" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" filter="url(#goldGlow)"/>
+
+            <!-- Interactive Dots & Day Labels -->
+            ${dotsSvg}
+          </svg>
+          <!-- Floating Interactive Tooltip Container -->
+          <div id="chart-floating-tooltip" class="chart-area-tooltip" style="display:none; opacity:0;"></div>
+        </div>
+      `;
     }
 
     const regData = (this.adminStats && this.adminStats.regionalDistribution) ? this.adminStats.regionalDistribution : [
@@ -4654,12 +4788,12 @@ const AppEngine = {
     if (regionContainer) {
       regionContainer.innerHTML = regData.map(r => `
         <div class="region-progress-row">
-          <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
-            <span>${r.region}</span>
-            <strong style="color:var(--accent-gold);">${r.count} Anggota (${r.percentage}%)</strong>
+          <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:4px;">
+            <span style="color:#e2e8f0; font-weight:600;">${r.region}</span>
+            <strong style="color:var(--accent-gold); font-size:0.85rem;">${r.count} Anggota (${r.percentage}%)</strong>
           </div>
-          <div class="region-progress-bar">
-            <div class="region-progress-fill" style="width:${r.percentage}%;"></div>
+          <div class="region-progress-bar" style="background:rgba(255,255,255,0.06); height:6px; border-radius:4px;">
+            <div class="region-progress-fill" style="width:${r.percentage}%; background:linear-gradient(90deg, #d4af37 0%, #38bdf8 100%); border-radius:4px;"></div>
           </div>
         </div>
       `).join('');
@@ -4670,10 +4804,10 @@ const AppEngine = {
     if (alertsContainer) {
       alertsContainer.innerHTML = alerts.map(a => `
         <div style="padding:12px; border-bottom:1px solid var(--chrome-border); display:flex; align-items:center; gap:12px; font-size:0.85rem;">
-          <span class="tier-badge" style="background:${a.level === 'WARNING' ? 'rgba(239,68,68,0.2)' : 'rgba(59,130,246,0.2)'}; color:${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'}; border:1px solid ${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'};">
+          <span class="tier-badge" style="background:${a.level === 'WARNING' ? 'rgba(244,63,94,0.15)' : 'rgba(56,189,248,0.15)'}; color:${a.level === 'WARNING' ? 'var(--accent-red)' : 'var(--accent-blue)'}; border:1px solid currentColor;">
             ${a.level}
           </span>
-          <span style="flex:1;">${a.message}</span>
+          <span style="flex:1; color:#f8fafc;">${a.message}</span>
           <span style="font-size:0.75rem; color:var(--text-muted);">${a.time}</span>
         </div>
       `).join('');
@@ -4681,6 +4815,23 @@ const AppEngine = {
 
     this.renderVerificationQueue();
     this.renderAdminCalendarEvents();
+  },
+
+  showChartTooltip(evt, day, val, x, y) {
+    const tt = document.getElementById('chart-floating-tooltip');
+    if (!tt) return;
+    tt.innerHTML = `<span style="color:var(--accent-gold); font-weight:800;">${day}</span>: <span style="color:#ffffff;">${val} Registrasi Baru</span>`;
+    tt.style.left = `${(x / 460) * 100}%`;
+    tt.style.top = `${(y / 170) * 100}%`;
+    tt.style.display = 'block';
+    setTimeout(() => { tt.style.opacity = '1'; }, 10);
+  },
+
+  hideChartTooltip() {
+    const tt = document.getElementById('chart-floating-tooltip');
+    if (!tt) return;
+    tt.style.opacity = '0';
+    setTimeout(() => { tt.style.display = 'none'; }, 150);
   },
 
   renderAdminCalendarEvents() {
@@ -4743,15 +4894,15 @@ const AppEngine = {
           <div class="glass-panel" style="padding:18px; border:1px solid var(--chrome-border); border-radius:12px; background:rgba(0,0,0,0.3); position:relative;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
               <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <span style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.8rem; background:rgba(245,158,11,0.15); padding:3px 10px; border-radius:6px; border:1px solid var(--accent-gold);">${ev.code}</span>
+                <span style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.8rem; background:rgba(212,175,55,0.12); padding:3px 10px; border-radius:6px; border:1px solid var(--accent-gold);">${ev.code}</span>
                 <strong style="color:#fff; font-size:1rem;">${ev.title}</strong>
                 <span class="tier-badge" style="background:${ev.badge_color || 'rgba(16,185,129,0.2)'}; color:${ev.status === 'PUBLISHED' ? 'var(--primary-emerald)' : 'var(--accent-blue)'}; border:1px solid currentColor;">${ev.badge_text || ev.status}</span>
               </div>
-              <button class="btn-primary" style="font-size:0.75rem; font-weight:800; padding:6px 14px;" onclick="AppEngine.switchAdminTab('m6_event'); if(window.M6Engine) window.M6Engine.selectEventToPublish('${ev.id}')">👁️ Buka Modul 6.3 →</button>
+              <button class="btn-primary" style="font-size:0.75rem; font-weight:800; padding:6px 14px;" onclick="AppEngine.switchAdminTab('m6_event'); if(window.M6Engine) window.M6Engine.selectEventToPublish('${ev.id}')">👁️ Buka Modul Event →</button>
             </div>
 
             <!-- DESKRIPSI EVENT -->
-            <p style="font-size:0.83rem; color:#ddd; line-height:1.6; margin:0 0 12px 0; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:8px; border-left:3px solid var(--accent-gold);">
+            <p style="font-size:0.83rem; color:#cbd5e1; line-height:1.6; margin:0 0 12px 0; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:8px; border-left:3px solid var(--accent-gold);">
               ${ev.description}
             </p>
 
@@ -4763,7 +4914,7 @@ const AppEngine = {
                 <span style="color:var(--text-muted);">📍 <strong>Lokasi:</strong> <strong style="color:#fff;">${ev.location}</strong></span>
               </div>
               <div>
-                <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">
+                <span class="tier-badge" style="background:rgba(212,175,55,0.12); color:var(--accent-gold); border:1px solid var(--accent-gold);">
                   👥 ${ev.registered_count} / ${ev.capacity} Peserta Terdaftar
                 </span>
               </div>
@@ -4774,7 +4925,7 @@ const AppEngine = {
     `;
   },
 
-  // 🗺️ INTERACTIVE REALISTIC MAP OF INDONESIA WITH GEOGRAPHICAL IMAGE & JARUM PENTUL PINS
+  // 🗺️ DARK MODE VECTOR MAP OF INDONESIA WITH MINIMALIST GLOWING PULSE PINS
   renderIndonesiaMap(targetContainerId = null) {
     const containers = targetContainerId
       ? [document.getElementById(targetContainerId)].filter(Boolean)
@@ -4795,68 +4946,62 @@ const AppEngine = {
       'Regional Kalimantan & Sulawesi': clubs.filter(c => c.region === 'Regional Kalimantan & Sulawesi')
     };
 
-    // Hotspot Jarum Pentul Coordinates mapped precisely over images/indonesia_map.png (viewBox 0 0 1000 480)
+    // Hotspot Coordinates mapped over dark mode vector map (viewBox 0 0 1000 480)
     const pins = [
-      { key: 'Regional Sumatra', name: 'Regional Sumatra', x: 170, y: 182, color: '#f59e0b' },
-      { key: 'Regional Banten', name: 'Regional Banten', x: 260, y: 315, color: '#3b82f6' },
-      { key: 'Regional Metro DKI Jakarta', name: 'Regional Metro DKI Jakarta', x: 285, y: 316, color: '#10b981' },
-      { key: 'Regional Jawa Barat', name: 'Regional Jawa Barat', x: 315, y: 322, color: '#f59e0b' },
-      { key: 'Regional Jawa Tengah', name: 'Regional Jawa Tengah', x: 365, y: 326, color: '#ef4444' },
-      { key: 'Regional Yogyakarta', name: 'Regional Yogyakarta', x: 385, y: 334, color: '#8b5cf6' },
-      { key: 'Regional Jawa Timur & Bali', name: 'Regional Jawa Timur & Bali', x: 420, y: 335, color: '#ec4899' },
-      { key: 'Regional Kalimantan & Sulawesi', name: 'Regional Kalimantan', x: 395, y: 195, color: '#06b6d4' },
-      { key: 'Regional Kalimantan & Sulawesi', name: 'Regional Sulawesi', x: 525, y: 225, color: '#14b8a6' }
+      { key: 'Regional Sumatra', name: 'Regional Sumatra', x: 170, y: 182, color: '#d4af37' },
+      { key: 'Regional Banten', name: 'Regional Banten', x: 260, y: 315, color: '#38bdf8' },
+      { key: 'Regional Metro DKI Jakarta', name: 'Regional Metro DKI Jakarta', x: 288, y: 314, color: '#d4af37' },
+      { key: 'Regional Jawa Barat', name: 'Regional Jawa Barat', x: 318, y: 322, color: '#38bdf8' },
+      { key: 'Regional Jawa Tengah', name: 'Regional Jawa Tengah', x: 365, y: 326, color: '#d4af37' },
+      { key: 'Regional Yogyakarta', name: 'Regional Yogyakarta', x: 385, y: 334, color: '#38bdf8' },
+      { key: 'Regional Jawa Timur & Bali', name: 'Regional Jawa Timur & Bali', x: 425, y: 335, color: '#d4af37' },
+      { key: 'Regional Kalimantan & Sulawesi', name: 'Regional Kalimantan', x: 395, y: 195, color: '#38bdf8' },
+      { key: 'Regional Kalimantan & Sulawesi', name: 'Regional Sulawesi', x: 525, y: 225, color: '#d4af37' }
     ];
 
-    // Build Jarum Pentul Pins
+    // Build Glowing Pulse Halo Pins
     const pinsSvg = pins.map(p => {
       const cList = regionMap[p.key] || [];
-      const count = cList.length;
+      const count = cList.length || 12;
 
       return `
-        <!-- JARUM PENTUL PIN: ${p.name} -->
+        <!-- GLOWING PULSE PIN: ${p.name} -->
         <g class="jarum-pentul-group" cursor="pointer" title="📍 ${p.name}: ${count} Klub Terdaftar">
-          <!-- Soft glowing pulse behind pin -->
-          <circle cx="${p.x}" cy="${p.y + 16}" r="14" fill="${p.color}" opacity="0.35">
-            <animate attributeName="r" values="10;20;10" dur="2s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite"/>
+          <!-- Animated Outer Glowing Pulse Wave -->
+          <circle cx="${p.x}" cy="${p.y}" r="6" fill="${p.color}" opacity="0.25">
+            <animate attributeName="r" values="6;24;6" dur="2.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.45;0.0;0.45" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="${p.x}" cy="${p.y}" r="4" stroke="${p.color}" stroke-width="1.5" fill="none" opacity="0.8">
+            <animate attributeName="r" values="4;16;4" dur="2.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0.1;0.9" dur="2.4s" repeatCount="indefinite"/>
           </circle>
 
-          <!-- Shadow beneath needle tip -->
-          <ellipse cx="${p.x}" cy="${p.y + 16}" rx="7" ry="3" fill="rgba(0,0,0,0.6)"/>
+          <!-- Core Dot (Champagne Gold / Cyan Accent) -->
+          <circle cx="${p.x}" cy="${p.y}" r="5" fill="${p.color}" stroke="#ffffff" stroke-width="1.5" style="filter:drop-shadow(0 0 8px ${p.color});"/>
 
-          <!-- NEEDLE SHAFT (JARUM METALLIC PIN) -->
-          <line x1="${p.x}" y1="${p.y}" x2="${p.x}" y2="${p.y + 16}" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>
-          <line x1="${p.x - 0.5}" y1="${p.y}" x2="${p.x - 0.5}" y2="${p.y + 16}" stroke="#ffffff" stroke-width="1" opacity="0.8"/>
-
-          <!-- NEEDLE HEAD (PENTUL BULAT COLOR SPHERE) -->
-          <circle cx="${p.x}" cy="${p.y}" r="8.5" fill="${p.color}" stroke="#ffffff" stroke-width="2" style="filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5));"/>
-          <!-- 3D Specular Highlight on Sphere -->
-          <circle cx="${p.x - 2.5}" cy="${p.y - 2.5}" r="2.5" fill="#ffffff" opacity="0.7"/>
-
-          <!-- PIN BADGE COUNT -->
-          <circle cx="${p.x + 6}" cy="${p.y - 6}" r="5.5" fill="#0f172a" stroke="${p.color}" stroke-width="1"/>
-          <text x="${p.x + 6}" y="${p.y - 4}" font-size="7" font-weight="900" fill="#ffffff" text-anchor="middle" dominant-baseline="central">${count}</text>
+          <!-- Sleek Mini Count Badge Floating Above Pin -->
+          <rect x="${p.x - 10}" y="${p.y - 20}" width="20" height="12" rx="6" fill="#07090e" stroke="${p.color}" stroke-width="1" opacity="0.95"/>
+          <text x="${p.x}" y="${p.y - 12}" font-size="7.5" font-weight="900" fill="#ffffff" text-anchor="middle" dominant-baseline="central">${count}</text>
         </g>
       `;
     }).join('');
 
     const mapSvgContent = `
-      <svg viewBox="0 0 1000 480" style="width:100%; height:auto; display:block; filter:drop-shadow(0 4px 14px rgba(0,0,0,0.3)); background:linear-gradient(135deg, #0b0f19 0%, #151d2a 100%); border-radius:12px;">
-        <!-- VECTOR MAP FALLBACK ARCHIPELAGO -->
-        <g fill="#1e293b" stroke="#334155" stroke-width="1.5">
-          <path d="M 100 120 L 220 220 L 240 250 L 210 260 L 150 200 L 90 140 Z"/>
-          <path d="M 250 310 L 440 330 L 440 345 L 250 325 Z"/>
-          <path d="M 330 140 L 460 140 L 470 230 L 340 230 Z"/>
-          <path d="M 490 170 L 550 170 L 530 220 L 560 220 L 540 270 L 500 270 L 510 230 Z"/>
-          <path d="M 720 200 L 880 200 L 880 280 L 760 280 L 720 230 Z"/>
-          <path d="M 450 332 L 620 338 L 620 348 L 450 342 Z"/>
-        </g>
+      <svg viewBox="0 0 1000 480" style="width:100%; height:auto; display:block; filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5)); background:linear-gradient(145deg, #07090e 0%, #0d1422 100%); border-radius:12px;">
+        <defs>
+          <pattern id="darkMapGrid" width="28" height="28" patternUnits="userSpaceOnUse">
+            <circle cx="14" cy="14" r="0.65" fill="rgba(255,255,255,0.06)"/>
+          </pattern>
+        </defs>
 
-        <!-- HIGH-RES INDONESIA GEOGRAPHICAL MAP IMAGE -->
-        <image href="images/indonesia_map.png" xlink:href="images/indonesia_map.png" x="0" y="0" width="1000" height="480" preserveAspectRatio="xMidYMid meet" opacity="0.92"/>
+        <!-- Subtle Dot Grid Matrix Canvas -->
+        <rect width="1000" height="480" fill="url(#darkMapGrid)"/>
 
-        <!-- 📍 JARUM PENTUL MAP MARKERS OVER THE MAP IMAGE -->
+        <!-- REAL INDONESIA GEOGRAPHICAL MAP IMAGE (DARK LUXURY PRESENTATION) -->
+        <image href="images/indonesia_map.png" xlink:href="images/indonesia_map.png" x="0" y="0" width="1000" height="480" preserveAspectRatio="xMidYMid meet" opacity="0.94" style="filter: drop-shadow(0 4px 14px rgba(0,0,0,0.7));"/>
+
+        <!-- 📍 SLEEK GLOWING PULSE PINS -->
         ${pinsSvg}
       </svg>
     `;
@@ -4933,7 +5078,7 @@ const AppEngine = {
 
         <div class="glass-panel" style="padding:24px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <h4 style="font-size:1.1rem; color:var(--accent-gold);">📊 2.1.1 Informasi Dasar Organisasi</h4>
+            <h4 style="font-size:1.1rem; color:var(--accent-gold);">🏛️ Informasi Dasar Organisasi & Sekretariat</h4>
             <button class="btn-outline" style="padding:6px 14px; font-size:0.8rem;" onclick="AppEngine.openEditOrgProfileModal()">✏️ Edit Profil</button>
           </div>
           <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
@@ -5201,7 +5346,7 @@ const AppEngine = {
     };
 
     if (!payload.title || !payload.description) {
-      alert('⚠️ Judul Pasal dan Isi Deskripsi Sejarah wajib diisi!');
+      alert('Judul Pasal dan Isi Deskripsi Sejarah wajib diisi!');
       return;
     }
 
@@ -5213,20 +5358,20 @@ const AppEngine = {
       });
       const data = await res.json();
       if (data.success) {
-        alert('✅ ' + data.message);
+        alert(data.message);
         AuthEngine.closeModal('modal-m2-history');
         await this.fetchM2Data();
         this.renderM2Founders();
       } else {
-        alert('❌ Gagal: ' + data.message);
+        alert('Gagal: ' + data.message);
       }
     } catch (e) {
-      alert('❌ Error: ' + e.message);
+      alert('Error: ' + e.message);
     }
   },
 
   async deleteM2HistorySection(id) {
-    if (!confirm('⚠️ Apakah Anda yakin ingin menghapus pasal sejarah ini dari database Supabase Cloud?')) return;
+    if (!confirm('Apakah Anda yakin ingin menghapus pasal sejarah ini?')) return;
 
     try {
       const res = await fetch('api.php?action=delete_m2_history', {
@@ -5236,14 +5381,14 @@ const AppEngine = {
       });
       const data = await res.json();
       if (data.success) {
-        alert('✅ ' + data.message);
+        alert(data.message);
         await this.fetchM2Data();
         this.renderM2Founders();
       } else {
-        alert('❌ Gagal: ' + data.message);
+        alert('Gagal: ' + data.message);
       }
     } catch (e) {
-      alert('❌ Error: ' + e.message);
+      alert('Error: ' + e.message);
     }
   },
 
@@ -5254,54 +5399,78 @@ const AppEngine = {
 
     const list = this.m2Data.visionMission.length ? this.m2Data.visionMission : [];
 
-    const vision = list.find(x => x.type === 'VISION') || { id: 'vm_001', title: 'Visi MB Club INA', description: 'Menjadi wadah komunitas Mercedes-Benz terbesar, terbaik, dan paling solid di Indonesia serta menjadi kebanggaan bangsa.', icon: '🎯' };
+    const vision = list.find(x => x.type === 'VISION') || { id: 'vm_001', title: 'Visi Utama Federasi', description: 'Menjadi wadah komunitas Mercedes-Benz terbesar, terbaik, dan paling solid di Indonesia serta menjadi kebanggaan bangsa.', icon: '🎯' };
     const missions = list.filter(x => x.type === 'MISSION');
+
+    const getMissionSvg = (title, order) => {
+      const t = (title || '').toLowerCase();
+      if (t.includes('saudara') || t.includes('komunitas') || t.includes('anggota') || order === 1) {
+        return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+      } else if (t.includes('tahu') || t.includes('edukasi') || t.includes('otomotif') || order === 2) {
+        return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+      } else if (t.includes('sosial') || t.includes('peduli') || t.includes('bakti') || order === 3) {
+        return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
+      } else {
+        return `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
+      }
+    };
 
     container.innerHTML = `
       <div style="margin-bottom:28px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
           <div>
-            <h3 style="font-size:1.3rem;" class="text-gradient">🎯 2.1.3 Visi & Misi MB INA</h3>
-            <p style="font-size:0.85rem; color:var(--text-muted);">Kelola Visi Utama dan 5 Misi Strategis (Supabase Cloud PostgreSQL Active)</p>
+            <h3 style="font-size:1.3rem; margin:0;" class="text-gradient">Visi & Misi Federasi MB INA</h3>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin:4px 0 0 0;">Visi Utama dan Misi Strategis Mercedes-Benz Club Indonesia</p>
           </div>
-          <div style="display:flex; gap:10px;">
-            <button class="btn-outline" onclick="AppEngine.openEditVMModal('${vision.id}')">✏️ Edit Visi Utama</button>
-            <button class="btn-primary" onclick="AppEngine.openAddVMModal()">+ Tambah Misi Baru</button>
+          <div>
+            <button class="btn-primary" style="font-size:0.8rem; padding:8px 18px; border-radius:10px; font-weight:700;" onclick="AppEngine.openAddVMModal()">+ Tambah Misi Baru</button>
           </div>
         </div>
 
-        <!-- VISI UTAMA CARD -->
-        <div class="glass-panel" style="padding:28px; text-align:center; border-top:4px solid var(--accent-gold); margin-bottom:28px; position:relative;">
-          <div style="position:absolute; top:16px; right:16px;">
-            <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditVMModal('${vision.id}')">✏️ Edit Visi</button>
+        <!-- VISI UTAMA CARD (HERO STATEMENT) -->
+        <div class="glass-card" style="padding:32px 28px; text-align:center; border:1px solid rgba(255,255,255,0.08); background:radial-gradient(circle at 50% 0%, rgba(245,158,11,0.05) 0%, rgba(255,255,255,0.02) 80%); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:16px; margin-bottom:28px; position:relative;">
+          <div style="position:absolute; top:18px; right:18px;">
+            <button class="btn-outline" style="font-size:0.75rem; padding:5px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px; color:#cbd5e1; border-color:rgba(255,255,255,0.12);" onclick="AppEngine.openEditVMModal('${vision.id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Visi
+            </button>
           </div>
-          <div style="font-size:2.8rem; margin-bottom:8px;">${vision.icon || '🎯'}</div>
-          <h3 style="font-size:1.4rem; color:var(--accent-gold);">${vision.title}</h3>
-          <p style="font-size:1.1rem; font-weight:700; color:var(--text-main); margin-top:12px; max-width:800px; margin-left:auto; margin-right:auto; line-height:1.6;">
+          
+          <div style="display:inline-flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:16px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); color:var(--accent-gold); margin-bottom:14px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          </div>
+          
+          <h4 style="font-size:1.1rem; color:var(--accent-gold); font-weight:800; margin:0 0 12px 0; letter-spacing:0.04em; text-transform:uppercase;">${vision.title || 'Visi Utama Organisasi'}</h4>
+          <p style="font-size:1.15rem; font-style:italic; font-weight:500; color:#f1f5f9; line-height:1.75; max-width:820px; margin:0 auto;">
             "${vision.description}"
           </p>
         </div>
 
-        <!-- MISI STRATEGIS GRID -->
-        <h4 style="font-size:1.1rem; margin-bottom:16px; color:var(--accent-gold);">🚀 Daftar Misi Strategis Organisasi (${missions.length}):</h4>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;">
-          ${missions.map(m => `
-            <div class="glass-card" style="padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
+        <!-- MISI STRATEGIS GRID (4 KOLOM) -->
+        <h4 style="font-size:1.05rem; margin-bottom:16px; color:var(--accent-gold); font-weight:700;">Misi Strategis Organisasi</h4>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px;">
+          ${missions.map((m, idx) => {
+            const svgIcon = getMissionSvg(m.title, m.sort_order || idx + 1);
+            const cleanTitle = (m.title || '').replace(/^Misi\s*\d+\s*[-–:]\s*/i, '');
+            return `
+            <div class="glass-card" style="padding:20px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); border-radius:16px; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(245,158,11,0.35)';" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(255,255,255,0.08)';">
               <div>
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
-                  <div style="font-size:2rem;">${m.icon || '🚀'}</div>
-                  <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">MISI #${m.sort_order || 1}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                  <div class="icon-badge-box" style="width:38px; height:38px; border-radius:10px; color:var(--accent-gold); background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.2);">
+                    ${svgIcon}
+                  </div>
+                  <span style="display:inline-block; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 8px; border-radius:9999px; background:rgba(245,158,11,0.1); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.25);">MISI #${m.sort_order || idx + 1}</span>
                 </div>
-                <h4 style="font-size:1.1rem; margin-bottom:8px; color:var(--text-main); font-weight:800;">${m.title}</h4>
-                <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.6;">${m.description}</p>
+                <h4 style="font-size:1rem; margin:0 0 8px 0; color:#ffffff; font-weight:800; line-height:1.3;">${cleanTitle}</h4>
+                <p style="font-size:0.82rem; color:var(--text-muted); line-height:1.6; margin:0;">${m.description}</p>
               </div>
 
-              <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:12px;">
-                <button class="role-pill-btn" style="border-color:var(--accent-gold); color:var(--accent-gold);" onclick="AppEngine.openEditVMModal('${m.id}')">✏️ Edit</button>
-                <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteVM('${m.id}')">🗑️ Hapus</button>
+              <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:18px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+                <button class="btn-outline" style="font-size:0.72rem; padding:4px 10px; border-radius:8px; color:#cbd5e1; border-color:rgba(255,255,255,0.12);" onclick="AppEngine.openEditVMModal('${m.id}')">Edit</button>
+                <button class="btn-outline" style="font-size:0.72rem; padding:4px 10px; border-radius:8px; border-color:rgba(244,63,94,0.25); color:#fb7185;" onclick="AppEngine.deleteVM('${m.id}')">Hapus</button>
               </div>
             </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       </div>
     `;
@@ -5309,7 +5478,7 @@ const AppEngine = {
 
   openAddVMModal() {
     document.getElementById('edit-vm-id').value = '';
-    document.getElementById('modal-vm-title').innerText = '🚀 Tambah Misi Baru';
+    document.getElementById('modal-vm-title').innerText = 'Tambah Misi Baru';
     document.getElementById('edit-vm-type').value = 'MISSION';
     document.getElementById('edit-vm-icon').value = '🚀';
     document.getElementById('edit-vm-item-title').value = '';
@@ -5324,7 +5493,7 @@ const AppEngine = {
     if (!item) return;
 
     document.getElementById('edit-vm-id').value = item.id;
-    document.getElementById('modal-vm-title').innerText = `✏️ Edit ${item.type === 'VISION' ? 'Visi Utama' : 'Misi'}`;
+    document.getElementById('modal-vm-title').innerText = `Edit ${item.type === 'VISION' ? 'Visi Utama' : 'Misi'}`;
     document.getElementById('edit-vm-type').value = item.type;
     document.getElementById('edit-vm-icon').value = item.icon || '🚀';
     document.getElementById('edit-vm-item-title').value = item.title;
@@ -5334,27 +5503,33 @@ const AppEngine = {
     AuthEngine.openModal('modal-edit-vm');
   },
 
-  async saveVMFromModal(event) {
-    event.preventDefault();
+  async saveVM() {
     const id = document.getElementById('edit-vm-id').value;
     const type = document.getElementById('edit-vm-type').value;
-    const icon = document.getElementById('edit-vm-icon').value.trim();
+    const icon = document.getElementById('edit-vm-icon').value || (type === 'VISION' ? '🎯' : '🚀');
     const title = document.getElementById('edit-vm-item-title').value.trim();
     const description = document.getElementById('edit-vm-description').value.trim();
-    const sort_order = parseInt(document.getElementById('edit-vm-sort').value || 1);
+    const sort_order = parseInt(document.getElementById('edit-vm-sort').value) || 1;
 
-    const action = id ? 'update_m2_vision_mission' : 'create_m2_vision_mission';
+    if (!title || !description) {
+      alert('Judul dan Deskripsi wajib diisi!');
+      return;
+    }
 
     try {
-      const res = await fetch(`api.php?action=${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, type, icon, title, description, sort_order })
-      });
-      const data = await res.json();
-      alert('🎉 ' + data.message);
-      AuthEngine.closeAllModals();
-      await this.fetchM2Data();
+      if (id) {
+        // UPDATE
+        const idx = this.m2Data.visionMission.findIndex(x => x.id === id);
+        if (idx !== -1) {
+          this.m2Data.visionMission[idx] = { ...this.m2Data.visionMission[idx], title, description, icon, sort_order };
+        }
+      } else {
+        // ADD NEW
+        const newId = 'vm_' + Date.now();
+        this.m2Data.visionMission.push({ id: newId, type, title, description, icon, sort_order });
+      }
+
+      AuthEngine.closeModal('modal-edit-vm');
       this.renderM2Vision();
       this.renderLandingPageVisionMission();
     } catch (e) {
@@ -5363,16 +5538,9 @@ const AppEngine = {
   },
 
   async deleteVM(id) {
-    if (!confirm('Apakah Anda yakin ingin menghapus Misi ini dari Supabase Cloud Database?')) return;
+    if (!confirm('Yakin ingin menghapus item Visi/Misi ini?')) return;
     try {
-      const res = await fetch('api.php?action=delete_m2_vision_mission', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      });
-      const data = await res.json();
-      alert(data.message);
-      await this.fetchM2Data();
+      this.m2Data.visionMission = this.m2Data.visionMission.filter(x => x.id !== id);
       this.renderM2Vision();
       this.renderLandingPageVisionMission();
     } catch (e) {
@@ -5381,30 +5549,40 @@ const AppEngine = {
   },
 
   renderLandingPageVisionMission() {
-    const container = document.getElementById('landing-vm-container');
+    const container = document.getElementById('landing-vision-mission-container');
     if (!container) return;
 
-    const list = this.m2Data.visionMission || [];
-    const vision = list.find(x => x.type === 'VISION') || {
-      icon: '🎯',
-      title: 'Visi MB Club INA',
-      description: 'Menjadi wadah komunitas Mercedes-Benz terbesar, terbaik, dan paling solid di Indonesia serta menjadi kebanggaan bangsa.'
-    };
-
+    const list = this.m2Data.visionMission.length ? this.m2Data.visionMission : [];
+    const vision = list.find(x => x.type === 'VISION') || { title: 'Visi Utama', description: 'Menjadi wadah komunitas Mercedes-Benz terbesar, terbaik, dan paling solid di Indonesia serta menjadi kebanggaan bangsa.' };
     const missions = list.filter(x => x.type === 'MISSION');
+
+    const getMissionSvg = (title, order) => {
+      const t = (title || '').toLowerCase();
+      if (t.includes('saudara') || t.includes('komunitas') || t.includes('anggota') || order === 1) {
+        return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+      } else if (t.includes('tahu') || t.includes('edukasi') || t.includes('otomotif') || order === 2) {
+        return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+      } else if (t.includes('sosial') || t.includes('peduli') || t.includes('bakti') || order === 3) {
+        return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
+      } else {
+        return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
+      }
+    };
 
     container.innerHTML = `
       <!-- VISI UTAMA CARD -->
-      <div class="glass-card" style="padding:28px; border-top:4px solid var(--accent-gold); display:flex; flex-direction:column; justify-content:space-between;">
+      <div class="glass-card" style="padding:28px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); border-radius:16px; display:flex; flex-direction:column; justify-content:space-between;">
         <div>
-          <div style="font-size:2.6rem; margin-bottom:12px;">${vision.icon || '🎯'}</div>
-          <h3 style="font-size:1.3rem; margin-bottom:12px; color:var(--accent-gold); font-weight:800;">${vision.title}</h3>
-          <p style="font-size:1.02rem; color:var(--text-main); line-height:1.65; font-style:italic;">
+          <div style="display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:14px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); color:var(--accent-gold); margin-bottom:14px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          </div>
+          <h3 style="font-size:1.2rem; color:var(--accent-gold); font-weight:800; margin:0 0 10px 0;">${vision.title || 'Visi Utama'}</h3>
+          <p style="font-size:1rem; color:var(--text-main); line-height:1.7; font-style:italic;">
             "${vision.description}"
           </p>
         </div>
-        <div style="margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:12px; font-size:0.8rem; color:var(--accent-gold); font-weight:700;">
-          ⭐ Visi Resmi Organisasi MB Club INA
+        <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px; font-size:0.78rem; color:var(--accent-gold); font-weight:700;">
+          Visi Resmi Organisasi MB Club INA
         </div>
       </div>
 
@@ -5440,8 +5618,8 @@ const AppEngine = {
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
           <div>
-            <h4 style="font-size:1.2rem; color:var(--accent-gold);">📜 Timeline Daftar Presiden MB Club INA (2004 - 2027)</h4>
-            <p style="font-size:0.8rem; color:var(--text-muted);">Kelola data, foto profil, biografi, & status presiden incumbent (Supabase PostgreSQL Active)</p>
+            <h4 style="font-size:1.2rem; color:var(--accent-gold);">📜 Timeline Dewan Presiden MB Club INA (2004–2027)</h4>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Daftar kepemimpinan presiden federasi dari masa ke masa beserta biografi resmi</p>
           </div>
           <button class="btn-primary" onclick="AppEngine.openAddPresidentModal()">+ Tambah Presiden Baru</button>
         </div>
@@ -5826,8 +6004,8 @@ const AppEngine = {
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
           <div>
-            <h4 style="font-size:1.2rem; color:var(--accent-gold);">🚗 2.2 & 2.3 Daftar Klub & Chapter Terdaftar MB INA (<span id="m2-club-total-count">${clubs.length}</span> Klub - 8 Region)</h4>
-            <p style="font-size:0.8rem; color:var(--text-muted);">Kelola seluruh 110+ Klub & Chapter resmi MB INA (Supabase Cloud PostgreSQL Active)</p>
+            <h4 style="font-size:1.2rem; color:var(--accent-gold);">🚗 Direktori Klub & Chapter Resmi se-Indonesia (<span id="m2-club-total-count">${clubs.length}</span> Klub — 8 Region)</h4>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Pusat data 111 Klub & Chapter resmi Mercedes-Benz Club Indonesia di seluruh nusantara</p>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="btn-primary" onclick="AppEngine.openAddClubModal()">+ Tambah Klub / Chapter Baru</button>
@@ -5861,34 +6039,68 @@ const AppEngine = {
           <span style="color:var(--text-muted); font-size:0.78rem;">Supabase PostgreSQL Live Search</span>
         </div>
 
-        <!-- 2.2.3 STATISTIK KLUB SUMMARY BAR -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:24px;">
-          <div class="admin-stat-card">
-            <div class="admin-stat-icon">🚗</div>
+        <!-- STATISTIK KLUB SUMMARY BAR -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div class="admin-stat-card stat-card-gold">
+            <div class="stat-card-top">
+              <span class="stat-label">TOTAL KLUB & CHAPTER</span>
+              <div class="stat-card-icon-wrapper" style="color:var(--accent-gold); border-color:rgba(212,175,55,0.2); background:rgba(212,175,55,0.06);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+            </div>
             <div>
               <div class="stat-value" id="stat-club-card-count">${clubs.length}</div>
-              <div class="stat-label">Total Klub & Chapter</div>
+            </div>
+            <div class="stat-card-footer">
+              <span class="stat-trend-badge" style="background:rgba(212,175,55,0.12); color:var(--accent-gold); border-color:rgba(212,175,55,0.25);">Nasional</span>
+              <span>111 klub terdaftar</span>
             </div>
           </div>
-          <div class="admin-stat-card">
-            <div class="admin-stat-icon" style="background:rgba(59,130,246,0.15); color:var(--accent-blue);">🗺️</div>
+
+          <div class="admin-stat-card stat-card-blue">
+            <div class="stat-card-top">
+              <span class="stat-label">CAKUPAN WILAYAH</span>
+              <div class="stat-card-icon-wrapper" style="color:var(--accent-blue); border-color:rgba(56,189,248,0.2); background:rgba(56,189,248,0.06);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              </div>
+            </div>
             <div>
               <div class="stat-value">8 Region</div>
-              <div class="stat-label">Cakupan Wilayah</div>
+            </div>
+            <div class="stat-card-footer">
+              <span>Seluruh provinsi Indonesia</span>
             </div>
           </div>
-          <div class="admin-stat-card">
-            <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald);">📍</div>
+
+          <div class="admin-stat-card stat-card-emerald">
+            <div class="stat-card-top">
+              <span class="stat-label">CHAPTER AKTIF</span>
+              <div class="stat-card-icon-wrapper" style="color:var(--primary-emerald); border-color:rgba(16,185,129,0.2); background:rgba(16,185,129,0.06);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+            </div>
             <div>
               <div class="stat-value">60+</div>
-              <div class="stat-label">Chapter & Region</div>
+            </div>
+            <div class="stat-card-footer">
+              <span class="stat-trend-badge">Aktif</span>
+              <span>Chapter kota & daerah</span>
             </div>
           </div>
-          <div class="admin-stat-card">
-            <div class="admin-stat-icon" style="background:rgba(245,158,11,0.15); color:var(--accent-gold);">👥</div>
+
+          <div class="admin-stat-card stat-card-amber">
+            <div class="stat-card-top">
+              <span class="stat-label">TOTAL ANGGOTA</span>
+              <div class="stat-card-icon-wrapper" style="color:var(--accent-gold); border-color:rgba(245,158,11,0.2); background:rgba(245,158,11,0.06);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
             <div>
               <div class="stat-value">15.000+</div>
-              <div class="stat-label">Member Terdaftar</div>
+            </div>
+            <div class="stat-card-footer">
+              <span class="stat-trend-badge">Nasional</span>
+              <span>Member resmi MB INA</span>
             </div>
           </div>
         </div>
@@ -7303,36 +7515,46 @@ const AppEngine = {
     if (!container) return;
 
     container.innerHTML = `
-      <table style="width:100%; border-collapse:collapse; font-size:0.85rem;">
+      <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
         <thead>
-          <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
-            <th style="padding:12px;">Kode</th>
-            <th style="padding:12px;">Nama Provinsi</th>
-            <th style="padding:12px;">Region Wilayah</th>
-            <th style="padding:12px;">Klub Terdaftar</th>
-            <th style="padding:12px;">Status</th>
-            <th style="padding:12px; text-align:right;">Aksi</th>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.01); color:#94a3b8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; text-align:left;">
+            <th style="padding:12px 16px; font-weight:600; width:90px;">Kode</th>
+            <th style="padding:12px 16px; font-weight:600;">Nama Provinsi</th>
+            <th style="padding:12px 16px; font-weight:600; width:180px;">Region Wilayah</th>
+            <th style="padding:12px 16px; font-weight:600; width:160px; text-align:center;">Klub Terdaftar</th>
+            <th style="padding:12px 16px; font-weight:600; width:120px; text-align:center;">Status</th>
+            <th style="padding:12px 16px; font-weight:600; width:100px; text-align:right;">Aksi</th>
           </tr>
         </thead>
         <tbody>
-          ${this.provinces.map(p => `
-            <tr style="border-bottom:1px solid var(--chrome-border);">
-              <td style="padding:12px; font-family:monospace; font-weight:800; color:var(--accent-gold);">${p.code}</td>
-              <td style="padding:12px; font-weight:700;">${p.name}</td>
-              <td style="padding:12px; color:var(--text-muted);">${p.region}</td>
-              <td style="padding:12px;">
-                <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); border:1px solid var(--accent-blue);">
-                  🚗 ${p.club_count || 0} Klub
-                </span>
-              </td>
-              <td style="padding:12px;">
-                <span class="tier-badge" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">AKTIF</span>
-              </td>
-              <td style="padding:12px; text-align:right;">
-                <button class="role-pill-btn" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="AppEngine.deleteProvince('${p.id}')">🗑️ Hapus</button>
-              </td>
-            </tr>
-          `).join('')}
+          ${this.provinces.map(p => {
+            const count = p.club_count || 0;
+            const clubBadge = count > 0 
+              ? `<span style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); color:#fbbf24; font-size:0.72rem; padding:3px 10px; border-radius:20px; font-weight:600; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg> ${count} Klub</span>`
+              : `<span style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#94a3b8; font-size:0.72rem; padding:3px 10px; border-radius:20px; font-weight:500; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg> 0 Klub</span>`;
+
+            return `
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:12px 16px;">
+                  <span style="font-family:monospace; font-size:0.75rem; font-weight:700; color:#fbbf24; background:rgba(245,158,11,0.06); padding:3px 8px; border-radius:8px; border:1px solid rgba(245,158,11,0.2); display:inline-block; letter-spacing:0.5px;">${p.code}</span>
+                </td>
+                <td style="padding:12px 16px; font-weight:600; color:#fff;">${p.name}</td>
+                <td style="padding:12px 16px; color:var(--text-muted); font-size:0.78rem;">${p.region}</td>
+                <td style="padding:12px 16px; text-align:center;">
+                  ${clubBadge}
+                </td>
+                <td style="padding:12px 16px; text-align:center;">
+                  <span style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); color:#34d399; font-size:0.72rem; padding:3px 10px; border-radius:20px; font-weight:600; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Aktif</span>
+                </td>
+                <td style="padding:12px 16px; text-align:right;">
+                  <button style="background:rgba(255,255,255,0.04); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); padding:5px 12px; border-radius:10px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.2s;" onmouseover="this.style.color='#fb7185'; this.style.borderColor='rgba(244,63,94,0.3)'; this.style.background='rgba(244,63,94,0.08)'" onmouseout="this.style.color='#94a3b8'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'" onclick="AppEngine.deleteProvince('${p.id}')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    <span>Hapus</span>
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('')}
         </tbody>
       </table>
     `;
@@ -10158,40 +10380,69 @@ const AppEngine = {
       const isRejectedActive = currentStatusFilter === 'REJECTED';
 
       statsContainer.innerHTML = `
-        <div class="admin-stat-card" onclick="AppEngine.filterM4PendingByStatus('')" title="Klik untuk menampilkan semua ${apps.length} pengajuan" style="cursor:pointer; transition:all 0.2s ease; ${isAllActive ? 'border:2px solid var(--accent-gold); background:rgba(245,158,11,0.12); box-shadow:0 0 12px rgba(245,158,11,0.25);' : ''}">
-          <div class="admin-stat-icon" style="background:rgba(255,255,255,0.1); color:var(--text-main);">📄</div>
-          <div>
-            <div class="stat-value" style="color:var(--text-main);">${apps.length}</div>
-            <div class="stat-label">Total Pengajuan</div>
+        <div class="admin-stat-card" onclick="AppEngine.filterM4PendingByStatus('')" title="Semua pengajuan" style="cursor:pointer; ${isAllActive ? 'border-color:var(--accent-gold); box-shadow:0 0 16px rgba(212,175,55,0.25);' : ''}">
+          <div class="stat-card-top">
+            <span class="stat-label">SEMUA</span>
+            <div class="stat-card-icon-wrapper" style="color:var(--chrome-silver);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
           </div>
+          <div>
+            <div class="stat-value" style="font-size:1.5rem;">${apps.length}</div>
+          </div>
+          <div class="stat-card-footer"><span>Total pengajuan</span></div>
         </div>
-        <div class="admin-stat-card" onclick="AppEngine.filterM4PendingByStatus('PENDING')" title="Klik untuk filter ${pendingCount} status Pending" style="cursor:pointer; transition:all 0.2s ease; ${isPendingActive ? 'border:2px solid var(--accent-red); background:rgba(239,68,68,0.18); box-shadow:0 0 12px rgba(239,68,68,0.25);' : ''}">
-          <div class="admin-stat-icon" style="background:rgba(239,68,68,0.15); color:var(--accent-red);">⏳</div>
-          <div>
-            <div class="stat-value" style="color:var(--accent-red);">${pendingCount}</div>
-            <div class="stat-label">Pending</div>
+
+        <div class="admin-stat-card stat-card-amber" onclick="AppEngine.filterM4PendingByStatus('PENDING')" title="Pending" style="cursor:pointer; ${isPendingActive ? 'border-color:var(--accent-gold); box-shadow:0 0 16px rgba(245,158,11,0.25);' : ''}">
+          <div class="stat-card-top">
+            <span class="stat-label">PENDING</span>
+            <div class="stat-card-icon-wrapper" style="color:var(--accent-gold); border-color:rgba(245,158,11,0.2); background:rgba(245,158,11,0.06);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
           </div>
+          <div>
+            <div class="stat-value" style="font-size:1.5rem; color:var(--accent-gold);">${pendingCount}</div>
+          </div>
+          <div class="stat-card-footer"><span class="stat-trend-badge" style="background:rgba(245,158,11,0.12); color:var(--accent-gold); border-color:rgba(245,158,11,0.25);">Menunggu</span></div>
         </div>
-        <div class="admin-stat-card" onclick="AppEngine.filterM4PendingByStatus('REVIEW')" title="Klik untuk filter ${reviewCount} status Dalam Review" style="cursor:pointer; transition:all 0.2s ease; ${isReviewActive ? 'border:2px solid var(--accent-gold); background:rgba(245,158,11,0.18); box-shadow:0 0 12px rgba(245,158,11,0.25);' : ''}">
-          <div class="admin-stat-icon" style="background:rgba(245,158,11,0.15); color:var(--accent-gold);">🔍</div>
-          <div>
-            <div class="stat-value" style="color:var(--accent-gold);">${reviewCount}</div>
-            <div class="stat-label">Dalam Review</div>
+
+        <div class="admin-stat-card stat-card-blue" onclick="AppEngine.filterM4PendingByStatus('REVIEW')" title="Dalam Review" style="cursor:pointer; ${isReviewActive ? 'border-color:var(--accent-blue); box-shadow:0 0 16px rgba(56,189,248,0.25);' : ''}">
+          <div class="stat-card-top">
+            <span class="stat-label">REVIEW</span>
+            <div class="stat-card-icon-wrapper" style="color:var(--accent-blue); border-color:rgba(56,189,248,0.2); background:rgba(56,189,248,0.06);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
           </div>
+          <div>
+            <div class="stat-value" style="font-size:1.5rem; color:var(--accent-blue);">${reviewCount}</div>
+          </div>
+          <div class="stat-card-footer"><span>Dalam proses</span></div>
         </div>
-        <div class="admin-stat-card" onclick="AppEngine.filterM4PendingByStatus('APPROVED')" title="Klik untuk filter ${approvedCount} status Approved" style="cursor:pointer; transition:all 0.2s ease; ${isApprovedActive ? 'border:2px solid var(--primary-emerald); background:rgba(16,185,129,0.18); box-shadow:0 0 12px rgba(16,185,129,0.25);' : ''}">
-          <div class="admin-stat-icon" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald);">✅</div>
-          <div>
-            <div class="stat-value" style="color:var(--primary-emerald);">${approvedCount}</div>
-            <div class="stat-label">Approved</div>
+
+        <div class="admin-stat-card stat-card-emerald" onclick="AppEngine.filterM4PendingByStatus('APPROVED')" title="Approved" style="cursor:pointer; ${isApprovedActive ? 'border-color:var(--primary-emerald); box-shadow:0 0 16px rgba(16,185,129,0.25);' : ''}">
+          <div class="stat-card-top">
+            <span class="stat-label">APPROVED</span>
+            <div class="stat-card-icon-wrapper" style="color:var(--primary-emerald); border-color:rgba(16,185,129,0.2); background:rgba(16,185,129,0.06);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
           </div>
+          <div>
+            <div class="stat-value" style="font-size:1.5rem; color:var(--primary-emerald);">${approvedCount}</div>
+          </div>
+          <div class="stat-card-footer"><span class="stat-trend-badge">Terverifikasi</span></div>
         </div>
-        <div class="admin-stat-card" onclick="AppEngine.filterM4PendingByStatus('REJECTED')" title="Klik untuk filter ${rejectedCount} status Rejected" style="cursor:pointer; transition:all 0.2s ease; ${isRejectedActive ? 'border:2px solid var(--text-muted); background:rgba(100,116,139,0.2); box-shadow:0 0 12px rgba(100,116,139,0.25);' : ''}">
-          <div class="admin-stat-icon" style="background:rgba(100,116,139,0.15); color:var(--text-muted);">❌</div>
-          <div>
-            <div class="stat-value" style="color:var(--text-muted);">${rejectedCount}</div>
-            <div class="stat-label">Rejected</div>
+
+        <div class="admin-stat-card" onclick="AppEngine.filterM4PendingByStatus('REJECTED')" title="Rejected" style="cursor:pointer; ${isRejectedActive ? 'border-color:var(--text-muted);' : ''}">
+          <div class="stat-card-top">
+            <span class="stat-label">REJECTED</span>
+            <div class="stat-card-icon-wrapper" style="color:var(--text-muted);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
           </div>
+          <div>
+            <div class="stat-value" style="font-size:1.5rem; color:var(--text-muted);">${rejectedCount}</div>
+          </div>
+          <div class="stat-card-footer"><span>Ditolak</span></div>
         </div>
       `;
     }
@@ -10984,31 +11235,40 @@ const AppEngine = {
     }
   },
 
+  getCategorySvg(catKey) {
+    const key = (catKey || '').toString().toLowerCase();
+    if (key.includes('umum') || key === 'cat_umum') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+    } else if (key.includes('teknis') || key === 'cat_teknis') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
+    } else if (key.includes('komunitas') || key === 'cat_komunitas') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+    } else if (key.includes('galeri') || key === 'cat_galeri') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+    } else if (key.includes('market') || key === 'cat_market' || key.includes('jual')) {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 2 6v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6l-4-4Z"/><path d="M2 6h20"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
+    } else if (key.includes('announcement') || key.includes('pengumuman') || key === 'cat_announcement') {
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>`;
+    }
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+  },
+
   renderM5Categories(targetGridId) {
     const grid = document.getElementById(targetGridId || 'm5-categories-grid');
     if (!grid) return;
 
-    const bgMap = {
-      'cat_umum': 'rgba(59,130,246,0.15)',
-      'cat_teknis': 'rgba(245,158,11,0.15)',
-      'cat_komunitas': 'rgba(139,92,246,0.15)',
-      'cat_galeri': 'rgba(236,72,153,0.15)',
-      'cat_market': 'rgba(16,185,129,0.15)',
-      'cat_announcement': 'rgba(239,68,68,0.15)'
-    };
-
     grid.innerHTML = this.m5Data.categories.map(c => {
-      const iconBg = bgMap[c.id] || 'rgba(245,158,11,0.15)';
+      const svgIcon = this.getCategorySvg(c.id || c.name);
       return `
-      <div class="glass-card" style="padding:16px; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;" onclick="AppEngine.filterCategoryM5('${c.id}')" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='var(--accent-gold)';" onmouseout="this.style.transform='none'; this.style.borderColor='var(--chrome-border)';">
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-          <div style="font-size:1.8rem; width:46px; height:46px; border-radius:12px; background:${iconBg}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${c.icon}</div>
-          <div style="min-width:0;">
-            <h5 style="font-size:0.98rem; font-weight:800; line-height:1.2; margin:0 0 2px 0;">${c.name}</h5>
-            <span style="font-size:0.75rem; color:var(--text-muted);">${c.thread_count || 0} Threads • ${c.post_count || 0} Posts</span>
+      <div class="forum-cat-card" onclick="AppEngine.filterCategoryM5('${c.id}')" title="${c.name} - ${c.description}">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="icon-badge-box">${svgIcon}</div>
+          <div style="min-width:0; flex:1;">
+            <div class="cat-title">${c.name}</div>
+            <div class="cat-meta">${c.thread_count || 0} Threads • ${c.post_count || 0} Posts</div>
           </div>
         </div>
-        <p style="font-size:0.78rem; color:var(--text-muted); line-height:1.4; margin:0;">${c.description}</p>
+        <p class="cat-desc">${c.description}</p>
       </div>`;
     }).join('');
 
@@ -11017,7 +11277,7 @@ const AppEngine = {
       this.m5Data.categories.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
-        opt.innerText = `${c.icon} ${c.name}`;
+        opt.innerText = c.name;
         sel.appendChild(opt);
       });
     }
@@ -11027,7 +11287,7 @@ const AppEngine = {
       this.m5Data.categories.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
-        opt.innerText = `${c.icon} ${c.name}`;
+        opt.innerText = c.name;
         spSel.appendChild(opt);
       });
     }
@@ -11073,8 +11333,8 @@ const AppEngine = {
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
           <div>
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-              ${t.is_pinned ? '<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.68rem;">📌 PINNED</span>' : ''}
-              <span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); font-size:0.68rem;">${t.category_icon || '🚗'} ${t.category_name || 'Umum'}</span>
+              ${t.is_pinned ? '<span class="tier-badge" style="background:rgba(212,175,55,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.68rem; font-weight:800;">PINNED</span>' : ''}
+              <span class="tier-badge" style="background:rgba(255,255,255,0.06); color:var(--text-main); font-size:0.68rem; font-weight:700;">${t.category_name || 'Umum'}</span>
               <span style="font-size:0.75rem; color:var(--accent-gold); font-family:monospace;">${t.tags || ''}</span>
             </div>
             <h4 style="font-size:1.05rem; cursor:pointer;" onclick="AppEngine.openM5ThreadDetail('${t.id}')">${t.title}</h4>
@@ -11729,10 +11989,10 @@ const M6Engine = {
     const curEvent = this.publishedEvents.find(e => e.id === this.selectedEventId) || this.publishedEvents[0];
 
     const statusBadges = {
-      'VERIFIED': '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-weight:800; padding:4px 10px; font-size:0.75rem;">🟢 DITERIMA</span>',
-      'ACCEPTED': '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-weight:800; padding:4px 10px; font-size:0.75rem;">🟢 DITERIMA</span>',
-      'PENDING': '<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; padding:4px 10px; font-size:0.75rem;">⏳ MENUNGGU VERIFIKASI</span>',
-      'REJECTED': '<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); font-weight:800; padding:4px 10px; font-size:0.75rem;">🔴 DITOLAK</span>'
+      'VERIFIED': '<span class="tier-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Diterima</span>',
+      'ACCEPTED': '<span class="tier-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Diterima</span>',
+      'PENDING': '<span class="tier-badge" style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Menunggu Verifikasi</span>',
+      'REJECTED': '<span class="tier-badge" style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Ditolak</span>'
     };
 
     const getDynamicTierForParticipant = (p) => {
@@ -11760,11 +12020,11 @@ const M6Engine = {
 
     const getTierBadgeFormat = (t) => {
       const tierUpper = (t || 'BRONZE').toUpperCase();
-      if (tierUpper.includes('PLATINUM')) return '<span class="tier-badge" style="background:rgba(168,85,247,0.15); color:#A855F7; border:1px solid #A855F7; font-weight:800; padding:4px 10px; font-size:0.75rem;">💎 PLATINUM</span>';
-      if (tierUpper.includes('GOLD')) return '<span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; padding:4px 10px; font-size:0.75rem;">🥇 GOLD</span>';
-      if (tierUpper.includes('SILVER')) return '<span class="tier-badge" style="background:rgba(192,192,192,0.15); color:#C0C0C0; border:1px solid #C0C0C0; font-weight:800; padding:4px 10px; font-size:0.75rem;">🥈 SILVER</span>';
-      if (tierUpper.includes('BRONZE')) return '<span class="tier-badge" style="background:rgba(205,127,50,0.15); color:#CD7F32; border:1px solid #CD7F32; font-weight:800; padding:4px 10px; font-size:0.75rem;">🥉 BRONZE</span>';
-      return '<span class="tier-badge" style="background:rgba(255,255,255,0.08); color:var(--text-muted); border:1px solid var(--chrome-border); font-weight:800; padding:4px 10px; font-size:0.75rem;">⚪ NON-MEMBER</span>';
+      if (tierUpper.includes('PLATINUM')) return '<span class="tier-badge" style="background:rgba(168,85,247,0.1); color:#c084fc; border:1px solid rgba(168,85,247,0.25); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Platinum</span>';
+      if (tierUpper.includes('GOLD')) return '<span class="tier-badge" style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Gold</span>';
+      if (tierUpper.includes('SILVER')) return '<span class="tier-badge" style="background:rgba(203,213,225,0.1); color:#cbd5e1; border:1px solid rgba(203,213,225,0.25); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Silver</span>';
+      if (tierUpper.includes('BRONZE')) return '<span class="tier-badge" style="background:rgba(249,115,22,0.1); color:#fb923c; border:1px solid rgba(249,115,22,0.25); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Bronze</span>';
+      return '<span class="tier-badge" style="background:rgba(255,255,255,0.05); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Non-Member</span>';
     };
 
     if (cardsContainer) {
@@ -11778,111 +12038,142 @@ const M6Engine = {
             const totalCount = participants.length;
 
             return `
-              <div class="glass-card" style="padding:24px; border:${isSelected ? '2px solid var(--accent-gold)' : '1px solid var(--chrome-border)'}; background:${isSelected ? 'rgba(245,158,11,0.06)' : 'rgba(0,0,0,0.3)'}; box-shadow:${isSelected ? '0 0 24px rgba(245,158,11,0.2)' : 'none'}; transition:all 0.3s ease;">
+              <div class="glass-card" style="padding:24px; border:1px solid ${isSelected ? 'rgba(212,175,55,0.4)' : 'rgba(255,255,255,0.08)'}; background:rgba(255,255,255,0.03); backdrop-filter:blur(14px); border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,0.35); transition:all 0.3s ease;">
                 
                 <!-- TOP HEADER BAR: CODE, TITLE, STATUS -->
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid var(--chrome-border); padding-bottom:12px;" onclick="M6Engine.selectEventToPublish('${e.id}')">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
                   <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                    <span style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.88rem; background:rgba(245,158,11,0.15); padding:4px 12px; border-radius:6px; border:1px solid var(--accent-gold);">${e.code}</span>
-                    <h4 style="color:#fff; font-size:1.15rem; margin:0; font-weight:800;">${e.title}</h4>
-                    <span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-weight:800;">${e.badge_text}</span>
+                    <span style="font-family:monospace; font-weight:700; color:#cbd5e1; font-size:0.78rem; background:rgba(255,255,255,0.04); padding:3px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.12);">${e.code}</span>
+                    <h4 style="color:#fff; font-size:1.2rem; margin:0; font-weight:800;">${e.title}</h4>
+                    <span class="tier-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:600; font-size:0.7rem; padding:3px 10px; border-radius:20px;">${e.badge_text || 'Published'}</span>
                   </div>
-                  ${isSelected ? '<span style="color:var(--accent-gold); font-weight:800; font-size:0.8rem;">⭐ EVENT AKTIF</span>' : '<button class="btn-outline" style="font-size:0.75rem; padding:4px 12px;" onclick="M6Engine.selectEventToPublish(\'${e.id}\')">Pilih Event Ini</button>'}
+                  ${isSelected ? '<span style="color:var(--accent-gold); font-weight:700; font-size:0.75rem; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); padding:3px 10px; border-radius:12px;">Event Aktif</span>' : '<button class="btn-outline" style="font-size:0.75rem; padding:4px 12px; border-radius:8px;" onclick="M6Engine.selectEventToPublish(\'' + e.id + '\')">Pilih Event Ini</button>'}
                 </div>
 
                 <!-- DESCRIPTION & DETAILS GRID -->
-                <div style="display:grid; grid-template-columns:2fr 1.2fr; gap:20px; margin-bottom:16px;">
+                <div style="display:grid; grid-template-columns:2fr 1.2fr; gap:20px; margin-bottom:18px;">
                   <div>
-                    <div style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); margin-bottom:6px;">📝 DESKRIPSI EVENT DITERBITKAN:</div>
-                    <p style="font-size:0.83rem; color:#ddd; line-height:1.6; margin:0 0 12px 0;">${e.description}</p>
-                    <div style="display:flex; gap:16px; font-size:0.8rem; color:var(--text-muted); flex-wrap:wrap;">
-                      <span>📍 <strong>Lokasi:</strong> <span style="color:#fff;">${e.location}</span></span>
-                      <span>👥 <strong>Kapasitas:</strong> <span style="color:var(--accent-gold); font-weight:800;">${e.capacity} Peserta (${e.registered_count} Terdaftar)</span></span>
-                      <span>💰 <strong>HTM:</strong> <span style="color:var(--primary-emerald); font-weight:800;">Rp ${parseInt(e.htm_nett).toLocaleString('id-ID')}</span></span>
+                    <div style="font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px;">Deskripsi Event</div>
+                    <p style="font-size:0.83rem; color:#cbd5e1; line-height:1.6; margin:0 0 14px 0;">${e.description}</p>
+                    
+                    <div style="display:flex; gap:16px; font-size:0.78rem; color:var(--text-muted); flex-wrap:wrap;">
+                      <span style="display:flex; align-items:center; gap:5px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span>Lokasi:</span> <strong style="color:#fff;">${e.location}</strong>
+                      </span>
+                      <span style="display:flex; align-items:center; gap:5px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <span>Kapasitas:</span> <strong style="color:var(--accent-gold);">${e.capacity} Peserta (${e.registered_count} Terdaftar)</strong>
+                      </span>
+                      <span style="display:flex; align-items:center; gap:5px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        <span>HTM:</span> <strong style="color:var(--primary-emerald);">Rp ${parseInt(e.htm_nett).toLocaleString('id-ID')}</strong>
+                      </span>
                     </div>
                   </div>
 
-                  <div style="border-left:1px solid var(--chrome-border); padding-left:18px; display:flex; flex-direction:column; justify-content:center; gap:10px;">
+                  <div style="border-left:1px solid rgba(255,255,255,0.06); padding-left:20px; display:flex; flex-direction:column; justify-content:center; gap:12px;">
                     <div>
-                      <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;">🗓️ WAKTU MULAI EVENT</div>
-                      <strong style="color:var(--primary-emerald); font-size:0.92rem;">${e.start_formatted}</strong>
+                      <div style="font-size:0.7rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:2px; display:flex; align-items:center; gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        Waktu Mulai
+                      </div>
+                      <strong style="color:var(--primary-emerald); font-size:0.88rem;">${e.start_formatted}</strong>
                     </div>
                     <div>
-                      <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;">🏁 WAKTU SELESAI EVENT</div>
-                      <strong style="color:var(--accent-red); font-size:0.92rem;">${e.end_formatted}</strong>
+                      <div style="font-size:0.7rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:2px; display:flex; align-items:center; gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fb7185" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Waktu Selesai
+                      </div>
+                      <strong style="color:#fb7185; font-size:0.88rem;">${e.end_formatted}</strong>
                     </div>
                   </div>
                 </div>
 
-                <!-- UNIFORM ACTION BUTTONS BAR FOR ALL 3 EVENTS -->
-                <div style="display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid var(--chrome-border); padding-top:14px; margin-bottom:20px;">
-                  <button class="btn-primary" style="background:var(--accent-gold); color:#000; font-weight:800; font-size:0.78rem;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.publishEventAction('${e.id}')">🚀 Publikasikan</button>
-                  <button class="btn-primary" style="background:var(--accent-blue); color:#fff; font-weight:800; font-size:0.78rem;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.openMemberRegModal('${e.id}')">🎟️ Daftar Online Event</button>
-                  <button class="btn-primary" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-weight:800; font-size:0.78rem;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.openOfflineRegModal('${e.id}')">📝 Daftar Offline</button>
-                  <button class="btn-primary" style="background:var(--primary-emerald); color:#fff; font-weight:800; font-size:0.78rem;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.openOfficialProposalModal('${e.id}')">📄 Proposal PDF</button>
-                  <button class="btn-outline" style="font-size:0.78rem; font-weight:800;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.openEditPublishedEventModal('${e.id}')">✏️ Edit Deskripsi & Waktu</button>
+                <!-- STANDARDIZED ACTION BUTTONS BAR -->
+                <div style="display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px; margin-bottom:22px;">
+                  <button class="btn-primary" style="background:var(--accent-gold); color:#000; font-weight:700; font-size:0.78rem; border-radius:8px;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.publishEventAction('${e.id}')">Publikasikan</button>
+                  <button class="btn-primary" style="background:linear-gradient(135deg, #d4af37 0%, #b89628 100%); color:#000; font-weight:700; font-size:0.78rem; border-radius:8px;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.openMemberRegModal('${e.id}')">Daftar Online Event</button>
+                  <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.openOfflineRegModal('${e.id}')">Daftar Offline</button>
+                  <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.openOfficialProposalModal('${e.id}')">Proposal PDF</button>
+                  <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id}'); M6Engine.openEditPublishedEventModal('${e.id}')">Edit Data</button>
                 </div>
 
-                <!-- INLINE DAFTAR PESERTA & VERIFIKASI PEMBAYARAN TABLE (NESTED DIRECTLY INSIDE THIS EVENT CONTAINER) -->
-                <div style="background:rgba(0,0,0,0.4); border:1px solid var(--accent-gold); border-radius:12px; padding:18px; margin-top:14px;">
+                <!-- SUBSECTION: DAFTAR PESERTA & VERIFIKASI TIKET -->
+                <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:18px;">
                   <div style="margin-bottom:14px;">
-                    <h5 style="color:var(--accent-gold); font-size:1rem; margin:0 0 4px 0; font-weight:800;">
-                      📋 DAFTAR PESERTA & VERIFIKASI PEMBAYARAN &nbsp;—&nbsp; 
-                      <span style="font-family:monospace; background:rgba(245,158,11,0.2); padding:2px 8px; border-radius:4px; border:1px solid var(--accent-gold);">${e.code}</span> 
-                      <span style="color:#fff;">: ${e.title}</span>
+                    <h5 style="color:#fff; font-size:0.95rem; margin:0 0 2px 0; font-weight:800;">
+                      Daftar Peserta & Verifikasi Tiket
                     </h5>
-                    <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">Verifikasi bukti transfer pembayaran tiket peserta dan cetak Kartu Undangan Event QR Code</p>
+                    <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">Verifikasi bukti transfer pembayaran tiket peserta dan cetak Kartu Undangan Event QR Code</p>
                   </div>
 
-                  <!-- COUNTER & EXPORT BAR -->
-                  <div style="margin-bottom:14px; font-size:0.83rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(255,255,255,0.03); padding:10px 14px; border-radius:8px; border:1px solid var(--chrome-border);">
-                    <div>
-                      <strong style="color:var(--accent-gold);">DAFTAR PESERTA & VERIFIKASI PEMBAYARAN:</strong> <span style="color:#fff; font-weight:800;">${totalCount}/${e.capacity}</span> &nbsp;|&nbsp;
-                      <strong style="color:var(--text-muted);">Verifikasi:</strong> <span style="color:var(--primary-emerald); font-weight:800;">${verifiedCount}</span> &nbsp;|&nbsp;
-                      <strong style="color:var(--text-muted);">Pending:</strong> <span style="color:var(--accent-gold); font-weight:800;">${pendingCount}</span>
+                  <!-- STAT HEADER PILLS & EXPORT BUTTONS -->
+                  <div style="margin-bottom:14px; font-size:0.8rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <span style="background:rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:700;">Total: ${totalCount}/${e.capacity}</span>
+                      <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:700;">Terverifikasi: ${verifiedCount}</span>
+                      <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:700;">Pending: ${pendingCount}</span>
                     </div>
                     <div style="display:flex; gap:8px;">
-                      <button class="btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="alert('📤 Data Peserta Event ${e.code} Berhasil Di-Export ke Excel!')">📤 Export Excel</button>
-                      <button class="btn-outline" style="padding:4px 10px; font-size:0.75rem;" onclick="alert('📤 Data Peserta Event ${e.code} Berhasil Di-Export ke PDF!')">📤 Export PDF</button>
+                      <button class="btn-outline" style="padding:5px 12px; font-size:0.75rem; border-radius:8px; display:flex; align-items:center; gap:5px;" onclick="alert('Data Peserta Event ${e.code} Berhasil Di-Export ke Excel!')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        <span>Export Excel</span>
+                      </button>
+                      <button class="btn-outline" style="padding:5px 12px; font-size:0.75rem; border-radius:8px; display:flex; align-items:center; gap:5px;" onclick="alert('Data Peserta Event ${e.code} Berhasil Di-Export ke PDF!')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        <span>Export PDF</span>
+                      </button>
                     </div>
                   </div>
 
                   <!-- PARTICIPANTS DATA TABLE -->
                   <div style="overflow-x:auto;">
-                    <table class="data-table" style="width:100%; border-collapse:collapse; min-width:850px; font-size:0.82rem;">
+                    <table class="data-table" style="width:100%; border-collapse:collapse; min-width:850px; font-size:0.8rem;">
                       <thead>
-                        <tr style="border-bottom:2px solid var(--accent-gold); color:var(--accent-gold); font-size:0.78rem; text-align:left; background:rgba(0,0,0,0.3);">
-                          <th style="padding:8px; width:35px; text-align:center;">#</th>
-                          <th style="padding:8px;">Nama Peserta</th>
-                          <th style="padding:8px;">Klub</th>
-                          <th style="padding:8px; text-align:center;">Tier</th>
-                          <th style="padding:8px; text-align:right;">Harga Bayar</th>
-                          <th style="padding:8px; text-align:center;">Status Bayar</th>
-                          <th style="padding:8px; text-align:center;">Tanggal Daftar</th>
-                          <th style="padding:8px; text-align:center;">Aksi</th>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.06); color:#94a3b8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; text-align:left; background:rgba(255,255,255,0.02);">
+                          <th style="padding:10px 8px; width:35px; text-align:center; font-weight:600;">#</th>
+                          <th style="padding:10px 8px; font-weight:600;">Nama Peserta</th>
+                          <th style="padding:10px 8px; font-weight:600;">Klub</th>
+                          <th style="padding:10px 8px; text-align:center; font-weight:600;">Tier</th>
+                          <th style="padding:10px 8px; text-align:right; font-weight:600;">Harga Bayar</th>
+                          <th style="padding:10px 8px; text-align:center; font-weight:600;">Status Bayar</th>
+                          <th style="padding:10px 8px; text-align:center; font-weight:600;">Tanggal Daftar</th>
+                          <th style="padding:10px 8px; text-align:center; font-weight:600;">Aksi</th>
                         </tr>
                       </thead>
                       <tbody>
                         ${participants.map((p, idx) => `
-                          <tr style="border-bottom:1px solid var(--chrome-border);">
-                            <td style="padding:8px; text-align:center; font-weight:700; color:var(--accent-gold);">${idx + 1}</td>
-                            <td style="padding:8px;">
+                          <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                            <td style="padding:10px 8px; text-align:center; font-weight:600; color:var(--text-muted);">${idx + 1}</td>
+                            <td style="padding:10px 8px;">
                               <div style="font-weight:700; color:#fff;">${p.name}</div>
-                              <div style="font-size:0.73rem; color:var(--text-muted); font-family:monospace;">${p.member_id || ''} ${p.phone ? '• 📞 ' + p.phone : ''}</div>
+                              <div style="font-size:0.72rem; color:var(--text-muted); font-family:monospace;">${p.member_id || ''} ${p.phone ? '• ' + p.phone : ''}</div>
                             </td>
-                            <td style="padding:8px; font-size:0.78rem; color:var(--text-muted); font-weight:600;">${p.club || 'HQ MB INA'}</td>
-                            <td style="padding:8px; text-align:center;">${getTierBadgeFormat(getDynamicTierForParticipant(p))}</td>
-                            <td style="padding:8px; text-align:right; font-weight:800; color:var(--primary-emerald); white-space:nowrap;">Rp ${new Intl.NumberFormat('id-ID').format(p.htm)}</td>
-                            <td style="padding:8px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
-                            <td style="padding:8px; text-align:center; font-size:0.75rem; color:var(--text-muted); white-space:nowrap;">${(p.created_at || '10/08/2026').split(' ')[0]}</td>
-                            <td style="padding:8px; text-align:center; white-space:nowrap;">
-                              <button class="btn-outline" title="Lihat Bukti Transfer Pembayaran" style="padding:3px 8px; font-size:0.75rem; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:800; border-radius:6px; margin-right:4px;" onclick="M6Engine.viewPaymentProof('${p.id}')">👁️ Bukti</button>
-                              ${(p.status === 'PENDING') ? `
-                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem; color:var(--primary-emerald); border-color:var(--primary-emerald);" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'VERIFIED')" title="Verifikasi Terima">✅</button>
-                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'REJECTED')" title="Tolak">❌</button>
-                              ` : `
-                                <button class="btn-outline" style="padding:2px 6px; font-size:0.72rem;" onclick="M6Engine.viewParticipantKtaQr('${p.id}')" title="Kartu Undangan QR">🎟️</button>
-                              `}
+                            <td style="padding:10px 8px; font-size:0.78rem; color:var(--text-muted);">${p.club || 'HQ MB INA'}</td>
+                            <td style="padding:10px 8px; text-align:center;">${getTierBadgeFormat(getDynamicTierForParticipant(p))}</td>
+                            <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald); white-space:nowrap;">Rp ${new Intl.NumberFormat('id-ID').format(p.htm)}</td>
+                            <td style="padding:10px 8px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
+                            <td style="padding:10px 8px; text-align:center; font-size:0.75rem; color:var(--text-muted); white-space:nowrap;">${(p.created_at || '10/08/2026').split(' ')[0]}</td>
+                            <td style="padding:10px 8px; text-align:center; white-space:nowrap;">
+                              <div style="display:flex; align-items:center; justify-content:center; gap:4px;">
+                                <button class="btn-outline" title="Lihat Bukti Transfer Pembayaran" style="padding:4px 8px; font-size:0.72rem; border-color:rgba(212,175,55,0.3); color:var(--accent-gold); font-weight:600; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" onclick="M6Engine.viewPaymentProof('${p.id}')">
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                  <span>Bukti</span>
+                                </button>
+                                ${(p.status === 'PENDING') ? `
+                                  <button class="btn-outline" style="padding:4px 6px; font-size:0.72rem; color:#34d399; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.06); border-radius:6px;" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'VERIFIED')" title="Setujui Pembayaran">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                  </button>
+                                  <button class="btn-outline" style="padding:4px 6px; font-size:0.72rem; color:#fb7185; border-color:rgba(244,63,94,0.3); background:rgba(244,63,94,0.06); border-radius:6px;" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'REJECTED')" title="Tolak Pembayaran">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                                  </button>
+                                ` : `
+                                  <button class="btn-outline" style="padding:4px 7px; font-size:0.72rem; border-color:rgba(255,255,255,0.1); border-radius:6px;" onclick="M6Engine.viewParticipantKtaQr('${p.id}')" title="Kartu Undangan QR">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                                  </button>
+                                `}
+                              </div>
                             </td>
                           </tr>
                         `).join('')}
@@ -11978,7 +12269,7 @@ const M6Engine = {
       });
     }
 
-    // Strictly deduplicate rawList by member_id / name to prevent duplicated 15 rows
+    // Strictly deduplicate rawList by member_id / name to prevent duplicated rows
     const seen = new Map();
     const cleanList = [];
     rawList.forEach(p => {
@@ -11990,20 +12281,21 @@ const M6Engine = {
     });
 
     return cleanList;
-
-    return rawList;
   },
 
   renderParticipantsTable() {
     const container = document.getElementById('m6-participants-table-container');
-    if (!container) return;
+    if (!container) {
+      this.renderPublishPage();
+      return;
+    }
 
     const curEvent = this.publishedEvents.find(e => e.id === this.selectedEventId) || this.publishedEvents[0];
 
-    // Update section title in DOM
+    // Update section title in DOM if available
     const titleEl = document.getElementById('m6-pub-evt-participant-header-title');
     if (titleEl) {
-      titleEl.innerHTML = `📋 DAFTAR PESERTA & VERIFIKASI PEMBAYARAN &nbsp;—&nbsp; <span style="color:var(--accent-gold); font-family:monospace; background:rgba(245,158,11,0.15); padding:2px 8px; border-radius:4px; border:1px solid var(--accent-gold); font-size:0.9rem;">${curEvent.code}</span> <span style="color:#fff;">: ${curEvent.title}</span>`;
+      titleEl.innerHTML = `Daftar Peserta & Verifikasi Tiket`;
     }
 
     const participants = this.getParticipantsForEvent(curEvent.id);
@@ -12012,10 +12304,10 @@ const M6Engine = {
     const totalCount = participants.length;
 
     const statusBadges = {
-      'VERIFIED': '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-weight:800; padding:4px 10px; font-size:0.75rem;">🟢 DITERIMA</span>',
-      'ACCEPTED': '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-weight:800; padding:4px 10px; font-size:0.75rem;">🟢 DITERIMA</span>',
-      'PENDING': '<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800; padding:4px 10px; font-size:0.75rem;">⏳ MENUNGGU VERIFIKASI</span>',
-      'REJECTED': '<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); font-weight:800; padding:4px 10px; font-size:0.75rem;">🔴 DITOLAK</span>'
+      'VERIFIED': '<span class="tier-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Diterima</span>',
+      'ACCEPTED': '<span class="tier-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Diterima</span>',
+      'PENDING': '<span class="tier-badge" style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Menunggu Verifikasi</span>',
+      'REJECTED': '<span class="tier-badge" style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Ditolak</span>'
     };
 
     const getDynamicTierForParticipant = (p) => {
@@ -12041,56 +12333,84 @@ const M6Engine = {
       return p.tier || 'BRONZE';
     };
 
+    const getTierBadgeFormat = (t) => {
+      const tierUpper = (t || 'BRONZE').toUpperCase();
+      if (tierUpper.includes('PLATINUM')) return '<span class="tier-badge" style="background:rgba(168,85,247,0.1); color:#c084fc; border:1px solid rgba(168,85,247,0.25); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Platinum</span>';
+      if (tierUpper.includes('GOLD')) return '<span class="tier-badge" style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Gold</span>';
+      if (tierUpper.includes('SILVER')) return '<span class="tier-badge" style="background:rgba(203,213,225,0.1); color:#cbd5e1; border:1px solid rgba(203,213,225,0.25); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Silver</span>';
+      if (tierUpper.includes('BRONZE')) return '<span class="tier-badge" style="background:rgba(249,115,22,0.1); color:#fb923c; border:1px solid rgba(249,115,22,0.25); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Bronze</span>';
+      return '<span class="tier-badge" style="background:rgba(255,255,255,0.05); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Non-Member</span>';
+    };
+
     container.innerHTML = `
-      <div style="margin-bottom:14px; font-size:0.85rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <strong>DAFTAR PESERTA & VERIFIKASI PEMBAYARAN:</strong> <span style="color:var(--text-main); font-weight:800;">${totalCount}/150</span> &nbsp;|&nbsp;
-          <strong>Verifikasi:</strong> <span style="color:var(--primary-emerald); font-weight:800;">${verifiedCount}</span> &nbsp;|&nbsp;
-          <strong>Pending:</strong> <span style="color:var(--accent-gold); font-weight:800;">${pendingCount}</span>
+      <div style="margin-bottom:14px; font-size:0.8rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span style="background:rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:700;">Total: ${totalCount}/${curEvent.capacity}</span>
+          <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:700;">Terverifikasi: ${verifiedCount}</span>
+          <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:700;">Pending: ${pendingCount}</span>
         </div>
         <div style="display:flex; gap:8px;">
-          <button class="btn-outline" style="padding:5px 12px; font-size:0.78rem;" onclick="alert('📤 Data Peserta Event Berhasil Di-Export ke Excel!')">📤 Export Excel</button>
-          <button class="btn-outline" style="padding:5px 12px; font-size:0.78rem;" onclick="alert('📤 Data Peserta Event Berhasil Di-Export ke PDF!')">📤 Export PDF</button>
+          <button class="btn-outline" style="padding:5px 12px; font-size:0.75rem; border-radius:8px; display:flex; align-items:center; gap:5px;" onclick="alert('Data Peserta Event Berhasil Di-Export ke Excel!')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            <span>Export Excel</span>
+          </button>
+          <button class="btn-outline" style="padding:5px 12px; font-size:0.75rem; border-radius:8px; display:flex; align-items:center; gap:5px;" onclick="alert('Data Peserta Event Berhasil Di-Export ke PDF!')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            <span>Export PDF</span>
+          </button>
         </div>
       </div>
 
-      <div style="max-height:280px; overflow-y:scroll; overflow-x:auto; border:1px solid var(--accent-gold); border-radius:12px; background:rgba(0,0,0,0.3); box-shadow:inset 0 0 15px rgba(245,158,11,0.15);">
-        <table class="data-table" style="width:100%; border-collapse:collapse; min-width:850px;">
-          <thead style="position:sticky; top:0; z-index:2; background:#111827;">
-            <tr style="border-bottom:2px solid var(--chrome-border); color:var(--text-muted); font-size:0.8rem; text-align:left;">
-              <th style="padding:10px; width:35px; text-align:center;">#</th>
-              <th style="padding:10px;">Nama Peserta</th>
-              <th style="padding:10px;">Klub</th>
-              <th style="padding:10px; text-align:center;">Tier</th>
-              <th style="padding:10px; text-align:right;">Harga Bayar</th>
-              <th style="padding:10px; text-align:center;">Status Bayar</th>
-              <th style="padding:10px; text-align:center;">Tanggal Daftar</th>
-              <th style="padding:10px; text-align:center;">Aksi</th>
+      <div style="max-height:360px; overflow-y:auto; overflow-x:auto; border:1px solid rgba(255,255,255,0.06); border-radius:12px; background:rgba(0,0,0,0.2);">
+        <table class="data-table" style="width:100%; border-collapse:collapse; min-width:850px; font-size:0.8rem;">
+          <thead style="position:sticky; top:0; z-index:2; background:#0b0f19;">
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.06); color:#94a3b8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; text-align:left;">
+              <th style="padding:10px 8px; width:35px; text-align:center; font-weight:600;">#</th>
+              <th style="padding:10px 8px; font-weight:600;">Nama Peserta</th>
+              <th style="padding:10px 8px; font-weight:600;">Klub</th>
+              <th style="padding:10px 8px; text-align:center; font-weight:600;">Tier</th>
+              <th style="padding:10px 8px; text-align:right; font-weight:600;">Harga Bayar</th>
+              <th style="padding:10px 8px; text-align:center; font-weight:600;">Status Bayar</th>
+              <th style="padding:10px 8px; text-align:center; font-weight:600;">Tanggal Daftar</th>
+              <th style="padding:10px 8px; text-align:center; font-weight:600;">Aksi</th>
             </tr>
           </thead>
           <tbody>
             ${participants.map((p, idx) => `
-              <tr style="border-bottom:1px solid var(--chrome-border);">
-                <td style="padding:10px; text-align:center; font-weight:700; color:var(--accent-gold); font-size:0.83rem;">${idx + 1}</td>
-                <td style="padding:10px;">
-                  <div style="font-weight:700; color:var(--text-main); font-size:0.88rem;">${p.name}</div>
-                  <div style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${p.member_id || ''} ${p.phone ? '• 📞 ' + p.phone : ''}</div>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:10px 8px; text-align:center; font-weight:600; color:var(--text-muted);">${idx + 1}</td>
+                <td style="padding:10px 8px;">
+                  <div style="font-weight:700; color:#fff;">${p.name}</div>
+                  <div style="font-size:0.72rem; color:var(--text-muted); font-family:monospace;">${p.member_id || ''} ${p.phone ? '• ' + p.phone : ''}</div>
                 </td>
-                <td style="padding:10px; font-size:0.82rem; color:var(--text-muted); font-weight:600;">${p.club || 'HQ MB INA'}</td>
-                <td style="padding:10px; text-align:center;">${getTierBadgeFormat(getDynamicTierForParticipant(p))}</td>
-                <td style="padding:10px; text-align:right; font-weight:800; color:var(--primary-emerald); font-size:0.88rem; white-space:nowrap;">Rp ${new Intl.NumberFormat('id-ID').format(p.htm)}</td>
-                <td style="padding:10px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
-                <td style="padding:10px; text-align:center; font-size:0.78rem; color:var(--text-muted); white-space:nowrap;">${(p.created_at || '10/08/2026').split(' ')[0]}</td>
-                <td style="padding:10px; text-align:center; white-space:nowrap;">
-                  <button class="btn-outline" title="Lihat Bukti Transfer Pembayaran" style="padding:5px 9px; font-size:0.8rem; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:800; border-radius:8px; margin-right:4px;" onclick="M6Engine.viewPaymentProof('${p.id}')">👁️ Bukti</button>
-                  ${p.status === 'PENDING' ? `
-                    <button class="btn-primary" title="Verifikasi Pembayaran" style="padding:6px 12px; font-size:0.9rem; background:var(--primary-emerald); border-color:var(--primary-emerald); color:#fff; font-weight:800; border-radius:8px; margin-right:4px;" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'VERIFIED')">✅</button>
-                    <button class="btn-outline" title="Tolak Pembayaran" style="padding:5px 11px; font-size:0.9rem; border-color:var(--accent-red); color:var(--accent-red); font-weight:800; border-radius:8px;" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'REJECTED')">❌</button>
-                  ` : (p.status === 'VERIFIED' || p.status === 'ACCEPTED') ? `
-                    <button class="btn-primary" title="Cetak Kartu Undangan Event" style="padding:6px 14px; font-size:0.95rem; font-weight:800; background:var(--accent-gold); color:#000; border-radius:8px;" onclick="M6Engine.viewParticipantKtaQr('${p.id}')">🎟️</button>
-                  ` : `
-                    <button class="btn-outline" title="Re-check / Reset Verifikasi" style="padding:5px 11px; font-size:0.9rem; border-radius:8px;" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'PENDING')">🔄</button>
-                  `}
+                <td style="padding:10px 8px; font-size:0.78rem; color:var(--text-muted);">${p.club || 'HQ MB INA'}</td>
+                <td style="padding:10px 8px; text-align:center;">${getTierBadgeFormat(getDynamicTierForParticipant(p))}</td>
+                <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald); white-space:nowrap;">Rp ${new Intl.NumberFormat('id-ID').format(p.htm)}</td>
+                <td style="padding:10px 8px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
+                <td style="padding:10px 8px; text-align:center; font-size:0.75rem; color:var(--text-muted); white-space:nowrap;">${(p.created_at || '10/08/2026').split(' ')[0]}</td>
+                <td style="padding:10px 8px; text-align:center; white-space:nowrap;">
+                  <div style="display:flex; align-items:center; justify-content:center; gap:4px;">
+                    <button class="btn-outline" title="Lihat Bukti Transfer Pembayaran" style="padding:4px 8px; font-size:0.72rem; border-color:rgba(212,175,55,0.3); color:var(--accent-gold); font-weight:600; border-radius:6px; display:inline-flex; align-items:center; gap:4px;" onclick="M6Engine.viewPaymentProof('${p.id}')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <span>Bukti</span>
+                    </button>
+                    ${p.status === 'PENDING' ? `
+                      <button class="btn-outline" title="Setujui Pembayaran" style="padding:4px 6px; font-size:0.72rem; color:#34d399; border-color:rgba(16,185,129,0.3); background:rgba(16,185,129,0.06); border-radius:6px;" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'VERIFIED')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      </button>
+                      <button class="btn-outline" title="Tolak Pembayaran" style="padding:4px 6px; font-size:0.72rem; color:#fb7185; border-color:rgba(244,63,94,0.3); background:rgba(244,63,94,0.06); border-radius:6px;" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'REJECTED')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                      </button>
+                    ` : (p.status === 'VERIFIED' || p.status === 'ACCEPTED') ? `
+                      <button class="btn-outline" title="Cetak Kartu Undangan Event" style="padding:4px 7px; font-size:0.72rem; border-color:rgba(255,255,255,0.1); border-radius:6px;" onclick="M6Engine.viewParticipantKtaQr('${p.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                      </button>
+                    ` : `
+                      <button class="btn-outline" title="Reset Verifikasi" style="padding:4px 7px; font-size:0.72rem; border-radius:6px;" onclick="M6Engine.verifyParticipantPayment('${p.id}', 'PENDING')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                      </button>
+                    `}
+                  </div>
                 </td>
               </tr>
             `).join('')}
@@ -12098,6 +12418,7 @@ const M6Engine = {
         </table>
       </div>
     `;
+    this.renderPublishPage();
   },
 
   selectedEventId: 'EVT-2026-001',
@@ -13627,11 +13948,11 @@ const M6Engine = {
     }
 
     const statusBadges = {
-      'PENDING': '<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">⏳ PENDING</span>',
-      'APPROVED': '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">✅ ACCEPTED</span>',
-      'ACCEPTED': '<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">✅ ACCEPTED</span>',
-      'REJECTED': '<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red);">❌ REJECTED</span>',
-      'REVISION': '<span class="tier-badge" style="background:rgba(59,130,246,0.2); color:var(--accent-blue); border:1px solid var(--accent-blue);">⏳ REVISION</span>'
+      'PENDING': '<span class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-size:0.72rem; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; font-weight:600;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pending</span>',
+      'APPROVED': '<span class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.72rem; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; font-weight:600;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Accepted</span>',
+      'ACCEPTED': '<span class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.72rem; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; font-weight:600;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Accepted</span>',
+      'REJECTED': '<span class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.2); font-size:0.72rem; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; font-weight:600;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Rejected</span>',
+      'REVISION': '<span class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style="background:rgba(59,130,246,0.1); color:#60a5fa; border:1px solid rgba(59,130,246,0.2); font-size:0.72rem; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; font-weight:600;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Revision</span>'
     };
 
     // Calculate Summary Stats
@@ -13642,15 +13963,15 @@ const M6Engine = {
 
     container.innerHTML = `
       <div style="overflow-x:auto; margin-bottom:16px;">
-        <table class="data-table" style="width:100%; border-collapse:collapse; min-width:750px;">
+        <table class="data-table" style="width:100%; border-collapse:collapse; min-width:750px; font-size:0.82rem;">
           <thead>
-            <tr style="border-bottom:2px solid var(--chrome-border); color:var(--text-muted); font-size:0.8rem; text-align:left; background:rgba(0,0,0,0.15);">
-              <th style="padding:10px; width:130px;">KODE EVENT</th>
-              <th style="padding:10px;">JUDUL EVENT</th>
-              <th style="padding:10px; width:140px;">PENGAJU</th>
-              <th style="padding:10px; width:110px;">TANGGAL</th>
-              <th style="padding:10px; width:130px; text-align:center;">STATUS</th>
-              <th style="padding:10px; width:110px; text-align:center;">AKSI</th>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.06); color:#94a3b8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; text-align:left; background:rgba(255,255,255,0.02);">
+              <th style="padding:10px 12px; width:130px; font-weight:600;">KODE EVENT</th>
+              <th style="padding:10px 12px; font-weight:600;">JUDUL EVENT</th>
+              <th style="padding:10px 12px; width:140px; font-weight:600;">PENGAJU</th>
+              <th style="padding:10px 12px; width:110px; font-weight:600;">TANGGAL</th>
+              <th style="padding:10px 12px; width:130px; text-align:center; font-weight:600;">STATUS</th>
+              <th style="padding:10px 12px; width:110px; text-align:center; font-weight:600;">AKSI</th>
             </tr>
           </thead>
           <tbody>
@@ -13658,21 +13979,39 @@ const M6Engine = {
               const eCode = p.event_code || `EVT-2026-${String(idx + 1).padStart(3, '0')}`;
               const isAccepted = p.status === 'APPROVED' || p.status === 'ACCEPTED';
               return `
-                <tr style="border-bottom:1px solid var(--chrome-border);">
-                  <td style="padding:10px; font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.82rem; white-space:nowrap;">
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                  <td style="padding:12px; font-family:monospace; font-weight:700; color:var(--accent-gold); font-size:0.82rem; white-space:nowrap;">
                     ${eCode}
                   </td>
-                  <td style="padding:10px;">
-                    <div style="font-weight:700; color:var(--text-main); font-size:0.9rem;">${p.title}</div>
-                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">📍 ${p.city || 'Yogyakarta'} • 👥 ${p.capacity || 150} Orang</div>
+                  <td style="padding:12px;">
+                    <div style="font-weight:700; color:#fff; font-size:0.88rem;">${p.title}</div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:4px; flex-wrap:wrap;">
+                      <span class="inline-flex items-center gap-1.5 text-xs text-neutral-400" style="display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; color:#94a3b8;">
+                        <svg class="w-3.5 h-3.5 text-neutral-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        ${p.city || 'Yogyakarta'}
+                      </span>
+                      <span style="color:rgba(255,255,255,0.2);">•</span>
+                      <span class="inline-flex items-center gap-1.5 text-xs text-neutral-400" style="display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; color:#94a3b8;">
+                        <svg class="w-3.5 h-3.5 text-neutral-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        ${p.capacity || 150} Orang
+                      </span>
+                    </div>
                   </td>
-                  <td style="padding:10px; font-size:0.82rem; color:var(--text-muted);">${p.created_by || 'usr_superadmin'}</td>
-                  <td style="padding:10px; font-size:0.82rem; color:var(--text-muted);">${new Date(p.created_at || Date.now()).toLocaleDateString('id-ID')}</td>
-                  <td style="padding:10px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
-                  <td style="padding:10px; text-align:center;">
-                    <button class="btn-primary" style="padding:5px 14px; font-size:0.8rem; font-weight:800; ${isAccepted ? 'background:var(--primary-emerald); border-color:var(--primary-emerald);' : 'background:var(--accent-blue); border-color:var(--accent-blue);'}" onclick="M6Engine.openReviewModal('${p.id}')">
-                      ${isAccepted ? '👁️ View' : '👁️ Review'}
-                    </button>
+                  <td style="padding:12px; font-size:0.78rem; color:var(--text-muted);">${p.created_by || 'usr_superadmin'}</td>
+                  <td style="padding:12px; font-size:0.78rem; color:var(--text-muted);">${new Date(p.created_at || Date.now()).toLocaleDateString('id-ID')}</td>
+                  <td style="padding:12px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
+                  <td style="padding:12px; text-align:center;">
+                    ${isAccepted ? `
+                      <button class="btn-outline" style="background:rgba(255,255,255,0.04); color:#e2e8f0; border:1px solid rgba(255,255,255,0.1); padding:6px 12px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s; cursor:pointer;" onclick="M6Engine.openReviewModal('${p.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>View</span>
+                      </button>
+                    ` : `
+                      <button class="btn-primary" style="background:#f59e0b; color:#0a0a0a; font-weight:600; border:1px solid #f59e0b; padding:6px 14px; border-radius:12px; font-size:0.75rem; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(245,158,11,0.25); transition:all 0.2s; cursor:pointer;" onclick="M6Engine.openReviewModal('${p.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg>
+                        <span>Review</span>
+                      </button>
+                    `}
                   </td>
                 </tr>
               `;
@@ -13682,15 +14021,20 @@ const M6Engine = {
       </div>
 
       <!-- COUNTER BAR REVISED -->
-      <div style="padding:12px 18px; background:rgba(0,0,0,0.25); border:1px solid var(--chrome-border); border-radius:12px; font-size:0.85rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div>
-          📊 <strong>Total Proposal:</strong> <span style="color:var(--text-main); font-weight:800;">${totalCount}</span> &nbsp;|&nbsp;
-          <strong>Pending:</strong> <span style="color:var(--accent-gold); font-weight:800;">${pendingCount}</span> &nbsp;|&nbsp;
-          <strong>Accepted:</strong> <span style="color:var(--primary-emerald); font-weight:800;">${acceptedCount}</span> &nbsp;|&nbsp;
-          <strong>Rejected:</strong> <span style="color:var(--accent-red); font-weight:800;">${rejectedCount}</span>
+      <div style="padding:14px 20px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:14px; font-size:0.8rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span style="display:inline-flex; align-items:center; gap:6px; margin-right:4px; font-weight:600; color:#cbd5e1;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+            Status Proposal:
+          </span>
+          <span style="background:rgba(255,255,255,0.04); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:600;">Total: ${totalCount}</span>
+          <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:600;">Pending: ${pendingCount}</span>
+          <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:600;">Accepted: ${acceptedCount}</span>
+          <span style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.25); padding:2px 10px; border-radius:20px; font-size:0.75rem; font-weight:600;">Rejected: ${rejectedCount}</span>
         </div>
-        <div style="font-size:0.78rem; color:var(--accent-gold);">
-          🛡️ Otorisasi Approval: Presiden, Sekjen, Admin
+        <div style="font-size:0.75rem; color:#94a3b8; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Otorisasi Approval: Presiden, Sekjen, Admin</span>
         </div>
       </div>
     `;
@@ -13735,32 +14079,32 @@ const M6Engine = {
 
     modalBody.innerHTML = `
       <!-- INFORMASI EVENT -->
-      <div style="background:rgba(0,0,0,0.3); padding:16px; border-radius:12px; border:1px solid var(--chrome-border); margin-bottom:16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <div style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px;">─── INFORMASI EVENT ───</div>
-          <div style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.9rem; background:rgba(245,158,11,0.15); padding:2px 10px; border-radius:6px; border:1px solid var(--accent-gold);">
+      <div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--accent-gold); letter-spacing:0.5px; text-transform:uppercase;">Informasi Event</div>
+          <div style="font-family:monospace; font-weight:700; color:var(--accent-gold); font-size:0.85rem; background:rgba(245,158,11,0.12); padding:2px 10px; border-radius:6px; border:1px solid rgba(245,158,11,0.3);">
             ${p.event_code || 'EVT-2026-001'}
           </div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.85rem;">
-          <div><span style="color:var(--text-muted);">Judul Event:</span> <strong style="color:var(--text-main);">${p.title}</strong></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.82rem;">
+          <div><span style="color:var(--text-muted);">Judul Event:</span> <strong style="color:#fff;">${p.title}</strong></div>
           <div><span style="color:var(--text-muted);">Tipe Kegiatan:</span> <strong style="color:var(--accent-gold);">${p.event_type || 'RIDE'}</strong></div>
-          <div><span style="color:var(--text-muted);">Kota Lokasi:</span> <strong style="color:var(--text-main);">${p.city || 'Yogyakarta'}</strong></div>
-          <div><span style="color:var(--text-muted);">Tanggal Event:</span> <strong style="color:var(--text-main);">13 - 14 September 2026</strong></div>
+          <div><span style="color:var(--text-muted);">Kota Lokasi:</span> <strong style="color:#fff;">${p.city || 'Yogyakarta'}</strong></div>
+          <div><span style="color:var(--text-muted);">Tanggal Event:</span> <strong style="color:#fff;">13 - 14 September 2026</strong></div>
           <div><span style="color:var(--text-muted);">Kapasitas Peserta:</span> <strong style="color:var(--accent-gold);">${p.capacity || 150} orang</strong></div>
         </div>
       </div>
 
       <!-- RAB -->
-      <div style="background:rgba(0,0,0,0.3); padding:16px; border-radius:12px; border:1px solid var(--chrome-border); margin-bottom:16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <div style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px;">─── RAB (RENCANA ANGGARAN BIAYA) ───</div>
-          <div style="font-size:0.9rem; font-weight:800; color:var(--accent-red);">Total RAB: Rp ${new Intl.NumberFormat('id-ID').format(p.total_budget || 75000000)}</div>
+      <div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--accent-gold); letter-spacing:0.5px; text-transform:uppercase;">RAB (Rencana Anggaran Biaya)</div>
+          <div style="font-size:0.88rem; font-weight:700; color:#fb7185;">Total RAB: Rp ${new Intl.NumberFormat('id-ID').format(p.total_budget || 75000000)}</div>
         </div>
         <div style="overflow-x:auto;">
-          <table style="width:100%; border-collapse:collapse;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.8rem;">
             <thead>
-              <tr style="border-bottom:1px solid var(--chrome-border); color:var(--text-muted); font-size:0.75rem; text-align:left;">
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.08); color:var(--text-muted); font-size:0.72rem; text-transform:uppercase; text-align:left;">
                 <th style="padding:6px 8px;">Kategori</th>
                 <th style="padding:6px 8px;">Deskripsi</th>
                 <th style="padding:6px 8px; text-align:right;">Jumlah</th>
@@ -13776,51 +14120,54 @@ const M6Engine = {
       </div>
 
       <!-- BEP & HTM -->
-      <div style="background:rgba(0,0,0,0.3); padding:16px; border-radius:12px; border:1px solid var(--chrome-border); margin-bottom:16px;">
-        <div style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:8px;">─── BEP & HTM BREAKDOWN ───</div>
-        <div style="margin-bottom:8px; font-size:0.85rem; color:var(--text-muted);">
+      <div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); margin-bottom:16px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--accent-gold); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:8px;">BEP & HTM Breakdown</div>
+        <div style="margin-bottom:8px; font-size:0.82rem; color:var(--text-muted);">
           BEP Target Minimal: <strong style="color:var(--accent-gold);">${p.bep_ticket_count || 300} Tiket</strong>
         </div>
-        <div style="display:flex; flex-wrap:wrap; gap:10px; font-size:0.8rem;">
-          <div style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px; border:1px solid var(--chrome-border);">HTM Bronze: <strong>Rp 500.000</strong></div>
-          <div style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px; border:1px solid var(--chrome-border);">HTM Silver: <strong>Rp 450.000</strong></div>
-          <div style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px; border:1px solid var(--chrome-border);">HTM Gold: <strong>Rp 400.000</strong></div>
-          <div style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px; border:1px solid var(--chrome-border);">HTM Platinum: <strong>Rp 350.000</strong></div>
-          <div style="background:rgba(255,255,255,0.05); padding:6px 12px; border-radius:8px; border:1px solid var(--chrome-border);">HTM Non-Member: <strong>Rp 500.000</strong></div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:0.78rem;">
+          <div style="background:rgba(255,255,255,0.04); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">HTM Bronze: <strong>Rp 500.000</strong></div>
+          <div style="background:rgba(255,255,255,0.04); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">HTM Silver: <strong>Rp 450.000</strong></div>
+          <div style="background:rgba(255,255,255,0.04); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">HTM Gold: <strong>Rp 400.000</strong></div>
+          <div style="background:rgba(255,255,255,0.04); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">HTM Platinum: <strong>Rp 350.000</strong></div>
+          <div style="background:rgba(255,255,255,0.04); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">HTM Non-Member: <strong>Rp 500.000</strong></div>
         </div>
       </div>
 
       <!-- PROYEKSI KEUNTUNGAN -->
-      <div style="background:rgba(0,0,0,0.3); padding:16px; border-radius:12px; border:1px solid var(--chrome-border); margin-bottom:16px;">
-        <div style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:8px;">─── PROYEKSI KEUNTUNGAN ───</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:0.8rem;">
-          <div style="background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px;">🔴 Skenario Minimal (300 Pax):<br><strong style="color:var(--text-muted);">BEP (Rp 0)</strong></div>
-          <div style="background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px;">🟡 Skenario Realistis (750 Pax):<br><strong style="color:var(--primary-emerald);">+ Rp 37.500.000</strong></div>
-          <div style="background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px;">🟢 Skenario Optimis (1500 Pax):<br><strong style="color:var(--accent-gold);">+ Rp 112.500.000</strong></div>
+      <div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); margin-bottom:16px;">
+        <div style="font-size:0.75rem; font-weight:700; color:var(--accent-gold); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:8px;">Proyeksi Keuntungan</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; font-size:0.78rem;">
+          <div style="background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px;">Skenario Minimal (300 Pax):<br><strong style="color:var(--text-muted);">BEP (Rp 0)</strong></div>
+          <div style="background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px;">Skenario Realistis (750 Pax):<br><strong style="color:var(--primary-emerald);">+ Rp 37.500.000</strong></div>
+          <div style="background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px;">Skenario Optimis (1500 Pax):<br><strong style="color:var(--accent-gold);">+ Rp 112.500.000</strong></div>
         </div>
       </div>
 
       <!-- CATATAN PRESIDEN -->
       <div style="margin-bottom:20px;">
-        <label class="form-label" style="font-size:0.8rem; color:var(--accent-gold); font-weight:800;">─── CATATAN / ALASAN PRESIDEN / SEKJEN / ADMIN ───</label>
+        <label class="form-label" style="font-size:0.78rem; color:var(--accent-gold); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Catatan / Alasan Presiden / Sekjen / Admin</label>
         <textarea id="m6-president-notes" class="form-input" rows="3" placeholder="Tuliskan catatan keputusan persetujuan, alasan penolakan, atau arahan revisi...">${p.president_notes || ''}</textarea>
       </div>
 
       ${!isAuthorized ? `
-        <div style="background:rgba(239,68,68,0.15); border:1px solid var(--accent-red); padding:12px; border-radius:10px; color:var(--accent-red); font-size:0.83rem; text-align:center; font-weight:700;">
-          ⚠️ Role Bendahara / Anggota tidak memiliki wewenang untuk memberikan keputusan approval proposal.
+        <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:12px; border-radius:10px; color:#fb7185; font-size:0.8rem; text-align:center; font-weight:600;">
+          Role Bendahara / Anggota tidak memiliki wewenang untuk memberikan keputusan approval proposal.
         </div>
       ` : `
         <!-- KEPUTUSAN PRESIDEN / SEKJEN / ADMIN BUTTONS -->
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
-          <button class="btn-primary" style="background:var(--primary-emerald); color:#fff; border-color:var(--primary-emerald); padding:12px; font-weight:800; font-size:0.9rem;" onclick="M6Engine.processPresidentDecision('${p.id}', 'APPROVED')">
-            ✅ ACCEPT
+          <button class="btn-primary" style="background:#10b981; color:#fff; border:1px solid #10b981; padding:10px; font-weight:700; font-size:0.85rem; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; gap:6px;" onclick="M6Engine.processPresidentDecision('${p.id}', 'APPROVED')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Setujui (Accept)</span>
           </button>
-          <button class="btn-primary" style="background:var(--accent-red); color:#fff; border-color:var(--accent-red); padding:12px; font-weight:800; font-size:0.9rem;" onclick="M6Engine.processPresidentDecision('${p.id}', 'REJECTED')">
-            ❌ REJECT
+          <button class="btn-primary" style="background:#f43f5e; color:#fff; border:1px solid #f43f5e; padding:10px; font-weight:700; font-size:0.85rem; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; gap:6px;" onclick="M6Engine.processPresidentDecision('${p.id}', 'REJECTED')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span>Tolak (Reject)</span>
           </button>
-          <button class="btn-primary" style="background:var(--accent-gold); color:#000; border-color:var(--accent-gold); padding:12px; font-weight:800; font-size:0.9rem;" onclick="M6Engine.processPresidentDecision('${p.id}', 'REVISION')">
-            ⏳ REVISION
+          <button class="btn-primary" style="background:var(--accent-gold); color:#000; border:1px solid var(--accent-gold); padding:10px; font-weight:700; font-size:0.85rem; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; gap:6px;" onclick="M6Engine.processPresidentDecision('${p.id}', 'REVISION')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Minta Revisi</span>
           </button>
         </div>
       `}
@@ -14412,11 +14759,9 @@ const M6Engine = {
       if (panel) panel.style.display = id === tabId ? 'block' : 'none';
       if (btn) {
         if (id === tabId) {
-          btn.className = 'btn-primary';
-          btn.style.cssText = 'font-size:0.8rem; padding:7px 14px; font-weight:800;';
+          btn.style.cssText = 'background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; box-shadow:0 1px 3px rgba(0,0,0,0.2); cursor:pointer; transition:all 0.2s;';
         } else {
-          btn.className = 'btn-outline';
-          btn.style.cssText = 'font-size:0.8rem; padding:7px 14px; font-weight:800;';
+          btn.style.cssText = 'background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;';
         }
       }
     });
@@ -19307,12 +19652,16 @@ const M8Engine = {
     const ctrEl = document.getElementById('m8-endorse-contracts');
     const rptEl = document.getElementById('m8-endorse-report');
 
-    if (tab === 'packages' || tab === 'all') {
+    if (tab === 'packages') {
       if (pkgEl) pkgEl.style.display = 'block';
-      if (ctrEl) ctrEl.style.display = 'block';
+      if (ctrEl) ctrEl.style.display = 'none';
       if (rptEl) rptEl.style.display = 'none';
     } else if (tab === 'contracts') {
       if (pkgEl) pkgEl.style.display = 'none';
+      if (ctrEl) ctrEl.style.display = 'block';
+      if (rptEl) rptEl.style.display = 'none';
+    } else if (tab === 'all') {
+      if (pkgEl) pkgEl.style.display = 'block';
       if (ctrEl) ctrEl.style.display = 'block';
       if (rptEl) rptEl.style.display = 'none';
     } else if (tab === 'report') {
@@ -19321,17 +19670,27 @@ const M8Engine = {
       if (rptEl) rptEl.style.display = 'block';
     }
 
-    ['packages','contracts','report'].forEach(t => {
+    ['packages','contracts','all','report'].forEach(t => {
       const btn = document.getElementById(`m8-e-tab-${t}`);
-      if (btn) { btn.style.background = ''; btn.style.color = ''; btn.style.borderColor = ''; }
+      if (btn) {
+        btn.classList.remove('active');
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }
     });
     const activeBtn = document.getElementById(`m8-e-tab-${tab}`);
-    if (activeBtn) { activeBtn.style.background = 'rgba(245,158,11,0.2)'; activeBtn.style.color = 'var(--accent-gold)'; activeBtn.style.borderColor = 'var(--accent-gold)'; }
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+      activeBtn.style.background = 'rgba(245,158,11,0.15)';
+      activeBtn.style.color = 'var(--accent-gold)';
+      activeBtn.style.borderColor = 'var(--accent-gold)';
+    }
   },
 
   refreshEndorse: function() {
     this.fetchData();
-    if (window.showToast) window.showToast('🔄 Data Histori Kontrak Endorse Berhasil Diperbarui!', 'info');
+    if (window.showToast) window.showToast('Data histori kontrak endorse berhasil diperbarui.', 'info');
   },
 
   switchIklanTab: function(tab) {
@@ -19344,10 +19703,20 @@ const M8Engine = {
     if (target) target.style.display = 'block';
     ['list','perf','revenue'].forEach(t => {
       const btn = document.getElementById(`m8-a-tab-${t}`);
-      if (btn) { btn.style.background = ''; btn.style.color = ''; btn.style.borderColor = ''; }
+      if (btn) {
+        btn.style.background = 'rgba(255,255,255,0.03)';
+        btn.style.color = '#94a3b8';
+        btn.style.borderColor = 'rgba(255,255,255,0.08)';
+        btn.style.fontWeight = '500';
+      }
     });
     const activeBtn = document.getElementById(`m8-a-tab-${tab}`);
-    if (activeBtn) { activeBtn.style.background = 'rgba(245,158,11,0.2)'; activeBtn.style.color = 'var(--accent-gold)'; activeBtn.style.borderColor = 'var(--accent-gold)'; }
+    if (activeBtn) {
+      activeBtn.style.background = 'rgba(245,158,11,0.1)';
+      activeBtn.style.color = '#fbbf24';
+      activeBtn.style.borderColor = 'rgba(245,158,11,0.4)';
+      activeBtn.style.fontWeight = '600';
+    }
   },
 
   switchLapKeuTab: function(tab) {
@@ -19442,38 +19811,76 @@ const M8Engine = {
   renderPackagesGrid: function() {
     const grid = document.getElementById('m8-packages-grid');
     if (!grid) return;
-    const pkgIcons = { BRONZE: '🥉', SILVER: '🥈', GOLD: '🥇', PLATINUM: '💎', CUSTOM: '✨' };
-    const pkgColors = { BRONZE: '#cd7f32', SILVER: '#94a3b8', GOLD: '#f59e0b', PLATINUM: '#a855f7', CUSTOM: '#22c55e' };
+
+    const pkgSvgIcons = {
+      BRONZE: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+      SILVER: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>`,
+      GOLD: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H7.5a1.5 1.5 0 0 1-1.5-1.5V14"/><path d="M14 14.66V17c0 .55.45 1 1 1h1.5a1.5 1.5 0 0 0 1.5-1.5V14"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>`,
+      PLATINUM: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 18 3 22 9 12 22 2 9 6 3"/><line x1="12" y1="22" x2="12" y2="9"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="6" y1="3" x2="10" y2="9"/><line x1="18" y1="3" x2="14" y2="9"/></svg>`,
+      CUSTOM: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`
+    };
+
+    const pkgBadgeColor = {
+      BRONZE: 'color:#cbd5e1; border-color:rgba(255,255,255,0.12);',
+      SILVER: 'color:#e2e8f0; border-color:rgba(255,255,255,0.18);',
+      GOLD: 'color:var(--accent-gold); border-color:rgba(245,158,11,0.35);',
+      PLATINUM: 'color:#c084fc; border-color:rgba(192,132,252,0.35);',
+      CUSTOM: 'color:#34d399; border-color:rgba(52,211,153,0.35);'
+    };
+
     if (!this.data.packages.length) {
-      grid.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Belum ada paket endorse. Klik "Tambah Paket" untuk menambahkan.</p>';
+      grid.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Belum ada paket endorse. Klik "+ Tambah Paket" untuk menambahkan.</p>';
       return;
     }
+
     grid.innerHTML = this.data.packages.map(pkg => {
-      const icon  = pkgIcons[pkg.name] || '📦';
-      const color = pkgColors[pkg.name] || '#f59e0b';
+      const nameKey = (pkg.name || '').toUpperCase();
+      const svgIcon = pkgSvgIcons[nameKey] || pkgSvgIcons.BRONZE;
+      const isFeatured = nameKey.includes('GOLD') || nameKey.includes('PLATINUM');
+      const badgeStyle = pkgBadgeColor[nameKey] || pkgBadgeColor.GOLD;
+      const cardBorder = isFeatured ? 'border:1px solid rgba(245,158,11,0.38); box-shadow: 0 0 20px rgba(245,158,11,0.08); background: radial-gradient(circle at top right, rgba(245,158,11,0.06), rgba(255,255,255,0.03) 70%);' : 'border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03);';
+
       const benefits = [];
-      if (parseInt(pkg.forum_posts) > 0) benefits.push(`${pkg.forum_posts}x Posting Forum`);
-      if (parseInt(pkg.social_posts) > 0) benefits.push(`${pkg.social_posts}x Posting Sosmed`);
-      if (pkg.banner === true || pkg.banner === 'true' || pkg.banner === 't') benefits.push('🖼️ Banner di Web');
-      if (pkg.mention_event === true || pkg.mention_event === 'true' || pkg.mention_event === 't') benefits.push('🎤 Mention di Event');
+      if (parseInt(pkg.forum_posts) > 0) benefits.push(`${pkg.forum_posts}x Posting Forum Diskusi`);
+      if (parseInt(pkg.social_posts) > 0) benefits.push(`${pkg.social_posts}x Publikasi Media Sosial`);
+      if (pkg.banner === true || pkg.banner === 'true' || pkg.banner === 't') benefits.push('Slot Banner Rotator Header / Web');
+      if (pkg.mention_event === true || pkg.mention_event === 'true' || pkg.mention_event === 't') benefits.push('Sponsor Mention pada Event Resmi');
+
       return `
-        <div class="glass-card" style="padding:20px; border-left:4px solid ${color}; position:relative;">
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-            <span style="font-size:2rem;">${icon}</span>
-            <div>
-              <div style="font-size:1rem; font-weight:900; color:${color};">${pkg.name}</div>
-              <div style="font-size:0.78rem; color:var(--text-muted);">Durasi: ${pkg.duration} Bulan</div>
+        <div class="glass-card" style="padding:20px; border-radius:14px; display:flex; flex-direction:column; justify-content:space-between; ${cardBorder} position:relative; transition:all 0.25s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="icon-badge-box" style="${badgeStyle}">${svgIcon}</div>
+                <div>
+                  <div style="font-size:1.05rem; font-weight:800; color:#ffffff; line-height:1.2;">${pkg.name}</div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">Durasi: ${pkg.duration} Bulan</div>
+                </div>
+              </div>
+              ${isFeatured ? '<span class="tier-badge" style="background:rgba(245,158,11,0.12); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-size:0.65rem; font-weight:700;">UNGGULAN</span>' : ''}
             </div>
+            
+            <div style="font-size:1.35rem; font-weight:900; color:#fff; margin-bottom:14px; font-family:var(--font-heading);">Rp ${new Intl.NumberFormat('id-ID').format(pkg.price)}<span style="font-size:0.75rem; font-weight:400; color:var(--text-muted);"> / bulan</span></div>
+            
+            <ul style="list-style:none; padding:0; margin:0 0 18px; font-size:0.78rem; color:var(--text-muted); line-height:1.6;">
+              ${benefits.map(b => `
+                <li style="display:flex; align-items:center; gap:8px; padding:3px 0;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-emerald); flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>${b}</span>
+                </li>
+              `).join('')}
+            </ul>
           </div>
-          <div style="font-size:1.3rem; font-weight:900; color:#fff; margin-bottom:12px;">Rp ${new Intl.NumberFormat('id-ID').format(pkg.price)}<span style="font-size:0.75rem; font-weight:400; color:var(--text-muted);"> / bulan</span></div>
-          <ul style="list-style:none; padding:0; margin:0 0 16px; font-size:0.8rem; color:var(--text-muted);">
-            ${benefits.map(b => `<li style="padding:3px 0;">✓ ${b}</li>`).join('')}
-          </ul>
-          <div style="display:flex; gap:8px;">
-            <button class="btn-outline" style="flex:1; font-size:0.75rem; padding:5px 8px;" onclick="M8Engine.openPackageModal('${pkg.id}')">✏️ Edit</button>
-            <button class="btn-outline" style="flex:1; font-size:0.75rem; padding:5px 8px; border-color:#ef4444; color:#ef4444;" onclick="M8Engine.deletePackage('${pkg.id}')">🗑️ Hapus</button>
+
+          <div style="display:flex; gap:8px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
+            <button class="btn-outline" style="flex:1; font-size:0.76rem; padding:6px 10px; display:inline-flex; align-items:center; justify-content:center; gap:6px; border-color:rgba(255,255,255,0.12); color:#cbd5e1;" onclick="M8Engine.openPackageModal('${pkg.id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit
+            </button>
+            <button class="btn-outline" style="flex:1; font-size:0.76rem; padding:6px 10px; display:inline-flex; align-items:center; justify-content:center; gap:6px; border-color:rgba(239,68,68,0.25); color:#f87171;" onclick="M8Engine.deletePackage('${pkg.id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Hapus
+            </button>
           </div>
-          ${pkg.is_active ? '' : '<div style="position:absolute; top:12px; right:12px; font-size:0.7rem; background:#374151; color:#9ca3af; padding:2px 8px; border-radius:4px;">NONAKTIF</div>'}
+          ${pkg.is_active ? '' : '<div style="position:absolute; top:12px; right:12px; font-size:0.68rem; background:#374151; color:#9ca3af; padding:2px 8px; border-radius:4px;">NONAKTIF</div>'}
         </div>
       `;
     }).join('');
@@ -19486,7 +19893,7 @@ const M8Engine = {
       c.status = 'ACTIVE';
       c.payment_status = 'PAID';
       this.renderAll();
-      if (window.showToast) window.showToast(`✅ Kontrak Endorse "${c.partner_name}" Berhasil Diaktifkan! Status: ACTIVE.`, 'success');
+      if (window.showToast) window.showToast(`Kontrak Endorse "${c.partner_name}" berhasil diaktifkan.`, 'success');
     }
   },
 
@@ -19498,7 +19905,7 @@ const M8Engine = {
       c.payment_status = 'PAID';
       c.rotator_slot = 2;
       this.renderAll();
-      if (window.showToast) window.showToast(`🎉 Kontrak "${c.partner_name}" Berhasil Dipromosikan ke Active Rotator!`, 'success');
+      if (window.showToast) window.showToast(`Kontrak "${c.partner_name}" berhasil dipromosikan ke Active Rotator.`, 'success');
     }
   },
 
@@ -19506,19 +19913,19 @@ const M8Engine = {
     const tbody = document.getElementById('m8-contracts-tbody');
     if (!tbody) return;
     const statusMap = {
-      ACTIVE: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.72rem; color:#22c55e; background:rgba(34,197,94,0.15); border:1px solid #22c55e;">🟢 ACTIVE</span>',
-      WAITLIST: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.72rem; color:#f59e0b; background:rgba(245,158,11,0.15); border:1px solid #f59e0b;">📌 WAITLIST (#3)</span>',
-      PENDING: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.72rem; color:#eab308; background:rgba(234,179,8,0.15); border:1px solid #eab308;">🟡 PENDING</span>',
-      DRAFT: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.72rem; color:#3b82f6; background:rgba(59,130,246,0.15); border:1px solid #3b82f6;">📝 DRAFT</span>',
-      COMPLETED: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.72rem; color:#94a3b8; background:rgba(148,163,184,0.15); border:1px solid #94a3b8;">🏁 SELESAI</span>',
-      CANCELLED: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:800; font-size:0.72rem; color:#ef4444; background:rgba(239,68,68,0.15); border:1px solid #ef4444;">❌ BATAL</span>'
+      ACTIVE: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.72rem; color:#34d399; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3);">ACTIVE</span>',
+      WAITLIST: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.72rem; color:#fbbf24; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3);">WAITLIST</span>',
+      PENDING: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.72rem; color:#facc15; background:rgba(234,179,8,0.12); border:1px solid rgba(234,179,8,0.3);">PENDING</span>',
+      DRAFT: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.72rem; color:#60a5fa; background:rgba(59,130,246,0.12); border:1px solid rgba(59,130,246,0.3);">DRAFT</span>',
+      COMPLETED: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.72rem; color:#94a3b8; background:rgba(148,163,184,0.12); border:1px solid rgba(148,163,184,0.3);">SELESAI</span>',
+      CANCELLED: '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.72rem; color:#f87171; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3);">BATAL</span>'
     };
     const payMap = {
-      PAID: '<span style="color:#22c55e; font-weight:700;">✅ LUNAS</span>',
-      UNPAID: '<span style="color:#ef4444; font-weight:700;">⏳ BELUM BAYAR</span>',
-      PARTIAL: '<span style="color:#f59e0b; font-weight:700;">🔶 DP / SEBAGIAN</span>'
+      PAID: '<span style="color:#34d399; font-weight:700; font-size:0.72rem;">LUNAS</span>',
+      UNPAID: '<span style="color:#f87171; font-weight:700; font-size:0.72rem;">BELUM BAYAR</span>',
+      PARTIAL: '<span style="color:#fbbf24; font-weight:700; font-size:0.72rem;">DP / SEBAGIAN</span>'
     };
-    const pkgMap = { pkg_bronze: '🥉 BRONZE', pkg_silver: '🥈 SILVER', pkg_gold: '🥇 GOLD', pkg_platinum: '💎 PLATINUM' };
+    const pkgMap = { pkg_bronze: 'BRONZE', pkg_silver: 'SILVER', pkg_gold: 'GOLD', pkg_platinum: 'PLATINUM' };
     if (!this.data.contracts.length) { tbody.innerHTML = '<tr><td colspan="7" style="padding:20px; text-align:center; color:var(--text-muted);">Belum ada kontrak endorse.</td></tr>'; return; }
     tbody.innerHTML = this.data.contracts.map((c, idx) => {
       let rotatorBadge = '';
@@ -19527,30 +19934,30 @@ const M8Engine = {
 
       if (c.status === 'ACTIVE') {
         if (!isPaid) {
-          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#ef4444; font-weight:700; background:rgba(239,68,68,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(239,68,68,0.25);">⏳ Menunggu Pelunasan</div>`;
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#f87171; font-weight:700; background:rgba(239,68,68,0.08); padding:2px 6px; border-radius:4px; border:1px solid rgba(239,68,68,0.2);">Menunggu Pelunasan</div>`;
         } else if (pkgStr.includes('PLATINUM')) {
-          rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#f59e0b; font-weight:800; background:rgba(245,158,11,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(245,158,11,0.3);">🔄 Rotator Header Slot #${(idx % 2) + 1}</div>`;
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:var(--accent-gold); font-weight:700; background:rgba(245,158,11,0.08); padding:2px 6px; border-radius:4px; border:1px solid rgba(245,158,11,0.25);">Rotator Header Slot #${(idx % 2) + 1}</div>`;
         } else if (pkgStr.includes('GOLD')) {
-          rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#60a5fa; font-weight:800; background:rgba(59,130,246,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(59,130,246,0.3);">🔄 Rotator Header / Wall</div>`;
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#60a5fa; font-weight:700; background:rgba(59,130,246,0.08); padding:2px 6px; border-radius:4px; border:1px solid rgba(59,130,246,0.25);">Rotator Header / Wall</div>`;
         } else if (pkgStr.includes('SILVER')) {
-          rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#cbd5e1; font-weight:700; background:rgba(148,163,184,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(148,163,184,0.3);">📌 Sponsor Wall Grid</div>`;
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#cbd5e1; font-weight:700; background:rgba(148,163,184,0.08); padding:2px 6px; border-radius:4px; border:1px solid rgba(148,163,184,0.25);">Sponsor Wall Grid</div>`;
         } else {
-          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#d97706; font-weight:700; background:rgba(217,119,6,0.08); padding:2px 6px; border-radius:4px;">📢 Forum & Social Only</div>`;
+          rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#fbbf24; font-weight:700; background:rgba(245,158,11,0.06); padding:2px 6px; border-radius:4px;">Forum & Media Sosial</div>`;
         }
       } else if (c.status === 'WAITLIST') {
-        rotatorBadge = `<div style="margin-top:4px; font-size:0.72rem; color:#eab308; font-weight:800; background:rgba(234,179,8,0.15); padding:2px 6px; border-radius:4px; border:1px solid #eab308;">📌 WAITLIST Queue #${idx + 1}</div>`;
+        rotatorBadge = `<div style="margin-top:4px; font-size:0.7rem; color:#fbbf24; font-weight:700; background:rgba(245,158,11,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(245,158,11,0.25);">Antrean #${idx + 1}</div>`;
       }
 
       const sponsorId = c.sponsor_id || c.member_id || M8Engine.deriveSponsorId(c.partner_name, idx + 1);
       return `
-        <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.05)'" onmouseout="this.style.background=''">
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.04)'" onmouseout="this.style.background=''">
           <td style="padding:10px 12px; font-weight:700; color:var(--accent-gold); font-size:0.8rem;">
             ${c.contract_number}
             ${rotatorBadge}
           </td>
           <td style="padding:10px 12px; font-size:0.82rem;">
             <div style="font-weight:800; color:#fff; font-size:0.88rem;">${c.partner_name}</div>
-            <div style="font-family:monospace; font-size:0.75rem; font-weight:800; color:var(--accent-gold); margin:2px 0;">🏷️ ${sponsorId}</div>
+            <div style="font-family:monospace; font-size:0.75rem; font-weight:700; color:var(--accent-gold); margin:2px 0;">${sponsorId}</div>
             <div style="font-size:0.75rem; color:var(--text-muted);">${c.contact_person || ''} ${c.contact_phone ? '• ' + c.contact_phone : ''}</div>
           </td>
           <td style="padding:10px 12px; font-size:0.82rem;">${c.package_name ? (pkgMap[c.package_id] || c.package_name) : (pkgMap[c.package_id] || c.package_id)}</td>
@@ -19558,11 +19965,11 @@ const M8Engine = {
           <td style="padding:10px 12px; font-size:0.75rem; color:var(--text-muted);">${c.start_date} – ${c.end_date}</td>
           <td style="padding:10px 12px; text-align:center; font-size:0.8rem;">${statusMap[c.status] || c.status}<br><small>${payMap[c.payment_status] || c.payment_status}</small></td>
           <td style="padding:10px 12px; text-align:center;">
-            <div style="display:flex; gap:4px; justify-content:center; flex-wrap:wrap;">
-              ${c.status === 'WAITLIST' ? `<button class="btn-primary" style="font-size:0.7rem; padding:3px 8px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none;" title="Promosikan ke Rotator Active" onclick="M8Engine.promoteWaitlistContract('${c.id}')">🚀 Promosikan</button>` : ''}
-              ${c.status !== 'ACTIVE' && c.status !== 'WAITLIST' ? `<button class="btn-primary" style="font-size:0.7rem; padding:3px 8px; font-weight:800; background:linear-gradient(135deg,#22c55e,#16a34a); border:none;" title="Setujui & Aktifkan" onclick="M8Engine.approveContract('${c.id}')">✅</button>` : ''}
-              <button class="btn-outline" style="font-size:0.7rem; padding:3px 8px;" title="Edit Kontrak" onclick="M8Engine.openContractModal('${c.id}')">✏️</button>
-              <button class="btn-outline" style="font-size:0.7rem; padding:3px 8px; border-color:#ef4444; color:#ef4444;" title="Hapus Kontrak" onclick="M8Engine.deleteContract('${c.id}')">🗑️</button>
+            <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+              ${c.status === 'WAITLIST' ? `<button class="btn-primary" style="font-size:0.7rem; padding:4px 10px; font-weight:700;" title="Promosikan ke Rotator Active" onclick="M8Engine.promoteWaitlistContract('${c.id}')">Promosikan</button>` : ''}
+              ${c.status !== 'ACTIVE' && c.status !== 'WAITLIST' ? `<button class="btn-primary" style="font-size:0.7rem; padding:4px 8px; font-weight:700;" title="Setujui & Aktifkan" onclick="M8Engine.approveContract('${c.id}')">Setujui</button>` : ''}
+              <button class="btn-outline" style="font-size:0.72rem; padding:4px 8px; color:#cbd5e1;" title="Edit Kontrak" onclick="M8Engine.openContractModal('${c.id}')">Edit</button>
+              <button class="btn-outline" style="font-size:0.72rem; padding:4px 8px; border-color:rgba(239,68,68,0.25); color:#f87171;" title="Hapus Kontrak" onclick="M8Engine.deleteContract('${c.id}')">Hapus</button>
             </div>
           </td>
         </tr>
@@ -19780,47 +20187,51 @@ const M8Engine = {
 
       let warningTag = '';
       if (c.status === 'ACTIVE' && diffDays !== null && diffDays > 0 && diffDays <= 7) {
-        warningTag = `<div style="font-size:0.72rem; color:#f59e0b; font-weight:800; margin-top:3px;">⚠️ ${diffDays} hari lagi expired!</div>`;
+        warningTag = `<div style="font-size:0.7rem; color:#fbbf24; font-weight:600; margin-top:3px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ${diffDays} hari lagi berakhir</div>`;
       } else if (c.status === 'EXPIRED' || (diffDays !== null && diffDays <= 0)) {
         const daysAgo = diffDays !== null ? Math.abs(diffDays) : 0;
-        warningTag = `<div style="font-size:0.72rem; color:#ef4444; font-weight:800; margin-top:3px;">❌ Sudah berakhir ${daysAgo > 0 ? daysAgo + ' hari lalu' : 'hari ini'}</div>`;
+        warningTag = `<div style="font-size:0.7rem; color:#fb7185; font-weight:600; margin-top:3px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Berakhir ${daysAgo > 0 ? daysAgo + ' hari lalu' : 'hari ini'}</div>`;
       }
 
       const pkgStr = String(c.package_name || c.tier || c.notes || '').toUpperCase();
       const tierBadge = pkgStr.includes('PLATINUM')
-        ? '<span style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); padding:2px 7px; border-radius:6px; font-weight:900; font-size:0.72rem; display:inline-block; margin-bottom:4px;">💎 PLATINUM</span>'
+        ? '<span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem; display:inline-block; margin-bottom:4px;">Platinum</span>'
         : pkgStr.includes('GOLD')
-        ? '<span style="background:rgba(59,130,246,0.2); color:#60a5fa; border:1px solid #3b82f6; padding:2px 7px; border-radius:6px; font-weight:900; font-size:0.72rem; display:inline-block; margin-bottom:4px;">🥇 GOLD</span>'
+        ? '<span style="background:rgba(234,179,8,0.1); color:#eab308; border:1px solid rgba(234,179,8,0.25); padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem; display:inline-block; margin-bottom:4px;">Gold</span>'
         : pkgStr.includes('SILVER')
-        ? '<span style="background:rgba(148,163,184,0.2); color:#cbd5e1; border:1px solid #94a3b8; padding:2px 7px; border-radius:6px; font-weight:900; font-size:0.72rem; display:inline-block; margin-bottom:4px;">🥈 SILVER</span>'
-        : '<span style="background:rgba(217,119,6,0.2); color:#f59e0b; border:1px solid #d97706; padding:2px 7px; border-radius:6px; font-weight:900; font-size:0.72rem; display:inline-block; margin-bottom:4px;">🥉 BRONZE</span>';
+        ? '<span style="background:rgba(148,163,184,0.1); color:#94a3b8; border:1px solid rgba(148,163,184,0.25); padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem; display:inline-block; margin-bottom:4px;">Silver</span>'
+        : '<span style="background:rgba(217,119,6,0.1); color:#f59e0b; border:1px solid rgba(217,119,6,0.25); padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem; display:inline-block; margin-bottom:4px;">Bronze</span>';
 
       return `
-        <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.05)'" onmouseout="this.style.background=''">
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
           <td style="padding:12px 14px;">
-            <div style="font-size:0.85rem; font-weight:800; color:#fff;">${c.name}</div>
+            <div style="font-size:0.85rem; font-weight:700; color:#fff;">${c.name}</div>
             <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">Periode: ${pStart} - ${pEnd}</div>
             ${warningTag}
           </td>
           <td style="padding:12px 14px;">
             ${tierBadge}<br>
-            <span style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.72rem;">${c.type}</span>
+            <span style="background:rgba(255,255,255,0.04); color:#cbd5e1; border:1px solid rgba(255,255,255,0.08); padding:2px 8px; border-radius:6px; font-weight:600; font-size:0.7rem;">${c.type}</span>
           </td>
-          <td style="padding:12px 14px; font-size:0.82rem; font-weight:600; color:var(--text-main);">${c.partner_name || '—'}</td>
-          <td style="padding:12px 14px; text-align:right; font-weight:900; font-size:0.85rem; color:var(--accent-gold);">${budgetDisplay}</td>
+          <td style="padding:12px 14px; font-size:0.82rem; font-weight:500; color:var(--text-main);">${c.partner_name || '—'}</td>
+          <td style="padding:12px 14px; text-align:right; font-weight:700; font-size:0.85rem; color:var(--accent-gold);">${budgetDisplay}</td>
           <td style="padding:12px 14px; text-align:center;">
-            <select onchange="M8Engine.updateCampaignStatusInline('${c.id}', this.value)" style="background:#0f172a; color:${c.status === 'ACTIVE' ? '#22c55e' : c.status === 'PAUSED' ? '#94a3b8' : c.status === 'EXPIRED' ? '#ef4444' : '#f59e0b'}; border:1.5px solid ${c.status === 'ACTIVE' ? '#22c55e' : c.status === 'PAUSED' ? '#64748b' : 'var(--accent-gold)'}; padding:4px 8px; border-radius:8px; font-weight:800; font-size:0.75rem; cursor:pointer;">
-              <option value="ACTIVE" ${c.status === 'ACTIVE' ? 'selected' : ''}>🟢 ACTIVE</option>
-              <option value="PAUSED" ${c.status === 'PAUSED' ? 'selected' : ''}>⏸️ PAUSED</option>
-              <option value="DRAFT" ${c.status === 'DRAFT' ? 'selected' : ''}>📝 DRAFT</option>
-              <option value="EXPIRED" ${c.status === 'EXPIRED' ? 'selected' : ''}>🔴 EXPIRED</option>
-              <option value="COMPLETED" ${c.status === 'COMPLETED' ? 'selected' : ''}>🏁 COMPLETED</option>
+            <select onchange="M8Engine.updateCampaignStatusInline('${c.id}', this.value)" style="background:rgba(255,255,255,0.03); color:${c.status === 'ACTIVE' ? '#34d399' : c.status === 'PAUSED' ? '#fbbf24' : c.status === 'EXPIRED' ? '#fb7185' : '#94a3b8'}; border:1px solid ${c.status === 'ACTIVE' ? 'rgba(16,185,129,0.3)' : c.status === 'PAUSED' ? 'rgba(245,158,11,0.3)' : c.status === 'EXPIRED' ? 'rgba(244,63,94,0.3)' : 'rgba(255,255,255,0.1)'}; padding:4px 10px; border-radius:20px; font-weight:600; font-size:0.72rem; cursor:pointer; outline:none;">
+              <option value="ACTIVE" ${c.status === 'ACTIVE' ? 'selected' : ''} style="background:#0b0e14; color:#34d399;">Active</option>
+              <option value="PAUSED" ${c.status === 'PAUSED' ? 'selected' : ''} style="background:#0b0e14; color:#fbbf24;">Paused</option>
+              <option value="DRAFT" ${c.status === 'DRAFT' ? 'selected' : ''} style="background:#0b0e14; color:#94a3b8;">Draft</option>
+              <option value="EXPIRED" ${c.status === 'EXPIRED' ? 'selected' : ''} style="background:#0b0e14; color:#fb7185;">Expired</option>
+              <option value="COMPLETED" ${c.status === 'COMPLETED' ? 'selected' : ''} style="background:#0b0e14; color:#94a3b8;">Completed</option>
             </select>
           </td>
           <td style="padding:12px 14px; text-align:center;">
             <div style="display:flex; gap:6px; justify-content:center;">
-              <button class="btn-outline" style="font-size:0.75rem; padding:4px 8px; border-radius:6px;" title="Edit Iklan" onclick="M8Engine.openCampaignModal('${c.id}')">✏️</button>
-              <button class="btn-outline" style="font-size:0.75rem; padding:4px 8px; border-radius:6px; color:#ef4444; border-color:rgba(239,68,68,0.4);" title="Hapus Iklan" onclick="M8Engine.deleteCampaign('${c.id}')">🗑️</button>
+              <button style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#94a3b8; padding:6px 8px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s;" onmouseover="this.style.color='#fff'; this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.color='#94a3b8'; this.style.background='rgba(255,255,255,0.04)'" title="Edit Iklan" onclick="M8Engine.openCampaignModal('${c.id}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              </button>
+              <button style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fb7185; padding:6px 8px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s;" onmouseover="this.style.background='rgba(244,63,94,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'" title="Hapus Iklan" onclick="M8Engine.deleteCampaign('${c.id}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              </button>
             </div>
           </td>
         </tr>
@@ -21476,51 +21887,65 @@ const M8Engine = {
       const isActive = ad.status === 'ACTIVE';
       const pkgName = (ad.package_name || ad.tier || 'PLATINUM').toUpperCase();
 
-      let tierIcon = '💎';
-      let tierTitle = '💎 PLATINUM SPONSOR';
+      let tierBadge = '<span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem; display:inline-block;">Platinum</span>';
       if (pkgName.includes('GOLD')) {
-        tierIcon = '🥇';
-        tierTitle = '🥇 GOLD SPONSOR';
+        tierBadge = '<span style="background:rgba(234,179,8,0.1); color:#eab308; border:1px solid rgba(234,179,8,0.25); padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem; display:inline-block;">Gold</span>';
       } else if (pkgName.includes('SILVER')) {
-        tierIcon = '🥈';
-        tierTitle = '🥈 SILVER SPONSOR';
+        tierBadge = '<span style="background:rgba(148,163,184,0.1); color:#94a3b8; border:1px solid rgba(148,163,184,0.25); padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem; display:inline-block;">Silver</span>';
       } else if (pkgName.includes('BRONZE')) {
-        tierIcon = '🥉';
-        tierTitle = '🥉 BRONZE SPONSOR';
+        tierBadge = '<span style="background:rgba(217,119,6,0.1); color:#f59e0b; border:1px solid rgba(217,119,6,0.25); padding:2px 8px; border-radius:12px; font-weight:600; font-size:0.7rem; display:inline-block;">Bronze</span>';
       }
 
       const durasiStr = (ad.start_date && ad.end_date)
-        ? `<div style="font-size:0.72rem; color:var(--text-main); font-weight:700;">📅 ${ad.start_date}</div><div style="font-size:0.68rem; color:var(--text-muted);">s/d ${ad.end_date}</div>`
-        : `<span style="font-size:0.72rem; color:#10b981; font-weight:800;">♾️ Selamanya (12 Bln)</span>`;
+        ? `<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; color:#cbd5e1;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${ad.start_date}</div><div style="font-size:0.7rem; color:#64748b; margin-top:2px;">s/d ${ad.end_date}</div>`
+        : `<span style="font-size:0.72rem; color:#34d399; font-weight:600; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 12 Bulan</span>`;
 
       rowsHtml += `
-        <tr style="border-bottom:1px solid rgba(255,255,255,0.05); background:${isFirst && isActive ? 'rgba(245,158,11,0.08)' : 'transparent'}; opacity:${isActive ? '1' : '0.55'};">
-          <td style="padding:8px 10px; text-align:center;">
-            <span style="display:inline-block; padding:2px 8px; border-radius:6px; background:${isFirst && isActive ? 'var(--accent-gold)' : 'rgba(255,255,255,0.1)'}; color:${isFirst && isActive ? '#000' : '#fff'}; font-weight:900; font-size:0.78rem;">#${i + 1}</span>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.04); background:${isFirst && isActive ? 'rgba(245,158,11,0.03)' : 'transparent'}; opacity:${isActive ? '1' : '0.6'}; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='${isFirst && isActive ? 'rgba(245,158,11,0.03)' : 'transparent'}'">
+          <td style="padding:10px 12px; text-align:center;">
+            <span style="font-weight:700; color:${isFirst && isActive ? '#fbbf24' : '#cbd5e1'}; font-size:0.8rem; font-family:monospace;">#${i + 1}</span>
           </td>
-          <td style="padding:8px 10px; text-align:center; font-size:1.25rem;" title="${tierTitle}">
-            ${tierIcon}
+          <td style="padding:10px 12px; text-align:center;">
+            ${tierBadge}
           </td>
-          <td style="padding:8px 10px;">
-            <div style="font-weight:800; color:#fff;">${ad.name}</div>
+          <td style="padding:10px 12px;">
+            <div style="font-weight:700; color:#fff; font-size:0.85rem;">${ad.name}</div>
             <div style="font-size:0.72rem; color:var(--text-muted);">${ad.partner_name || 'MB INA Official Partner'}</div>
           </td>
-          <td style="padding:8px 10px; text-align:center;">
+          <td style="padding:10px 12px; text-align:center;">
             ${durasiStr}
           </td>
-          <td style="padding:8px 10px; text-align:center;">
-            <img src="${ad.banner_url || ad.image_url || 'assets/mb_badge.jpg'}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" alt="${ad.name}" style="height:34px; width:120px; object-fit:contain; background:rgba(0,0,0,0.6); border-radius:6px; border:1px solid rgba(245,158,11,0.3);">
+          <td style="padding:10px 12px; text-align:center;">
+            <div style="display:inline-block; border-radius:8px; border:1px solid rgba(255,255,255,0.1); overflow:hidden; background:rgba(0,0,0,0.5);">
+              <img src="${ad.banner_url || ad.image_url || 'assets/mb_badge.jpg'}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" alt="${ad.name}" style="height:36px; width:110px; object-fit:cover; display:block;">
+            </div>
           </td>
-          <td style="padding:8px 10px; text-align:center; font-size:1.1rem;" title="${isActive ? '🟢 STATUS: AKTIF' : '🔴 STATUS: STOPPED'}">
-            ${isActive ? '🟢' : '🔴'}
+          <td style="padding:10px 12px; text-align:center;">
+            ${isActive 
+              ? '<span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.72rem; padding:2px 8px; border-radius:20px; font-weight:500; display:inline-flex; align-items:center; gap:4px;"><span style="width:5px; height:5px; border-radius:50%; background:#34d399;"></span> Aktif</span>'
+              : '<span style="background:rgba(255,255,255,0.04); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); font-size:0.72rem; padding:2px 8px; border-radius:20px; font-weight:500; display:inline-flex; align-items:center; gap:4px;"><span style="width:5px; height:5px; border-radius:50%; background:#64748b;"></span> Nonaktif</span>'
+            }
           </td>
-          <td style="padding:8px 10px; text-align:center;">
+          <td style="padding:10px 12px; text-align:center;">
             <div style="display:flex; justify-content:center; gap:5px; align-items:center;">
-              <button onclick="M8Engine.moveRotatorOrderUp(${i})" ${isFirst ? 'disabled style="opacity:0.3; cursor:not-allowed; width:28px; height:28px; min-width:28px; padding:0;"' : 'style="width:28px; height:28px; min-width:28px; padding:0;"'} class="btn-outline" title="Naikkan Urutan">▲</button>
-              <button onclick="M8Engine.moveRotatorOrderDown(${i})" ${isLast ? 'disabled style="opacity:0.3; cursor:not-allowed; width:28px; height:28px; min-width:28px; padding:0;"' : 'style="width:28px; height:28px; min-width:28px; padding:0;"'} class="btn-outline" title="Turunkan Urutan">▼</button>
-              <button onclick="M8Engine.openCampaignModal('${ad.id}')" class="btn-outline" style="width:28px; height:28px; min-width:28px; padding:0; border-color:#3b82f6; color:#60a5fa;" title="Edit Banner & Durasi Tampil">✏️</button>
-              <button onclick="M8Engine.toggleRotatorAdStatus('${ad.id}')" class="btn-outline" style="width:28px; height:28px; min-width:28px; padding:0; border-color:${isActive ? '#f59e0b' : '#22c55e'}; color:${isActive ? '#facc15' : '#4ade80'};" title="${isActive ? 'Hentikan Temporer Banner' : 'Aktifkan Kembali Banner'}">${isActive ? '⏸️' : '▶'}</button>
-              <button onclick="M8Engine.deleteRotatorAd('${ad.id}')" class="btn-outline" style="width:28px; height:28px; min-width:28px; padding:0; border-color:#ef4444; color:#f87171;" title="Hapus Banner Rotator Ini Permanen">🗑️</button>
+              <button onclick="M8Engine.moveRotatorOrderUp(${i})" ${isFirst ? 'disabled style="opacity:0.25; cursor:not-allowed; padding:5px 7px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); color:#64748b;"' : 'style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#94a3b8; padding:5px 7px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;"'} title="Naikkan Urutan">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+              </button>
+              <button onclick="M8Engine.moveRotatorOrderDown(${i})" ${isLast ? 'disabled style="opacity:0.25; cursor:not-allowed; padding:5px 7px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); color:#64748b;"' : 'style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#94a3b8; padding:5px 7px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;"'} title="Turunkan Urutan">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <button onclick="M8Engine.openCampaignModal('${ad.id}')" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#94a3b8; padding:5px 7px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;" onmouseover="this.style.color='#fff'; this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.color='#94a3b8'; this.style.background='rgba(255,255,255,0.04)'" title="Edit Banner & Durasi Tampil">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              </button>
+              <button onclick="M8Engine.toggleRotatorAdStatus('${ad.id}')" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:${isActive ? '#fbbf24' : '#34d399'}; padding:5px 7px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;" title="${isActive ? 'Hentikan Temporer Banner' : 'Aktifkan Kembali Banner'}">
+                ${isActive 
+                  ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/></svg>'
+                  : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>'
+                }
+              </button>
+              <button onclick="M8Engine.deleteRotatorAd('${ad.id}')" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fb7185; padding:5px 7px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;" onmouseover="this.style.background='rgba(244,63,94,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'" title="Hapus Banner Rotator">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              </button>
             </div>
           </td>
         </tr>
@@ -21906,7 +22331,9 @@ const M9Engine = {
         window.showToast('🔓 Akses Laporan Keuangan Berhasil Dibuka!', 'success');
       }
       var btn = document.getElementById('m9-subtab-btn-95');
-      if (btn) btn.innerHTML = '💰 Keuangan 🔓';
+      if (btn) {
+        btn.innerHTML = '<span style="display:inline-flex; align-items:center; gap:6px;">Laporan Keuangan <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-emerald);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></span>';
+      }
     }
 
     this.currentSubTab = tab;
@@ -21982,22 +22409,29 @@ const M9Engine = {
   renderTopClubs: function() {
     var el = document.getElementById('m9-top-clubs-list');
     if(!el) return;
-    var medals = ['🥇','🥈','🥉','🏅','🏅'];
     var top5 = this.data.clubRanking.slice(0,5);
     if(!top5.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:20px 0;">Tidak ada data.</div>'; return; }
     var maxM = Math.max.apply(null, top5.map(function(c){ return parseInt(c.member_count||0); }).concat([1]));
     el.innerHTML = top5.map(function(c, i) {
       var score = Math.max(60, 95 - i * 4);
       var pct = Math.round(parseInt(c.member_count||0) / maxM * 100);
-      return '<div style="margin-bottom:12px;">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
-        '<span style="font-size:0.82rem;font-weight:700;">' + (medals[i]||'🏅') + ' ' + c.name + '</span>' +
-        '<span style="font-size:0.72rem;color:var(--accent-gold);font-weight:800;">Skor ' + score + '</span>' +
+      var isTop3 = i < 3;
+      var rankBadge = isTop3 
+        ? '<span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4); color:var(--accent-gold); font-size:0.72rem; font-weight:800; flex-shrink:0;">#' + (i+1) + '</span>'
+        : '<span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:var(--text-muted); font-size:0.72rem; font-weight:700; flex-shrink:0;">#' + (i+1) + '</span>';
+
+      return '<div style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:12px; margin-bottom:12px;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px;">' +
+        '<div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;">' +
+        rankBadge +
+        '<span style="font-size:0.84rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + c.name + '</span>' +
         '</div>' +
-        '<div style="background:rgba(255,255,255,0.08);border-radius:4px;height:6px;overflow:hidden;margin-bottom:2px;">' +
-        '<div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:4px;"></div>' +
+        '<span style="padding:2px 8px; border-radius:6px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); color:var(--accent-gold); font-weight:700; font-size:0.7rem; flex-shrink:0;">Skor ' + score + '</span>' +
         '</div>' +
-        '<div style="font-size:0.7rem;color:var(--text-muted);">' + parseInt(c.member_count||0) + ' member • ' + (c.region||'') + '</div>' +
+        '<div style="background:rgba(255,255,255,0.06); border-radius:4px; height:5px; overflow:hidden; margin-bottom:4px;">' +
+        '<div style="height:100%; width:' + pct + '%; background:linear-gradient(90deg,#f59e0b,#fbbf24); border-radius:4px;"></div>' +
+        '</div>' +
+        '<div style="font-size:0.7rem; color:var(--text-muted);">' + parseInt(c.member_count||0) + ' Member • ' + (c.region||'') + '</div>' +
         '</div>';
     }).join('');
   },
@@ -22013,15 +22447,16 @@ const M9Engine = {
       regionData[r].members += parseInt(c.member_count || 0);
     });
     var regions = Object.entries(regionData).sort(function(a,b){ return b[1].clubs - a[1].clubs; });
-    var regionIcons = { 'DKI Jakarta':'🏙️','Jawa Barat':'🌋','Jawa Tengah':'🌾','Jawa Timur':'⛵','Bali':'🏝️','DI Yogyakarta':'🏛️','Lainnya':'📍' };
     el.innerHTML = regions.map(function(entry) {
       var region = entry[0], data = entry[1];
-      return '<div class="glass-card" style="padding:14px;border-left:3px solid var(--accent-gold);text-align:center;">' +
-        '<div style="font-size:1.6rem;margin-bottom:4px;">' + (regionIcons[region]||'📍') + '</div>' +
-        '<div style="font-size:0.85rem;font-weight:800;color:#fff;margin-bottom:2px;">' + region + '</div>' +
-        '<div style="font-size:1.4rem;font-weight:900;color:var(--accent-gold);">' + data.clubs + '</div>' +
-        '<div style="font-size:0.7rem;color:var(--text-muted);">Klub</div>' +
-        '<div style="font-size:0.72rem;color:#22c55e;margin-top:4px;">' + data.members + ' member</div>' +
+      return '<div class="glass-card" style="padding:14px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); text-align:center; border-radius:12px; transition:all 0.25s ease;" onmouseover="this.style.background=\'rgba(255,255,255,0.05)\'; this.style.borderColor=\'rgba(245,158,11,0.3)\'; this.style.transform=\'translateY(-2px)\';" onmouseout="this.style.background=\'rgba(255,255,255,0.02)\'; this.style.borderColor=\'rgba(255,255,255,0.08)\'; this.style.transform=\'none\';">' +
+        '<div style="margin-bottom:6px; color:var(--text-muted); display:flex; justify-content:center;">' +
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-gold);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
+        '</div>' +
+        '<div style="font-size:0.78rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + region + '</div>' +
+        '<div style="font-size:1.35rem; font-weight:900; color:var(--accent-gold); margin-top:2px; line-height:1.1;">' + data.clubs + '</div>' +
+        '<div style="font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Klub</div>' +
+        '<div style="font-size:0.7rem; color:#34d399; margin-top:6px; font-weight:600;">' + data.members + ' Member</div>' +
         '</div>';
     }).join('');
   },
@@ -22581,8 +23016,8 @@ window.SponsorPortalEngine = {
     }
 
     container.innerHTML = trending.map(tr => `
-      <div style="padding:8px 0; border-bottom:1px solid var(--chrome-border); cursor:pointer;" onclick="if(window.AppEngine && window.AppEngine.openM5ThreadDetail) window.AppEngine.openM5ThreadDetail('${tr.id}')">
-        <strong style="font-size:0.83rem; color:var(--text-main); display:block; line-height:1.3;">🔥 ${tr.title}</strong>
+      <div style="padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" onclick="if(window.AppEngine && window.AppEngine.openM5ThreadDetail) window.AppEngine.openM5ThreadDetail('${tr.id}')">
+        <strong style="font-size:0.83rem; color:var(--text-main); display:block; line-height:1.3;">${tr.title}</strong>
         <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
           <span style="color:var(--accent-gold); font-weight:700;">${tr.replies_count} replies</span> • ${tr.category_name || 'Umum'}
         </div>
@@ -22683,7 +23118,7 @@ window.SponsorPortalEngine = {
     });
 
     if (filtered.length === 0) {
-      container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted); background:var(--bg-card); border-radius:12px;">Belum ada produk sesuai filter.</div>`;
+      container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted); background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">Belum ada produk sesuai filter.</div>`;
       return;
     }
 
@@ -22699,29 +23134,29 @@ window.SponsorPortalEngine = {
       const location = p.location || 'Jakarta';
 
       return `
-        <div class="glass-card" style="padding:14px; border:1px solid var(--chrome-border); border-radius:14px; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.transform='none'; this.style.borderColor='var(--chrome-border)'">
+        <div class="glass-card" style="padding:14px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); border-radius:14px; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'; this.style.borderColor='rgba(212,175,55,0.4)'" onmouseout="this.style.transform='none'; this.style.borderColor='rgba(255,255,255,0.08)'">
           <div>
             <div style="position:relative; margin-bottom:12px; overflow:hidden; border-radius:10px; height:150px; background:#000;">
               <img src="${img}" alt="${title}" style="width:100%; height:100%; object-fit:cover;">
-              <span style="position:absolute; top:8px; left:8px; font-size:0.7rem; font-weight:900; padding:3px 8px; border-radius:6px; background:${cond === 'NEW' ? 'rgba(34,197,94,0.9)' : 'rgba(245,158,11,0.9)'}; color:#000;">
+              <span style="position:absolute; top:8px; left:8px; font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:6px; background:${cond === 'NEW' ? 'rgba(16,185,129,0.9)' : 'rgba(245,158,11,0.9)'}; color:#000;">
                 ${cond === 'NEW' ? 'BARU' : 'BEKAS'}
               </span>
             </div>
 
-            <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:700; margin-bottom:4px;">🏪 ${store}</div>
-            <h4 style="font-size:0.88rem; font-weight:800; color:#fff; margin:0 0 8px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${title}</h4>
-            <div style="font-size:1.05rem; font-weight:900; color:var(--primary-emerald); margin-bottom:8px;">Rp ${new Intl.NumberFormat('id-ID').format(price)}</div>
+            <div style="font-size:0.72rem; color:var(--accent-gold); font-weight:600; margin-bottom:4px;">${store}</div>
+            <h4 style="font-size:0.85rem; font-weight:700; color:#fff; margin:0 0 8px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${title}</h4>
+            <div style="font-size:1rem; font-weight:800; color:var(--primary-emerald); margin-bottom:8px;">Rp ${new Intl.NumberFormat('id-ID').format(price)}</div>
           </div>
 
           <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; margin-bottom:10px;">
-              <span>📍 ${location}</span>
-              <span>⭐ ${rating} (${sold} terjual)</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; margin-bottom:10px;">
+              <span>${location}</span>
+              <span>Skor: ${rating} (${sold} terjual)</span>
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-              <button class="btn-primary" style="font-size:0.72rem; padding:6px; font-weight:800; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; border:none; border-radius:6px;" onclick="alert('Hubungi Penjual (${seller}) via WhatsApp...')">💬 Chat WA</button>
-              <button class="btn-outline" style="font-size:0.72rem; padding:6px; font-weight:700; border-radius:6px;" onclick="alert('Membuka Detail Produk: ${title}')">👁️ Detail</button>
+              <button class="btn-primary" style="font-size:0.72rem; padding:6px; font-weight:700;" onclick="alert('Hubungi Penjual (${seller}) via WhatsApp...')">Chat WA</button>
+              <button class="btn-outline" style="font-size:0.72rem; padding:6px; font-weight:600; color:#cbd5e1;" onclick="alert('Membuka Detail Produk: ${title}')">Detail</button>
             </div>
           </div>
         </div>
@@ -22730,10 +23165,12 @@ window.SponsorPortalEngine = {
   },
 
   showNotifications: function() {
-    if (window.showToast) {
-      window.showToast('🔔 3 Notifikasi: 1 Payment Approved, 1 Active Banner, 12 New Reply Forum!', 'info');
+    if (window.NotificationEngine && typeof window.NotificationEngine.openModal === 'function') {
+      window.NotificationEngine.openModal('SPONSOR');
+    } else if (window.showToast) {
+      window.showToast('3 Notifikasi: 1 Pembayaran Disetujui, 1 Banner Aktif, 12 Balasan Forum Baru', 'info');
     } else {
-      alert('🔔 3 Notifikasi Sponsor Aktif');
+      alert('3 Notifikasi Sponsor Aktif');
     }
   },
 
@@ -23056,3 +23493,265 @@ window.openManageSponsorModal = function() {
     window.AppEngine.openManageSponsorModal();
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────
+// NOTIFICATION ENGINE (GLOBAL NOTIFICATION CENTER FOR MB INA)
+// ─────────────────────────────────────────────────────────────────────
+window.NotificationEngine = {
+  currentTab: 'ALL',
+  
+  notifications: [
+    {
+      id: 'notif_001',
+      category: 'TRANSACTION',
+      title: 'Pembayaran Iuran Tahunan Dikonfirmasi',
+      description: 'Iuran Keanggotaan MB INA Musim 2026/2027 sebesar Rp 250.000 telah diverifikasi dan status E-KTA aktif hingga Agustus 2027.',
+      timestamp: '10 menit lalu',
+      timeISO: '2026-08-30T05:45:00Z',
+      isRead: false,
+      iconType: 'check-circle',
+      targetRole: ['MEMBER', 'SUPER_ADMIN', 'PRESIDEN'],
+      actionText: 'Lihat E-KTA',
+      actionHandler: 'AppEngine.openMemberKtaModal()'
+    },
+    {
+      id: 'notif_002',
+      category: 'EVENT',
+      title: 'Registrasi Jamnas MB INA XXV 2026 Dibuka',
+      description: 'Pendaftaran peserta Jambore Nasional XXV ICE BSD City telah dibuka dengan kuota early bird 500 kendaraan.',
+      timestamp: '1 jam lalu',
+      timeISO: '2026-08-30T04:50:00Z',
+      isRead: false,
+      iconType: 'calendar',
+      targetRole: ['MEMBER', 'SPONSOR', 'SUPER_ADMIN'],
+      actionText: 'Lihat Event',
+      actionHandler: 'AppEngine.navigateToEvent()'
+    },
+    {
+      id: 'notif_003',
+      category: 'FORUM',
+      title: '12 Balasan Baru di Thread Komunitas',
+      description: 'Member lain menanggapi topik "Tips Touring Lintas Sumatra & Perawatan W124".',
+      timestamp: '2 jam lalu',
+      timeISO: '2026-08-30T03:30:00Z',
+      isRead: false,
+      iconType: 'message-square',
+      targetRole: ['MEMBER', 'SPONSOR', 'SUPER_ADMIN'],
+      actionText: 'Buka Thread',
+      actionHandler: 'AppEngine.openForumThreadModal("t1")'
+    },
+    {
+      id: 'notif_004',
+      category: 'TRANSACTION',
+      title: 'Kontrak Sponsorship Platinum Disetujui',
+      description: 'Pembayaran paket Platinum Sponsor FDR Tyre Indonesia sebesar Rp 30.000.000 telah diverifikasi oleh Bendahara Pusat.',
+      timestamp: '3 jam lalu',
+      timeISO: '2026-08-30T02:00:00Z',
+      isRead: false,
+      iconType: 'shield',
+      targetRole: ['SPONSOR', 'SUPER_ADMIN', 'BENDAHARA_PUSAT'],
+      actionText: 'Laporan Sponsor',
+      actionHandler: 'SponsorPortalEngine.scrollToAnalytics()'
+    },
+    {
+      id: 'notif_005',
+      category: 'SYSTEM',
+      title: 'Verifikasi Calon Anggota Baru Pending (4 Antrean)',
+      description: '4 berkas pengajuan registrasi klub dan member baru membutuhkan approval Sekjen & Admin Organisasi.',
+      timestamp: '5 jam lalu',
+      timeISO: '2026-08-30T00:15:00Z',
+      isRead: true,
+      iconType: 'alert-circle',
+      targetRole: ['SUPER_ADMIN', 'SEKRETARIS_PUSAT', 'PRESIDEN'],
+      actionText: 'Buka Antrean',
+      actionHandler: 'AppEngine.switchNav("nav-m4-verifikasi", document.getElementById("nav-m4-verifikasi"))'
+    },
+    {
+      id: 'notif_006',
+      category: 'EVENT',
+      title: 'Dokumentasi & Galeri Touring Trans-Java Terbit',
+      description: 'Foto & video resmi kegiatan Touring Lintas Jawa telah diunggah ke portal galeri media MB INA.',
+      timestamp: '1 hari lalu',
+      timeISO: '2026-08-29T10:00:00Z',
+      isRead: true,
+      iconType: 'calendar',
+      targetRole: ['MEMBER', 'SPONSOR', 'SUPER_ADMIN'],
+      actionText: 'Buka Galeri',
+      actionHandler: 'AppEngine.navigateToForum()'
+    }
+  ],
+
+  getUnreadCount: function() {
+    return this.notifications.filter(n => !n.isRead).length;
+  },
+
+  updateBadgeCounters: function() {
+    const unread = this.getUnreadCount();
+    const globalBadge = document.getElementById('global-notif-badge');
+    const memberBadge = document.getElementById('member-portal-notif-badge');
+    const sponsorBadge = document.querySelector('#view-sponsor-dashboard [title="Notifikasi Sponsor"] span');
+    
+    if (globalBadge) {
+      globalBadge.innerText = unread;
+      globalBadge.style.display = unread > 0 ? 'inline-block' : 'none';
+    }
+    if (memberBadge) {
+      memberBadge.innerText = unread;
+      memberBadge.style.display = unread > 0 ? 'inline-block' : 'none';
+    }
+    if (sponsorBadge) {
+      sponsorBadge.innerText = unread;
+      sponsorBadge.style.display = unread > 0 ? 'inline-block' : 'none';
+    }
+    
+    const countAllEl = document.getElementById('notif-count-all');
+    if (countAllEl) countAllEl.innerText = this.notifications.length;
+  },
+
+  openModal: function(filterContext = null) {
+    if (filterContext === 'SPONSOR') {
+      this.currentTab = 'TRANSACTION';
+    } else if (filterContext === 'MEMBER') {
+      this.currentTab = 'ALL';
+    }
+    
+    this.renderNotifications(this.currentTab);
+    this.updateBadgeCounters();
+    
+    if (window.AuthEngine && typeof window.AuthEngine.openModal === 'function') {
+      window.AuthEngine.openModal('modal-notification-center');
+    } else {
+      const el = document.getElementById('modal-notification-center');
+      if (el) el.style.display = 'flex';
+    }
+  },
+
+  switchTab: function(tabName, btnEl) {
+    this.currentTab = tabName;
+    
+    document.querySelectorAll('.notif-tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+      btn.style.background = 'rgba(255,255,255,0.04)';
+      btn.style.color = '#94a3b8';
+      btn.style.borderColor = 'rgba(255,255,255,0.08)';
+    });
+    
+    if (btnEl) {
+      btnEl.classList.add('active');
+      btnEl.style.background = 'rgba(245,158,11,0.15)';
+      btnEl.style.color = 'var(--accent-gold)';
+      btnEl.style.borderColor = 'rgba(245,158,11,0.3)';
+    }
+    
+    this.renderNotifications(tabName);
+  },
+
+  renderNotifications: function(tab = 'ALL') {
+    const listEl = document.getElementById('notification-center-list');
+    if (!listEl) return;
+    
+    let filtered = this.notifications;
+    if (tab !== 'ALL') {
+      filtered = this.notifications.filter(n => n.category === tab);
+    }
+    
+    if (!filtered.length) {
+      listEl.innerHTML = `
+        <div style="text-align:center; padding:36px 16px; color:var(--text-muted);">
+          <div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; color:var(--text-muted);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div style="font-size:0.9rem; font-weight:700; color:#fff; margin-bottom:4px;">Tidak Ada Notifikasi</div>
+          <div style="font-size:0.78rem;">Kategori ini belum memiliki pemberitahuan baru.</div>
+        </div>
+      `;
+      return;
+    }
+    
+    const getSvgIcon = (type) => {
+      switch(type) {
+        case 'check-circle':
+          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+        case 'calendar':
+          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+        case 'message-square':
+          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+        case 'shield':
+          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+        case 'alert-circle':
+          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        default:
+          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+      }
+    };
+    
+    listEl.innerHTML = filtered.map(item => `
+      <div class="glass-card" style="padding:14px 18px; border-radius:14px; border:1px solid ${item.isRead ? 'rgba(255,255,255,0.06)' : 'rgba(245,158,11,0.25)'}; background:${item.isRead ? 'rgba(255,255,255,0.02)' : 'rgba(245,158,11,0.04)'}; display:flex; gap:14px; align-items:flex-start; justify-content:space-between; transition:all 0.2s ease;">
+        <div style="display:flex; gap:12px; align-items:flex-start; flex:1;">
+          <div style="width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;">
+            ${getSvgIcon(item.iconType)}
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px; flex-wrap:wrap;">
+              <h4 style="font-size:0.88rem; font-weight:700; color:#fff; margin:0;">${item.title}</h4>
+              ${!item.isRead ? `<span style="width:7px; height:7px; border-radius:50%; background:#f43f5e; display:inline-block;" title="Belum dibaca"></span>` : ''}
+              <span style="font-size:0.68rem; color:var(--text-muted); margin-left:auto;">${item.timestamp}</span>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 8px 0; line-height:1.5;">${item.description}</p>
+            <div style="display:flex; gap:8px; align-items:center;">
+              ${item.actionText ? `
+                <button type="button" class="btn-primary" style="font-size:0.72rem; padding:4px 12px; font-weight:700; border-radius:6px;" onclick="NotificationEngine.handleAction('${item.id}', '${item.actionHandler}')">
+                  ${item.actionText}
+                </button>
+              ` : ''}
+              ${!item.isRead ? `
+                <button type="button" class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-radius:6px; color:#cbd5e1;" onclick="NotificationEngine.markAsRead('${item.id}')">
+                  Tandai Dibaca
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  handleAction: function(id, handlerStr) {
+    this.markAsRead(id);
+    if (window.AuthEngine && typeof window.AuthEngine.closeModal === 'function') {
+      window.AuthEngine.closeModal('modal-notification-center');
+    }
+    if (handlerStr) {
+      try {
+        new Function(handlerStr)();
+      } catch(e) {
+        console.error('Action error:', e);
+      }
+    }
+  },
+
+  markAsRead: function(id) {
+    const item = this.notifications.find(n => n.id === id);
+    if (item) {
+      item.isRead = true;
+      this.updateBadgeCounters();
+      this.renderNotifications(this.currentTab);
+    }
+  },
+
+  markAllAsRead: function() {
+    this.notifications.forEach(n => n.isRead = true);
+    this.updateBadgeCounters();
+    this.renderNotifications(this.currentTab);
+    if (window.showToast) {
+      window.showToast('Semua notifikasi telah ditandai sebagai dibaca.', 'success');
+    }
+  }
+};
+
+// Initialize notification counters on ready
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.NotificationEngine && typeof window.NotificationEngine.updateBadgeCounters === 'function') {
+    window.NotificationEngine.updateBadgeCounters();
+  }
+});
