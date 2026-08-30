@@ -387,13 +387,18 @@ const AppEngine = {
     const mClub = document.getElementById('member-portal-club');
     const mTier = document.getElementById('member-portal-tier');
     
-    if (wName) wName.innerText = `Selamat Datang, ${u.name || 'Member MB INA'}`;
+    if (wName) wName.innerText = u.name || 'Member MB INA';
     if (mId) mId.innerText = memberId;
     if (mClub) {
       mClub.innerText = clubName;
       mClub.style.color = hasClub ? 'var(--accent-gold)' : 'var(--accent-blue)';
     }
-    if (mTier) mTier.innerText = `${tierCalc.icon} ${tierName} MEMBER`;
+    if (mTier) {
+      mTier.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        ${tierName} Member
+      `;
+    }
 
     // 💳 Populasikan Kartu Tanda Anggota (KTA Digital) Resmi di Kolom Kiri
     const ktaTierBadge = document.getElementById('kta-tier-badge');
