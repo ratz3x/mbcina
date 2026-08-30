@@ -2248,6 +2248,42 @@ body.light-mode [style*="color: var(--accent-blue)"] {
   color: #0369a1 !important;
 }
 
+/* 14. Notification Center Modal in Light Mode */
+body.light-mode #modal-notification-center .modal-container {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.light-mode #modal-notification-center .modal-header {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+body.light-mode #modal-notification-center .notif-tab-btn {
+  background: #f1f5f9 !important;
+  color: #64748b !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+body.light-mode #modal-notification-center .notif-tab-btn:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.light-mode #modal-notification-center .notif-tab-btn.active {
+  background: #fffbeb !important;
+  color: #b45309 !important;
+  border-color: #fde68a !important;
+  font-weight: 700 !important;
+}
+
+body.light-mode #modal-notification-center .glass-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+
 
 
 
