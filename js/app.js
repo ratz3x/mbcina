@@ -116,6 +116,13 @@ const AppEngine = {
     this.initTheme();
     this.bindAdminTabs();
 
+    // Close M3 member action menus on click outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.m3-action-menu-wrapper')) {
+        this.closeAllM3ActionMenus();
+      }
+    });
+
     // Fetch data asynchronously in background without blocking page load spinner!
     setTimeout(() => {
       this.fetchM2Data();
@@ -8416,38 +8423,47 @@ const AppEngine = {
     const startIndex = (currentPage - 1) * pageSize;
     const paginated = filtered.slice(startIndex, startIndex + pageSize);
 
-    // TIER: icon only + tooltip (no text)
-    const getTierIcon = (t) => {
-      const map = {
-        'PLATINUM': { icon: '💎', color: '#A855F7', bg: 'rgba(168,85,247,0.15)', border: '#A855F7', label: 'PLATINUM' },
-        'GOLD':     { icon: '🥇', color: '#F59E0B', bg: 'rgba(245,158,11,0.15)',  border: '#F59E0B', label: 'GOLD' },
-        'SILVER':   { icon: '🥈', color: '#C0C0C0', bg: 'rgba(192,192,192,0.15)', border: '#C0C0C0', label: 'SILVER' },
-        'BRONZE':   { icon: '🥉', color: '#CD7F32', bg: 'rgba(205,127,50,0.15)',  border: '#CD7F32', label: 'BRONZE' },
-      };
-      const d = map[t] || map['BRONZE'];
-      return `<span title="${d.label} Member" style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:8px; background:${d.bg}; border:1px solid ${d.border}; font-size:1.1rem; cursor:default;">${d.icon}</span>`;
+    // TIER: Minimalist Text Badge Pill
+    const getTierBadge = (t) => {
+      const tier = String(t || 'BRONZE').toUpperCase();
+      if (tier.includes('PLATINUM')) {
+        return `<span style="font-size:10px; font-weight:600; letter-spacing:0.05em; color:#67e8f9; background:rgba(34,211,238,0.1); border:1px solid rgba(34,211,238,0.3); padding:2px 8px; border-radius:6px; text-transform:uppercase; display:inline-block;">Platinum</span>`;
+      }
+      if (tier.includes('GOLD')) {
+        return `<span style="font-size:10px; font-weight:600; letter-spacing:0.05em; color:#fbbf24; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:2px 8px; border-radius:6px; text-transform:uppercase; display:inline-block;">Gold</span>`;
+      }
+      if (tier.includes('SILVER')) {
+        return `<span style="font-size:10px; font-weight:600; letter-spacing:0.05em; color:#94a3b8; background:rgba(148,163,184,0.1); border:1px solid rgba(148,163,184,0.2); padding:2px 8px; border-radius:6px; text-transform:uppercase; display:inline-block;">Silver</span>`;
+      }
+      return `<span style="font-size:10px; font-weight:600; letter-spacing:0.05em; color:#d97706; background:rgba(217,119,6,0.1); border:1px solid rgba(217,119,6,0.2); padding:2px 8px; border-radius:6px; text-transform:uppercase; display:inline-block;">Bronze</span>`;
     };
 
-    // STATUS: text only, no icon
+    // STATUS: Status Dot Indicator Pill
     const getStatusBadge = (s) => {
-      if (s === 'ACTIVE')    return `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-size:0.7rem;">ACTIVE</span>`;
-      if (s === 'PENDING')   return `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.7rem;">PENDING</span>`;
-      if (s === 'SUSPENDED') return `<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); font-size:0.7rem;">SUSPENDED</span>`;
-      return `<span class="tier-badge" style="background:rgba(100,116,139,0.2); color:var(--text-muted); font-size:0.7rem;">${s}</span>`;
+      if (s === 'ACTIVE') {
+        return `<span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.72rem; padding:3px 10px; border-radius:20px; font-weight:500; display:inline-flex; align-items:center; gap:6px;"><span style="width:6px; height:6px; border-radius:50%; background:#34d399;"></span> Active</span>`;
+      }
+      if (s === 'PENDING') {
+        return `<span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-size:0.72rem; padding:3px 10px; border-radius:20px; font-weight:500; display:inline-flex; align-items:center; gap:6px;"><span style="width:6px; height:6px; border-radius:50%; background:#fbbf24;"></span> Pending</span>`;
+      }
+      if (s === 'SUSPENDED') {
+        return `<span style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.2); font-size:0.72rem; padding:3px 10px; border-radius:20px; font-weight:500; display:inline-flex; align-items:center; gap:6px;"><span style="width:6px; height:6px; border-radius:50%; background:#fb7185;"></span> Suspended</span>`;
+      }
+      return `<span style="background:rgba(255,255,255,0.04); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); font-size:0.72rem; padding:3px 10px; border-radius:20px; font-weight:500; display:inline-flex; align-items:center; gap:6px;"><span style="width:6px; height:6px; border-radius:50%; background:#64748b;"></span> ${s}</span>`;
     };
 
     container.innerHTML = `
       <div style="overflow-x:auto;">
       <table class="data-table" style="width:100%; border-collapse:collapse; table-layout:auto; min-width:750px;">
         <thead>
-          <tr style="border-bottom:2px solid var(--chrome-border); text-align:left; color:var(--text-muted); font-size:0.8rem; background:rgba(0,0,0,0.15);">
-            <th style="padding:10px 10px; white-space:nowrap;">ID MEMBER</th>
-            <th style="padding:10px 10px;">NAMA & KONTAK</th>
-            <th style="padding:10px 10px;">KLUB / CHAPTER</th>
-            <th style="padding:10px 10px; text-align:center; white-space:nowrap;">TIER</th>
-            <th style="padding:10px 10px; text-align:center; white-space:nowrap;">STATUS</th>
-            <th style="padding:10px 10px; white-space:nowrap;">TOTAL DONASI</th>
-            <th style="padding:10px 10px; text-align:center; width:120px;">AKSI</th>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06); text-align:left; color:#94a3b8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.01);">
+            <th style="padding:12px 14px; white-space:nowrap;">ID MEMBER</th>
+            <th style="padding:12px 14px;">NAMA & KONTAK</th>
+            <th style="padding:12px 14px;">KLUB / CHAPTER</th>
+            <th style="padding:12px 14px; text-align:center; white-space:nowrap;">TIER</th>
+            <th style="padding:12px 14px; text-align:center; white-space:nowrap;">STATUS</th>
+            <th style="padding:12px 14px; white-space:nowrap;">TOTAL DONASI</th>
+            <th style="padding:12px 14px; text-align:center; width:120px;">AKSI</th>
           </tr>
         </thead>
         <tbody>
@@ -8464,40 +8480,69 @@ const AppEngine = {
             const tierCalc = this.calculateMemberTier(realTotal);
             const displayTier = (realTotal > 0 || m.tier) ? tierCalc.tier : 'BRONZE';
 
+            const donationDisplay = realTotal > 0
+              ? `<span style="color:#34d399; font-family:monospace; font-size:0.75rem; font-weight:600;">Rp ${new Intl.NumberFormat('id-ID').format(realTotal)}</span>`
+              : `<span style="color:#64748b; font-family:monospace; font-size:0.75rem;">Rp 0</span>`;
+
             return `
-            <tr class="m3-member-row" data-mid="${m.id}" style="border-bottom:1px solid var(--chrome-border); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background=''">
-              <td style="font-family:monospace; font-weight:800; color:var(--accent-gold); font-size:0.78rem; padding:10px; white-space:nowrap;">
-                ${m.member_id || '<span style="color:var(--accent-red); font-size:0.72rem;">[PENDING ID]</span>'}
+            <tr class="m3-member-row" data-mid="${m.id}" style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+              <td style="font-family:monospace; font-weight:700; color:#fbbf24; font-size:0.78rem; padding:12px 14px; white-space:nowrap;">
+                ${m.member_id || '<span style="color:#fb7185; font-size:0.72rem;">[PENDING ID]</span>'}
               </td>
-              <td style="padding:10px;">
-                <div style="font-weight:700; color:var(--text-main); font-size:0.88rem;">${m.name}</div>
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:3px;">
-                  ${m.email} • <span style="color:var(--accent-gold); font-weight:700;">📞 ${m.phone || '-'}</span>
+              <td style="padding:12px 14px;">
+                <div style="font-weight:600; color:#fff; font-size:0.85rem;">${m.name}</div>
+                <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+                  ${m.email} ${m.phone ? `• <span style="color:#cbd5e1;">${m.phone}</span>` : ''}
                 </div>
               </td>
-              <td style="font-size:0.82rem; padding:10px; color:var(--text-muted);">${m.club || m.club_name || 'HQ MB INA'}</td>
-              <td style="padding:10px; text-align:center;">${getTierIcon(displayTier)}</td>
-              <td style="padding:10px; text-align:center;">${getStatusBadge(m.status)}</td>
-              <td style="font-weight:800; color:var(--primary-emerald); font-size:0.85rem; padding:10px; white-space:nowrap;">
-                Rp ${new Intl.NumberFormat('id-ID').format(realTotal)}
+              <td style="font-size:0.8rem; padding:12px 14px; color:var(--text-muted);">${m.club || m.club_name || 'HQ MB INA'}</td>
+              <td style="padding:12px 14px; text-align:center;">${getTierBadge(displayTier)}</td>
+              <td style="padding:12px 14px; text-align:center;">${getStatusBadge(m.status)}</td>
+              <td style="padding:12px 14px; white-space:nowrap;">
+                ${donationDisplay}
               </td>
-              <td style="padding:10px; text-align:center;">
-                <div style="display:inline-flex; gap:5px; justify-content:center;">
-                  <button class="m3-btn-detail" data-id="${m.id}" title="👁️ Detail Profile Member"
-                    style="width:32px; height:32px; border-radius:8px; border:1px solid var(--accent-blue); background:rgba(59,130,246,0.1); color:var(--accent-blue); cursor:pointer; font-size:0.95rem; display:flex; align-items:center; justify-content:center; transition:all 0.15s;"
-                    onmouseover="this.style.background='rgba(59,130,246,0.25)'" onmouseout="this.style.background='rgba(59,130,246,0.1)'">👁️</button>
-                  <button class="m3-btn-kta" data-id="${m.id}" title="💳 Cetak Kartu Tanda Anggota (KTA)"
-                    style="width:32px; height:32px; border-radius:8px; border:1px solid var(--accent-gold); background:rgba(212,175,55,0.15); color:var(--accent-gold); cursor:pointer; font-size:0.95rem; display:flex; align-items:center; justify-content:center; transition:all 0.15s;"
-                    onmouseover="this.style.background='rgba(212,175,55,0.3)'" onmouseout="this.style.background='rgba(212,175,55,0.15)'">💳</button>
-                  <button class="m3-btn-edit" data-id="${m.id}" title="✏️ Edit Data Member"
-                    style="width:32px; height:32px; border-radius:8px; border:1px solid var(--accent-gold); background:rgba(245,158,11,0.1); color:var(--accent-gold); cursor:pointer; font-size:0.95rem; display:flex; align-items:center; justify-content:center; transition:all 0.15s;"
-                    onmouseover="this.style.background='rgba(245,158,11,0.25)'" onmouseout="this.style.background='rgba(245,158,11,0.1)'">✏️</button>
-                  <button class="m3-btn-donasi" data-id="${m.id}" title="💰 Catat Donasi & Upgrade Tier"
-                    style="width:32px; height:32px; border-radius:8px; border:1px solid var(--primary-emerald); background:rgba(16,185,129,0.1); color:var(--primary-emerald); cursor:pointer; font-size:0.95rem; display:flex; align-items:center; justify-content:center; transition:all 0.15s;"
-                    onmouseover="this.style.background='rgba(16,185,129,0.25)'" onmouseout="this.style.background='rgba(16,185,129,0.1)'">💰</button>
-                  <button class="m3-btn-delete" data-id="${m.id}" title="🗑️ Hapus Member"
-                    style="width:32px; height:32px; border-radius:8px; border:1px solid var(--accent-red); background:rgba(239,68,68,0.1); color:var(--accent-red); cursor:pointer; font-size:0.95rem; display:flex; align-items:center; justify-content:center; transition:all 0.15s;"
-                    onmouseover="this.style.background='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">🗑️</button>
+              <td style="padding:12px 14px; text-align:center;">
+                <div style="display:inline-flex; gap:6px; align-items:center; justify-content:center;">
+                  <!-- View / Detail Profile -->
+                  <button class="m3-btn-detail" data-id="${m.id}" title="Detail Profile Member"
+                    style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; padding:6px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s;"
+                    onmouseover="this.style.color='#ffffff'; this.style.background='rgba(255,255,255,0.08)'"
+                    onmouseout="this.style.color='#94a3b8'; this.style.background='rgba(255,255,255,0.04)'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+
+                  <!-- Edit Member -->
+                  <button class="m3-btn-edit" data-id="${m.id}" title="Edit Data Member"
+                    style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; padding:6px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s;"
+                    onmouseover="this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(245,158,11,0.1)'"
+                    onmouseout="this.style.color='#94a3b8'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  </button>
+
+                  <!-- Secondary Actions Context Dropdown Menu -->
+                  <div class="m3-action-menu-wrapper" style="position:relative; display:inline-block;">
+                    <button class="m3-btn-more" onclick="AppEngine.toggleM3ActionMenu(event, '${m.id}')" title="Aksi Lainnya"
+                      style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; padding:6px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all 0.2s;"
+                      onmouseover="this.style.color='#ffffff'; this.style.background='rgba(255,255,255,0.08)'"
+                      onmouseout="this.style.color='#94a3b8'; this.style.background='rgba(255,255,255,0.04)'">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                    </button>
+                    <div id="m3-menu-${m.id}" class="m3-action-dropdown-menu" style="display:none; position:absolute; right:0; top:calc(100% + 4px); background:#0b0e14; border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:6px; min-width:170px; z-index:99; box-shadow:0 10px 25px rgba(0,0,0,0.8); text-align:left; backdrop-filter:blur(16px);">
+                      <button onclick="AppEngine.openKtaModal('${m.id}'); AppEngine.closeAllM3ActionMenus();" style="width:100%; display:flex; align-items:center; gap:8px; padding:8px 10px; background:transparent; border:none; color:#cbd5e1; font-size:0.75rem; border-radius:8px; cursor:pointer; text-align:left; transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#cbd5e1';">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                        <span>Cetak E-KTA</span>
+                      </button>
+                      <button onclick="AppEngine.openM3AddDonationModal('${m.id}'); AppEngine.closeAllM3ActionMenus();" style="width:100%; display:flex; align-items:center; gap:8px; padding:8px 10px; background:transparent; border:none; color:#cbd5e1; font-size:0.75rem; border-radius:8px; cursor:pointer; text-align:left; transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#fff';" onmouseout="this.style.background='transparent'; this.style.color='#cbd5e1';">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+                        <span>Catat Donasi</span>
+                      </button>
+                      <div style="height:1px; background:rgba(255,255,255,0.08); margin:4px 0;"></div>
+                      <button onclick="AppEngine.deleteM3Member('${m.id}'); AppEngine.closeAllM3ActionMenus();" style="width:100%; display:flex; align-items:center; gap:8px; padding:8px 10px; background:transparent; border:none; color:#fb7185; font-size:0.75rem; border-radius:8px; cursor:pointer; text-align:left; transition:all 0.15s;" onmouseover="this.style.background='rgba(244,63,94,0.1)'; this.style.color='#f43f5e';" onmouseout="this.style.background='transparent'; this.style.color='#fb7185';">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        <span>Hapus Member</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -8508,15 +8553,15 @@ const AppEngine = {
       </div>
 
       <!-- PAGINATION CONTROLS BAR -->
-      <div class="m3-pagination-bar" style="margin-top:16px; padding:12px 16px; background:rgba(0,0,0,0.2); border:1px solid var(--chrome-border); border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div style="font-size:0.82rem; color:var(--text-muted);">
+      <div class="m3-pagination-bar" style="margin-top:16px; padding:12px 16px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.06); border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="font-size:0.8rem; color:var(--text-muted);">
           Menampilkan <strong style="color:var(--accent-gold);">${totalCount === 0 ? 0 : startIndex + 1} - ${Math.min(startIndex + pageSize, totalCount)}</strong> dari <strong style="color:var(--text-main);">${totalCount}</strong> member (Total <strong style="color:var(--text-main);">${this.m3Data.members.length}</strong>)
         </div>
 
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--text-muted);">
+          <div style="display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--text-muted);">
             <span>Tampilkan:</span>
-            <select id="m3-page-size-select" class="form-input" style="padding:3px 8px; font-size:0.78rem; width:auto;" onchange="AppEngine.changeM3PageSize(this.value)">
+            <select id="m3-page-size-select" class="form-input" style="padding:3px 8px; font-size:0.75rem; width:auto; border-radius:8px;" onchange="AppEngine.changeM3PageSize(this.value)">
               <option value="10" ${pageSize === 10 ? 'selected' : ''}>10 / hal</option>
               <option value="25" ${pageSize === 25 ? 'selected' : ''}>25 / hal</option>
               <option value="50" ${pageSize === 50 ? 'selected' : ''}>50 / hal</option>
@@ -8525,18 +8570,18 @@ const AppEngine = {
           </div>
 
           <div style="display:flex; gap:4px; align-items:center;">
-            <button class="btn-outline" style="padding:4px 10px; font-size:0.78rem;" ${currentPage <= 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} onclick="AppEngine.setM3Page(${currentPage - 1})">◀ Prev</button>
+            <button class="btn-outline" style="padding:4px 10px; font-size:0.75rem; border-radius:8px;" ${currentPage <= 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} onclick="AppEngine.setM3Page(${currentPage - 1})">◀ Prev</button>
 
             ${Array.from({length: totalPages}, (_, i) => i + 1)
               .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
               .map((p, idx, arr) => {
                 const prev = arr[idx - 1];
                 const ellipsis = prev && p - prev > 1 ? '<span style="color:var(--text-muted); padding:0 2px;">...</span>' : '';
-                const activeStyle = p === currentPage ? 'background:var(--accent-gold); color:#000; font-weight:800; border-color:var(--accent-gold);' : '';
-                return `${ellipsis}<button class="btn-outline" style="padding:4px 9px; font-size:0.78rem; ${activeStyle}" onclick="AppEngine.setM3Page(${p})">${p}</button>`;
+                const activeStyle = p === currentPage ? 'background:rgba(245,158,11,0.15); color:#fbbf24; font-weight:700; border-color:rgba(245,158,11,0.4);' : 'border-radius:8px;';
+                return `${ellipsis}<button class="btn-outline" style="padding:4px 9px; font-size:0.75rem; border-radius:8px; ${activeStyle}" onclick="AppEngine.setM3Page(${p})">${p}</button>`;
               }).join('')}
 
-            <button class="btn-outline" style="padding:4px 10px; font-size:0.78rem;" ${currentPage >= totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} onclick="AppEngine.setM3Page(${currentPage + 1})">Next ▶</button>
+            <button class="btn-outline" style="padding:4px 10px; font-size:0.75rem; border-radius:8px;" ${currentPage >= totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''} onclick="AppEngine.setM3Page(${currentPage + 1})">Next ▶</button>
           </div>
         </div>
       </div>
@@ -8546,17 +8591,27 @@ const AppEngine = {
     container.querySelectorAll('.m3-btn-detail').forEach(btn => {
       btn.addEventListener('click', () => AppEngine.openM3MemberDetail(btn.dataset.id));
     });
-    container.querySelectorAll('.m3-btn-kta').forEach(btn => {
-      btn.addEventListener('click', () => AppEngine.openKtaModal(btn.dataset.id));
-    });
     container.querySelectorAll('.m3-btn-edit').forEach(btn => {
       btn.addEventListener('click', () => AppEngine.openEditM3MemberModal(btn.dataset.id));
     });
-    container.querySelectorAll('.m3-btn-donasi').forEach(btn => {
-      btn.addEventListener('click', () => AppEngine.openM3AddDonationModal(btn.dataset.id));
-    });
-    container.querySelectorAll('.m3-btn-delete').forEach(btn => {
-      btn.addEventListener('click', () => AppEngine.deleteM3Member(btn.dataset.id));
+  },
+
+  toggleM3ActionMenu(e, id) {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    const targetMenu = document.getElementById(`m3-menu-${id}`);
+    const isAlreadyOpen = targetMenu && targetMenu.style.display === 'block';
+    this.closeAllM3ActionMenus();
+    if (targetMenu && !isAlreadyOpen) {
+      targetMenu.style.display = 'block';
+    }
+  },
+
+  closeAllM3ActionMenus() {
+    document.querySelectorAll('.m3-action-dropdown-menu').forEach(menu => {
+      menu.style.display = 'none';
     });
   },
 
