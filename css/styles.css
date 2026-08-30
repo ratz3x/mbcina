@@ -2283,6 +2283,33 @@ body.light-mode #modal-notification-center .glass-card {
   border: 1px solid #e2e8f0 !important;
 }
 
+/* 15. Custom Slim Scrollbar for Notification Center */
+#notification-center-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+#notification-center-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#notification-center-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+#notification-center-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+body.light-mode #notification-center-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+body.light-mode #notification-center-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+
 
 
 

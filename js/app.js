@@ -23686,16 +23686,18 @@ window.NotificationEngine = {
     
     document.querySelectorAll('.notif-tab-btn').forEach(btn => {
       btn.classList.remove('active');
-      btn.style.background = 'rgba(255,255,255,0.04)';
+      btn.style.background = 'rgba(255,255,255,0.03)';
       btn.style.color = '#94a3b8';
       btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      btn.style.fontWeight = '500';
     });
     
     if (btnEl) {
       btnEl.classList.add('active');
-      btnEl.style.background = 'rgba(245,158,11,0.15)';
-      btnEl.style.color = 'var(--accent-gold)';
+      btnEl.style.background = 'rgba(245,158,11,0.1)';
+      btnEl.style.color = '#fbbf24';
       btnEl.style.borderColor = 'rgba(245,158,11,0.3)';
+      btnEl.style.fontWeight = '600';
     }
     
     this.renderNotifications(tabName);
@@ -23712,59 +23714,67 @@ window.NotificationEngine = {
     
     if (!filtered.length) {
       listEl.innerHTML = `
-        <div style="text-align:center; padding:36px 16px; color:var(--text-muted);">
-          <div style="width:44px; height:44px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; color:var(--text-muted);">
+        <div style="text-align:center; padding:48px 16px; color:#64748b;">
+          <div style="width:48px; height:48px; border-radius:16px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; margin:0 auto 12px auto; color:#64748b;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           </div>
-          <div style="font-size:0.9rem; font-weight:700; color:#fff; margin-bottom:4px;">Tidak Ada Notifikasi</div>
-          <div style="font-size:0.78rem;">Kategori ini belum memiliki pemberitahuan baru.</div>
+          <div style="font-size:0.9rem; font-weight:600; color:#fff; margin-bottom:4px;">Tidak Ada Notifikasi</div>
+          <div style="font-size:0.75rem; color:#64748b;">Kategori ini belum memiliki pemberitahuan baru.</div>
         </div>
       `;
       return;
     }
     
-    const getSvgIcon = (type) => {
-      switch(type) {
-        case 'check-circle':
-          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
-        case 'calendar':
-          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
-        case 'message-square':
-          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-        case 'shield':
-          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
-        case 'alert-circle':
-          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
-        default:
-          return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+    const getNotificationIcon = (category, iconType) => {
+      if (category === 'TRANSACTION') {
+        return `
+          <div style="width:40px; height:40px; border-radius:12px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#34d399; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+        `;
       }
+      if (category === 'EVENT') {
+        return `
+          <div style="width:40px; height:40px; border-radius:12px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+        `;
+      }
+      if (category === 'FORUM') {
+        return `
+          <div style="width:40px; height:40px; border-radius:12px; background:rgba(14,165,233,0.1); border:1px solid rgba(14,165,233,0.2); color:#38bdf8; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+        `;
+      }
+      return `
+        <div style="width:40px; height:40px; border-radius:12px; background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.2); color:#c084fc; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+      `;
     };
     
     listEl.innerHTML = filtered.map(item => `
-      <div class="glass-card" style="padding:14px 18px; border-radius:14px; border:1px solid ${item.isRead ? 'rgba(255,255,255,0.06)' : 'rgba(245,158,11,0.25)'}; background:${item.isRead ? 'rgba(255,255,255,0.02)' : 'rgba(245,158,11,0.04)'}; display:flex; gap:14px; align-items:flex-start; justify-content:space-between; transition:all 0.2s ease;">
-        <div style="display:flex; gap:12px; align-items:flex-start; flex:1;">
-          <div style="width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;">
-            ${getSvgIcon(item.iconType)}
+      <div style="background:rgba(255,255,255,0.02); border:1px solid ${item.isRead ? 'rgba(255,255,255,0.06)' : 'rgba(245,158,11,0.2)'}; border-radius:16px; padding:16px; transition:all 0.2s ease; margin-bottom:12px; display:flex; gap:14px; align-items:flex-start;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.borderColor='${item.isRead ? 'rgba(255,255,255,0.12)' : 'rgba(245,158,11,0.35)'}'" onmouseout="this.style.background='rgba(255,255,255,0.02)'; this.style.borderColor='${item.isRead ? 'rgba(255,255,255,0.06)' : 'rgba(245,158,11,0.2)'}'">
+        ${getNotificationIcon(item.category, item.iconType)}
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap;">
+            <h4 style="font-size:0.875rem; font-weight:600; color:#ffffff; margin:0; line-height:1.3;">${item.title}</h4>
+            ${!item.isRead ? `<span style="width:8px; height:8px; border-radius:50%; background:#fbbf24; box-shadow:0 0 8px rgba(251,191,36,0.8); display:inline-block; flex-shrink:0;" title="Belum dibaca"></span>` : ''}
+            <span style="font-size:11px; color:#94a3b8; margin-left:auto; white-space:nowrap;">${item.timestamp}</span>
           </div>
-          <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px; flex-wrap:wrap;">
-              <h4 style="font-size:0.88rem; font-weight:700; color:#fff; margin:0;">${item.title}</h4>
-              ${!item.isRead ? `<span style="width:7px; height:7px; border-radius:50%; background:#f43f5e; display:inline-block;" title="Belum dibaca"></span>` : ''}
-              <span style="font-size:0.68rem; color:var(--text-muted); margin-left:auto;">${item.timestamp}</span>
-            </div>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 8px 0; line-height:1.5;">${item.description}</p>
-            <div style="display:flex; gap:8px; align-items:center;">
-              ${item.actionText ? `
-                <button type="button" class="btn-primary" style="font-size:0.72rem; padding:4px 12px; font-weight:700; border-radius:6px;" onclick="NotificationEngine.handleAction('${item.id}', '${item.actionHandler}')">
-                  ${item.actionText}
-                </button>
-              ` : ''}
-              ${!item.isRead ? `
-                <button type="button" class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-radius:6px; color:#cbd5e1;" onclick="NotificationEngine.markAsRead('${item.id}')">
-                  Tandai Dibaca
-                </button>
-              ` : ''}
-            </div>
+          <p style="font-size:0.75rem; color:#cbd5e1; margin:4px 0 10px 0; line-height:1.6;">${item.description}</p>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            ${item.actionText ? `
+              <button type="button" style="font-size:0.75rem; font-weight:600; color:#fbbf24; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:5px 12px; border-radius:8px; cursor:pointer; transition:all 0.15s; display:inline-flex; align-items:center; gap:6px;" onmouseover="this.style.background='rgba(245,158,11,0.2)'; this.style.color='#fde68a';" onmouseout="this.style.background='rgba(245,158,11,0.1)'; this.style.color='#fbbf24';" onclick="NotificationEngine.handleAction('${item.id}', '${item.actionHandler}')">
+                ${item.actionText}
+              </button>
+            ` : ''}
+            ${!item.isRead ? `
+              <button type="button" style="font-size:0.75rem; color:#94a3b8; background:transparent; border:1px solid rgba(255,255,255,0.1); padding:5px 10px; border-radius:8px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#ffffff';" onmouseout="this.style.background='transparent'; this.style.color='#94a3b8';" onclick="NotificationEngine.markAsRead('${item.id}')">
+                Tandai Dibaca
+              </button>
+            ` : ''}
           </div>
         </div>
       </div>
