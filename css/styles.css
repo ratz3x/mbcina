@@ -2102,11 +2102,152 @@ body.light-mode .dropdown-menu button:hover {
   color: #0f172a !important;
 }
 
-/* 9. Stat Card Top Icons */
-body.light-mode .stat-card-icon-wrapper {
-  background: #f8fafc !important;
+/* 10. Exhaustive Text & Color Overrides for Absolute Readability in Light Mode */
+body.light-mode [class*="text-white"],
+body.light-mode .text-white,
+body.light-mode [class*="text-neutral-100"],
+body.light-mode [class*="text-neutral-200"],
+body.light-mode [class*="text-neutral-300"],
+body.light-mode [class*="text-slate-100"],
+body.light-mode [class*="text-slate-200"],
+body.light-mode [class*="text-slate-300"],
+body.light-mode [class*="text-gray-100"],
+body.light-mode [class*="text-gray-200"],
+body.light-mode [class*="text-gray-300"],
+body.light-mode [class*="text-zinc-100"],
+body.light-mode [class*="text-zinc-200"],
+body.light-mode [class*="text-zinc-300"],
+body.light-mode [style*="color:#fff"],
+body.light-mode [style*="color: #fff"],
+body.light-mode [style*="color:#ffffff"],
+body.light-mode [style*="color: #ffffff"],
+body.light-mode [style*="color:white"],
+body.light-mode [style*="color: white"],
+body.light-mode [style*="color:#f8fafc"],
+body.light-mode [style*="color: #f8fafc"],
+body.light-mode [style*="color:#f1f5f9"],
+body.light-mode [style*="color: #f1f5f9"],
+body.light-mode [style*="color:var(--text-main)"],
+body.light-mode [style*="color: var(--text-main)"] {
+  color: #0f172a !important;
+}
+
+body.light-mode [class*="text-neutral-400"],
+body.light-mode .text-neutral-400,
+body.light-mode [class*="text-neutral-500"],
+body.light-mode .text-neutral-500,
+body.light-mode [class*="text-slate-400"],
+body.light-mode [class*="text-gray-400"],
+body.light-mode [class*="text-zinc-400"],
+body.light-mode [style*="color:var(--text-muted)"],
+body.light-mode [style*="color: var(--text-muted)"],
+body.light-mode [style*="color:#94a3b8"],
+body.light-mode [style*="color: #94a3b8"],
+body.light-mode [style*="color:#cbd5e1"],
+body.light-mode [style*="color: #cbd5e1"] {
+  color: #64748b !important;
+}
+
+/* Specific button text protection */
+body.light-mode .btn-primary,
+body.light-mode [class*="bg-amber-500"],
+body.light-mode [class*="bg-amber-400"] {
+  color: #0a0a0a !important;
+}
+
+body.light-mode .btn-primary:hover,
+body.light-mode [class*="bg-amber-500"]:hover,
+body.light-mode [class*="bg-amber-400"]:hover {
+  color: #000000 !important;
+}
+
+/* 11. Dark Background Container Overrides in Light Mode */
+body.light-mode [class*="bg-neutral-900"],
+body.light-mode [class*="bg-neutral-950"],
+body.light-mode [class*="bg-[#0b0e14]"],
+body.light-mode [class*="bg-[#07090e]"],
+body.light-mode [class*="bg-[#0e131f]"],
+body.light-mode [style*="background: #0b0e14"],
+body.light-mode [style*="background:#0b0e14"],
+body.light-mode [style*="background: #07090e"],
+body.light-mode [style*="background:#07090e"],
+body.light-mode [style*="background: #0e131f"],
+body.light-mode [style*="background:#0e131f"] {
+  background-color: #ffffff !important;
+}
+
+body.light-mode [class*="bg-white/[0.01]"],
+body.light-mode [class*="bg-white/[0.02]"],
+body.light-mode [class*="bg-white/[0.03]"],
+body.light-mode [class*="bg-white/[0.04]"],
+body.light-mode [class*="bg-white/[0.05]"],
+body.light-mode [class*="bg-white/[0.06]"],
+body.light-mode [class*="bg-white/[0.08]"],
+body.light-mode [style*="background: rgba(255, 255, 255, 0.0"],
+body.light-mode [style*="background:rgba(255,255,255,0.0"],
+body.light-mode [style*="background: rgba(0, 0, 0, 0.2)"],
+body.light-mode [style*="background:rgba(0,0,0,0.2)"],
+body.light-mode [style*="background: rgba(0, 0, 0, 0.15)"],
+body.light-mode [style*="background:rgba(0,0,0,0.15)"] {
+  background-color: #f8fafc !important;
+}
+
+/* 12. Border Overrides in Light Mode */
+body.light-mode [class*="border-white/"],
+body.light-mode [class*="border-white\\["],
+body.light-mode [class*="border-neutral-800"],
+body.light-mode [class*="border-neutral-700"],
+body.light-mode [style*="border: 1px solid var(--chrome-border)"],
+body.light-mode [style*="border:1px solid var(--chrome-border)"],
+body.light-mode [style*="border-bottom: 1px solid var(--chrome-border)"],
+body.light-mode [style*="border-bottom:1px solid var(--chrome-border)"],
+body.light-mode [style*="border-bottom: 2px solid var(--chrome-border)"],
+body.light-mode [style*="border-bottom:2px solid var(--chrome-border)"],
+body.light-mode [style*="border-bottom:1px solid rgba(255,255,255"],
+body.light-mode [style*="border-bottom: 1px solid rgba(255, 255, 255"],
+body.light-mode [style*="border:1px solid rgba(255,255,255"],
+body.light-mode [style*="border: 1px solid rgba(255, 255, 255"] {
   border-color: #e2e8f0 !important;
 }
+
+/* 13. Accent Text High Contrast */
+body.light-mode [class*="text-amber-400"],
+body.light-mode [class*="text-amber-300"],
+body.light-mode [style*="color:#fbbf24"],
+body.light-mode [style*="color: #fbbf24"],
+body.light-mode [style*="color:var(--accent-gold)"],
+body.light-mode [style*="color: var(--accent-gold)"] {
+  color: #b45309 !important;
+}
+
+body.light-mode [class*="text-emerald-400"],
+body.light-mode [class*="text-emerald-300"],
+body.light-mode [style*="color:#34d399"],
+body.light-mode [style*="color: #34d399"],
+body.light-mode [style*="color:var(--primary-emerald)"],
+body.light-mode [style*="color: var(--primary-emerald)"] {
+  color: #047857 !important;
+}
+
+body.light-mode [class*="text-rose-400"],
+body.light-mode [class*="text-red-400"],
+body.light-mode [style*="color:#fb7185"],
+body.light-mode [style*="color: #fb7185"],
+body.light-mode [style*="color:var(--accent-red)"],
+body.light-mode [style*="color: var(--accent-red)"] {
+  color: #be123c !important;
+}
+
+body.light-mode [class*="text-cyan-300"],
+body.light-mode [class*="text-cyan-400"],
+body.light-mode [class*="text-sky-400"],
+body.light-mode [style*="color:#67e8f9"],
+body.light-mode [style*="color: #67e8f9"],
+body.light-mode [style*="color:var(--accent-blue)"],
+body.light-mode [style*="color: var(--accent-blue)"] {
+  color: #0369a1 !important;
+}
+
 
 
 
