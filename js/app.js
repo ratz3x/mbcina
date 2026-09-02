@@ -18127,16 +18127,19 @@ const M6Engine = {
   activeReceiptId: null,
 
   switchDonationSubtab(subtab) {
-    if (typeof window.switchDonationSubtab === 'function') {
-      window.switchDonationSubtab(subtab);
-    } else {
-      this.activeDonationSubtab = subtab;
-      document.querySelectorAll('.m73-subtab-content').forEach(el => el.style.setProperty('display', 'none', 'important'));
-      document.querySelectorAll('[data-m73-subtab]').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-m73-subtab') === subtab);
-      });
-      const target = document.getElementById(`m73-subtab-${subtab}`);
-      if (target) target.style.setProperty('display', 'block', 'important');
+    // FIXED: Do NOT call window.switchDonationSubtab - it's forwarded back to this method (infinite recursion)
+    this.activeDonationSubtab = subtab;
+    document.querySelectorAll('.m73-subtab-content').forEach(el => {
+      el.style.removeProperty('display');
+      el.style.display = 'none';
+    });
+    document.querySelectorAll('[data-m73-subtab]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-m73-subtab') === subtab);
+    });
+    const target = document.getElementById(`m73-subtab-${subtab}`);
+    if (target) {
+      target.style.removeProperty('display');
+      target.style.display = 'block';
     }
   },
 
@@ -18675,11 +18678,7 @@ const M6Engine = {
       console.warn('API save background note:', e);
     }
 
-    if (typeof window.switchDonationSubtab === 'function') {
-      window.switchDonationSubtab('7_3_1_progress');
-    } else {
-      this.switchDonationSubtab('7_3_1_progress');
-    }
+    this.switchDonationSubtab('7_3_1_progress');
   },
 
   openMemberDonationModal(campaignId = 'camp_yogya_2026') {
@@ -18943,13 +18942,16 @@ const M6Engine = {
       }).then(r => r.json());
 
       if (res.success) {
-        alert(`✅ STATUS DONASI BERHASIL DI-VERIFIKASI!\n\nStatus: ${status}\nDigital Receipt resmi telah diterbitkan & dikirim ke email donatur.`);
+        if (typeof window.showToast === 'function') window.showToast('✅ STATUS DONASI BERHASIL DI-VERIFIKASI! Status: ' + status, 'success');
         AuthEngine.closeModal('modal-donation-verify');
-        this.renderDonationModule();
+        // Re-render table only (NO full re-fetch to prevent loop)
+        this.renderDonationDonorTable();
+        this.renderDonationCampaignCards();
+        this.renderDonationReceiptsTable();
         if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
         if (typeof this.renderM3MemberList === 'function') this.renderM3MemberList();
       } else {
-        alert('⚠️ Gagal memverifikasi: ' + res.message);
+        if (typeof window.showToast === 'function') window.showToast('⚠️ Gagal memverifikasi: ' + res.message, 'error');
       }
     } catch (e) {
       // Local fallback
@@ -18966,9 +18968,12 @@ const M6Engine = {
           created_at: 'Baru Saja'
         });
       }
-      alert(`✅ STATUS DONASI BERHASIL DI-VERIFIKASI (LOCAL)!\n\nStatus: ${status}\nDigital Receipt resmi telah diterbitkan.`);
+      if (typeof window.showToast === 'function') window.showToast('✅ STATUS DONASI BERHASIL DI-VERIFIKASI (LOCAL)! Status: ' + status, 'success');
       AuthEngine.closeModal('modal-donation-verify');
-      this.renderDonationModule();
+      // Re-render table only (NO full re-fetch to prevent loop)
+      this.renderDonationDonorTable();
+      this.renderDonationCampaignCards();
+      this.renderDonationReceiptsTable();
       if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
       if (typeof this.renderM3MemberList === 'function') this.renderM3MemberList();
     }

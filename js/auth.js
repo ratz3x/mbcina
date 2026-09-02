@@ -223,12 +223,14 @@ photo_url: sbUser.user_metadata?.picture || '',
     if (targetModal) {
       document.body.style.overflow = 'hidden';
       targetModal.style.removeProperty('display');
-      targetModal.style.setProperty('display', 'flex', 'important');
-      targetModal.classList.add('active');
-      targetModal.style.pointerEvents = 'auto';
-      targetModal.style.opacity = '1';
+      targetModal.style.removeProperty('visibility');
+      targetModal.style.removeProperty('opacity');
+      targetModal.style.display = 'flex';
       targetModal.style.visibility = 'visible';
+      targetModal.style.opacity = '1';
+      targetModal.style.pointerEvents = 'auto';
       targetModal.style.zIndex = '10000';
+      targetModal.classList.add('active');
 
       if (modalId === 'modal-register') {
         this.currentStep = 1;
@@ -283,9 +285,10 @@ photo_url: sbUser.user_metadata?.picture || '',
       m.style.display = 'none';
       m.style.pointerEvents = 'none';
       m.style.opacity = '0';
+      m.style.visibility = 'hidden';
     });
     const loader = document.getElementById('global-app-loader');
-    if (loader) loader.style.setProperty('display', 'none', 'important');
+    if (loader) { loader.style.removeProperty('display'); loader.style.display = 'none'; }
     document.body.style.overflow = '';
   },
 
