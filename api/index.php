@@ -171,6 +171,7 @@ $moduleMap = [
     'create_m6_proposal' => 'm6_event',
     'save_m6_bep_proposal' => 'm6_event',
     'approve_m6_proposal' => 'm6_event',
+    'delete_m6_proposal' => 'm6_event',
     'process_m6_pos_transaction' => 'm6_event',
     'process_m6_qr_checkin' => 'm6_event',
     'verify_participant_payment' => 'm6_event',

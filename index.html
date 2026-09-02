@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260830_luxury_v34">
+  <link rel="stylesheet" href="css/styles.css?v=20260903_fix_buttons_v73">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -666,15 +666,38 @@
       alert('\ud83d\udccb DETAIL DONASI\n\nKode Donasi: ' + code + '\nKlik \ud83e\uddfe untuk melihat Digital Receipt resmi.');
     };
 
-    /* ─── OVERRIDE switchDonationSubtab — auto render donor list per campaign ─── */
+    /* ─── switchDonationSubtab — safe subtab navigation & auto render donor list ─── */
     (function(){
       var _orig = window.switchDonationSubtab;
       window.switchDonationSubtab = function(subtab) {
-        _orig(subtab);
-        if (subtab === '7_3_3_donor_list') {
+        if (!subtab) subtab = "7_3_1_progress";
+        if (typeof _orig === "function") {
+          _orig(subtab);
+        } else {
+          var contents = document.querySelectorAll(".m73-subtab-content");
+          for (var i = 0; i < contents.length; i++) {
+            contents[i].style.setProperty("display", "none", "important");
+          }
+          var buttons = document.querySelectorAll("[data-m73-subtab]");
+          for (var j = 0; j < buttons.length; j++) {
+            if (buttons[j].getAttribute("data-m73-subtab") === subtab) {
+              buttons[j].classList.add("active");
+            } else {
+              buttons[j].classList.remove("active");
+            }
+          }
+          var target = document.getElementById("m73-subtab-" + subtab);
+          if (target) target.style.setProperty("display", "block", "important");
+        }
+        if (subtab === "7_3_3_donor_list") {
           var defCamp = window.m73Campaigns && window.m73Campaigns.length > 0
-            ? window.m73Campaigns[window.m73Campaigns.length - 1].id : 'camp_yogya_2026';
-          window.renderM73DonorTable(defCamp);
+            ? window.m73Campaigns[window.m73Campaigns.length - 1].id : "camp_yogya_2026";
+          if (typeof window.renderM73DonorTable === "function") {
+            window.renderM73DonorTable(defCamp);
+          }
+        }
+        if (window.AppEngine) {
+          window.AppEngine.activeDonationSubtab = subtab;
         }
       };
     })();
@@ -10462,8 +10485,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260830_luxury_v34"></script>
-  <script src="js/app.js?v=20260830_luxury_v34"></script>
+  <script src="js/auth.js?v=20260903_fix_buttons_v73"></script>
+  <script src="js/app.js?v=20260903_fix_buttons_v73"></script>
   <script>
     lucide.createIcons();
     try {

@@ -188,6 +188,19 @@ switch ($action) {
         }
         break;
 
+    case 'delete_m6_proposal':
+        try {
+            $id = $input['id'] ?? '';
+            if (!empty($id)) {
+                $stmt = $sPdo->prepare("DELETE FROM event_proposals WHERE id = :id");
+                $stmt->execute([':id' => $id]);
+            }
+            echo json_encode(['success' => true, 'message' => 'Proposal berhasil dihapus!']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
     case 'process_m6_pos_transaction':
         try {
             $eventId = $input['event_id'] ?? 'evt_jamnas_19';

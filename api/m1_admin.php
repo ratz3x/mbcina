@@ -406,14 +406,18 @@ switch ($action) {
 
             $formattedNetProfit = 'Rp ' . number_format($netProfit, 0, ',', '.');
 
-            // Dynamic Lapak count from products table
-            $totalLapak = 0;
+            // Real Pending Approvals = PENDING users (member registrations) + PENDING club applications
+            $totalPending = 0;
             try {
-                $stmtLapak = $sPdo->query("SELECT COUNT(*) as cnt FROM products");
-                if ($stmtLapak) {
-                    $totalLapak = (int)$stmtLapak->fetch()['cnt'];
-                }
-            } catch (Exception $eLapak) {}
+                // Count users with PENDING status
+                $stmtPendU = $sPdo->query("SELECT COUNT(*) as cnt FROM users WHERE UPPER(status) = 'PENDING'");
+                $totalPending += (int)($stmtPendU ? $stmtPendU->fetch()['cnt'] : 0);
+            } catch (Exception $ePendU) {}
+            try {
+                // Count pending club applications from m4_club_applications table
+                $stmtPendC = $sPdo->query("SELECT COUNT(*) as cnt FROM m4_club_applications WHERE UPPER(status) = 'PENDING'");
+                $totalPending += (int)($stmtPendC ? $stmtPendC->fetch()['cnt'] : 0);
+            } catch (Exception $ePendC) {}
 
             echo json_encode([
                 'success' => true,
@@ -422,7 +426,7 @@ switch ($action) {
                     'totalMembers' => $totalUsers,
                     'activeClubs' => $totalClubs,
                     'monthlyTransactionRp' => $formattedNetProfit,
-                    'pendingApprovals' => $totalLapak
+                    'pendingApprovals' => $totalPending
                 ],
                 'chartGrowth' => [
                     'weekly' => ['Sen' => 42, 'Sel' => 65, 'Rab' => 58, 'Kam' => 84, 'Jum' => 96, 'Sab' => 120, 'Ming' => 110],
