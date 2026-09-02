@@ -8759,15 +8759,15 @@ const AppEngine = {
       clubsList.map(c => `<option value="${c.name}">${c.name} (${c.region})</option>`).join('');
 
     const filterSelect = document.getElementById('m3-club-filter');
-    if (filterSelect && filterSelect.options.length <= 1) filterSelect.innerHTML = optionsHtml;
+    if (filterSelect && filterSelect.options && filterSelect.options.length <= 1) filterSelect.innerHTML = optionsHtml;
 
     const addSelect = document.getElementById('m3-add-club');
-    if (addSelect && !addSelect.children.length) {
+    if (addSelect && (!addSelect.children || !addSelect.children.length)) {
       addSelect.innerHTML = clubsList.map(c => `<option value="${c.name}">${c.name} (${c.code || 'MB'})</option>`).join('');
     }
 
     const editSelect = document.getElementById('m3-edit-club');
-    if (editSelect && !editSelect.children.length) {
+    if (editSelect && (!editSelect.children || !editSelect.children.length)) {
       editSelect.innerHTML = clubsList.map(c => `<option value="${c.name}">${c.name} (${c.code || 'MB'})</option>`).join('');
     }
   },
@@ -11763,7 +11763,7 @@ const AppEngine = {
     }).join('');
 
     const sel = document.getElementById('m5-category-filter');
-    if (sel && sel.options.length <= 1) {
+    if (sel && sel.options && sel.options.length <= 1 && Array.isArray(this.m5Data?.categories)) {
       this.m5Data.categories.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
@@ -11773,7 +11773,7 @@ const AppEngine = {
     }
 
     const spSel = document.getElementById('sp-forum-cat-filter');
-    if (spSel && spSel.options.length <= 1) {
+    if (spSel && spSel.options && spSel.options.length <= 1 && Array.isArray(this.m5Data?.categories)) {
       this.m5Data.categories.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
@@ -12439,7 +12439,8 @@ const M6Engine = {
     const cleanUserProposals = [];
     const seenCodes = new Set();
 
-    (rawList || []).forEach(p => {
+    let list = Array.isArray(rawList) ? rawList : (rawList && Array.isArray(rawList.proposals) ? rawList.proposals : (rawList && Array.isArray(rawList.data) ? rawList.data : []));
+    list.forEach(p => {
       if (!p || !p.title) return;
       const code = (p.event_code || p.id || '').trim().toUpperCase();
       const title = p.title.trim().toLowerCase();
@@ -12820,7 +12821,11 @@ const M6Engine = {
   getAllMasterParticipants() {
     let saved = [];
     try {
-      saved = JSON.parse(localStorage.getItem('mbcina_m6_participants') || '[]');
+      const raw = localStorage.getItem('mbcina_m6_participants');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) saved = parsed;
+      }
     } catch(e) { saved = []; }
 
     const seedParticipants = [
@@ -12850,7 +12855,7 @@ const M6Engine = {
       { id: 'part_sum_3', event_code: 'EVT-2026-003', event_id: 'EVT-2026-003', member_id: 'MBINA-PLB-2026-000203', name: 'Herman Susanto', club: 'MBC Palembang', tier: 'Silver', htm: 600000, status: 'PENDING', phone: '081355667788', created_at: '12/08/2026 09:30', qr_code: 'QR-EVT-2026-003-3' }
     ];
 
-    const runtimeList = [...(this.data?.participants || []), ...saved];
+    const runtimeList = [...(Array.isArray(this.data?.participants) ? this.data.participants : []), ...(Array.isArray(saved) ? saved : [])];
     const combined = [...runtimeList, ...seedParticipants];
 
     // Deduplicate by composite key: event_code + member_id + name
