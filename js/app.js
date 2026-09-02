@@ -1108,11 +1108,14 @@ const AppEngine = {
         if (Array.isArray(res.campaigns)) window.m73Campaigns = res.campaigns;
         this._renderMemberDonasiCard();
         if (typeof this.renderDonationCampaignCards === 'function') this.renderDonationCampaignCards();
+        if (typeof this.renderDonationDonorTable === 'function') this.renderDonationDonorTable();
         if (typeof window.renderAllDonationCards === 'function') window.renderAllDonationCards();
       }
     } catch (e) {
       console.warn("Donation fetch warning:", e);
     }
+    if (typeof this.renderDonationCampaignCards === 'function') this.renderDonationCampaignCards();
+    if (typeof this.renderDonationDonorTable === 'function') this.renderDonationDonorTable();
   },
 
   // ── PROPOSAL PDF MODAL ──
@@ -4066,6 +4069,7 @@ const AppEngine = {
         M6Engine.switchSubtab('6_4_sponsorship');
       }
     } else if (tab === 'm7_donation') {
+      this.renderDonationModule();
       if (typeof window.switchDonationSubtab === 'function') {
         try { window.switchDonationSubtab('7_3_1_progress'); } catch (e) { console.warn(e); }
       }
@@ -18334,13 +18338,51 @@ const M6Engine = {
     const container = document.getElementById('m73-donor-table-container');
     if (!container) return;
 
+    if (!this.donationData) this.donationData = {};
+    if (!this.donationData.campaigns || this.donationData.campaigns.length === 0) {
+      this.donationData.campaigns = [
+        {
+          id: 'camp_yogya_2026',
+          title: 'Donasi Bakti Sosial Yogyakarta 2026',
+          description: 'Bantu kami berbagi kebahagiaan dengan masyarakat dan panti asuhan Yogyakarta dalam rangka Jamnas & Touring MB INA 2026.',
+          target_amount: 20000000,
+          collected_amount: 12500000,
+          start_date: '2026-09-01',
+          end_date: '2026-09-14',
+          is_active: true
+        }
+      ];
+    }
+
+    if (!this.donationData.donations || this.donationData.donations.length === 0) {
+      this.donationData.donations = [
+        { id: 'DON-TRX-2026-001', trx_code: 'DON-TRX-2026-001', campaign_id: 'camp_yogya_2026', user_id: 'usr_superadmin', donor_name: 'Derist Touriano', member_id: 'MBINA-HQ-2026-000001', amount: 5000000, payment_method: 'TRANSFER', status: 'PENDING', payment_proof_url: 'assets/mb_hero.jpg', created_at: '2026-08-10 08:30' },
+        { id: 'DON-TRX-2026-002', trx_code: 'DON-TRX-2026-002', campaign_id: 'camp_yogya_2026', user_id: 'usr_mem_005', donor_name: 'Andi Pratama', member_id: 'MBINA-JKT-2026-000005', amount: 2000000, payment_method: 'QRIS', status: 'SUCCESS', payment_proof_url: 'assets/mb_hero.jpg', created_at: '2026-08-10 09:15' },
+        { id: 'DON-TRX-2026-003', trx_code: 'DON-TRX-2026-003', campaign_id: 'camp_yogya_2026', user_id: 'usr_mem_007', donor_name: 'Siti Rahmawati', member_id: 'MBINA-SBY-2026-000007', amount: 1000000, payment_method: 'CASH', status: 'SUCCESS', payment_proof_url: 'assets/mb_hero.jpg', created_at: '2026-08-10 10:00' },
+        { id: 'DON-TRX-2026-004', trx_code: 'DON-TRX-2026-004', campaign_id: 'camp_yogya_2026', user_id: 'usr_mem_006', donor_name: 'Budi Santoso', member_id: 'MBINA-BDG-2026-000006', amount: 500000, payment_method: 'TRANSFER', status: 'REJECTED', payment_proof_url: 'assets/mb_hero.jpg', created_at: '2026-08-09 14:20' }
+      ];
+    }
+
+    const sel = document.getElementById('m73-donor-campaign-filter');
+    const activeVal = filterCampaignId || (sel ? sel.value : 'ALL');
+
+    if (sel && Array.isArray(this.donationData.campaigns)) {
+      let opts = '<option value="ALL">🔍 Semua Campaign (All)</option>';
+      this.donationData.campaigns.forEach(c => {
+        const selAttr = c.id === activeVal ? ' selected' : '';
+        opts += `<option value="${c.id}"${selAttr}>❤️ ${c.title || c.id}</option>`;
+      });
+      sel.innerHTML = opts;
+      sel.value = activeVal;
+    }
+
     let list = this.donationData.donations || [];
-    if (filterCampaignId && filterCampaignId !== 'ALL') {
-      list = list.filter(d => d.campaign_id === filterCampaignId);
+    if (activeVal && activeVal !== 'ALL') {
+      list = list.filter(d => d.campaign_id === activeVal);
     }
     
     if (list.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#94a3b8; font-size:0.875rem;">Belum ada transaksi donasi terdaftar.</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#94a3b8; font-size:0.875rem;">Belum ada transaksi donasi terdaftar untuk campaign ini.</div>`;
       return;
     }
 
