@@ -4069,7 +4069,11 @@ const AppEngine = {
         M6Engine.switchSubtab('6_4_sponsorship');
       }
     } else if (tab === 'm7_donation') {
-      this.renderDonationModule();
+      if (window.M6Engine && typeof window.M6Engine.renderDonationModule === 'function') {
+        window.M6Engine.renderDonationModule();
+      } else if (typeof this.renderDonationModule === 'function') {
+        this.renderDonationModule();
+      }
       if (typeof window.switchDonationSubtab === 'function') {
         try { window.switchDonationSubtab('7_3_1_progress'); } catch (e) { console.warn(e); }
       }
@@ -18967,6 +18971,31 @@ if (typeof M6Engine !== 'undefined') {
   if (typeof M6Engine.openSponsorDashboardSim === 'function') {
     AppEngine.openSponsorDashboardSim = M6Engine.openSponsorDashboardSim.bind(M6Engine);
   }
+
+  // Forward all donation engine methods to AppEngine for seamless interoperability
+  const donationMethods = [
+    'renderDonationModule',
+    'renderDonationCampaignCards',
+    'renderDonationDonorTable',
+    'renderDonationReceiptsTable',
+    'openDonationVerifyModal',
+    'confirmVerifyDonation',
+    'openMemberDonationModal',
+    'openDigitalReceiptModalByDonationId',
+    'openDigitalReceiptModal',
+    'downloadDigitalReceiptPdf',
+    'sendDigitalReceiptEmail',
+    'printDigitalReceipt',
+    'exportDonationsExcel',
+    'exportDonationsPdf',
+    'sendThankYouToAllDonors',
+    'switchDonationSubtab'
+  ];
+  donationMethods.forEach(m => {
+    if (typeof M6Engine[m] === 'function') {
+      AppEngine[m] = M6Engine[m].bind(M6Engine);
+    }
+  });
 }
 
 window.saveSponsorProfile = function() {
