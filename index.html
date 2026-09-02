@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260903_perfect_tabs_v78">
+  <link rel="stylesheet" href="css/styles.css?v=20260903_nocrash_v79">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -9713,19 +9713,6 @@
     <div class="modal-container" style="max-width:540px;">
       <div class="modal-header">
         <div>
-          <h3 style="font-size:1.2rem; margin:0;" class="text-gradient" id="modal-m6-album-title-txt">📁 BUAT ALBUM EVENT BARU</h3>
-          <span style="font-size:0.78rem; color:var(--accent-gold);">Kelola album pengelompokan foto & video dokumentasi event MB INA</span>
-        </div>
-        <button class="modal-close-btn" onclick="AuthEngine.closeModal('modal-m6-create-album')">✕</button>
-      </div>
-      <div class="modal-body" style="padding:20px;">
-        <form id="form-m6-create-album" onsubmit="M6Engine.saveAlbumFromModal(event)">
-          <input type="hidden" id="m6-alb-id" value="">
-          <div class="form-group">
-            <label class="form-label" style="font-size:0.8rem; font-weight:700;">Judul Album *</label>
-            <input type="text" id="m6-alb-title" class="form-input" placeholder="contoh: 📁 OPENING CEREMONY / PARADE MB" required>
-          </div>
-          <div class="form-group">
             <label class="form-label" style="font-size:0.8rem; font-weight:700;">Deskripsi Album</label>
             <textarea id="m6-alb-desc" class="form-input" rows="3" placeholder="Tuliskan gambaran singkat dokumentasi acara dalam album ini..."></textarea>
           </div>
@@ -9882,7 +9869,7 @@
   </div>
 
   <!-- GLOBAL GLASS LOADING SPINNER OVERLAY -->
-  <div id="global-app-loader" class="glass-loader-overlay" style="display:none;">
+  <div id="global-app-loader" class="glass-loader-overlay" style="display:none !important;">
     <div class="glass-loader-card">
       <div class="mb-spinner"></div>
       <div class="loader-text" id="global-loader-text">Memuat Data MB INA (Supabase Cloud)...</div>
@@ -10331,8 +10318,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260903_perfect_tabs_v78"></script>
-  <script src="js/app.js?v=20260903_perfect_tabs_v78"></script>
+  <script src="js/auth.js?v=20260903_nocrash_v79"></script>
+  <script src="js/app.js?v=20260903_nocrash_v79"></script>
   <script>
     lucide.createIcons();
     try {

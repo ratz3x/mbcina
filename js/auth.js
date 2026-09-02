@@ -269,10 +269,12 @@ photo_url: sbUser.user_metadata?.picture || '',
   },
 
   closeAllModals() {
-    document.querySelectorAll('.modal-backdrop').forEach(m => {
+    document.querySelectorAll('.modal-backdrop, .modal-overlay, .modal-container-backdrop').forEach(m => {
       m.classList.remove('active');
-      m.style.display = 'none';
+      m.style.setProperty('display', 'none', 'important');
     });
+    const loader = document.getElementById('global-app-loader');
+    if (loader) loader.style.setProperty('display', 'none', 'important');
     document.body.style.overflow = '';
   },
 

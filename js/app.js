@@ -111,6 +111,9 @@ const AppEngine = {
 
   init() {
     console.log("MB INA Platform Engine Initializing (M2 & M3 Active)...");
+    this.hideLoader();
+    this.closeAllModals();
+    document.body.style.overflow = '';
     this.initSession();
     this.renderView();
     this.initTheme();
@@ -3758,7 +3761,8 @@ const AppEngine = {
 
   hideLoader() {
     const el = document.getElementById('global-app-loader');
-    if (el) el.style.display = 'none';
+    if (el) el.style.setProperty('display', 'none', 'important');
+    document.body.style.overflow = '';
   },
 
   closeModal(modalId) {
@@ -3783,7 +3787,6 @@ const AppEngine = {
   },
 
   async fetchM2Data() {
-    this.showLoader('Memuat Data Organisasi, Klub & Keanggotaan (Supabase Cloud)...');
     try {
       const resp = await fetch('api.php?action=get_app_init_data');
       if (resp && resp.ok) {
@@ -3858,18 +3861,21 @@ const AppEngine = {
   } catch (e) {
       console.warn("API Offline / slow, ensuring local fallback data is populated:", e);
     } finally {
-      this.ensureDataPopulated();
-      // 🔑 KRITIS: Setelah data ter-load, sinkronkan status currentUser dari master list
-      this.syncCurrentUserStatusFromList();
-      this.renderClubsList();
-      this.renderLandingPageVisionMission();
-      this.renderLandingSponsors();
-      this.updateLandingCounters();
-      if (this.activeAdminTab === 'm2_org') this.renderM2Module();
-      if (this.activeAdminTab === 'm3_membership') this.renderM3Module();
-      if (this.activeAdminTab === 'm4_registration') this.renderM4Module();
-      if (this.activeAdminTab === 'm1_portal' || this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
       this.hideLoader();
+      try {
+        this.ensureDataPopulated();
+        this.syncCurrentUserStatusFromList();
+        this.renderClubsList();
+        this.renderLandingPageVisionMission();
+        this.renderLandingSponsors();
+        this.updateLandingCounters();
+        if (this.activeAdminTab === 'm2_org') this.renderM2Module();
+        if (this.activeAdminTab === 'm3_membership') this.renderM3Module();
+        if (this.activeAdminTab === 'm4_registration') this.renderM4Module();
+        if (this.activeAdminTab === 'm1_portal' || this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+      } catch (err) {
+        console.warn('Post-fetch rendering warning:', err);
+      }
     }
   },
 
