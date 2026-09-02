@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260903_dashboard_resolved_v80">
+  <link rel="stylesheet" href="css/styles.css?v=20260903_noloop_v81">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -96,7 +96,7 @@
 
     window.filterDonorsByCampaign = function(campaignId) {
       var sel = document.getElementById('m73-donor-campaign-filter');
-      if (sel) sel.value = campaignId || 'ALL';
+      if (sel && sel.value !== campaignId) sel.value = campaignId || 'ALL';
       if (window.M6Engine && typeof window.M6Engine.renderDonationDonorTable === 'function') {
         window.M6Engine.renderDonationDonorTable(campaignId || 'ALL');
       } else if (window.AppEngine && typeof window.AppEngine.renderDonationDonorTable === 'function') {
@@ -3233,7 +3233,7 @@
               <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0;" id="m73-donor-list-header-desc">Semua transaksi donasi pada seluruh campaign aktif</p>
             </div>
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-              <select id="m73-donor-campaign-filter" class="form-input" style="font-size:0.78rem; padding:6px 12px; max-width:260px; background:rgba(15,23,42,0.9); color:var(--accent-gold); border:1px solid var(--accent-gold);" onchange="window.renderM73DonorTable(this.value)">
+              <select id="m73-donor-campaign-filter" class="form-input" style="font-size:0.78rem; padding:6px 12px; max-width:260px; background:rgba(15,23,42,0.9); color:var(--accent-gold); border:1px solid var(--accent-gold);" onchange="window.filterDonorsByCampaign(this.value)">
                 <option value="ALL">🔍 Semua Campaign (All)</option>
               </select>
               <button class="btn-outline" style="font-size:0.78rem; padding:6px 12px;" onclick="exportDonationsExcel()">📤 Export Excel</button>
@@ -10318,8 +10318,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260903_dashboard_resolved_v80"></script>
-  <script src="js/app.js?v=20260903_dashboard_resolved_v80"></script>
+  <script src="js/auth.js?v=20260903_noloop_v81"></script>
+  <script src="js/app.js?v=20260903_noloop_v81"></script>
   <script>
     lucide.createIcons();
     try {

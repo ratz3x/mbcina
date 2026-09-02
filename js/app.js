@@ -18139,6 +18139,7 @@ const M6Engine = {
 
   async renderDonationModule() {
     // 1. Immediately populate local sample data synchronously so UI is never blank
+    if (!this.donationData) this.donationData = {};
     if (!this.donationData.campaigns || this.donationData.campaigns.length === 0) {
       this.donationData.campaigns = [
         {
@@ -18184,21 +18185,21 @@ const M6Engine = {
     this.renderDonationCampaignCards();
     this.renderDonationDonorTable();
     this.renderDonationReceiptsTable();
-    if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
 
-    // 2. Fetch live data from backend if available
+    // 2. Fetch live data from backend ONCE to prevent infinite loops
+    if (this._hasFetchedLiveDonations) return;
+    this._hasFetchedLiveDonations = true;
+
     try {
       const res = await fetch('api.php?action=get_donation_campaigns').then(r => r.json());
-      if (res.success) {
-        if (Array.isArray(res.campaigns)) this.donationData.campaigns = res.campaigns;
-        if (Array.isArray(res.donations)) this.donationData.donations = res.donations;
-        if (Array.isArray(res.receipts))  this.donationData.receipts  = res.receipts;
+      if (res && res.success) {
+        if (Array.isArray(res.campaigns) && res.campaigns.length > 0) this.donationData.campaigns = res.campaigns;
+        if (Array.isArray(res.donations) && res.donations.length > 0) this.donationData.donations = res.donations;
+        if (Array.isArray(res.receipts) && res.receipts.length > 0)  this.donationData.receipts  = res.receipts;
         
         this.renderDonationCampaignCards();
         this.renderDonationDonorTable();
         this.renderDonationReceiptsTable();
-        if (typeof this.populateMemberPortalData === 'function') this.populateMemberPortalData();
-        if (typeof this.renderM3MemberList === 'function') this.renderM3MemberList();
       }
     } catch (e) {
       console.warn('API fetch warning, using loaded donation data');
@@ -18441,13 +18442,14 @@ const M6Engine = {
     const sel = document.getElementById('m73-donor-campaign-filter');
     const activeVal = filterCampaignId || (sel ? sel.value : 'ALL');
 
-    if (sel && Array.isArray(this.donationData.campaigns)) {
+    if (sel && (!sel.options || sel.options.length <= 1) && Array.isArray(this.donationData.campaigns)) {
       let opts = '<option value="ALL">🔍 Semua Campaign (All)</option>';
       this.donationData.campaigns.forEach(c => {
-        const selAttr = c.id === activeVal ? ' selected' : '';
-        opts += `<option value="${c.id}"${selAttr}>❤️ ${c.title || c.id}</option>`;
+        opts += `<option value="${c.id}">❤️ ${c.title || c.id}</option>`;
       });
       sel.innerHTML = opts;
+    }
+    if (sel && activeVal && sel.value !== activeVal) {
       sel.value = activeVal;
     }
 
