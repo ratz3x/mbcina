@@ -137,6 +137,66 @@ const AppEngine = {
     }, 20);
   },
 
+  closeAllModals() {
+    if (window.AuthEngine && typeof window.AuthEngine.closeAllModals === 'function') {
+      window.AuthEngine.closeAllModals();
+    } else {
+      document.querySelectorAll('.modal-backdrop, .modal-overlay').forEach(m => {
+        m.classList.remove('active');
+        m.style.setProperty('display', 'none', 'important');
+      });
+    }
+    const loader = document.getElementById('global-app-loader');
+    if (loader) loader.style.setProperty('display', 'none', 'important');
+    document.body.style.overflow = '';
+  },
+
+  showLoader(message = 'Memuat Data (Supabase Cloud)...') {
+    const el = document.getElementById('global-app-loader');
+    const txt = document.getElementById('global-loader-text');
+    if (txt) txt.innerText = message;
+    if (el) el.style.setProperty('display', 'flex', 'important');
+  },
+
+  hideLoader() {
+    const el = document.getElementById('global-app-loader');
+    if (el) el.style.setProperty('display', 'none', 'important');
+    document.body.style.overflow = '';
+  },
+
+  switchView(viewId) {
+    if (viewId === 'member-dashboard' || viewId === 'member') {
+      if (typeof this.openPortalMember === 'function') this.openPortalMember();
+      else if (typeof this.switchAdminTab === 'function') this.switchAdminTab('m1_portal');
+    } else if (viewId === 'admin' || viewId === 'admin-dashboard') {
+      this.switchAdminTab('m1_portal');
+    } else if (viewId === 'sponsor' || viewId === 'sponsor-dashboard') {
+      if (typeof this.openPortalSponsor === 'function') this.openPortalSponsor();
+      else this.switchAdminTab('m1_portal');
+    } else {
+      this.switchAdminTab('m1_portal');
+    }
+  },
+
+  switchNavTab(tab) {
+    if (tab === 'landing') {
+      document.querySelectorAll('.view-screen, [id^="view-"]').forEach(v => v.style.display = 'none');
+      const landing = document.getElementById('view-landing') || document.getElementById('view-public-portal');
+      if (landing) landing.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (tab === 'member') {
+      if (typeof this.openPortalMember === 'function') this.openPortalMember();
+      else this.switchAdminTab('m3_membership');
+    } else if (tab === 'sponsor') {
+      if (typeof this.openPortalSponsor === 'function') this.openPortalSponsor();
+      else this.switchAdminTab('m6_sponsorship');
+    } else if (tab === 'lapak') {
+      this.switchAdminTab('m7_shop');
+    } else if (tab === 'admin') {
+      this.switchAdminTab('m1_portal');
+    }
+  },
+
   initSession() {
     const savedUser = localStorage.getItem('mbina_session_user');
     if (savedUser) {
