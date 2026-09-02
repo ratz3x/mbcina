@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "isomorphic-git": "^1.41.9",
+    "jsdom": "^30.0.1"
+  }
+}

@@ -143,7 +143,10 @@ const AppEngine = {
     } else {
       document.querySelectorAll('.modal-backdrop, .modal-overlay').forEach(m => {
         m.classList.remove('active');
-        m.style.setProperty('display', 'none', 'important');
+        m.style.removeProperty('display');
+        m.style.display = 'none';
+        m.style.pointerEvents = 'none';
+        m.style.opacity = '0';
       });
     }
     const loader = document.getElementById('global-app-loader');
@@ -18854,7 +18857,8 @@ const M6Engine = {
     const proofLink = document.getElementById('verify-don-proof-link');
     const actionsEl = document.getElementById('verify-don-actions');
 
-    const campObj = (this.donationData.campaigns || []).find(c => c.id === don.campaign_id);
+    const campaignsList = (this.donationData && Array.isArray(this.donationData.campaigns)) ? this.donationData.campaigns : [];
+    const campObj = campaignsList.find(c => c.id === don.campaign_id);
     const campTitle = campObj ? campObj.title : (don.campaign_id || 'Donasi Bakti Sosial Yogyakarta 2026');
 
     if (codeEl) codeEl.innerText = don.trx_code || don.id || donationId;

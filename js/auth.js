@@ -222,8 +222,13 @@ photo_url: sbUser.user_metadata?.picture || '',
     const targetModal = document.getElementById(modalId);
     if (targetModal) {
       document.body.style.overflow = 'hidden';
-      targetModal.style.display = 'flex';
+      targetModal.style.removeProperty('display');
+      targetModal.style.setProperty('display', 'flex', 'important');
       targetModal.classList.add('active');
+      targetModal.style.pointerEvents = 'auto';
+      targetModal.style.opacity = '1';
+      targetModal.style.visibility = 'visible';
+      targetModal.style.zIndex = '10000';
 
       if (modalId === 'modal-register') {
         this.currentStep = 1;
@@ -257,7 +262,10 @@ photo_url: sbUser.user_metadata?.picture || '',
       const targetModal = document.getElementById(modalId);
       if (targetModal) {
         targetModal.classList.remove('active');
+        targetModal.style.removeProperty('display');
         targetModal.style.display = 'none';
+        targetModal.style.pointerEvents = 'none';
+        targetModal.style.opacity = '0';
       }
     } else {
       this.closeAllModals();
@@ -271,7 +279,10 @@ photo_url: sbUser.user_metadata?.picture || '',
   closeAllModals() {
     document.querySelectorAll('.modal-backdrop, .modal-overlay, .modal-container-backdrop').forEach(m => {
       m.classList.remove('active');
-      m.style.setProperty('display', 'none', 'important');
+      m.style.removeProperty('display');
+      m.style.display = 'none';
+      m.style.pointerEvents = 'none';
+      m.style.opacity = '0';
     });
     const loader = document.getElementById('global-app-loader');
     if (loader) loader.style.setProperty('display', 'none', 'important');

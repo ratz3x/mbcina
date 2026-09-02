@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260903_noloop_v81">
+  <link rel="stylesheet" href="css/styles.css?v=20260903_bukti_perfect_v82">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -3306,134 +3306,6 @@
               </div>
             </form>
           </div>
-        </div>
-
-        <!-- ╔═════════════════════════════════════════════════════╗ -->
-        <!-- ║  👥 7.3.3 DONOR LIST & VERIFIKASI                    ║ -->
-        <!-- ╚═════════════════════════════════════════════════════╝ -->
-        <div id="m73-subtab-7_3_3_donor_list" class="m73-subtab-content" style="display:none;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
-            <div>
-              <h4 style="color:var(--accent-gold); font-size:1.1rem; margin:0;">👥 DONOR LIST & VERIFIKASI</h4>
-              <p style="font-size:0.8rem; color:var(--text-muted); margin:2px 0 0;">Campaign: <strong style="color:#fff;">Donasi Bakti Sosial Yogyakarta 2026</strong></p>
-            </div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px;" onclick="exportDonationsExcel()">📤 Export Excel</button>
-              <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px;" onclick="exportDonationsPdf()">📤 Export PDF</button>
-              <button class="btn-primary" style="font-size:0.8rem; padding:6px 14px;" onclick="sendThankYouToAllDonors()">📧 Kirim Terima Kasih</button>
-            </div>
-          </div>
-
-          <!-- DONOR TABLE -->
-          <div id="m73-donor-table-container" class="glass-card" style="padding:16px; margin-bottom:20px; border:1px solid var(--chrome-border); border-radius:14px;">
-            <div style="overflow-x:auto;">
-              <table class="admin-table" style="width:100%; font-size:0.8rem;">
-                <thead>
-                  <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
-                    <th style="padding:8px; text-align:center; width:40px;">No</th>
-                    <th style="padding:8px;">Kode Donasi</th>
-                    <th style="padding:8px;">Member ID</th>
-                    <th style="padding:8px;">Nama Donatur</th>
-                    <th style="padding:8px;">Campaign Kode</th>
-                    <th style="padding:8px; text-align:right;">Jumlah</th>
-                    <th style="padding:8px; text-align:center;">Metode</th>
-                    <th style="padding:8px; text-align:center;">Status</th>
-                    <th style="padding:8px; text-align:center;">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="border-bottom:1px solid var(--chrome-border);">
-                    <td style="padding:10px 8px; text-align:center; font-weight:700;">1</td>
-                    <td style="padding:10px 8px; font-weight:800; color:#fff;">Derist T.</td>
-                    <td style="padding:10px 8px; font-family:monospace; color:var(--accent-gold); font-size:0.75rem;">MBINA-HQ-2026-000001</td>
-                    <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald);">Rp 5.000.000</td>
-                    <td style="padding:10px 8px; text-align:center; font-weight:700; color:var(--accent-blue);">TRANSFER</td>
-                    <td style="padding:10px 8px; text-align:center;"><span style="color:var(--primary-emerald); font-weight:800;">✅ SUCCESS</span></td>
-                    <td style="padding:10px 8px; text-align:center;">
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="viewDonationReceipt('rec_1')" title="Detail">👁️</button>
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="viewDonationReceipt('rec_1')" title="Receipt">🧾</button>
-                    </td>
-                  </tr>
-                  <tr style="border-bottom:1px solid var(--chrome-border);">
-                    <td style="padding:10px 8px; text-align:center; font-weight:700;">2</td>
-                    <td style="padding:10px 8px; font-weight:800; color:#fff;">Andi P.</td>
-                    <td style="padding:10px 8px; font-family:monospace; color:var(--accent-gold); font-size:0.75rem;">MBINA-JKT-2026-000005</td>
-                    <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald);">Rp 2.000.000</td>
-                    <td style="padding:10px 8px; text-align:center; font-weight:700; color:var(--accent-blue);">QRIS</td>
-                    <td style="padding:10px 8px; text-align:center;"><span style="color:var(--primary-emerald); font-weight:800;">✅ SUCCESS</span></td>
-                    <td style="padding:10px 8px; text-align:center;">
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="viewDonationReceipt('rec_2')" title="Detail">👁️</button>
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="viewDonationReceipt('rec_2')" title="Receipt">🧾</button>
-                    </td>
-                  </tr>
-                  <tr style="border-bottom:1px solid var(--chrome-border);">
-                    <td style="padding:10px 8px; text-align:center; font-weight:700;">3</td>
-                    <td style="padding:10px 8px; font-weight:800; color:#fff;">Siti R.</td>
-                    <td style="padding:10px 8px; font-family:monospace; color:var(--accent-gold); font-size:0.75rem;">MBINA-SBY-2026-000007</td>
-                    <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald);">Rp 1.000.000</td>
-                    <td style="padding:10px 8px; text-align:center; font-weight:700; color:var(--accent-blue);">CASH</td>
-                    <td style="padding:10px 8px; text-align:center;"><span style="color:var(--primary-emerald); font-weight:800;">✅ SUCCESS</span></td>
-                    <td style="padding:10px 8px; text-align:center;">
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="viewDonationReceipt('rec_3')" title="Detail">👁️</button>
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="viewDonationReceipt('rec_3')" title="Receipt">🧾</button>
-                    </td>
-                  </tr>
-                  <tr style="border-bottom:1px solid var(--chrome-border);">
-                    <td style="padding:10px 8px; text-align:center; font-weight:700;">4</td>
-                    <td style="padding:10px 8px; font-weight:800; color:#fff;">Budi S.</td>
-                    <td style="padding:10px 8px; font-family:monospace; color:var(--accent-gold); font-size:0.75rem;">MBINA-BDG-2026-000006</td>
-                    <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--accent-gold);">Rp 500.000</td>
-                    <td style="padding:10px 8px; text-align:center; font-weight:700; color:var(--accent-blue);">TRANSFER</td>
-                    <td style="padding:10px 8px; text-align:center;"><span style="color:var(--accent-gold); font-weight:800;">⏳ PENDING</span></td>
-                    <td style="padding:10px 8px; text-align:center;">
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="alert('📷 Pratinjau Bukti Transfer Budi S. (Rp 500.000)')" title="Detail">👁️</button>
-                      <button class="btn-primary" style="padding:3px 8px; font-size:0.75rem; background:var(--primary-emerald); border-color:var(--primary-emerald);" onclick="verifyDonation('don_4', true)" title="Approve">✅</button>
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="verifyDonation('don_4', false)" title="Reject">❌</button>
-                    </td>
-                  </tr>
-                  <tr style="border-bottom:1px solid var(--chrome-border);">
-                    <td style="padding:10px 8px; text-align:center; font-weight:700;">5</td>
-                    <td style="padding:10px 8px; font-weight:800; color:#fff;">Andi W.</td>
-                    <td style="padding:10px 8px; font-family:monospace; color:var(--accent-gold); font-size:0.75rem;">MBINA-MED-2026-000008</td>
-                    <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--accent-gold);">Rp 250.000</td>
-                    <td style="padding:10px 8px; text-align:center; font-weight:700; color:var(--accent-blue);">QRIS</td>
-                    <td style="padding:10px 8px; text-align:center;"><span style="color:var(--accent-gold); font-weight:800;">⏳ PENDING</span></td>
-                    <td style="padding:10px 8px; text-align:center;">
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="alert('📷 Pratinjau Bukti Transfer Andi W. (Rp 250.000)')" title="Detail">👁️</button>
-                      <button class="btn-primary" style="padding:3px 8px; font-size:0.75rem; background:var(--primary-emerald); border-color:var(--primary-emerald);" onclick="verifyDonation('don_5', true)" title="Approve">✅</button>
-                      <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="verifyDonation('don_5', false)" title="Reject">❌</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-top:12px; padding-top:10px; border-top:1px solid var(--chrome-border);">
-              <span>Total: <strong style="color:var(--primary-emerald);">Rp 8.750.000</strong></span>
-              <span>Donatur: <strong style="color:#fff;">5</strong></span>
-              <span>Pending: <strong style="color:var(--accent-gold);">2</strong></span>
-            </div>
-          </div>
-
-          <!-- VERIFIKASI DONASI PANEL -->
-          <div class="glass-card" style="padding:20px; border:1px solid var(--accent-gold); border-radius:14px;">
-            <h5 style="color:var(--accent-gold); font-size:0.95rem; margin-bottom:12px;">─── VERIFIKASI DONASI ───</h5>
-            <div style="background:rgba(0,0,0,0.3); padding:16px; border-radius:12px; border:1px solid var(--chrome-border); margin-bottom:14px;">
-              <div style="font-size:0.85rem; color:#fff; font-weight:800; margin-bottom:4px;">Donatur: Budi Santoso</div>
-              <div style="font-size:0.85rem; color:var(--primary-emerald); font-weight:800; margin-bottom:8px;">Jumlah: Rp 500.000</div>
-              <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
-                Bukti: <button class="btn-outline" style="font-size:0.75rem; padding:3px 10px;" onclick="alert('📷 Menampilkan foto bukti transfer Budi Santoso (Rp 500.000)...')">📷 Lihat Bukti</button>
-              </div>
-              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
-                <button class="btn-primary" style="background:var(--primary-emerald); border-color:var(--primary-emerald); font-weight:800; font-size:0.8rem; padding:8px 18px;" onclick="verifyDonation('don_4', true)">[✅ VERIFIKASI]</button>
-                <button class="btn-outline" style="color:var(--accent-red); border-color:var(--accent-red); font-weight:800; font-size:0.8rem; padding:8px 18px;" onclick="verifyDonation('don_4', false)">[❌ TOLAK]</button>
-              </div>
-              <div style="font-size:0.8rem; color:var(--text-muted);">
-                Catatan: <input type="text" class="form-input" style="width:260px; font-size:0.8rem;" placeholder="Catatan verifikasi (opsional)...">
-              </div>
-            </div>
-          </div>
-
         </div>
 
         <!-- ╔═════════════════════════════════════════════════════╗ -->
@@ -9878,7 +9750,7 @@
   </div>
 
   <!-- 2. MODAL VERIFIKASI DONASI (LUXURY MERCEDES-BENZ DARK MODE) -->
-  <div id="modal-donation-verify" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:20px;">
+  <div id="modal-donation-verify" class="modal-backdrop" onclick="if(event.target===this) AuthEngine.closeAllModals()" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:20px;">
     <div class="modal-container" style="max-width:620px; width:100%; border-radius:24px; background:rgba(9,13,22,0.96); border:1px solid rgba(255,255,255,0.1); box-shadow:0 25px 60px rgba(0,0,0,0.85); overflow:hidden;">
       
       <!-- Modal Header -->
@@ -9947,7 +9819,7 @@
   </div>
 
   <!-- 3. MODAL DIGITAL RECEIPT (TAMPILAN OFFICIAL DIGITAL RECEIPT) -->
-  <div id="modal-digital-receipt" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+  <div id="modal-digital-receipt" class="modal-backdrop" onclick="if(event.target===this) AuthEngine.closeAllModals()" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
     <div class="modal-container" style="max-width:680px;">
       <div class="modal-header">
         <h3 class="modal-title" style="color:var(--accent-gold);">🧾 DIGITAL RECEIPT - MB INA</h3>
@@ -10318,8 +10190,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260903_noloop_v81"></script>
-  <script src="js/app.js?v=20260903_noloop_v81"></script>
+  <script src="js/auth.js?v=20260903_bukti_perfect_v82"></script>
+  <script src="js/app.js?v=20260903_bukti_perfect_v82"></script>
   <script>
     lucide.createIcons();
     try {
