@@ -222,14 +222,17 @@ photo_url: sbUser.user_metadata?.picture || '',
     const targetModal = document.getElementById(modalId);
     if (targetModal) {
       document.body.style.overflow = 'hidden';
+      // Remove all !important inline overrides set by closeAllModals
       targetModal.style.removeProperty('display');
-      targetModal.style.removeProperty('visibility');
       targetModal.style.removeProperty('opacity');
-      targetModal.style.display = 'flex';
-      targetModal.style.visibility = 'visible';
-      targetModal.style.opacity = '1';
-      targetModal.style.pointerEvents = 'auto';
-      targetModal.style.zIndex = '10000';
+      targetModal.style.removeProperty('pointer-events');
+      targetModal.style.removeProperty('visibility');
+      // Re-apply with !important to beat CSS base rule (opacity:0, pointer-events:none)
+      targetModal.style.setProperty('display', 'flex', 'important');
+      targetModal.style.setProperty('opacity', '1', 'important');
+      targetModal.style.setProperty('pointer-events', 'auto', 'important');
+      targetModal.style.setProperty('visibility', 'visible', 'important');
+      targetModal.style.zIndex = '10001';
       targetModal.classList.add('active');
 
       if (modalId === 'modal-register') {
@@ -281,14 +284,13 @@ photo_url: sbUser.user_metadata?.picture || '',
   closeAllModals() {
     document.querySelectorAll('.modal-backdrop, .modal-overlay, .modal-container-backdrop').forEach(m => {
       m.classList.remove('active');
-      m.style.removeProperty('display');
-      m.style.display = 'none';
-      m.style.pointerEvents = 'none';
-      m.style.opacity = '0';
+      m.style.setProperty('display', 'none', 'important');
+      m.style.setProperty('opacity', '0', 'important');
+      m.style.setProperty('pointer-events', 'none', 'important');
       m.style.visibility = 'hidden';
     });
     const loader = document.getElementById('global-app-loader');
-    if (loader) { loader.style.removeProperty('display'); loader.style.display = 'none'; }
+    if (loader) loader.style.setProperty('display', 'none', 'important');
     document.body.style.overflow = '';
   },
 
