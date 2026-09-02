@@ -18364,24 +18364,37 @@ const M6Engine = {
           ? `<span style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.2); font-size:0.75rem; padding:2px 8px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px; font-weight:500;"><span style="width:6px; height:6px; border-radius:50%; background:#fb7185;"></span><span>Rejected</span></span>`
           : `<span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-size:0.75rem; padding:2px 8px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px; font-weight:500;"><span style="width:6px; height:6px; border-radius:50%; background:#fbbf24;"></span><span>Pending</span></span>`);
 
-      // Secondary outline buttons with monoline SVG icons
-      const actionBtn = isSuccess
-        ? `<div style="display:flex; gap:6px; justify-content:center; align-items:center;">
-             <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#d4d4d4; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(245,158,11,0.1)';" onmouseout="this.style.color='#d4d4d4'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.03)';" onclick="window.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer">
-               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-               <span>Bukti</span>
-             </button>
-             <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#d4d4d4; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(245,158,11,0.1)';" onmouseout="this.style.color='#d4d4d4'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.03)';" onclick="window.viewDonationReceipt('${d.id}')" title="Kwitansi Digital Resmi">
-               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
-               <span>Kwitansi</span>
-             </button>
-           </div>`
-        : `<div style="display:flex; gap:6px; justify-content:center; align-items:center;">
-             <button type="button" style="font-size:0.75rem; padding:5px 12px; background:#f59e0b; color:#0a0a0a; font-weight:600; border-radius:8px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:5px; transition:all 0.15s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="window.openDonationVerifyModal('${d.id}')" title="Periksa Bukti & Verifikasi">
-               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-               <span>Periksa Bukti</span>
-             </button>
-           </div>`;
+      // Action button based on precise status (No checkmark on rejected!)
+      let actionBtn = '';
+      if (isSuccess) {
+        actionBtn = `
+          <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#d4d4d4; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(245,158,11,0.1)';" onmouseout="this.style.color='#d4d4d4'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.03)';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Bukti</span>
+            </button>
+            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(52,211,153,0.3); background:rgba(16,185,129,0.08); color:#34d399; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(16,185,129,0.18)';" onmouseout="this.style.background='rgba(16,185,129,0.08)';" onclick="AppEngine.openDigitalReceiptModalByDonationId('${d.id}')" title="Kwitansi Digital Resmi">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+              <span>Kwitansi</span>
+            </button>
+          </div>`;
+      } else if (d.status === 'REJECTED') {
+        actionBtn = `
+          <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(244,63,94,0.3); background:rgba(244,63,94,0.06); color:#fb7185; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(244,63,94,0.15)';" onmouseout="this.style.background='rgba(244,63,94,0.06)';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer (Ditolak)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Lihat Bukti</span>
+            </button>
+          </div>`;
+      } else {
+        actionBtn = `
+          <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+            <button type="button" style="font-size:0.75rem; padding:6px 14px; background:#f59e0b; color:#0a0a0a; font-weight:700; border-radius:8px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s; box-shadow:0 2px 8px rgba(245,158,11,0.25);" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Periksa Bukti Transfer & Verifikasi">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Periksa Bukti</span>
+            </button>
+          </div>`;
+      }
 
       const campObj = (this.donationData.campaigns || []).find(c => c.id === d.campaign_id);
       const campTitle = campObj ? campObj.title : d.campaign_id;
@@ -18706,246 +18719,83 @@ const M6Engine = {
   },
 
   openDonationVerifyModal(donationId) {
-    if (typeof window.openDonationVerifyModal === 'function') {
-      window.openDonationVerifyModal(donationId);
-    }
-  },
-
-  async confirmVerifyDonation(isApproved) {
-    if (typeof window.confirmVerifyDonation === 'function') {
-      await window.confirmVerifyDonation(isApproved);
-    }
-  },
-
-  async saveDonationCampaign(event) {
-    if (event && typeof event.preventDefault === 'function') event.preventDefault();
-
-    if (!this.donationData) this.donationData = {};
-    if (!Array.isArray(this.donationData.campaigns)) this.donationData.campaigns = [];
-
-    const titleEl = document.getElementById('m73-camp-title');
-    const descEl = document.getElementById('m73-camp-desc');
-    const targetEl = document.getElementById('m73-camp-target');
-    const startEl = document.getElementById('m73-camp-start');
-    const endEl = document.getElementById('m73-camp-end');
-
-    const title = titleEl && titleEl.value ? titleEl.value : 'Donasi Bakti Sosial Yogyakarta 2026';
-    const description = descEl && descEl.value ? descEl.value : 'Bantu kami berbagi kebahagiaan dengan masyarakat Yogyakarta...';
-    const target_amount = targetEl && targetEl.value ? parseFloat(targetEl.value) : 20000000;
-    const start_date = startEl && startEl.value ? startEl.value : '2026-09-01';
-    const end_date = endEl && endEl.value ? endEl.value : '2026-09-14';
-
-    const newCampaign = {
-      id: 'camp_' + Date.now(),
-      title: title,
-      description: description,
-      target_amount: target_amount,
-      collected_amount: 0,
-      start_date: start_date,
-      end_date: end_date,
-      is_active: true,
-      created_by: (this.currentUser && this.currentUser.id) ? this.currentUser.id : 'usr_superadmin'
-    };
-
-    this.donationData.campaigns.unshift(newCampaign);
-
-    window.showToast('🎉 CAMPAIGN DONASI BERHASIL DIBUAT!\n\nProgram "' + title + '" telah tersimpan dan siap menerima donasi.', 'success');
-
-    try {
-      fetch('api.php?action=create_donation_campaign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newCampaign)
-      });
-    } catch (e) {
-      console.warn('API save background note:', e);
-    }
-
-    if (typeof window.switchDonationSubtab === 'function') {
-      window.switchDonationSubtab('7_3_1_progress');
-    } else {
-      this.switchDonationSubtab('7_3_1_progress');
-    }
-  },
-
-  openMemberDonationModal(campaignId = 'camp_yogya_2026') {
-    const knownCamps = [
-      { id: 'camp_yogya_2026', title: 'Dana Touring & Bakti Sosial Yogyakarta 2026', goal_amount: 50000000, target_amount: 50000000, collected_amount: 32450000, donors_count: 48 },
-      { id: 'camp_jamnas_2026', title: 'Sponsorship Jamnas MB INA XXV 2026', goal_amount: 150000000, target_amount: 150000000, collected_amount: 78000000, donors_count: 112 },
-      { id: 'DON-CAMP-2026-002', title: 'Donasi Bakti Sosial Bandung 2026', target_amount: 10000000, goal_amount: 10000000, collected_amount: 11000000, donors_count: 2 },
-      { id: 'DON-CAMP-2026-001', title: 'Campaign Test Ramadhan 2026', target_amount: 15000000, goal_amount: 15000000, collected_amount: 200000, donors_count: 1 }
-    ];
-
-    const appCamps = (window.AppEngine && window.AppEngine.donationData && Array.isArray(window.AppEngine.donationData.campaigns))
-      ? window.AppEngine.donationData.campaigns : [];
-    const m7Camps = (this.donationData && Array.isArray(this.donationData.campaigns))
-      ? this.donationData.campaigns : [];
-
-    const allCamps = [...m7Camps, ...appCamps, ...knownCamps];
-    let camp = allCamps.find(c => c && c.id === campaignId);
-    if (!camp) {
-      camp = knownCamps.find(c => c.id === campaignId) || knownCamps[0];
-    }
-
-    const title = camp.title || 'Dana Touring & Bakti Sosial Yogyakarta 2026';
-    const targetVal = Number(camp.target_amount || camp.goal_amount || camp.target || 50000000);
-    const collectedVal = Number(camp.collected_amount || 0);
-    const donorVal = Number(camp.donor_count || camp.donors_count || camp.donors || 0);
-    const pct = Math.min(100, Math.round((collectedVal / (targetVal || 1)) * 100));
-
-    const elId = document.getElementById('member-don-camp-id');
-    const elTitle = document.getElementById('member-don-camp-title');
-    const elTarget = document.getElementById('member-don-camp-target');
-    const elCollected = document.getElementById('member-don-camp-collected');
-    const elBar = document.getElementById('member-don-camp-bar');
-    const elDonors = document.getElementById('member-don-camp-donors');
-
-    if (elId) elId.value = camp.id || campaignId;
-    if (elTitle) elTitle.innerText = title;
-    if (elTarget) elTarget.innerText = 'Rp ' + targetVal.toLocaleString('id-ID');
-    if (elCollected) elCollected.innerText = 'Rp ' + collectedVal.toLocaleString('id-ID');
-    if (elBar) elBar.style.width = pct + '%';
-    if (elDonors && donorVal) elDonors.innerText = 'Donatur: ' + donorVal + ' orang';
-
-    // Auto-prefill active user name & ID
-    const u = (window.AppEngine && window.AppEngine.currentUser) || (window.AuthEngine && window.AuthEngine.currentUser) || {};
-    const nameEl = document.getElementById('member-don-name');
-    const idEl = document.getElementById('member-don-id');
-    if (nameEl && u.name) nameEl.value = u.name;
-    if (idEl && (u.member_id || u.id)) idEl.value = u.member_id || u.id;
-
-    if (window.AuthEngine && typeof window.AuthEngine.closeAllModals === 'function') {
-      window.AuthEngine.closeAllModals();
-    }
-    const modal = document.getElementById('modal-member-donation');
-    if (modal) {
-      modal.style.setProperty('display', 'flex', 'important');
-      modal.classList.add('active');
-      modal.style.opacity = '1';
-      modal.style.pointerEvents = 'auto';
-      modal.style.zIndex = '99999';
-      document.body.style.overflow = 'hidden';
-    }
-  },
-
-  handleDonationProofUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-      document.getElementById('member-don-file-name').innerText = '✅ ' + file.name;
-    }
-  },
-
-  selectDonationPreset(amount, btnElement) {
-    var el = document.getElementById('member-don-custom-amount');
-    if (el) {
-      el.value = amount;
-    }
-    if (btnElement) {
-      var btns = btnElement.parentElement.querySelectorAll('button');
-      btns.forEach(b => {
-        b.style.backgroundColor = 'transparent';
-        b.style.color = 'var(--text-light)';
-      });
-      btnElement.style.backgroundColor = 'var(--accent-gold)';
-      btnElement.style.color = 'var(--bg-dark)';
-    }
-  },
-
-  async submitMemberDonation(event) {
-    event.preventDefault();
-    const campaign_id = document.getElementById('member-don-camp-id').value;
-    const amount = document.getElementById('member-don-custom-amount').value;
-    const payment_method = document.getElementById('member-don-method').value;
-    
-    // New fields
-    const donor_name = document.getElementById('member-don-name') ? document.getElementById('member-don-name').value : '';
-    const member_id_input = document.getElementById('member-don-id') ? document.getElementById('member-don-id').value : '';
-
-    if (!amount || parseFloat(amount) <= 0) {
-      window.showToast('⚠️ Silakan masukkan nominal donasi!', 'error');
-      return;
-    }
-
-    try {
-      const res = await fetch('api.php?action=submit_donation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          campaign_id,
-          user_id: this.currentUser?.id || 'usr_superadmin',
-          donor_name,
-          member_id_input,
-          amount,
-          payment_method,
-          payment_proof_url: 'assets/mb_hero.jpg'
-        })
-      }).then(r => r.json());
-
-      if (res.success) {
-        window.showToast(`💝 TERIMA KASIH ATAS DONASI ANDA!\n\nNominal: Rp ${parseFloat(amount).toLocaleString('id-ID')}\nMetode: ${payment_method}\n\nDonasi Anda telah berhasil dikirim dan akan diverifikasi oleh Admin MB INA.`, 'success');
-        
-        // Reset form for next usage
-        document.getElementById('member-donation-form').reset();
-        AuthEngine.closeModal('modal-member-donation');
-        
-        // Reload data but stay on the same tab so member can fill out other events
-        if (window.loadDonationData) {
-          await window.loadDonationData();
-          if (typeof this.renderDonationCampaignCards === 'function') {
-            this.renderDonationCampaignCards();
-          }
-          if (typeof this.renderDonationDonorTable === 'function') {
-            this.renderDonationDonorTable();
-          }
-          if (typeof this.renderDonationReceiptsTable === 'function') {
-            this.renderDonationReceiptsTable();
-          }
-        }
-
-      } else {
-        window.showToast('⚠️ Error: ' + res.message, 'error');
-      }
-    } catch (e) {
-      // Local fallback
-      if (!this.donationData) this.donationData = {};
-      if (!Array.isArray(this.donationData.donations)) this.donationData.donations = [];
-      this.donationData.donations.unshift({
-        id: 'don_' + Date.now(),
-        campaign_id,
-        user_id: this.currentUser?.id || 'usr_superadmin',
-        donor_name: this.currentUser?.name || 'Derist Touriano',
-        member_id: 'MBINA-HQ-2026-000001',
-        amount: parseFloat(amount),
-        payment_method,
-        status: 'PENDING',
-        created_at: 'Baru Saja'
-      });
-      alert(`💝 TERIMA KASIH ATAS DONASI ANDA (LOCAL)!\n\nNominal: Rp ${parseFloat(amount).toLocaleString('id-ID')}\nDonasi Anda telah tersimpan dan menunggu verifikasi admin.`);
-      AuthEngine.closeModal('modal-member-donation');
-      this.renderDonationModule();
-    }
-  },
-
-  openDonationVerifyModal(donationId) {
     const don = (this.donationData && Array.isArray(this.donationData.donations))
-      ? this.donationData.donations.find(d => d.id === donationId) || {}
+      ? this.donationData.donations.find(d => String(d.id) === String(donationId) || String(d.trx_code) === String(donationId)) || {}
       : {};
-    this.activeDonationVerifyId = donationId;
+    this.activeDonationVerifyId = don.id || donationId;
 
+    const codeEl = document.getElementById('verify-don-code');
     const nameEl = document.getElementById('verify-don-name');
+    const memberEl = document.getElementById('verify-don-member-id');
     const amtEl = document.getElementById('verify-don-amount');
     const methodEl = document.getElementById('verify-don-method');
-    const dateEl = document.getElementById('verify-don-date');
+    const campEl = document.getElementById('verify-don-campaign');
+    const badgeEl = document.getElementById('verify-don-status-badge');
     const proofImg = document.getElementById('verify-don-proof-img');
+    const proofLink = document.getElementById('verify-don-proof-link');
+    const actionsEl = document.getElementById('verify-don-actions');
 
-    if (nameEl) nameEl.innerText = `${don.donor_name || 'Donatur MB INA'} ${don.member_id ? '(' + don.member_id + ')' : ''}`;
+    const campObj = (this.donationData.campaigns || []).find(c => c.id === don.campaign_id);
+    const campTitle = campObj ? campObj.title : (don.campaign_id || 'Donasi Bakti Sosial Yogyakarta 2026');
+
+    if (codeEl) codeEl.innerText = don.trx_code || don.id || donationId;
+    if (nameEl) nameEl.innerText = don.donor_name || 'Hamba Allah';
+    if (memberEl) memberEl.innerText = don.member_id || 'Non-Member';
     if (amtEl) amtEl.innerText = 'Rp ' + parseFloat(don.amount || 0).toLocaleString('id-ID');
-    if (methodEl) methodEl.innerText = `${don.payment_method || 'TRANSFER'} • ${don.status || 'PENDING'}`;
-    if (dateEl) dateEl.innerText = don.created_at || 'Hari Ini';
-    
+    if (methodEl) methodEl.innerText = `${don.payment_method || 'TRANSFER'} • ${don.created_at || 'Hari Ini'}`;
+    if (campEl) campEl.innerText = campTitle;
+
+    const status = don.status || 'PENDING';
+    if (badgeEl) {
+      if (status === 'SUCCESS' || status === 'CONFIRMED') {
+        badgeEl.style.cssText = 'background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); font-size:0.75rem; padding:4px 12px; border-radius:9999px; font-weight:600; display:inline-block;';
+        badgeEl.innerText = 'TERVERIFIKASI (SUCCESS)';
+      } else if (status === 'REJECTED') {
+        badgeEl.style.cssText = 'background:rgba(244,63,94,0.15); color:#fb7185; border:1px solid rgba(244,63,94,0.3); font-size:0.75rem; padding:4px 12px; border-radius:9999px; font-weight:600; display:inline-block;';
+        badgeEl.innerText = 'DITOLAK (REJECTED)';
+      } else {
+        badgeEl.style.cssText = 'background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-size:0.75rem; padding:4px 12px; border-radius:9999px; font-weight:600; display:inline-block;';
+        badgeEl.innerText = 'MENUNGGU VERIFIKASI (PENDING)';
+      }
+    }
+
+    const proofUrl = don.payment_proof_url || 'assets/mb_hero.jpg';
     if (proofImg) {
-      proofImg.src = don.payment_proof_url || 'assets/mb_hero.jpg';
+      proofImg.src = proofUrl;
       proofImg.onerror = function() { this.src = 'assets/mb_hero.jpg'; };
+    }
+    if (proofLink) {
+      proofLink.href = proofUrl;
+    }
+
+    if (actionsEl) {
+      if (status === 'PENDING') {
+        actionsEl.innerHTML = `
+          <button type="button" class="btn-outline" style="border-color:rgba(244,63,94,0.4); color:#fb7185; padding:9px 20px; border-radius:12px; font-weight:600; font-size:0.8125rem; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine.confirmVerifyDonation(false)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <span>Tolak Donasi</span>
+          </button>
+          <button type="button" class="btn-primary" style="background:#10b981; color:#042f2e; font-weight:700; padding:9px 24px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 10px rgba(16,185,129,0.3);" onclick="AppEngine.confirmVerifyDonation(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Setujui & Terbitkan Kwitansi</span>
+          </button>
+        `;
+      } else if (status === 'SUCCESS' || status === 'CONFIRMED') {
+        actionsEl.innerHTML = `
+          <button type="button" class="btn-outline" style="padding:9px 20px; border-radius:12px; font-size:0.8125rem; color:#94a3b8; border-color:rgba(255,255,255,0.1);" onclick="AuthEngine.closeAllModals()">Tutup</button>
+          <button type="button" class="btn-outline" style="border-color:rgba(52,211,153,0.3); background:rgba(16,185,129,0.1); color:#34d399; padding:9px 22px; border-radius:12px; font-weight:600; font-size:0.8125rem; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AuthEngine.closeAllModals(); AppEngine.openDigitalReceiptModalByDonationId('${donationId}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+            <span>Buka Kwitansi Resmi</span>
+          </button>
+        `;
+      } else {
+        actionsEl.innerHTML = `
+          <button type="button" class="btn-outline" style="padding:9px 20px; border-radius:12px; font-size:0.8125rem; color:#94a3b8; border-color:rgba(255,255,255,0.1);" onclick="AuthEngine.closeAllModals()">Tutup</button>
+          <span style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.25); font-size:0.75rem; padding:8px 16px; border-radius:10px; font-weight:600; display:inline-flex; align-items:center; gap:5px;">
+            <span>Transaksi Donasi Telah Ditolak</span>
+          </span>
+        `;
+      }
     }
 
     AuthEngine.openModal('modal-donation-verify');
