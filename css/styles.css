@@ -291,24 +291,37 @@ body.light-mode .brand-title {
 }
 
 .dropdown-item-luxury {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  color: #cbd5e1;
-  background: transparent;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  padding: 8px 12px !important;
+  border-radius: 12px !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  color: #d4d4d4 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  text-align: left !important;
+  text-decoration: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 }
 
 .dropdown-item-luxury:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06) !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+}
+
+.dropdown-item-luxury:hover svg {
+  color: #fbbf24 !important;
 }
 
 body.light-mode .nav-pill-btn:hover {
