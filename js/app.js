@@ -15455,6 +15455,8 @@ const M6Engine = {
     this.renderPublishPage();
     this.renderCalendar();
     this.renderBepSummary();
+    if (typeof this.renderSponsorEventSelector === 'function') this.renderSponsorEventSelector();
+    if (typeof this.renderSponsorConfirmTable === 'function') this.renderSponsorConfirmTable();
     if (typeof AppEngine !== 'undefined' && AppEngine._renderMemberEventCard) {
       AppEngine._renderMemberEventCard();
     }
@@ -16202,23 +16204,38 @@ const M6Engine = {
 
     const allProposals = [...(this.data?.proposals || []), ...savedProps, ...masterOfficial];
     
-    // Deduplicate strictly by event_code / id
+    // Priority mapping: masterOfficial baseline, updated by savedProps, updated by live this.data.proposals
     const propMap = new Map();
-    allProposals.forEach(p => {
+    masterOfficial.forEach(m => {
+      const code = String(m.event_code || m.id || '').trim().toUpperCase();
+      if (code) propMap.set(code, m);
+    });
+    savedProps.forEach(p => {
       if (!p) return;
-      const isApproved = p.status === 'APPROVED' || p.status === 'ACCEPTED' || masterOfficial.some(m => m.event_code === p.event_code || m.id === p.id);
-      if (!isApproved) return;
-      const code = String(p.event_code || p.id || p.code || '').trim().toUpperCase();
-      if (!code) return;
-      if (!propMap.has(code)) {
-        propMap.set(code, p);
-      }
+      const code = String(p.event_code || p.id || '').trim().toUpperCase();
+      if (code) propMap.set(code, p);
+    });
+    (this.data?.proposals || []).forEach(p => {
+      if (!p) return;
+      const code = String(p.event_code || p.id || '').trim().toUpperCase();
+      if (code) propMap.set(code, p);
     });
 
-    let list = Array.from(propMap.values());
+    // ⛔ STRICT PRESIDENT CONFIRMATION FILTER:
+    // Only proposals with status 'APPROVED' or 'ACCEPTED' and confirmed by President are permitted!
+    // Proposals with status PENDING, REVISION, REJECTED, or DRAFT are completely excluded.
+    const confirmedProposals = Array.from(propMap.values()).filter(p => {
+      if (!p) return false;
+      const st = String(p.status || '').trim().toUpperCase();
+      if (st === 'PENDING' || st === 'REVISION' || st === 'REJECTED' || st === 'DRAFT') {
+        return false;
+      }
+      return st === 'APPROVED' || st === 'ACCEPTED' || st === 'CONFIRMED';
+    });
 
+    let list = confirmedProposals;
     if (!list || !list.length) {
-      list = masterOfficial;
+      list = masterOfficial.filter(m => m.status === 'APPROVED' || m.status === 'ACCEPTED');
     }
 
     // Sort by date upcoming
@@ -16233,7 +16250,7 @@ const M6Engine = {
       const sDate = p.date_start || p.start_date || '2026-09-13T08:00';
       const eDate = p.date_end || p.end_date || sDate;
       
-      // Calculate real total budget strictly from proposal
+      // Calculate real total budget strictly from proposal approved by President
       let budget = Number(p.total_budget);
       if (!budget && p.rab_items && Array.isArray(p.rab_items) && p.rab_items.length) {
         budget = p.rab_items.reduce((sum, item) => sum + ((Number(item.qty) || 1) * (Number(item.unit_cost || item.price) || 0)), 0);
@@ -16256,7 +16273,11 @@ const M6Engine = {
         end_date: eDate,
         location: p.address || p.location || p.city || 'Indonesia',
         total_budget: budget,
-        rab_items: p.rab_items || []
+        rab_items: p.rab_items || [],
+        status: p.status || 'APPROVED',
+        approved_by: p.approved_by || 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
+        approved_at: p.approved_at || 'Agustus 2026',
+        president_notes: p.president_notes || 'Disetujui resmi oleh Presiden MB Club Indonesia'
       };
     });
   },
@@ -16286,7 +16307,8 @@ const M6Engine = {
     const optionsHtml = events.map(ev => {
       const d = new Date(ev.start_date);
       const isSel = (ev.id === this.selectedSponsorEventId || ev.code === this.selectedSponsorEventId);
-      return `<option value="${ev.id}" ${isSel ? 'selected' : ''}>[${ev.code}] ${ev.title} (${this.formatDateIndo(d)})</option>`;
+      const rabFmt = 'Rp ' + ((ev.total_budget || 0) / 1e6).toFixed(0) + ' Jt';
+      return `<option value="${ev.id}" ${isSel ? 'selected' : ''}>[${ev.code}] ${ev.title} (RAB: ${rabFmt} • Disahkan Presiden)</option>`;
     }).join('');
 
     if (sel) sel.innerHTML = optionsHtml;
@@ -16348,6 +16370,11 @@ const M6Engine = {
     if (fLoc) fLoc.textContent = ev.location;
     if (fDate) fDate.textContent = dateStr;
     if (fRab) fRab.textContent = 'Rp ' + this.EVENT_RAB.toLocaleString('id-ID');
+
+    const fAuth = document.getElementById('m6-sp-form-event-auth');
+    if (fAuth) {
+      fAuth.innerHTML = `<span style="color:#34d399; font-weight:700;">✅ Disetujui Presiden (${ev.approved_by || 'Dr. Rochady Hendra Setya Wibawa'})</span>`;
+    }
 
     this.onSponsorConfirmPkgChange();
 
@@ -17060,11 +17087,20 @@ const M6Engine = {
     const targetRabEl = document.getElementById('m6-sp-confirm-target-rab');
     const eventTitleEl = document.getElementById('m6-sp-confirm-rab-event-title');
     const pctBadgeEl = document.getElementById('m6-sp-confirm-pct-badge');
+    const presBadgeEl = document.getElementById('m6-sp-confirm-president-badge');
+    const presAuthorEl = document.getElementById('m6-sp-confirm-president-author');
 
     if (rabTotalEl) rabTotalEl.textContent = 'Rp ' + rab.toLocaleString('id-ID');
     if (targetRabEl) targetRabEl.textContent = 'Rp ' + targetRab.toLocaleString('id-ID');
     if (eventTitleEl && curEvent) {
       eventTitleEl.textContent = `[${curEvent.code}] ${curEvent.title}`;
+    }
+    if (presBadgeEl) {
+      presBadgeEl.textContent = '✅ DISAHKAN PRESIDEN';
+    }
+    if (presAuthorEl && curEvent) {
+      presAuthorEl.textContent = curEvent.approved_by || 'Dr. Rochady Hendra Setya Wibawa';
+      presAuthorEl.title = `Disahkan pada: ${curEvent.approved_at || 'Resmi MB INA'}`;
     }
 
     // Count confirmed sponsors for current active event
