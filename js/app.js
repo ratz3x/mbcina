@@ -4983,7 +4983,17 @@ const AppEngine = {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
               <span>${e.location}</span>
             </p>
-            <p style="font-size:0.8rem; color:#94a3b8; line-height:1.5; margin:0 0 14px 0;">${e.description}</p>
+            <p style="font-size:0.8rem; color:#94a3b8; line-height:1.5; margin:0 0 10px 0;">${e.description}</p>
+            ${(() => {
+              const evtSponsors = window.M6Engine?.getConfirmedSponsorsForEvent ? window.M6Engine.getConfirmedSponsorsForEvent(e.id || e.code) : [];
+              if (!evtSponsors || !evtSponsors.length) return '';
+              return `
+                <div style="margin-bottom:12px; padding:6px 10px; background:rgba(245,158,11,0.08); border-radius:8px; border:1px solid rgba(245,158,11,0.25); font-size:0.72rem; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                  <span style="color:var(--accent-gold); font-weight:700;">🤝 Mitra Sponsor:</span>
+                  <span style="color:#cbd5e1;">${evtSponsors.map(s => s.name).join(', ')}</span>
+                </div>
+              `;
+            })()}
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px; margin-top:auto;">
             <span style="font-size:0.78rem; color:var(--primary-emerald); font-weight:700;">HTM: ${e.htm}</span>
@@ -12936,6 +12946,36 @@ const M6Engine = {
                   </div>
                 </div>
               </div>
+              <!-- DAFTAR SPONSOR RESMI EVENT INI -->
+              ${(() => {
+                const evtSponsors = this.getConfirmedSponsorsForEvent ? this.getConfirmedSponsorsForEvent(e.id || e.code) : [];
+                const totalSponsorVal = evtSponsors.reduce((sum, s) => sum + (s.value || 0), 0);
+                return `
+                  <div style="margin-bottom:14px; padding:12px 16px; background:rgba(0,0,0,0.35); border-radius:12px; border:1px solid rgba(245,158,11,0.25);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                      <span style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); display:inline-flex; align-items:center; gap:6px;">
+                        🤝 SPONSOR RESMI TERKONFIRMASI (${evtSponsors.length})
+                      </span>
+                      <span style="font-size:0.72rem; color:var(--primary-emerald); font-weight:700;">
+                        Dana Masuk: Rp ${totalSponsorVal.toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                    ${evtSponsors.length === 0 ? `
+                      <div style="font-size:0.75rem; color:#94a3b8; font-style:italic;">Belum ada mitra sponsor terkonfirmasi untuk kegiatan ini.</div>
+                    ` : `
+                      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                        ${evtSponsors.map(s => `
+                          <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(245,158,11,0.35); border-radius:20px; padding:4px 12px; display:inline-flex; align-items:center; gap:8px;">
+                            <span style="font-size:0.8rem; font-weight:800; color:#fff;">${s.name}</span>
+                            <span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.68rem; font-weight:900; padding:1px 8px; border-radius:12px;">${s.pkg}</span>
+                            <span style="font-size:0.72rem; color:var(--primary-emerald); font-weight:700;">Rp ${(s.value/1e6).toFixed(1)} JT</span>
+                          </div>
+                        `).join('')}
+                      </div>
+                    `}
+                  </div>
+                `;
+              })()}
 
               <!-- ACTION BUTTONS BAR -->
               <div style="display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
@@ -15938,6 +15978,11 @@ const M6Engine = {
       name: 'PT. BNI', 
       email: 'sponsor@bni.co.id', 
       phone: '08111222333', 
+      eventId: 'EVT-2026-001',
+      eventCode: 'EVT-2026-001',
+      eventTitle: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026',
+      eventDate: '12 - 14 September 2026',
+      eventLocation: 'Hotel Tentrem & Panti Asuhan Yogyakarta',
       pkg: '💎 PLATINUM', 
       pct: 50, 
       value: 37500000, 
@@ -15960,13 +16005,18 @@ const M6Engine = {
       name: 'Bank Mandiri', 
       email: 'corporate@bankmandiri.co.id', 
       phone: '08129876543', 
+      eventId: 'EVT-2026-003',
+      eventCode: 'EVT-2026-003',
+      eventTitle: 'Grand Touring Trans Sumatra & Celebes Rally 2026',
+      eventDate: '5 - 10 Desember 2026',
+      eventLocation: 'Medan - Danau Toba - Bukittinggi',
       pkg: '💎 PLATINUM', 
       pct: 50, 
-      value: 37500000, 
+      value: 60000000, 
       status: 'WAITING_BENDAHARA', 
       submitDate: '03/09/2026', 
       confirmDate: '-', 
-      deadline: '06/09/2026', 
+      deadline: '28/11/2026', 
       bendaharaApproved: false, 
       presidenApproved: false, 
       adminApproved: false,
@@ -15979,13 +16029,18 @@ const M6Engine = {
       name: 'Astra Otoparts', 
       email: 'info@astra-otoparts.co.id', 
       phone: '081388889999', 
+      eventId: 'EVT-2026-002',
+      eventCode: 'EVT-2026-002',
+      eventTitle: 'Jamnas MB INA XXV & Musyawarah Nasional 2026',
+      eventDate: '20 - 22 November 2026',
+      eventLocation: 'ICE BSD City, Tangerang',
       pkg: '🥇 GOLD', 
       pct: 35, 
-      value: 26250000, 
+      value: 87500000, 
       status: 'WAITING_PRESIDEN', 
       submitDate: '02/09/2026', 
       confirmDate: '-', 
-      deadline: '06/09/2026', 
+      deadline: '13/11/2026', 
       bendaharaApproved: true, 
       bendaharaApprovedAt: '03/09/2026 11:00', 
       presidenApproved: false, 
@@ -15999,13 +16054,18 @@ const M6Engine = {
       name: 'Pertamina Lubricants', 
       email: 'sponsor@pertaminalub.com', 
       phone: '081700001111', 
+      eventId: 'EVT-2026-012',
+      eventCode: 'EVT-2026-012',
+      eventTitle: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+      eventDate: '5 September 2026',
+      eventLocation: 'TOPGOLF JAKARTA, Fatmawati',
       pkg: '🥈 SILVER', 
       pct: 15, 
-      value: 11250000, 
+      value: 5250000, 
       status: 'WAITING_ADMIN', 
       submitDate: '01/09/2026', 
       confirmDate: '-', 
-      deadline: '06/09/2026', 
+      deadline: '29/08/2026', 
       bendaharaApproved: true, 
       bendaharaApprovedAt: '02/09/2026 09:30', 
       presidenApproved: true, 
@@ -16084,24 +16144,52 @@ const M6Engine = {
     });
   },
 
+  getConfirmedSponsorsForEvent(eventIdOrCode) {
+    if (!eventIdOrCode) return [];
+    const codeClean = String(eventIdOrCode).trim().toUpperCase();
+    return (this.sampleSponsors || []).filter(s => {
+      const sId = String(s.eventId || '').trim().toUpperCase();
+      const sCode = String(s.eventCode || '').trim().toUpperCase();
+      return (sId === codeClean || sCode === codeClean) && s.status === 'CONFIRMED';
+    });
+  },
+
   renderSponsorEventSelector() {
     const sel = document.getElementById('m6-sp-event-select');
+    const formSel = document.getElementById('m6-sp-form-event-select');
+    const filterSel = document.getElementById('m6-sp-table-event-filter');
     const badge = document.getElementById('m6-sp-event-count-badge');
     const events = this.getActiveSponsorEvents();
     if (badge) badge.textContent = `${events.length} Event Aktif`;
-    if (!sel) return;
 
     if (!this.selectedSponsorEventId || !events.some(e => e.id === this.selectedSponsorEventId || e.code === this.selectedSponsorEventId)) {
       this.selectedSponsorEventId = events[0]?.id || 'EVT-2026-001';
     }
 
-    sel.innerHTML = events.map(ev => {
+    const optionsHtml = events.map(ev => {
       const d = new Date(ev.start_date);
       const isSel = (ev.id === this.selectedSponsorEventId || ev.code === this.selectedSponsorEventId);
       return `<option value="${ev.id}" ${isSel ? 'selected' : ''}>[${ev.code}] ${ev.title} (${this.formatDateIndo(d)})</option>`;
     }).join('');
 
-    this.onSponsorEventChange(sel.value);
+    if (sel) sel.innerHTML = optionsHtml;
+    if (formSel) formSel.innerHTML = optionsHtml;
+
+    if (filterSel) {
+      const curFilterVal = filterSel.value || 'ALL';
+      filterSel.innerHTML = `<option value="ALL">🌐 Semua Event Resmi</option>` +
+        events.map(ev => `<option value="${ev.id}" ${curFilterVal === ev.id ? 'selected' : ''}>[${ev.code}] ${ev.title}</option>`).join('');
+    }
+
+    this.onSponsorEventChange(this.selectedSponsorEventId);
+  },
+
+  onSponsorFormEventChange(eventId) {
+    const sel = document.getElementById('m6-sp-event-select');
+    if (sel && sel.value !== eventId) {
+      sel.value = eventId;
+    }
+    this.onSponsorEventChange(eventId);
   },
 
   onSponsorEventChange(eventId) {
@@ -16115,20 +16203,36 @@ const M6Engine = {
     this.EVENT_DATE = new Date(ev.start_date);
     this.SPONSOR_DEADLINE = new Date(this.EVENT_DATE.getTime() - 7 * 24 * 60 * 60 * 1000);
 
+    // Sync selectors if different
+    const formSel = document.getElementById('m6-sp-form-event-select');
+    if (formSel && formSel.value !== ev.id) formSel.value = ev.id;
+    const topSel = document.getElementById('m6-sp-event-select');
+    if (topSel && topSel.value !== ev.id) topSel.value = ev.id;
+
     // Update Quick Indicator Grid
     const locEl = document.getElementById('m6-sp-event-location');
     const dateEl = document.getElementById('m6-sp-event-date');
     const rabEl = document.getElementById('m6-sp-event-rab-display');
     const deadlineEl = document.getElementById('m6-sp-deadline-display');
 
+    const s = new Date(ev.start_date);
+    const e = new Date(ev.end_date);
+    const dateStr = (s.toDateString() === e.toDateString()) ? this.formatDateIndo(s) : `${s.getDate()} - ${this.formatDateIndo(e)}`;
+
     if (locEl) locEl.textContent = ev.location;
-    if (dateEl) {
-      const s = new Date(ev.start_date);
-      const e = new Date(ev.end_date);
-      dateEl.textContent = (s.toDateString() === e.toDateString()) ? this.formatDateIndo(s) : `${s.getDate()} - ${this.formatDateIndo(e)}`;
-    }
+    if (dateEl) dateEl.textContent = dateStr;
     if (rabEl) rabEl.textContent = 'Rp ' + this.EVENT_RAB.toLocaleString('id-ID');
     if (deadlineEl) deadlineEl.textContent = this.formatDateIndo(this.SPONSOR_DEADLINE);
+
+    // Update Form Indicator Grid
+    const fLoc = document.getElementById('m6-sp-form-event-loc');
+    const fDate = document.getElementById('m6-sp-form-event-date');
+    const fRab = document.getElementById('m6-sp-form-event-rab');
+    if (fLoc) fLoc.textContent = ev.location;
+    if (fDate) fDate.textContent = dateStr;
+    if (fRab) fRab.textContent = 'Rp ' + this.EVENT_RAB.toLocaleString('id-ID');
+
+    this.onSponsorConfirmPkgChange();
 
     // Evaluate timing relative to now
     const now = new Date();
@@ -16761,43 +16865,66 @@ const M6Engine = {
     const website  = document.getElementById('m6-sp-form-website-url')?.value.trim();
     const pkgSel   = document.getElementById('m6-sp-form-package-select');
     const statusSel= document.getElementById('m6-sp-form-status-select');
+    const eventSel = document.getElementById('m6-sp-form-event-select');
 
     if (!compName) { alert('⚠️ Nama Perusahaan wajib diisi!'); return; }
+
+    const events = this.getActiveSponsorEvents();
+    const evId = eventSel ? eventSel.value : (this.selectedSponsorEventId || 'EVT-2026-001');
+    const ev = events.find(item => item.id === evId || item.code === evId) || events[0];
 
     const pkgName = pkgSel ? pkgSel.value.split(' (')[0] : '💎 PLATINUM';
     const opt     = pkgSel ? pkgSel.options[pkgSel.selectedIndex] : null;
     const pct     = parseFloat(opt ? opt.getAttribute('data-pct') : 50) || 50;
     const status  = statusSel ? statusSel.value : 'CONFIRMED';
-    const rab     = this.EVENT_RAB || 75000000;
+    const rab     = ev ? ev.total_budget : (this.EVENT_RAB || 75000000);
     const val     = Math.round((pct / 100) * rab);
+
+    const sDate = ev ? new Date(ev.start_date) : new Date();
+    const eDate = ev ? new Date(ev.end_date) : new Date();
+    const dateStr = (sDate.toDateString() === eDate.toDateString()) ? this.formatDateIndo(sDate) : `${sDate.getDate()} - ${this.formatDateIndo(eDate)}`;
 
     const newSponsor = {
       id: 'sp_' + Date.now(),
       name: compName,
       email: email || (compName.toLowerCase().replace(/[^a-z0-9]/g, '') + '@sponsor.com'),
       phone: phone || '081234567890',
+      eventId: ev ? ev.id : 'EVT-2026-001',
+      eventCode: ev ? ev.code : 'EVT-2026-001',
+      eventTitle: ev ? ev.title : 'Touring & Bakti Sosial MB INA',
+      eventDate: dateStr,
+      eventLocation: ev ? ev.location : 'Indonesia',
       pkg: pkgName,
       pct: pct,
       value: val,
       status: status,
       submitDate: new Date().toLocaleDateString('id-ID'),
       confirmDate: status === 'CONFIRMED' ? new Date().toLocaleDateString('id-ID') : '-',
-      deadline: '06/09/2026',
+      deadline: ev ? this.formatDateIndo(new Date(new Date(ev.start_date).getTime() - 7 * 24 * 60 * 60 * 1000)) : '06/09/2026',
       logoUrl: 'assets/mb_club_badge.jpg',
       bannerUrl: 'assets/mb_hero.jpg',
-      impressions: 0, clicks: 0, reach: 0, period: '6 Sep – 13 Okt 2026'
+      impressions: 0, clicks: 0, reach: 0, period: 'Sep – Okt 2026'
     };
 
     this.sampleSponsors.unshift(newSponsor);
     this.renderSponsorConfirmTable();
     this.resetSponsorConfirmForm();
-    alert('🎉 Data konfirmasi sponsor "' + compName + '" berhasil disimpan & ditambahkan ke Daftar Sponsor Terdaftar!');
+
+    // Synchronize event lists & cards if confirmed
+    if (status === 'CONFIRMED') {
+      if (typeof this.renderPublishPage === 'function') this.renderPublishPage();
+      if (typeof this.renderEventsList === 'function') this.renderEventsList();
+    }
+
+    alert('🎉 Data konfirmasi sponsor "' + compName + '" untuk event [' + newSponsor.eventCode + '] ' + newSponsor.eventTitle + ' berhasil disimpan & ditambahkan ke Daftar Sponsor Terdaftar!');
   },
 
   deleteSponsorConfirm(spId) {
     if (!confirm('Hapus sponsor ini dari daftar?')) return;
     this.sampleSponsors = this.sampleSponsors.filter(s => s.id !== spId);
     this.renderSponsorConfirmTable();
+    if (typeof this.renderPublishPage === 'function') this.renderPublishPage();
+    if (typeof this.renderEventsList === 'function') this.renderEventsList();
   },
 
   renderSponsorConfirmTable() {
@@ -16810,15 +16937,35 @@ const M6Engine = {
     if (rabTotalEl) rabTotalEl.textContent = 'Rp ' + (this.EVENT_RAB || 75000000).toLocaleString('id-ID');
     if (targetRabEl) targetRabEl.textContent = 'Rp ' + Math.round((this.EVENT_RAB || 75000000) * 1.11).toLocaleString('id-ID');
 
+    // Count confirmed sponsors for current active event
+    const curEventId = this.selectedSponsorEventId;
+    const curEventConfirmed = this.sampleSponsors.filter(s => {
+      const match = (s.eventId === curEventId || s.eventCode === curEventId);
+      return match && s.status === 'CONFIRMED';
+    });
+    const curEventAmount = curEventConfirmed.reduce((sum, s) => sum + (s.value || 0), 0);
+
     const countEl = document.getElementById('m6-sp-summary-count');
     const amountEl = document.getElementById('m6-sp-summary-amount');
-    const confirmedList = this.sampleSponsors.filter(s => s.status === 'CONFIRMED');
-    const totalAmount = confirmedList.reduce((sum, s) => sum + (s.value || 0), 0);
+    if (countEl) countEl.textContent = curEventConfirmed.length;
+    if (amountEl) amountEl.textContent = 'Rp ' + curEventAmount.toLocaleString('id-ID');
 
-    if (countEl) countEl.textContent = confirmedList.length;
-    if (amountEl) amountEl.textContent = 'Rp ' + totalAmount.toLocaleString('id-ID');
+    // Table filter by event
+    const filterEl = document.getElementById('m6-sp-table-event-filter');
+    const filterVal = filterEl ? filterEl.value : 'ALL';
 
-    tbody.innerHTML = this.sampleSponsors.map(sp => {
+    let displayList = this.sampleSponsors;
+    if (filterVal && filterVal !== 'ALL') {
+      displayList = displayList.filter(s => s.eventId === filterVal || s.eventCode === filterVal);
+    }
+
+    if (displayList.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="padding:24px; text-align:center; color:#94a3b8; font-style:italic;">Belum ada sponsor yang terdaftar untuk filter ini.</td></tr>`;
+      this.renderSponsorSummaryContracts();
+      return;
+    }
+
+    tbody.innerHTML = displayList.map(sp => {
       let statusHtml;
       if (sp.status === 'CONFIRMED') {
         statusHtml = `<span style="color:var(--primary-emerald); font-weight:800;">✅ CONFIRMED</span>`;
@@ -16827,17 +16974,69 @@ const M6Engine = {
       } else {
         statusHtml = `<span style="color:var(--accent-gold); font-weight:800;">⏳ PENDING</span>`;
       }
+
+      const evCode = sp.eventCode || sp.eventId || 'EVT-2026';
+      const evTitle = sp.eventTitle || 'Event Resmi MB INA';
+
       return `
         <tr style="border-bottom:1px solid var(--chrome-border);">
-          <td style="padding:10px 8px; font-weight:800; color:#fff;">${sp.name}</td>
-          <td style="padding:10px 8px;"><span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.75rem;">${sp.pkg}</span></td>
-          <td style="padding:10px 8px; text-align:right; color:var(--accent-gold); font-weight:800;">Rp ${(sp.value/1e6).toFixed(1)} JT</td>
+          <td style="padding:10px 8px; font-weight:800; color:#fff;">
+            ${sp.name}
+            <div style="font-size:0.7rem; color:var(--text-muted); font-weight:400;">PIC: ${sp.phone || '-'}</div>
+          </td>
+          <td style="padding:10px 8px;">
+            <div style="font-weight:700; color:#fbbf24; font-size:0.78rem;">[${evCode}]</div>
+            <div style="font-size:0.74rem; color:#e2e8f0; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${evTitle}">${evTitle}</div>
+          </td>
+          <td style="padding:10px 8px;"><span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.72rem;">${sp.pkg}</span></td>
+          <td style="padding:10px 8px; text-align:right; color:var(--accent-gold); font-weight:800;">Rp ${((sp.value || 0)/1e6).toFixed(1)} JT</td>
           <td style="padding:10px 8px; text-align:center;">${statusHtml}</td>
           <td style="padding:10px 8px; text-align:center;">
             <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.switchSponsorInnerTab('644')" title="Pasang Banner">👁️</button>
             <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.switchSponsorInnerTab('646')" title="Laporan Efektifitas">📊</button>
             <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorConfirm('${sp.id}')" title="Hapus">🗑️</button>
           </td>
+        </tr>`;
+    }).join('');
+
+    this.renderSponsorSummaryContracts();
+  },
+
+  renderSponsorSummaryContracts() {
+    const tbody = document.getElementById('spnd-summary-history-tbody');
+    if (!tbody) return;
+
+    const confirmed = (this.sampleSponsors || []).filter(s => s.status === 'CONFIRMED');
+    if (confirmed.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#94a3b8;">Belum ada kemitraan sponsor terkonfirmasi.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = confirmed.map(sp => {
+      const evCode = sp.eventCode || sp.eventId || 'EVT-2026';
+      const evTitle = sp.eventTitle || 'Event MB Club INA';
+      const valFmt = 'Rp ' + ((sp.value || 0)).toLocaleString('id-ID');
+      const revImpact = 'Rp ' + Math.round((sp.value || 0) * 3.2).toLocaleString('id-ID');
+
+      let roi = '3.8x';
+      if (sp.pkg && sp.pkg.includes('TUNGGAL')) roi = '4.6x';
+      else if (sp.pkg && sp.pkg.includes('PLATINUM')) roi = '3.8x';
+      else if (sp.pkg && sp.pkg.includes('GOLD')) roi = '2.9x';
+      else if (sp.pkg && sp.pkg.includes('SILVER')) roi = '2.1x';
+      else roi = '1.8x';
+
+      return `
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+          <td style="padding:10px;">
+            <div style="font-weight:700; color:#fbbf24;">[${evCode}]</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">${evTitle}</div>
+          </td>
+          <td style="padding:10px; font-weight:700; color:#fff;">${sp.name}</td>
+          <td style="padding:10px;"><span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.72rem;">${sp.pkg}</span></td>
+          <td style="padding:10px; font-weight:700; color:#fff;">${valFmt}</td>
+          <td style="padding:10px; font-weight:700; color:var(--primary-emerald);">${revImpact}</td>
+          <td style="padding:10px; font-weight:700; color:#60a5fa;">${roi}</td>
+          <td style="padding:10px;"><span style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:2px 8px; font-size:0.72rem; font-weight:700;">Aktif</span></td>
         </tr>`;
     }).join('');
   },
@@ -17190,6 +17389,8 @@ const M6Engine = {
       sp.status = 'CONFIRMED';
       sp.confirmDate = new Date().toLocaleDateString('id-ID');
       sp.period = '6 Sep – 13 Okt 2026';
+      if (typeof this.renderPublishPage === 'function') this.renderPublishPage();
+      if (typeof this.renderEventsList === 'function') this.renderEventsList();
       alert(`🎉 CONGRATULATIONS!\n\nMitra Sponsor '${sp.name}' (${sp.pkg}) BERHASIL DITETAPKAN & DIAKTIFKAN (CONFIRMED).\n\nBenefit iklan web & lokasi venue resmi tayang otomatis!`);
     }
 
@@ -24760,7 +24961,11 @@ window.SponsorPortalEngine = {
     });
 
     if (window.M6Engine) {
-      if (tabKey === 'packages') {
+      if (tabKey === 'summary') {
+        if (typeof window.M6Engine.renderSponsorSummaryContracts === 'function') {
+          window.M6Engine.renderSponsorSummaryContracts();
+        }
+      } else if (tabKey === 'packages') {
         window.M6Engine.renderSponsorPackagesTable();
         window.M6Engine.calcSponsorPkgValue();
       } else if (tabKey === 'confirm') {

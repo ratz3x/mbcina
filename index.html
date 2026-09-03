@@ -6702,12 +6702,13 @@
 
         <!-- HISTORI KONTRAK TABLE -->
         <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:16px;">
-          <h4 style="color:var(--accent-gold); font-size:0.92rem; font-weight:700; margin-top:0; margin-bottom:12px;">Histori Kontrak Kemitraan MB INA</h4>
+          <h4 style="color:var(--accent-gold); font-size:0.92rem; font-weight:700; margin-top:0; margin-bottom:12px;">Histori & Daftar Kemitraan Event Resmi MB INA</h4>
           <div style="overflow-x:auto;">
             <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.82rem;">
               <thead>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; color:var(--text-muted);">
-                  <th style="padding:8px 10px; font-weight:600;">Musim / Event</th>
+                  <th style="padding:8px 10px; font-weight:600;">Event / Kegiatan</th>
+                  <th style="padding:8px 10px; font-weight:600;">Mitra Sponsor</th>
                   <th style="padding:8px 10px; font-weight:600;">Tier Paket</th>
                   <th style="padding:8px 10px; font-weight:600;">Nilai Kontrak</th>
                   <th style="padding:8px 10px; font-weight:600;">Revenue Impact</th>
@@ -6715,23 +6716,8 @@
                   <th style="padding:8px 10px; font-weight:600;">Status</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
-                  <td style="padding:10px 8px; font-weight:700; color:#fff;">2026 — Jamnas XXI & Munas MB INA</td>
-                  <td style="padding:10px 8px;"><span class="tier-badge" style="background:rgba(245,158,11,0.12); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-size:0.7rem;">PLATINUM</span></td>
-                  <td style="padding:10px 8px; font-weight:600;">Rp 30.000.000</td>
-                  <td style="padding:10px 8px; color:#34d399; font-weight:600;">Rp 45.000.000</td>
-                  <td style="padding:10px 8px; color:var(--accent-gold); font-weight:700;">50%</td>
-                  <td style="padding:10px 8px;"><span style="color:#34d399; font-weight:700; font-size:0.75rem;">AKTIF (Lunas)</span></td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
-                  <td style="padding:10px 8px; font-weight:700; color:#fff;">2025 — Regional Touring Jawa-Bali</td>
-                  <td style="padding:10px 8px;"><span class="tier-badge" style="background:rgba(245,158,11,0.12); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-size:0.7rem;">GOLD</span></td>
-                  <td style="padding:10px 8px; font-weight:600;">Rp 15.000.000</td>
-                  <td style="padding:10px 8px; color:#34d399; font-weight:600;">Rp 24.000.000</td>
-                  <td style="padding:10px 8px; color:var(--accent-gold); font-weight:700;">60%</td>
-                  <td style="padding:10px 8px;"><span style="color:var(--text-muted); font-weight:600; font-size:0.75rem;">SELESAI</span></td>
-                </tr>
+              <tbody id="spnd-summary-history-tbody">
+                <!-- Rendered dynamically by M6Engine.renderSponsorSummaryContracts() -->
               </tbody>
             </table>
           </div>
@@ -7083,16 +7069,29 @@
                       <input type="url" id="m6-sp-form-website-url" class="form-input" placeholder="https://www.unaja.co.id">
                     </div>
 
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── EVENT YANG DISPONSORI ───</div>
+                    <div class="form-group">
+                      <label class="form-label" style="font-size:0.75rem;">Pilih Kegiatan Resmi MB Club INA *</label>
+                      <select id="m6-sp-form-event-select" class="form-input" style="font-weight:700; color:#fbbf24; background:#0b1120; border:1px solid rgba(245,158,11,0.45); cursor:pointer;" required onchange="M6Engine.onSponsorFormEventChange(this.value)">
+                        <!-- Diisi secara dinamis oleh M6Engine.renderSponsorEventSelector() -->
+                      </select>
+                      <div id="m6-sp-form-event-info" style="margin-top:6px; font-size:0.72rem; color:#94a3b8; display:flex; gap:12px; flex-wrap:wrap;">
+                        <span>📍 Lokasi: <span id="m6-sp-form-event-loc" style="color:#fff; font-weight:600;">-</span></span>
+                        <span>🗓️ Tanggal: <span id="m6-sp-form-event-date" style="color:#fff; font-weight:600;">-</span></span>
+                        <span>💰 RAB: <strong id="m6-sp-form-event-rab" style="color:var(--accent-gold);">-</strong></span>
+                      </div>
+                    </div>
+
                     <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── PAKET SPONSOR ───</div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                       <div class="form-group">
                         <label class="form-label" style="font-size:0.75rem;">Pilih Paket *</label>
                         <select id="m6-sp-form-package-select" class="form-input" style="font-weight:700;" onchange="M6Engine.onSponsorConfirmPkgChange()">
-                          <option value=" PLATINUM" data-pct="50" selected> PLATINUM (50%)</option>
-                          <option value=" SPONSOR TUNGGAL" data-pct="70"> SPONSOR TUNGGAL (70%)</option>
-                          <option value=" GOLD" data-pct="35"> GOLD (35%)</option>
-                          <option value=" SILVER" data-pct="15"> SILVER (15%)</option>
-                          <option value=" BRONZE" data-pct="5"> BRONZE (5%)</option>
+                          <option value="💎 PLATINUM" data-pct="50" selected>💎 PLATINUM (50%)</option>
+                          <option value="👑 SPONSOR TUNGGAL" data-pct="70">👑 SPONSOR TUNGGAL (70%)</option>
+                          <option value="🥇 GOLD" data-pct="35">🥇 GOLD (35%)</option>
+                          <option value="🥈 SILVER" data-pct="15">🥈 SILVER (15%)</option>
+                          <option value="🥉 BRONZE" data-pct="5">🥉 BRONZE (5%)</option>
                         </select>
                       </div>
                       <div class="form-group">
@@ -7116,27 +7115,36 @@
                     <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── STATUS ───</div>
                     <div class="form-group">
                       <select id="m6-sp-form-status-select" class="form-input" style="font-weight:800; color:var(--primary-emerald);">
-                        <option value="CONFIRMED" selected> CONFIRMED</option>
+                        <option value="CONFIRMED" selected>✅ CONFIRMED</option>
                         <option value="PENDING">⏳ PENDING</option>
-                        <option value="REJECTED"> REJECTED</option>
+                        <option value="REJECTED">❌ REJECTED</option>
                       </select>
                     </div>
 
                     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
                       <button type="button" class="btn-outline" style="padding:6px 14px; font-size:0.78rem;" onclick="M6Engine.resetSponsorConfirmForm()">BATAL</button>
-                      <button type="submit" class="btn-primary" style="padding:6px 18px; font-weight:800; font-size:0.78rem; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;"> SIMPAN</button>
+                      <button type="submit" class="btn-primary" style="padding:6px 18px; font-weight:800; font-size:0.78rem; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;">💾 SIMPAN</button>
                     </div>
                   </form>
                 </div>
 
                 <!-- TABEL DAFTAR SPONSOR TERDAFTAR -->
                 <div class="glass-card" style="padding:20px; border:1px solid var(--chrome-border);">
-                  <h6 style="color:var(--accent-gold); font-size:0.95rem; margin-bottom:14px;"> DAFTAR SPONSOR TERDAFTAR</h6>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+                    <h6 style="color:var(--accent-gold); font-size:0.95rem; margin:0;">📋 DAFTAR SPONSOR TERDAFTAR</h6>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <label for="m6-sp-table-event-filter" style="font-size:0.72rem; color:#94a3b8; font-weight:600;">Filter Event:</label>
+                      <select id="m6-sp-table-event-filter" class="form-input" style="font-size:0.72rem; padding:4px 8px; width:auto; border-radius:6px; background:#0b1120; color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:700; cursor:pointer;" onchange="M6Engine.renderSponsorConfirmTable()">
+                        <option value="ALL">🌐 Semua Event Resmi</option>
+                      </select>
+                    </div>
+                  </div>
                   <div style="overflow-x:auto;">
                     <table class="admin-table" style="width:100%; font-size:0.8rem;">
                       <thead>
                         <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
-                          <th style="padding:8px;">Sponsor</th>
+                          <th style="padding:8px;">Sponsor & Perusahaan</th>
+                          <th style="padding:8px;">Event Yang Disponsori</th>
                           <th style="padding:8px;">Paket</th>
                           <th style="padding:8px; text-align:right;">Nilai</th>
                           <th style="padding:8px; text-align:center;">Status</th>
@@ -10317,7 +10325,7 @@
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="js/auth.js?v=20260903_v88_mbux"></script>
-  <script src="js/app.js?v=20260904_v113_event_selector_in_confirm_tab"></script>
+  <script src="js/app.js?v=20260904_v114_event_linked_sponsorship"></script>
   <script>
     lucide.createIcons();
     try {
