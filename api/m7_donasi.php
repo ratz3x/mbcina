@@ -282,9 +282,12 @@ switch ($action) {
                     $uRow = $uStmt->fetch();
 
                     if ($uRow) {
-                        // Formula: 1 Poin per Rp 10.000 Donasi (misal Rp 5.000.000 = 500 Poin)
+                        // Formula: 1 Poin per Rp 10.000 Donasi
                         $pointsEarned = max(1, intval($amount / 10000));
-                        $userTotalDon = ((int)$uRow['total_donation']) + $amount;
+                        // Always calculate true cumulative donation from verified donations table
+                        $sumStmt = $sPdo->prepare("SELECT COALESCE(SUM(amount), 0) FROM donations WHERE user_id = ? AND status IN ('SUCCESS', 'CONFIRMED')");
+                        $sumStmt->execute([$userId]);
+                        $userTotalDon = (int)$sumStmt->fetchColumn();
                         $oldTier = $uRow['tier'] ?? 'BRONZE';
 
                         // Automatic Tier Calculation

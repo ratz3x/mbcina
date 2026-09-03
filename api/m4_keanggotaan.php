@@ -447,8 +447,14 @@ switch ($action) {
                 exit;
             }
 
-            // Donations history
-            $donStmt = $sPdo->prepare("SELECT * FROM donations WHERE user_id = :uid ORDER BY created_at DESC");
+            // Donations history with joined campaign title
+            $donStmt = $sPdo->prepare("
+                SELECT d.*, c.title AS campaign_title 
+                FROM donations d 
+                LEFT JOIN donation_campaigns c ON c.id = d.campaign_id 
+                WHERE d.user_id = :uid 
+                ORDER BY d.created_at DESC
+            ");
             $donStmt->execute([':uid' => $id]);
             $donations = $donStmt->fetchAll();
 
