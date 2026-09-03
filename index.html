@@ -7038,54 +7038,76 @@
                 </div>
               </div>
 
-              <div style="display:grid; grid-template-columns:1.1fr 1.3fr; gap:20px; align-items:flex-start;">
+              <div style="display:flex; flex-direction:column; gap:24px;">
                 
-                <!-- FORM KONFIRMASI SPONSOR -->
-                <div class="glass-card" style="padding:20px; border:1px solid var(--accent-gold);">
-                  <h6 style="color:var(--accent-gold); font-size:0.95rem; margin-bottom:14px;"> FORM KONFIRMASI SPONSOR</h6>
+                <!-- 1. FORM KONFIRMASI SPONSOR (FULL WIDTH DI ATAS) -->
+                <div class="glass-card" style="padding:24px 28px; border:1px solid rgba(245,158,11,0.4); background:rgba(255,255,255,0.02); border-radius:16px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; flex-wrap:wrap; gap:10px;">
+                    <div>
+                      <h6 style="color:var(--accent-gold); font-size:1.05rem; font-weight:800; margin:0; display:flex; align-items:center; gap:8px;">
+                        <span>📝</span> FORM INPUT & KONFIRMASI SPONSORSHIP
+                      </h6>
+                      <p style="margin:4px 0 0 0; font-size:0.75rem; color:#94a3b8;">Lengkapi data kemitraan perusahaan, pilih event resmi yang dituju, dan tentukan paket kontribusi sponsorship.</p>
+                    </div>
+                    <span style="font-size:0.72rem; padding:3px 10px; border-radius:20px; background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:700;">Format Resmi MB INA</span>
+                  </div>
                   
                   <form id="m6-sp-confirm-form" onsubmit="M6Engine.saveSponsorFromForm(event)">
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── DATA PERUSAHAAN ───</div>
-                    <div class="form-group">
-                      <label class="form-label" style="font-size:0.75rem;">Nama Perusahaan *</label>
-                      <input type="text" id="m6-sp-form-company-name" class="form-input" required placeholder="Contoh: Universitas Adiwangsa Jambi / PT Bank Mandiri">
-                    </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Contact Person *</label>
-                        <input type="text" id="m6-sp-form-contact-person" class="form-input" required placeholder="Nama kontak...">
+                    
+                    <!-- BAGIAN 1: EVENT YANG DISPONSORI -->
+                    <div style="background:rgba(245,158,11,0.04); border:1px solid rgba(245,158,11,0.2); border-radius:12px; padding:16px; margin-bottom:18px;">
+                      <div style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                        <span>🎯</span> EVENT RESMI YANG DISPONSORI
                       </div>
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Contact Phone *</label>
-                        <input type="text" id="m6-sp-form-contact-phone" class="form-input" required placeholder="Nomor telepon...">
+                      <div class="form-group" style="margin-bottom:10px;">
+                        <label class="form-label" style="font-size:0.76rem; font-weight:700; color:#e2e8f0;">Pilih Kegiatan Resmi MB Club INA *</label>
+                        <select id="m6-sp-form-event-select" class="form-input" style="font-weight:700; color:#fbbf24; background:#0b1120; border:1px solid rgba(245,158,11,0.45); cursor:pointer; font-size:0.85rem;" required onchange="M6Engine.onSponsorFormEventChange(this.value)">
+                          <!-- Diisi secara dinamis oleh M6Engine.renderSponsorEventSelector() -->
+                        </select>
                       </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label" style="font-size:0.75rem;">Contact Email *</label>
-                      <input type="email" id="m6-sp-form-contact-email" class="form-input" required placeholder="Email resmi...">
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label" style="font-size:0.75rem;">Website URL</label>
-                      <input type="url" id="m6-sp-form-website-url" class="form-input" placeholder="https://www.unaja.co.id">
-                    </div>
-
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── EVENT YANG DISPONSORI ───</div>
-                    <div class="form-group">
-                      <label class="form-label" style="font-size:0.75rem;">Pilih Kegiatan Resmi MB Club INA *</label>
-                      <select id="m6-sp-form-event-select" class="form-input" style="font-weight:700; color:#fbbf24; background:#0b1120; border:1px solid rgba(245,158,11,0.45); cursor:pointer;" required onchange="M6Engine.onSponsorFormEventChange(this.value)">
-                        <!-- Diisi secara dinamis oleh M6Engine.renderSponsorEventSelector() -->
-                      </select>
-                      <div id="m6-sp-form-event-info" style="margin-top:6px; font-size:0.72rem; color:#94a3b8; display:flex; gap:12px; flex-wrap:wrap;">
-                        <span>📍 Lokasi: <span id="m6-sp-form-event-loc" style="color:#fff; font-weight:600;">-</span></span>
-                        <span>🗓️ Tanggal: <span id="m6-sp-form-event-date" style="color:#fff; font-weight:600;">-</span></span>
-                        <span>💰 RAB: <strong id="m6-sp-form-event-rab" style="color:var(--accent-gold);">-</strong></span>
+                      <div id="m6-sp-form-event-info" style="font-size:0.76rem; color:#94a3b8; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; background:rgba(0,0,0,0.3); padding:10px 14px; border-radius:8px;">
+                        <span>📍 Lokasi: <strong id="m6-sp-form-event-loc" style="color:#fff;">-</strong></span>
+                        <span>🗓️ Tanggal: <strong id="m6-sp-form-event-date" style="color:#fff;">-</strong></span>
+                        <span>💰 RAB Kegiatan: <strong id="m6-sp-form-event-rab" style="color:var(--accent-gold);">-</strong></span>
                       </div>
                     </div>
 
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── PAKET SPONSOR ───</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Pilih Paket *</label>
+                    <!-- BAGIAN 2: DATA PERUSAHAAN & PIC -->
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:12px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
+                      ─── DATA PERUSAHAAN & KONTAK PIC ───
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:14px;">
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Nama Perusahaan / Brand *</label>
+                        <input type="text" id="m6-sp-form-company-name" class="form-input" required placeholder="Contoh: PT Bank Mandiri (Persero) Tbk">
+                      </div>
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Website URL Perusahaan</label>
+                        <input type="url" id="m6-sp-form-website-url" class="form-input" placeholder="https://www.mandiri.co.id">
+                      </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:18px;">
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Nama Contact Person (PIC) *</label>
+                        <input type="text" id="m6-sp-form-contact-person" class="form-input" required placeholder="Nama PIC sponsorship...">
+                      </div>
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Nomor Telepon / WhatsApp *</label>
+                        <input type="text" id="m6-sp-form-contact-phone" class="form-input" required placeholder="0812-xxxx-xxxx">
+                      </div>
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Email Resmi PIC *</label>
+                        <input type="email" id="m6-sp-form-contact-email" class="form-input" required placeholder="pic@perusahaan.com">
+                      </div>
+                    </div>
+
+                    <!-- BAGIAN 3: PAKET SPONSORSHIP & STATUS -->
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:12px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
+                      ─── PAKET SPONSOR & PROMOSI ───
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:18px;">
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Pilih Paket Sponsorship *</label>
                         <select id="m6-sp-form-package-select" class="form-input" style="font-weight:700;" onchange="M6Engine.onSponsorConfirmPkgChange()">
                           <option value="💎 PLATINUM" data-pct="50" selected>💎 PLATINUM (50%)</option>
                           <option value="👑 SPONSOR TUNGGAL" data-pct="70">👑 SPONSOR TUNGGAL (70%)</option>
@@ -7094,61 +7116,66 @@
                           <option value="🥉 BRONZE" data-pct="5">🥉 BRONZE (5%)</option>
                         </select>
                       </div>
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Nilai Sponsor (Auto)</label>
-                        <input type="text" id="m6-sp-form-package-value" class="form-input" readonly value="Rp 37.500.000" style="color:var(--accent-gold); font-weight:800;">
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Nilai Sponsor Otomatis (RAB)</label>
+                        <input type="text" id="m6-sp-form-package-value" class="form-input" readonly value="Rp 37.500.000" style="color:var(--accent-gold); font-weight:800; font-size:0.95rem;">
+                      </div>
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Status Penetapan *</label>
+                        <select id="m6-sp-form-status-select" class="form-input" style="font-weight:800; color:var(--primary-emerald);">
+                          <option value="CONFIRMED" selected>✅ CONFIRMED</option>
+                          <option value="PENDING">⏳ PENDING</option>
+                          <option value="REJECTED">❌ REJECTED</option>
+                        </select>
                       </div>
                     </div>
 
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── DOKUMEN & LOGO ───</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Upload Logo (PNG/JPG)</label>
+                    <!-- BAGIAN 4: FILE UPLOAD -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; margin-bottom:18px;">
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Upload File Logo (PNG / Vector)</label>
                         <input type="file" id="m6-sp-form-logo" class="form-input" style="font-size:0.75rem;">
                       </div>
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Upload Banner (JPG/PNG)</label>
+                      <div class="form-group" style="margin:0;">
+                        <label class="form-label" style="font-size:0.75rem;">Upload File Banner Promosi (JPG / PNG)</label>
                         <input type="file" id="m6-sp-form-banner" class="form-input" style="font-size:0.75rem;">
                       </div>
                     </div>
 
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── STATUS ───</div>
-                    <div class="form-group">
-                      <select id="m6-sp-form-status-select" class="form-input" style="font-weight:800; color:var(--primary-emerald);">
-                        <option value="CONFIRMED" selected>✅ CONFIRMED</option>
-                        <option value="PENDING">⏳ PENDING</option>
-                        <option value="REJECTED">❌ REJECTED</option>
-                      </select>
-                    </div>
-
-                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
-                      <button type="button" class="btn-outline" style="padding:6px 14px; font-size:0.78rem;" onclick="M6Engine.resetSponsorConfirmForm()">BATAL</button>
-                      <button type="submit" class="btn-primary" style="padding:6px 18px; font-weight:800; font-size:0.78rem; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;">💾 SIMPAN</button>
+                    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.08); padding-top:16px;">
+                      <button type="button" class="btn-outline" style="padding:8px 18px; font-size:0.82rem;" onclick="M6Engine.resetSponsorConfirmForm()">🔄 RESET FORM</button>
+                      <button type="submit" class="btn-primary" style="padding:8px 26px; font-weight:800; font-size:0.85rem; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;">💾 SIMPAN & TETAPKAN SPONSOR</button>
                     </div>
                   </form>
                 </div>
 
-                <!-- TABEL DAFTAR SPONSOR TERDAFTAR -->
-                <div class="glass-card" style="padding:20px; border:1px solid var(--chrome-border);">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-                    <h6 style="color:var(--accent-gold); font-size:0.95rem; margin:0;">📋 DAFTAR SPONSOR TERDAFTAR</h6>
-                    <div style="display:flex; align-items:center; gap:6px;">
-                      <label for="m6-sp-table-event-filter" style="font-size:0.72rem; color:#94a3b8; font-weight:600;">Filter Event:</label>
-                      <select id="m6-sp-table-event-filter" class="form-input" style="font-size:0.72rem; padding:4px 8px; width:auto; border-radius:6px; background:#0b1120; color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:700; cursor:pointer;" onchange="M6Engine.renderSponsorConfirmTable()">
+                <!-- 2. TABEL DAFTAR SPONSOR TERDAFTAR (FULL WIDTH DI BAWAH) -->
+                <div class="glass-card" style="padding:24px 28px; border:1px solid rgba(255,255,255,0.1); border-radius:16px; background:rgba(255,255,255,0.02);">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                    <div>
+                      <h6 style="color:var(--accent-gold); font-size:1.05rem; font-weight:800; margin:0; display:flex; align-items:center; gap:8px;">
+                        <span>📋</span> DAFTAR SPONSOR TERDAFTAR
+                      </h6>
+                      <p style="margin:4px 0 0 0; font-size:0.75rem; color:#94a3b8;">Daftar lengkap seluruh mitra sponsorship yang terdaftar per kegiatan resmi MB Club INA</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                      <label for="m6-sp-table-event-filter" style="font-size:0.75rem; color:#94a3b8; font-weight:600;">Filter Berdasarkan Event:</label>
+                      <select id="m6-sp-table-event-filter" class="form-input" style="font-size:0.75rem; padding:6px 12px; width:auto; min-width:220px; border-radius:8px; background:#0b1120; color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:700; cursor:pointer;" onchange="M6Engine.renderSponsorConfirmTable()">
                         <option value="ALL">🌐 Semua Event Resmi</option>
                       </select>
                     </div>
                   </div>
+
                   <div style="overflow-x:auto;">
-                    <table class="admin-table" style="width:100%; font-size:0.8rem;">
+                    <table class="admin-table" style="width:100%; font-size:0.82rem; border-collapse:collapse;">
                       <thead>
-                        <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
-                          <th style="padding:8px;">Sponsor & Perusahaan</th>
-                          <th style="padding:8px;">Event Yang Disponsori</th>
-                          <th style="padding:8px;">Paket</th>
-                          <th style="padding:8px; text-align:right;">Nilai</th>
-                          <th style="padding:8px; text-align:center;">Status</th>
-                          <th style="padding:8px; text-align:center;">Aksi</th>
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.12); text-align:left; color:#94a3b8; background:rgba(255,255,255,0.02);">
+                          <th style="padding:10px 12px; font-weight:700;">Sponsor & Perusahaan</th>
+                          <th style="padding:10px 12px; font-weight:700;">Event Yang Disponsori</th>
+                          <th style="padding:10px 12px; font-weight:700;">Paket Sponsorship</th>
+                          <th style="padding:10px 12px; text-align:right; font-weight:700;">Nilai Sponsor</th>
+                          <th style="padding:10px 12px; text-align:center; font-weight:700;">Status</th>
+                          <th style="padding:10px 12px; text-align:center; font-weight:700;">Aksi Cepat</th>
                         </tr>
                       </thead>
                       <tbody id="m6-sp-confirm-tbody">
@@ -7158,7 +7185,7 @@
                   </div>
                 </div>
 
-              </div><!-- END GRID -->
+              </div><!-- END STACKED CONTAINER -->
             </div><!-- END m6-sp-inner-643 -->
 
             <!-- ╔═════════════════════════════════════════════════════╗ -->
@@ -10325,7 +10352,7 @@
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="js/auth.js?v=20260903_v88_mbux"></script>
-  <script src="js/app.js?v=20260904_v114_event_linked_sponsorship"></script>
+  <script src="js/app.js?v=20260904_v115_stacked_confirm_and_table"></script>
   <script>
     lucide.createIcons();
     try {
