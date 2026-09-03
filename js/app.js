@@ -12546,6 +12546,7 @@ const M6Engine = {
 
   async init() {
     console.log('M6Engine init...');
+    if (typeof this.loadSponsors === 'function') this.loadSponsors();
     this.switchSubtab(this.data.activeSubtab);
     await this.fetchData();
   },
@@ -15969,6 +15970,245 @@ const M6Engine = {
     { id:'pkg5', name:'🥉 BRONZE',          pct:5,  before:1, after:1, webBenefits:['Footer Event Page'], physBenefits:[] }
   ],
 
+  // Master Official Confirmed Sponsors for MB Club Indonesia
+  getMasterOfficialSponsors() {
+    return [
+      { 
+        id: 'sp1', 
+        mouNumber: 'PKS/MBINA-001/BNI/VIII/2026',
+        name: 'PT. Bank BNI (Persero) Tbk', 
+        email: 'sponsor@bni.co.id', 
+        phone: '0811-1222-333', 
+        picName: 'Agus Pratama (SVP Corporate Secretary)',
+        eventId: 'EVT-2026-001',
+        eventCode: 'EVT-2026-001',
+        eventTitle: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026',
+        eventDate: '12 - 14 September 2026',
+        eventLocation: 'Hotel Tentrem & Panti Asuhan Yogyakarta',
+        pkg: '💎 PLATINUM', 
+        pct: 50, 
+        value: 37500000, 
+        status: 'CONFIRMED', 
+        submitDate: '28/08/2026', 
+        confirmDate: '01/09/2026', 
+        deadline: '06/09/2026', 
+        bendaharaApproved: true, 
+        bendaharaApprovedAt: '29/08/2026 10:15', 
+        presidenApproved: true, 
+        presidenApprovedAt: '31/08/2026 14:20', 
+        adminApproved: true, 
+        adminApprovedAt: '01/09/2026 09:00',
+        logoUrl: 'assets/mb_club_badge.png', 
+        bannerUrl: 'assets/mb_hero.jpg',
+        impressions: 12450, clicks: 1234, reach: 8900, period: '6 Sep – 13 Okt 2026'
+      },
+      { 
+        id: 'sp5', 
+        mouNumber: 'PKS/MBINA-001/GOODYEAR/VIII/2026',
+        name: 'PT Goodyear Indonesia Tbk', 
+        email: 'partnership@goodyear.co.id', 
+        phone: '0812-3344-5566', 
+        picName: 'Bambang Wijaya (Head of Marketing)',
+        eventId: 'EVT-2026-001',
+        eventCode: 'EVT-2026-001',
+        eventTitle: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026',
+        eventDate: '12 - 14 September 2026',
+        eventLocation: 'Hotel Tentrem & Panti Asuhan Yogyakarta',
+        pkg: '🥇 GOLD', 
+        pct: 35, 
+        value: 26250000, 
+        status: 'CONFIRMED', 
+        submitDate: '29/08/2026', 
+        confirmDate: '02/09/2026', 
+        deadline: '06/09/2026', 
+        bendaharaApproved: true, 
+        presidenApproved: true, 
+        adminApproved: true,
+        logoUrl: 'assets/mb_club_badge.png', 
+        bannerUrl: 'assets/mb_hero.jpg',
+        impressions: 8900, clicks: 950, reach: 6700, period: '6 Sep – 13 Okt 2026'
+      },
+      { 
+        id: 'sp2', 
+        mouNumber: 'PKS/MBINA-003/MANDIRI/IX/2026',
+        name: 'PT Bank Mandiri (Persero) Tbk', 
+        email: 'corporate@bankmandiri.co.id', 
+        phone: '0812-9876-5432', 
+        picName: 'Rian Hidayat (VP Transaction Banking)',
+        eventId: 'EVT-2026-003',
+        eventCode: 'EVT-2026-003',
+        eventTitle: 'Grand Touring Trans Sumatra & Celebes Rally 2026',
+        eventDate: '1 - 7 Oktober 2026',
+        eventLocation: 'Medan - Padang (Lintas Sumatera)',
+        pkg: '💎 PLATINUM', 
+        pct: 50, 
+        value: 60000000, 
+        status: 'CONFIRMED', 
+        submitDate: '01/09/2026', 
+        confirmDate: '02/09/2026', 
+        deadline: '24/09/2026', 
+        bendaharaApproved: true, 
+        presidenApproved: true, 
+        adminApproved: true,
+        logoUrl: 'assets/mb_club_badge.png', 
+        bannerUrl: 'assets/mb_hero.jpg',
+        impressions: 15800, clicks: 1720, reach: 11200, period: '15 Sep – 30 Nov 2026'
+      },
+      { 
+        id: 'sp6', 
+        mouNumber: 'PKS/MBINA-003/SHELL/IX/2026',
+        name: 'PT Shell Indonesia', 
+        email: 'corporate-sponsor@shell.co.id', 
+        phone: '0811-9988-7766', 
+        picName: 'Dian Sasmita (Senior Brand Manager)',
+        eventId: 'EVT-2026-003',
+        eventCode: 'EVT-2026-003',
+        eventTitle: 'Grand Touring Trans Sumatra & Celebes Rally 2026',
+        eventDate: '1 - 7 Oktober 2026',
+        eventLocation: 'Medan - Padang (Lintas Sumatera)',
+        pkg: '🥇 GOLD', 
+        pct: 35, 
+        value: 42000000, 
+        status: 'CONFIRMED', 
+        submitDate: '02/09/2026', 
+        confirmDate: '03/09/2026', 
+        deadline: '24/09/2026', 
+        bendaharaApproved: true, 
+        presidenApproved: true, 
+        adminApproved: true,
+        logoUrl: 'assets/mb_club_badge.png', 
+        bannerUrl: 'assets/mb_hero.jpg',
+        impressions: 10400, clicks: 1120, reach: 7800, period: '15 Sep – 30 Nov 2026'
+      },
+      { 
+        id: 'sp7', 
+        mouNumber: 'PKS/MBINA-002/MBDI/VIII/2026',
+        name: 'Mercedes-Benz Distribution Indonesia', 
+        email: 'partnership@mercedes-benz.co.id', 
+        phone: '021-5084-5600', 
+        picName: 'Kariyanto Hardjosoemarto (Deputy Director)',
+        eventId: 'EVT-2026-002',
+        eventCode: 'EVT-2026-002',
+        eventTitle: 'Jamnas MB INA XXV & Musyawarah Nasional 2026',
+        eventDate: '20 - 22 November 2026',
+        eventLocation: 'ICE BSD City, Tangerang',
+        pkg: '👑 SPONSOR TUNGGAL', 
+        pct: 70, 
+        value: 175000000, 
+        status: 'CONFIRMED', 
+        submitDate: '20/08/2026', 
+        confirmDate: '25/08/2026', 
+        deadline: '13/11/2026', 
+        bendaharaApproved: true, 
+        presidenApproved: true, 
+        adminApproved: true,
+        logoUrl: 'assets/mb_club_badge.png', 
+        bannerUrl: 'assets/mb_hero.jpg',
+        impressions: 28900, clicks: 3410, reach: 21500, period: '1 Okt – 31 Des 2026'
+      },
+      { 
+        id: 'sp3', 
+        mouNumber: 'PKS/MBINA-002/ASTRA/IX/2026',
+        name: 'PT Astra Otoparts Tbk', 
+        email: 'info@astra-otoparts.co.id', 
+        phone: '0813-8888-9999', 
+        picName: 'Hendra Gunawan (Div. Head Corporate)',
+        eventId: 'EVT-2026-002',
+        eventCode: 'EVT-2026-002',
+        eventTitle: 'Jamnas MB INA XXV & Musyawarah Nasional 2026',
+        eventDate: '20 - 22 November 2026',
+        eventLocation: 'ICE BSD City, Tangerang',
+        pkg: '🥇 GOLD', 
+        pct: 35, 
+        value: 87500000, 
+        status: 'WAITING_PRESIDEN', 
+        submitDate: '02/09/2026', 
+        confirmDate: '-', 
+        deadline: '13/11/2026', 
+        bendaharaApproved: true, 
+        bendaharaApprovedAt: '03/09/2026 11:00', 
+        presidenApproved: false, 
+        adminApproved: false,
+        logoUrl: 'assets/mb_club_badge.png', 
+        bannerUrl: 'assets/mb_hero.jpg',
+        impressions: 0, clicks: 0, reach: 0, period: '–'
+      },
+      { 
+        id: 'sp4', 
+        mouNumber: 'PKS/MBINA-012/PERTAMINA/VIII/2026',
+        name: 'PT Pertamina Lubricants', 
+        email: 'sponsor@pertaminalub.com', 
+        phone: '0817-0000-1111', 
+        picName: 'Eko Waskito (Manager Brand Fastron)',
+        eventId: 'EVT-2026-012',
+        eventCode: 'EVT-2026-012',
+        eventTitle: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+        eventDate: '5 September 2026',
+        eventLocation: 'TOPGOLF JAKARTA, Fatmawati',
+        pkg: '💎 PLATINUM', 
+        pct: 50, 
+        value: 17500000, 
+        status: 'CONFIRMED', 
+        submitDate: '25/08/2026', 
+        confirmDate: '28/08/2026', 
+        deadline: '29/08/2026', 
+        bendaharaApproved: true, 
+        presidenApproved: true, 
+        adminApproved: true,
+        logoUrl: 'assets/mb_club_badge.png', 
+        bannerUrl: 'assets/mb_hero.jpg',
+        impressions: 5400, clicks: 620, reach: 4100, period: '28 Agu – 15 Sep 2026'
+      },
+      { 
+        id: 'sp8', 
+        mouNumber: 'PKS/MBINA-012/TOPGOLF/VIII/2026',
+        name: 'TOPGOLF Jakarta', 
+        email: 'events@topgolf.co.id', 
+        phone: '021-765-4321', 
+        picName: 'Clarissa Putri (Commercial Event Manager)',
+        eventId: 'EVT-2026-012',
+        eventCode: 'EVT-2026-012',
+        eventTitle: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+        eventDate: '5 September 2026',
+        eventLocation: 'TOPGOLF JAKARTA, Fatmawati',
+        pkg: '🥈 SILVER', 
+        pct: 15, 
+        value: 5250000, 
+        status: 'CONFIRMED', 
+        submitDate: '26/08/2026', 
+        confirmDate: '29/08/2026', 
+        deadline: '29/08/2026', 
+        bendaharaApproved: true, 
+        presidenApproved: true, 
+        adminApproved: true,
+        logoUrl: 'assets/mb_club_badge.png', 
+        bannerUrl: 'assets/mb_hero.jpg',
+        impressions: 3200, clicks: 380, reach: 2500, period: '28 Agu – 15 Sep 2026'
+      }
+    ];
+  },
+
+  loadSponsors() {
+    try {
+      const saved = localStorage.getItem('mbcina_m6_sponsors');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          this.sampleSponsors = parsed;
+          return;
+        }
+      }
+    } catch(e) {}
+    this.sampleSponsors = this.getMasterOfficialSponsors();
+    this.saveSponsors();
+  },
+
+  saveSponsors() {
+    try {
+      localStorage.setItem('mbcina_m6_sponsors', JSON.stringify(this.sampleSponsors || []));
+    } catch(e) {}
+  },
+
   // Sample Sponsors & Tiered Approval Submissions
   sampleSponsors: [
     { 
@@ -17010,13 +17250,19 @@ const M6Engine = {
     const eDate = ev ? new Date(ev.end_date) : new Date();
     const dateStr = (sDate.toDateString() === eDate.toDateString()) ? this.formatDateIndo(sDate) : `${sDate.getDate()} - ${this.formatDateIndo(eDate)}`;
 
+    const evCode = ev ? (ev.code || ev.id) : 'EVT-2026-001';
+    const compSlug = compName.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8) || 'SPONSOR';
+    const generatedMou = `PKS/MBINA-${evCode.replace('EVT-2026-', '')}/${compSlug}/IX/2026`;
+
     const newSponsor = {
       id: 'sp_' + Date.now(),
+      mouNumber: generatedMou,
       name: compName,
       email: email || (compName.toLowerCase().replace(/[^a-z0-9]/g, '') + '@sponsor.com'),
       phone: phone || '081234567890',
+      picName: document.getElementById('m6-sp-form-contact-person')?.value || 'PIC Sponsorship',
       eventId: ev ? ev.id : 'EVT-2026-001',
-      eventCode: ev ? ev.code : 'EVT-2026-001',
+      eventCode: evCode,
       eventTitle: ev ? ev.title : 'Touring & Bakti Sosial MB INA',
       eventDate: dateStr,
       eventLocation: ev ? ev.location : 'Indonesia',
@@ -17027,13 +17273,18 @@ const M6Engine = {
       submitDate: new Date().toLocaleDateString('id-ID'),
       confirmDate: status === 'CONFIRMED' ? new Date().toLocaleDateString('id-ID') : '-',
       deadline: ev ? this.formatDateIndo(new Date(new Date(ev.start_date).getTime() - 7 * 24 * 60 * 60 * 1000)) : '06/09/2026',
-      logoUrl: 'assets/mb_club_badge.jpg',
+      logoUrl: 'assets/mb_club_badge.png',
       bannerUrl: 'assets/mb_hero.jpg',
-      impressions: 0, clicks: 0, reach: 0, period: 'Sep – Okt 2026'
+      impressions: 0, 
+      clicks: 0, 
+      reach: 0, 
+      period: 'Sep – Nov 2026'
     };
 
     this.sampleSponsors.unshift(newSponsor);
+    if (typeof this.saveSponsors === 'function') this.saveSponsors();
     this.renderSponsorConfirmTable();
+    this.renderSponsorSummaryContracts();
     this.resetSponsorConfirmForm();
 
     // Synchronize event lists & cards if confirmed
@@ -17048,7 +17299,9 @@ const M6Engine = {
   deleteSponsorConfirm(spId) {
     if (!confirm('Hapus sponsor ini dari daftar?')) return;
     this.sampleSponsors = this.sampleSponsors.filter(s => s.id !== spId);
+    if (typeof this.saveSponsors === 'function') this.saveSponsors();
     this.renderSponsorConfirmTable();
+    this.renderSponsorSummaryContracts();
     if (typeof this.renderPublishPage === 'function') this.renderPublishPage();
     if (typeof this.renderEventsList === 'function') this.renderEventsList();
   },
@@ -17250,18 +17503,33 @@ const M6Engine = {
         else if (sp.pkg && sp.pkg.includes('SILVER')) roi = '2.1x';
         else roi = '1.8x';
 
+        const mouNum = sp.mouNumber || `PKS/MBINA-${evCode.replace('EVT-2026-','')}/${(sp.name || 'SP').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8)}/2026`;
+        const picStr = sp.picName ? `${sp.picName} (${sp.phone || '-'})` : (sp.phone || '-');
+
         return `
-          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-            <td style="padding:10px;">
-              <div style="font-weight:700; color:#fbbf24;">[${evCode}]</div>
-              <div style="font-size:0.75rem; color:#94a3b8;">${evTitle}</div>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.06); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+            <td style="padding:12px 10px;">
+              <div style="font-weight:800; color:#fbbf24; font-size:0.85rem;">[${evCode}] ${evTitle}</div>
+              <div style="font-size:0.72rem; color:#94a3b8; margin-top:2px;">🗓️ ${sp.eventDate || '-'} • 📍 ${sp.eventLocation || '-'}</div>
             </td>
-            <td style="padding:10px; font-weight:700; color:#fff;">${sp.name}</td>
-            <td style="padding:10px;"><span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.72rem;">${sp.pkg}</span></td>
-            <td style="padding:10px; font-weight:700; color:#fff;">${valFmt}</td>
-            <td style="padding:10px; font-weight:700; color:var(--primary-emerald);">${revImpact}</td>
-            <td style="padding:10px; font-weight:700; color:#60a5fa;">${roi}</td>
-            <td style="padding:10px;"><span style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:2px 8px; font-size:0.72rem; font-weight:700;">Aktif</span></td>
+            <td style="padding:12px 10px;">
+              <div style="font-weight:800; color:#fff; font-size:0.85rem;">${sp.name}</div>
+              <div style="font-size:0.7rem; color:#d97706; font-family:monospace; margin-top:2px; font-weight:700;">📄 No. PKS: ${mouNum}</div>
+              <div style="font-size:0.7rem; color:#94a3b8; margin-top:1px;">👤 PIC: ${picStr}</div>
+            </td>
+            <td style="padding:12px 10px;">
+              <span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.72rem; font-weight:800;">${sp.pkg}</span>
+              <div style="font-size:0.7rem; color:#34d399; margin-top:3px; font-weight:600;">${sp.pct || 50}% Porsi RAB</div>
+            </td>
+            <td style="padding:12px 10px; font-weight:800; color:#fff; font-size:0.9rem;">${valFmt}</td>
+            <td style="padding:12px 10px; font-weight:800; color:var(--primary-emerald);">${revImpact}</td>
+            <td style="padding:12px 10px; font-weight:800; color:#60a5fa;">${roi}</td>
+            <td style="padding:12px 10px;">
+              <span style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid rgba(16,185,129,0.3); border-radius:6px; padding:3px 10px; font-size:0.72rem; font-weight:700; display:inline-flex; align-items:center; gap:4px;">
+                <span>🟢</span> ${sp.status}
+              </span>
+              <div style="font-size:0.68rem; color:#94a3b8; margin-top:3px;">Disahkan: ${sp.confirmDate || 'Agustus 2026'}</div>
+            </td>
           </tr>`;
       }).join('');
     }
