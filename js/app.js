@@ -4140,13 +4140,10 @@ const AppEngine = {
         M6Engine.switchSubtab('6_4_sponsorship');
       }
     } else if (tab === 'm7_donation') {
-      if (window.M6Engine && typeof window.M6Engine.renderDonationModule === 'function') {
-        window.M6Engine.renderDonationModule();
+      if (window.DonationManager) {
+        window.DonationManager.init();
       } else if (typeof this.renderDonationModule === 'function') {
         this.renderDonationModule();
-      }
-      if (typeof window.switchDonationSubtab === 'function') {
-        try { window.switchDonationSubtab('7_3_1_progress'); } catch (e) { console.warn(e); }
       }
     } else if (tab === 'm7_shop' || tab === 'm7_ecommerce') {
       if (window.M7Engine) {
