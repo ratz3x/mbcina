@@ -49,6 +49,16 @@
       start_date: '2026-08-01',
       end_date: '2026-12-31',
       is_active: true
+    },
+    {
+      id: 'camp_ntt_2026',
+      title: 'Donasi Nusa Tenggara Timur (NTT) 2026',
+      description: 'Program darurat bantuan pangan, air bersih, layanan kesehatan, dan pemulihan hunian warga korban bencana di Nusa Tenggara Timur bersama MB Club Indonesia.',
+      target_amount: 25000000,
+      collected_amount: 0,
+      start_date: '2026-09-03',
+      end_date: '2026-12-31',
+      is_active: true
     }
   ];
 
@@ -173,6 +183,11 @@
         if (stored) {
           const parsed = JSON.parse(stored);
           this.data.campaigns = (parsed.campaigns && parsed.campaigns.length) ? parsed.campaigns : defaultCampaigns;
+          defaultCampaigns.forEach(defC => {
+            if (!this.data.campaigns.some(c => c.id === defC.id)) {
+              this.data.campaigns.push(defC);
+            }
+          });
           this.data.donations = (parsed.donations && parsed.donations.length) ? parsed.donations : defaultDonations;
           this.data.receipts  = (parsed.receipts && parsed.receipts.length)   ? parsed.receipts  : defaultReceipts;
         } else {
@@ -653,6 +668,12 @@
                       <span>Capaian: <strong style="color:#F8FAFC;">${pct}%</strong></span>
                       <span>Periode s/d: ${c.end_date || '2026'}</span>
                     </div>
+                    <div style="margin-top:14px; padding-top:12px; border-top:1px solid rgba(226,232,240,0.08);">
+                      <button type="button" class="mbux-btn-primary" style="width:100%; justify-content:center; padding:9px 16px; font-size:0.82rem; letter-spacing:0.02em;" onclick="window.DonationManager.openDonateModal('${c.id}')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                        <span>Donasi Sekarang</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               `;
@@ -1082,6 +1103,204 @@
     },
 
     // ─── MODAL 1: VERIFIKASI BUKTI TRANSFER (WAJIB PERIKSA BUKTI) ─────────────
+    
+    // ─── MODAL: DONASI SEKARANG (FORM SALURKAN DONASI) ────────────────────────
+    openDonateModal(campaignId) {
+      const camp = this.data.campaigns.find(c => c.id === campaignId) || this.data.campaigns[0] || {};
+      const u = (window.AppEngine && window.AppEngine.currentUser) || {};
+      const defaultName = u.name || 'Derist Touriano';
+      const defaultMemberId = u.member_id || u.memberId || 'MBINA-HQ-2026-000001';
+
+      const portal = this.getOrCreateModalPortal();
+      portal.innerHTML = `
+        <div class="mbux-modal-overlay" onclick="if(event.target===this) window.DonationManager.closeModal()">
+          <div class="mbux-modal-dialog" style="max-width:640px;">
+            <div class="mbux-modal-header">
+              <div>
+                <h3 style="margin:0; font-size:1.1rem; font-weight:700; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                  <span>Form Penyaluran Donasi</span>
+                </h3>
+                <span style="font-size:0.72rem; color:#94A3B8;">${camp.title || 'Donasi MB INA'}</span>
+              </div>
+              <button type="button" class="mbux-btn-stroke" style="padding:5px 9px;" onclick="window.DonationManager.closeModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+
+            <form onsubmit="window.DonationManager.handleSubmitDonation(event)">
+              <div class="mbux-modal-body">
+                <!-- CAMPAIGN SELECTOR -->
+                <div style="margin-bottom:16px;">
+                  <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Program Donasi *</label>
+                  <select id="donate-modal-camp-id" class="mbux-input" style="width:100%; box-sizing:border-box;">
+                    ${this.data.campaigns.map(c => `<option value="${c.id}" ${c.id === camp.id ? 'selected' : ''}>${c.title}</option>`).join('')}
+                  </select>
+                </div>
+
+                <!-- DONOR IDENTITY -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+                  <div>
+                    <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Nama Donatur *</label>
+                    <input type="text" id="donate-modal-name" class="mbux-input" required value="${defaultName}" style="width:100%; box-sizing:border-box;">
+                  </div>
+                  <div>
+                    <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Member ID *</label>
+                    <input type="text" id="donate-modal-mid" class="mbux-input" required value="${defaultMemberId}" style="width:100%; box-sizing:border-box; font-family:monospace;">
+                  </div>
+                </div>
+
+                <!-- NOMINAL DONASI & PRESET PILLS -->
+                <div style="margin-bottom:18px;">
+                  <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Pilih Nominal Donasi (Rp) *</label>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(100px, 1fr)); gap:8px; margin-bottom:10px;">
+                    <button type="button" class="mbux-btn-stroke" style="justify-content:center; font-family:monospace; font-size:0.75rem;" onclick="document.getElementById('donate-modal-amount').value = '250000'">Rp 250rb</button>
+                    <button type="button" class="mbux-btn-stroke" style="justify-content:center; font-family:monospace; font-size:0.75rem;" onclick="document.getElementById('donate-modal-amount').value = '500000'">Rp 500rb</button>
+                    <button type="button" class="mbux-btn-stroke" style="justify-content:center; font-family:monospace; font-size:0.75rem;" onclick="document.getElementById('donate-modal-amount').value = '1000000'">Rp 1 Jt</button>
+                    <button type="button" class="mbux-btn-stroke" style="justify-content:center; font-family:monospace; font-size:0.75rem;" onclick="document.getElementById('donate-modal-amount').value = '2500000'">Rp 2.5 Jt</button>
+                    <button type="button" class="mbux-btn-stroke" style="justify-content:center; font-family:monospace; font-size:0.75rem;" onclick="document.getElementById('donate-modal-amount').value = '5000000'">Rp 5 Jt</button>
+                  </div>
+                  <input type="number" id="donate-modal-amount" class="mbux-input" min="50000" step="50000" required value="1000000" placeholder="Ketik nominal kustom..."
+                    style="width:100%; box-sizing:border-box; font-size:1.1rem; font-weight:700; font-family:monospace; color:#FFFFFF;">
+                </div>
+
+                <!-- PAYMENT METHOD & BANK ACCOUNTS -->
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.08); border-radius:14px; padding:16px; margin-bottom:16px;">
+                  <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Metode Penyaluran Dana *</label>
+                  <select id="donate-modal-method" class="mbux-input" style="width:100%; box-sizing:border-box; margin-bottom:12px;" onchange="window.DonationManager.updateBankInstructions(this.value)">
+                    <option value="TRANSFER">Transfer Bank BCA / Mandiri</option>
+                    <option value="QRIS">QRIS Mercedes-Benz Club Indonesia</option>
+                  </select>
+
+                  <div id="donate-modal-bank-info" style="font-size:0.78rem; color:#CBD5E1; line-height:1.6; background:#07090E; border:1px solid rgba(226,232,240,0.1); border-radius:10px; padding:12px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                      <span>Bank BCA: <strong style="font-family:monospace; color:#FFFFFF;">5410-888-299</strong></span>
+                      <span style="color:#94A3B8;">a.n. MB Club Indonesia</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                      <span>Bank Mandiri: <strong style="font-family:monospace; color:#FFFFFF;">137-00-1928-333</strong></span>
+                      <span style="color:#94A3B8;">a.n. MB Club Indonesia</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ATTACH PAYMENT PROOF -->
+                <div style="margin-bottom:16px;">
+                  <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Lampirkan Bukti Transfer (Foto/Struk) *</label>
+                  <input type="file" id="donate-modal-proof-file" accept="image/*" class="mbux-input" style="width:100%; box-sizing:border-box; padding:6px;" onchange="window.DonationManager.handleProofFileSelect(event)">
+                  <div style="font-size:0.7rem; color:#64748B; margin-top:4px;">Format: JPG, PNG, WEBP. Admin wajib memverifikasi struk ini sebelum persetujuan.</div>
+                </div>
+
+                <!-- NOTES -->
+                <div>
+                  <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Pesan / Catatan Donatur (Opsional)</label>
+                  <input type="text" id="donate-modal-notes" class="mbux-input" placeholder="Tuliskan doa atau pesan kepedulian..." style="width:100%; box-sizing:border-box;">
+                </div>
+              </div>
+
+              <div class="mbux-modal-footer">
+                <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.closeModal()">Batal</button>
+                <button type="submit" class="mbux-btn-primary">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+                  <span>Kirim Donasi &amp; Unggah Bukti</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+
+      document.body.style.overflow = 'hidden';
+    },
+
+    handleProofFileSelect(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        this._stagedProofUrl = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    },
+
+    updateBankInstructions(val) {
+      const el = document.getElementById('donate-modal-bank-info');
+      if (!el) return;
+      if (val === 'QRIS') {
+        el.innerHTML = `
+          <div style="text-align:center; padding:6px;">
+            <div style="font-weight:600; color:#FFFFFF; margin-bottom:4px;">QRIS MB INA Nasional</div>
+            <div style="font-size:0.75rem; color:#94A3B8;">Pindai kode QRIS resmi MB Club Indonesia melalui aplikasi mobile banking atau e-wallet apa saja.</div>
+          </div>
+        `;
+      } else {
+        el.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span>Bank BCA: <strong style="font-family:monospace; color:#FFFFFF;">5410-888-299</strong></span>
+            <span style="color:#94A3B8;">a.n. MB Club Indonesia</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Bank Mandiri: <strong style="font-family:monospace; color:#FFFFFF;">137-00-1928-333</strong></span>
+            <span style="color:#94A3B8;">a.n. MB Club Indonesia</span>
+          </div>
+        `;
+      }
+    },
+
+    async handleSubmitDonation(e) {
+      e.preventDefault();
+      const campaignId = document.getElementById('donate-modal-camp-id').value;
+      const donorName  = document.getElementById('donate-modal-name').value.trim();
+      const memberId   = document.getElementById('donate-modal-mid').value.trim();
+      const amount     = parseFloat(document.getElementById('donate-modal-amount').value) || 0;
+      const method     = document.getElementById('donate-modal-method').value;
+      const notes      = (document.getElementById('donate-modal-notes') || {}).value || '';
+      const proofUrl   = this._stagedProofUrl || 'assets/mb_hero.jpg';
+
+      if (amount <= 0) {
+        this.notifyToast('Silakan masukkan nominal donasi yang valid.', 'error');
+        return;
+      }
+
+      const newDon = {
+        id: 'DON-TRX-2026-' + String(Math.floor(100 + Math.random() * 900)),
+        trx_code: 'DON-TRX-2026-' + String(Math.floor(100 + Math.random() * 900)),
+        campaign_id: campaignId,
+        donor_name: donorName || 'Hamba Allah',
+        member_id: memberId || 'Non-Member',
+        amount: amount,
+        payment_method: method,
+        payment_proof_url: proofUrl,
+        status: 'PENDING',
+        notes: notes,
+        created_at: new Date().toLocaleString('id-ID')
+      };
+
+      this.data.donations.unshift(newDon);
+      this.saveStoredData();
+      this._stagedProofUrl = null;
+
+      this.closeModal();
+      this.notifyToast('Terima kasih! Donasi sebesar Rp ' + amount.toLocaleString('id-ID') + ' berhasil dikirim dan menunggu verifikasi Admin.', 'success');
+      this.renderActiveSubtab();
+
+      try {
+        await fetch('api.php?action=submit_donation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            campaign_id: campaignId,
+            donor_name: donorName,
+            member_id_input: memberId,
+            amount: amount,
+            payment_method: method,
+            payment_proof_url: proofUrl,
+            notes: notes
+          })
+        });
+      } catch (err) {}
+    },
+
     openVerifyModal(donationId) {
       const don = this.data.donations.find(d => String(d.id) === String(donationId) || String(d.trx_code) === String(donationId));
       if (!don) {
@@ -1597,6 +1816,14 @@
     window.openDonationVerifyModal = function(id) {
       DonationManager.openVerifyModal(id);
     };
+    window.openMemberDonationModal = function(campaignId) {
+      DonationManager.openDonateModal(campaignId);
+    };
+    if (window.AppEngine) {
+      window.AppEngine.openMemberDonationModal = function(campaignId) {
+        DonationManager.openDonateModal(campaignId);
+      };
+    }
     window.switchDonationSubtab = function(subtab) {
       const tabMap = {
         '7_3_1_progress': 'monitoring',
