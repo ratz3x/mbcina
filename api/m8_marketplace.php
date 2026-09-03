@@ -164,7 +164,7 @@ switch ($action) {
         try {
             ensureM7Tables($sPdo);
             $lapakId = $input['lapak_id'] ?? '';
-            $status  = strtoupper($input['status'] ?? 'APPROVED'); // APPROVED, REJECTED, REVISION
+            $status  = strtoupper($input['status'] ?? 'APPROVED');
             $reason  = trim($input['rejection_reason'] ?? '');
             $userId  = $input['user_id'] ?? 'usr_superadmin';
 
@@ -176,8 +176,56 @@ switch ($action) {
             $sPdo->prepare("UPDATE lapak SET sewa_status = ?, sewa_paid_status = ?, is_active = ?, status = ?, is_verified = ?, rejection_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
                  ->execute([$sewaStatus, $sewaPaid, $isActBool, $status, $isVerBool, $reason, $lapakId]);
 
-            logAudit($userId, 'VERIFY', 'E_COMMERCE_LAPAK', ['lapak_id' => $lapakId, 'status' => $status, 'reason' => $reason]);
+            if ($status === 'APPROVED') {
+                $sPdo->prepare("UPDATE lapak_sewa_logs SET payment_status = 'PAID' WHERE lapak_id = ? AND payment_status != 'PAID'")
+                     ->execute([$lapakId]);
 
+                $lStmt = $sPdo->prepare("SELECT user_id, final_fee, sewa_fee, name FROM lapak WHERE id = ? LIMIT 1");
+                $lStmt->execute([$lapakId]);
+                $lRow = $lStmt->fetch();
+
+                if ($lRow && !empty($lRow['user_id'])) {
+                    $lUid = $lRow['user_id'];
+                    $lFee = (int)($lRow['final_fee'] ?: $lRow['sewa_fee'] ?: 0);
+                    $pts = max(1, intval($lFee / 10000));
+
+                    $sPdo->prepare("UPDATE users SET points = points + :pts WHERE id = :uid")->execute([':pts' => $pts, ':uid' => $lUid]);
+
+                    $sPdo->exec("
+                        UPDATE users u
+                        SET tier = CASE
+                            WHEN (
+                                COALESCE((SELECT SUM(amount) FROM donations WHERE user_id = u.id AND status IN ('SUCCESS','CONFIRMED')), 0) +
+                                COALESCE((SELECT SUM(fee_paid) FROM event_participants WHERE user_id = u.id AND payment_status IN ('SUCCESS','CONFIRMED','VERIFIED','APPROVED','PAID')), 0) +
+                                COALESCE((SELECT SUM(fee) FROM lapak_sewa_logs WHERE created_by = u.id AND payment_status IN ('PAID','VERIFIED','SUCCESS')), 0)
+                            ) >= 9000000 THEN 'PLATINUM'
+                            WHEN (
+                                COALESCE((SELECT SUM(amount) FROM donations WHERE user_id = u.id AND status IN ('SUCCESS','CONFIRMED')), 0) +
+                                COALESCE((SELECT SUM(fee_paid) FROM event_participants WHERE user_id = u.id AND payment_status IN ('SUCCESS','CONFIRMED','VERIFIED','APPROVED','PAID')), 0) +
+                                COALESCE((SELECT SUM(fee) FROM lapak_sewa_logs WHERE created_by = u.id AND payment_status IN ('PAID','VERIFIED','SUCCESS')), 0)
+                            ) >= 4500000 THEN 'GOLD'
+                            WHEN (
+                                COALESCE((SELECT SUM(amount) FROM donations WHERE user_id = u.id AND status IN ('SUCCESS','CONFIRMED')), 0) +
+                                COALESCE((SELECT SUM(fee_paid) FROM event_participants WHERE user_id = u.id AND payment_status IN ('SUCCESS','CONFIRMED','VERIFIED','APPROVED','PAID')), 0) +
+                                COALESCE((SELECT SUM(fee) FROM lapak_sewa_logs WHERE created_by = u.id AND payment_status IN ('PAID','VERIFIED','SUCCESS')), 0)
+                            ) >= 1500000 THEN 'SILVER'
+                            ELSE 'BRONZE'
+                        END
+                        WHERE u.id = '" . $lUid . "';
+                    ");
+
+                    try {
+                        $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'MARKETPLACE', 'Sewa Lapak Terverifikasi', :det)")
+                             ->execute([
+                                 ':id' => 'act_' . uniqid(),
+                                 ':uid' => $lUid,
+                                 ':det' => 'Sewa lapak "' . ($lRow['name'] ?? 'Lapak') . '" Rp ' . number_format($lFee, 0, ',', '.') . " terverifikasi (+{$pts} Poin Reward)."
+                             ]);
+                    } catch (Exception $eAct) {}
+                }
+            }
+
+            logAudit($userId, 'VERIFY', 'E_COMMERCE_LAPAK', ['lapak_id' => $lapakId, 'status' => $status, 'reason' => $reason]);
             echo json_encode(['success' => true, 'message' => "Pengajuan Lapak berhasil di-$status!"]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);

@@ -10,11 +10,34 @@ switch ($action) {
         try {
             ensureM3Tables($sPdo);
             $stmt = $sPdo->query("
-                SELECT id, username, name, email, phone, role, status, tier, club, club_id, province, city, 
-                       member_id, vehicle_model, license_plate, total_donation, total_events, points, gender, birth_date, 
-                       admin_notes, photo_url, rejection_reason, verified_at, created_at 
-                FROM users 
-                ORDER BY created_at DESC
+                SELECT u.id, u.username, u.name, u.email, u.phone, u.role, u.status, u.club, u.club_id, u.province, u.city, 
+                       u.member_id, u.vehicle_model, u.license_plate, u.total_events, u.points, u.gender, u.birth_date, 
+                       u.admin_notes, u.photo_url, u.rejection_reason, u.verified_at, u.created_at,
+                       (
+                         COALESCE((SELECT SUM(d.amount) FROM donations d WHERE d.user_id = u.id AND d.status IN ('SUCCESS','CONFIRMED')), 0) +
+                         COALESCE((SELECT SUM(p.fee_paid) FROM event_participants p WHERE p.user_id = u.id AND p.payment_status IN ('SUCCESS','CONFIRMED','VERIFIED','APPROVED','PAID')), 0) +
+                         COALESCE((SELECT SUM(l.fee) FROM lapak_sewa_logs l WHERE l.created_by = u.id AND l.payment_status IN ('PAID','VERIFIED','SUCCESS')), 0)
+                       ) AS total_donation,
+                       CASE
+                         WHEN (
+                           COALESCE((SELECT SUM(d.amount) FROM donations d WHERE d.user_id = u.id AND d.status IN ('SUCCESS','CONFIRMED')), 0) +
+                           COALESCE((SELECT SUM(p.fee_paid) FROM event_participants p WHERE p.user_id = u.id AND p.payment_status IN ('SUCCESS','CONFIRMED','VERIFIED','APPROVED','PAID')), 0) +
+                           COALESCE((SELECT SUM(l.fee) FROM lapak_sewa_logs l WHERE l.created_by = u.id AND l.payment_status IN ('PAID','VERIFIED','SUCCESS')), 0)
+                         ) >= 9000000 THEN 'PLATINUM'
+                         WHEN (
+                           COALESCE((SELECT SUM(d.amount) FROM donations d WHERE d.user_id = u.id AND d.status IN ('SUCCESS','CONFIRMED')), 0) +
+                           COALESCE((SELECT SUM(p.fee_paid) FROM event_participants p WHERE p.user_id = u.id AND p.payment_status IN ('SUCCESS','CONFIRMED','VERIFIED','APPROVED','PAID')), 0) +
+                           COALESCE((SELECT SUM(l.fee) FROM lapak_sewa_logs l WHERE l.created_by = u.id AND l.payment_status IN ('PAID','VERIFIED','SUCCESS')), 0)
+                         ) >= 4500000 THEN 'GOLD'
+                         WHEN (
+                           COALESCE((SELECT SUM(d.amount) FROM donations d WHERE d.user_id = u.id AND d.status IN ('SUCCESS','CONFIRMED')), 0) +
+                           COALESCE((SELECT SUM(p.fee_paid) FROM event_participants p WHERE p.user_id = u.id AND p.payment_status IN ('SUCCESS','CONFIRMED','VERIFIED','APPROVED','PAID')), 0) +
+                           COALESCE((SELECT SUM(l.fee) FROM lapak_sewa_logs l WHERE l.created_by = u.id AND l.payment_status IN ('PAID','VERIFIED','SUCCESS')), 0)
+                         ) >= 1500000 THEN 'SILVER'
+                         ELSE 'BRONZE'
+                       END AS tier
+                FROM users u 
+                ORDER BY u.created_at DESC
             ");
             $members = $stmt->fetchAll();
 
@@ -473,7 +496,7 @@ switch ($action) {
                 $eventStmt = $sPdo->prepare("
                     SELECT COALESCE(SUM(fee_paid), 0) AS event_total, COUNT(*) AS event_count
                     FROM event_participants
-                    WHERE user_id = :uid AND payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+                    WHERE user_id = :uid AND payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED', 'PAID')
                 ");
                 $eventStmt->execute([':uid' => $id]);
                 $eventRow = $eventStmt->fetch();
@@ -481,14 +504,27 @@ switch ($action) {
                 $eventCount = intval($eventRow['event_count'] ?? 0);
             } catch (Exception $eEvt) {}
 
-            // Total Contribution = Verified Donations + Verified Event Tickets
-            $totalContribution = $realTotalDonation + $eventTicketTotal;
+            // Query verified lapak rental fees paid by member
+            $lapakFeeTotal = 0;
+            try {
+                $lapakStmt = $sPdo->prepare("
+                    SELECT COALESCE(SUM(fee), 0) AS lapak_total
+                    FROM lapak_sewa_logs
+                    WHERE created_by = :uid AND payment_status IN ('PAID', 'VERIFIED', 'SUCCESS')
+                ");
+                $lapakStmt->execute([':uid' => $id]);
+                $lapakFeeTotal = intval($lapakStmt->fetchColumn() ?? 0);
+            } catch (Exception $eLpk) {}
+
+            // Total Contribution = 1. Donasi + 2. Tiket Event + 3. Sewa Lapak
+            $totalContribution = $realTotalDonation + $eventTicketTotal + $lapakFeeTotal;
             $member['total_donation'] = $realTotalDonation;
             $member['event_tickets_total'] = $eventTicketTotal;
+            $member['lapak_fee_total'] = $lapakFeeTotal;
             $member['total_contribution'] = $totalContribution;
             $member['total_events'] = $eventCount;
 
-            // Tier evaluation based on Total Contribution (Donations + Event Tickets)
+            // Tier evaluation based on Total Contribution (Donasi + Tiket Event + Sewa Lapak)
             if ($totalContribution >= 9000000) {
                 $member['tier'] = 'PLATINUM';
             } elseif ($totalContribution >= 4500000) {
