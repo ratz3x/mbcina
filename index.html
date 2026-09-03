@@ -182,18 +182,14 @@
             <div id="dropdown-user-name" style="font-size:0.75rem; font-weight:700; color:#ffffff; letter-spacing:0.025em; line-height:1.2;">Derist Touriano</div>
             <div id="dropdown-user-email" style="font-size:11px; color:#a3a3a3; font-family:monospace; margin-top:2px;">dtouriano@gmail.com</div>
           </div>
-          <!-- Item Menu Navigasi (Halaman Utama Masuk ke Portal Admin untuk Admin) -->
+          <!-- Item Menu Navigasi -->
           <button type="button" id="dropdown-item-home" class="dropdown-item-luxury" style="width:100%; display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; font-size:0.75rem; font-weight:500; color:#d4d4d4; background:transparent; border:0; outline:none; text-align:left; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#ffffff'; this.querySelector('svg').style.color='#fbbf24';" onmouseout="this.style.background='transparent'; this.style.color='#d4d4d4'; this.querySelector('svg').style.color='#a3a3a3';" onclick="AppEngine.navigateHomeForUser(); AppEngine.closeUserDropdown();">
             <svg id="dropdown-icon-home" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#a3a3a3; transition:color 0.15s; flex-shrink:0;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-            <span id="dropdown-label-home">Halaman Utama (Portal Admin)</span>
+            <span id="dropdown-label-home">Portal Admin</span>
           </button>
           <button type="button" class="dropdown-item-luxury" style="width:100%; display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; font-size:0.75rem; font-weight:500; color:#d4d4d4; background:transparent; border:0; outline:none; text-align:left; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#ffffff'; this.querySelector('svg').style.color='#fbbf24';" onmouseout="this.style.background='transparent'; this.style.color='#d4d4d4'; this.querySelector('svg').style.color='#a3a3a3';" onclick="AppEngine.openPortalMember(); AppEngine.closeUserDropdown();">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#a3a3a3; transition:color 0.15s; flex-shrink:0;"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
             <span>Dashboard Member Saya</span>
-          </button>
-          <button type="button" class="dropdown-item-luxury" style="width:100%; display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; font-size:0.75rem; font-weight:500; color:#d4d4d4; background:transparent; border:0; outline:none; text-align:left; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#ffffff'; this.querySelector('svg').style.color='#fbbf24';" onmouseout="this.style.background='transparent'; this.style.color='#d4d4d4'; this.querySelector('svg').style.color='#a3a3a3';" onclick="AppEngine.openMemberKtaModal(); AppEngine.closeUserDropdown();">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#a3a3a3; transition:color 0.15s; flex-shrink:0;"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-            <span>Kartu Tanda Anggota (E-KTA)</span>
           </button>
           <button type="button" class="dropdown-item-luxury" style="width:100%; display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; font-size:0.75rem; font-weight:500; color:#d4d4d4; background:transparent; border:0; outline:none; text-align:left; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#ffffff'; this.querySelector('svg').style.color='#fbbf24';" onmouseout="this.style.background='transparent'; this.style.color='#d4d4d4'; this.querySelector('svg').style.color='#a3a3a3';" onclick="AppEngine.openPortalSponsor(); AppEngine.closeUserDropdown();">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#a3a3a3; transition:color 0.15s; flex-shrink:0;"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -204,14 +200,14 @@
             <span>Forum Diskusi Komunitas</span>
           </button>
           <button type="button" id="dropdown-item-public-web" class="dropdown-item-luxury" style="width:100%; display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; font-size:0.75rem; font-weight:500; color:#d4d4d4; background:transparent; border:0; outline:none; text-align:left; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#ffffff'; this.querySelector('svg').style.color='#fbbf24';" onmouseout="this.style.background='transparent'; this.style.color='#d4d4d4'; this.querySelector('svg').style.color='#a3a3a3';" onclick="AppEngine.navigateToHome(); AppEngine.closeUserDropdown();">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#a3a3a3; transition:color 0.15s; flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg>
-            <span>Lihat Website Publik (Beranda)</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#a3a3a3; transition:color 0.15s; flex-shrink:0;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Beranda</span>
           </button>
           <!-- Menu Keluar (Sign Out) Monokrom Netral Tanpa Warna Merah -->
           <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:8px; margin-top:8px;">
             <button type="button" class="dropdown-item-luxury" style="width:100%; display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:12px; font-size:0.75rem; font-weight:500; color:#a3a3a3; background:transparent; border:0; outline:none; text-align:left; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.color='#e5e5e5';" onmouseout="this.style.background='transparent'; this.style.color='#a3a3a3';" onclick="AuthEngine.logout(); AppEngine.closeUserDropdown();">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#a3a3a3; flex-shrink:0;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-              <span>Keluar (Sign Out)</span>
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
@@ -10264,7 +10260,7 @@
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="js/auth.js?v=20260903_v88_mbux"></script>
-  <script src="js/app.js?v=20260904_v105_admin_home_portal"></script>
+  <script src="js/app.js?v=20260904_v106_user_dropdown_items"></script>
   <script>
     lucide.createIcons();
     try {

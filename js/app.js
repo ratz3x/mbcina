@@ -4310,7 +4310,7 @@ const AppEngine = {
         const ddPublicBtn = document.getElementById('dropdown-item-public-web');
 
         if (isAdminRole) {
-          if (ddHomeLabel) ddHomeLabel.innerText = 'Halaman Utama (Portal Admin)';
+          if (ddHomeLabel) ddHomeLabel.innerText = 'Portal Admin';
           if (ddHomeIcon) ddHomeIcon.innerHTML = '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>';
           if (ddPublicBtn) ddPublicBtn.style.display = 'flex';
         } else if (this.currentRole === 'SPONSOR') {
