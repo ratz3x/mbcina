@@ -16621,9 +16621,9 @@ const M6Engine = {
     if (!container) return;
     const sp = this.getSelectedSponsor();
 
-    const imps = sp.impressions || (sp.status === 'CONFIRMED' ? 12450 : 0);
-    const clks = sp.clicks || (sp.status === 'CONFIRMED' ? 1234 : 0);
-    const rch  = sp.reach || (sp.status === 'CONFIRMED' ? 8900 : 0);
+    const imps = Number(sp.impressions) || 0;
+    const clks = Number(sp.clicks) || 0;
+    const rch  = Number(sp.reach) || 0;
     const ctr  = imps > 0 ? ((clks / imps) * 100).toFixed(1) + '%' : '0.0%';
 
     container.innerHTML = `
@@ -16717,14 +16717,26 @@ const M6Engine = {
     `;
   },
 
+  trackSponsorInteraction(sponsorId, type = 'click') {
+    const sp = (this.sampleSponsors || []).find(s => s.id === sponsorId);
+    if (!sp) return;
+    if (type === 'click') {
+      sp.clicks = (Number(sp.clicks) || 0) + 1;
+    } else if (type === 'impression') {
+      sp.impressions = (Number(sp.impressions) || 0) + 1;
+    }
+    this.renderSponsorSummaryContracts();
+    this.renderSponsorEffectivenessReport();
+  },
+
   renderSponsorEffectivenessReport() {
     const container = document.getElementById('m6-sp-report-container');
     if (!container) return;
     const sp = this.getSelectedSponsor();
 
-    const imps = sp.impressions || (sp.status === 'CONFIRMED' ? 12450 : 0);
-    const clks = sp.clicks || (sp.status === 'CONFIRMED' ? 1234 : 0);
-    const rch  = sp.reach || (sp.status === 'CONFIRMED' ? 8900 : 0);
+    const imps = Number(sp.impressions) || 0;
+    const clks = Number(sp.clicks) || 0;
+    const rch  = Number(sp.reach) || 0;
 
     container.innerHTML = `
       <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold); margin-bottom:20px;">
@@ -17149,43 +17161,114 @@ const M6Engine = {
     this.renderSponsorSummaryContracts();
   },
 
-  renderSponsorSummaryContracts() {
+  renderSponsorSummaryContracts(selectedScope = 'ALL') {
     const tbody = document.getElementById('spnd-summary-history-tbody');
-    if (!tbody) return;
+    const filterSel = document.getElementById('spnd-analytics-filter-select');
+    const impEl = document.getElementById('spnd-impressions');
+    const clkEl = document.getElementById('spnd-clicks');
+    const rchEl = document.getElementById('spnd-reach');
+    const engEl = document.getElementById('spnd-engagement');
+    const insightsEl = document.getElementById('spnd-insights-content');
 
+    const investEl = document.getElementById('spnd-card-invest-amount');
+    const revenueEl = document.getElementById('spnd-card-revenue-amount');
+    const roiEl = document.getElementById('spnd-card-roi-percent');
+
+    // 1. Get confirmed sponsors
     const confirmed = (this.sampleSponsors || []).filter(s => s.status === 'CONFIRMED');
-    if (confirmed.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#94a3b8;">Belum ada kemitraan sponsor terkonfirmasi.</td></tr>`;
-      return;
+
+    // 2. Populate filter dropdown if empty or needed
+    if (filterSel && (!filterSel.options || filterSel.options.length <= 1)) {
+      const events = this.getActiveSponsorEvents();
+      let optHtml = `<option value="ALL">🌐 Seluruh Event Resmi (Konsolidasi Total)</option>`;
+      events.forEach(ev => {
+        optHtml += `<option value="${ev.code}">[${ev.code}] ${ev.title}</option>`;
+      });
+      filterSel.innerHTML = optHtml;
+      filterSel.value = selectedScope;
     }
 
-    tbody.innerHTML = confirmed.map(sp => {
-      const evCode = sp.eventCode || sp.eventId || 'EVT-2026';
-      const evTitle = sp.eventTitle || 'Event MB Club INA';
-      const valFmt = 'Rp ' + ((sp.value || 0)).toLocaleString('id-ID');
-      const revImpact = 'Rp ' + Math.round((sp.value || 0) * 3.2).toLocaleString('id-ID');
+    // 3. Filter sponsors based on scope
+    let targetList = confirmed;
+    if (selectedScope && selectedScope !== 'ALL') {
+      targetList = confirmed.filter(s => s.eventCode === selectedScope || s.eventId === selectedScope);
+    }
 
-      let roi = '3.8x';
-      if (sp.pkg && sp.pkg.includes('TUNGGAL')) roi = '4.6x';
-      else if (sp.pkg && sp.pkg.includes('PLATINUM')) roi = '3.8x';
-      else if (sp.pkg && sp.pkg.includes('GOLD')) roi = '2.9x';
-      else if (sp.pkg && sp.pkg.includes('SILVER')) roi = '2.1x';
-      else roi = '1.8x';
+    // 4. Calculate REAL metrics from targetList
+    const totalInvest = targetList.reduce((sum, s) => sum + (Number(s.value) || 0), 0);
+    const estRevenue = Math.round(totalInvest * 2.8);
+    const roiCalc = totalInvest > 0 ? '180%' : '0%';
 
-      return `
-        <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-          <td style="padding:10px;">
-            <div style="font-weight:700; color:#fbbf24;">[${evCode}]</div>
-            <div style="font-size:0.75rem; color:#94a3b8;">${evTitle}</div>
-          </td>
-          <td style="padding:10px; font-weight:700; color:#fff;">${sp.name}</td>
-          <td style="padding:10px;"><span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.72rem;">${sp.pkg}</span></td>
-          <td style="padding:10px; font-weight:700; color:#fff;">${valFmt}</td>
-          <td style="padding:10px; font-weight:700; color:var(--primary-emerald);">${revImpact}</td>
-          <td style="padding:10px; font-weight:700; color:#60a5fa;">${roi}</td>
-          <td style="padding:10px;"><span style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:2px 8px; font-size:0.72rem; font-weight:700;">Aktif</span></td>
-        </tr>`;
-    }).join('');
+    const totalImps = targetList.reduce((sum, s) => sum + (Number(s.impressions) || 0), 0);
+    const totalClks = targetList.reduce((sum, s) => sum + (Number(s.clicks) || 0), 0);
+    const totalRch = targetList.reduce((sum, s) => sum + (Number(s.reach) || 0), 0);
+    const ctrPct = totalImps > 0 ? ((totalClks / totalImps) * 100).toFixed(1) : '0.0';
+
+    if (investEl) investEl.textContent = 'Rp ' + totalInvest.toLocaleString('id-ID');
+    if (revenueEl) revenueEl.textContent = 'Rp ' + estRevenue.toLocaleString('id-ID');
+    if (roiEl) roiEl.textContent = roiCalc;
+
+    if (impEl) impEl.textContent = totalImps.toLocaleString('id-ID');
+    if (clkEl) clkEl.textContent = totalClks.toLocaleString('id-ID');
+    if (rchEl) rchEl.textContent = totalRch.toLocaleString('id-ID');
+    if (engEl) engEl.textContent = ctrPct + '%';
+
+    // 5. Update dynamic insights text based on REAL calculations
+    if (insightsEl) {
+      if (targetList.length > 0) {
+        insightsEl.innerHTML = `
+          • Seluruh materi promosi telah ditayangkan sebanyak <strong style="color:var(--accent-gold);">${totalImps.toLocaleString('id-ID')} kali tayang riil</strong>.<br>
+          • Sebanyak <strong style="color:#60a5fa;">${totalClks.toLocaleString('id-ID')} interaksi klik</strong> berhasil mengarahkan member ke website / tautan resmi mitra.<br>
+          • Total keterpaparan mencapai <strong style="color:#34d399;">${totalRch.toLocaleString('id-ID')} audiens member terdaftar</strong> di seluruh regional MB INA.<br>
+          • Rasio interaksi aktif (Engagement Rate) tercatat <strong style="color:#c084fc;">${ctrPct}%</strong> (${parseFloat(ctrPct) >= 5 ? 'Performa Sangat Tinggi' : 'Stabil'}).
+        `;
+      } else {
+        insightsEl.innerHTML = `
+          • Belum ada data impresi untuk event yang dipilih karena belum ada mitra yang terkonfirmasi.<br>
+          • Segera input data mitra pada form Konfirmasi Sponsor untuk mulai mencatat performa tayang iklan.
+        `;
+      }
+    }
+
+    // 6. Render table
+    if (tbody) {
+      if (targetList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="padding:20px; text-align:center; color:#94a3b8;">Belum ada kemitraan sponsor terkonfirmasi untuk filter ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = targetList.map(sp => {
+        const evCode = sp.eventCode || sp.eventId || 'EVT-2026';
+        const evTitle = sp.eventTitle || 'Event MB Club INA';
+        const valFmt = 'Rp ' + ((sp.value || 0)).toLocaleString('id-ID');
+        const revImpact = 'Rp ' + Math.round((sp.value || 0) * 2.8).toLocaleString('id-ID');
+
+        let roi = '2.8x';
+        if (sp.pkg && sp.pkg.includes('TUNGGAL')) roi = '4.6x';
+        else if (sp.pkg && sp.pkg.includes('PLATINUM')) roi = '3.8x';
+        else if (sp.pkg && sp.pkg.includes('GOLD')) roi = '2.9x';
+        else if (sp.pkg && sp.pkg.includes('SILVER')) roi = '2.1x';
+        else roi = '1.8x';
+
+        return `
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+            <td style="padding:10px;">
+              <div style="font-weight:700; color:#fbbf24;">[${evCode}]</div>
+              <div style="font-size:0.75rem; color:#94a3b8;">${evTitle}</div>
+            </td>
+            <td style="padding:10px; font-weight:700; color:#fff;">${sp.name}</td>
+            <td style="padding:10px;"><span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.72rem;">${sp.pkg}</span></td>
+            <td style="padding:10px; font-weight:700; color:#fff;">${valFmt}</td>
+            <td style="padding:10px; font-weight:700; color:var(--primary-emerald);">${revImpact}</td>
+            <td style="padding:10px; font-weight:700; color:#60a5fa;">${roi}</td>
+            <td style="padding:10px;"><span style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid rgba(16,185,129,0.3); border-radius:4px; padding:2px 8px; font-size:0.72rem; font-weight:700;">Aktif</span></td>
+          </tr>`;
+      }).join('');
+    }
+  },
+
+  onAnalyticsFilterChange(scope) {
+    this.renderSponsorSummaryContracts(scope);
   },
 
   // ─────────────────────────────────────────────

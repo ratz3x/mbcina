@@ -6620,19 +6620,24 @@
         </div>
       </div>
 
-      <!-- 4. LAPORAN ANALITIK, EFEKTIVITAS & INSIGHT PENAYANGAN (LIVE METRICS) -->
+      <!-- 4. LAPORAN ANALITIK, EFEKTIVITAS & INSIGHT PENAYANGAN (LIVE METRICS DINAMIS) -->
       <div id="sponsor-analytics-section" class="glass-panel" style="padding:24px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); margin-bottom:24px; border-radius:18px;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
           <div>
             <h3 style="font-size:1.15rem; color:var(--accent-gold); font-weight:800; margin:0;">
               Laporan Efektivitas & Insight Performa Iklan
             </h3>
-            <p style="font-size:0.78rem; color:var(--text-muted); margin:3px 0 0 0;">Data analitik penayangan iklan banner dan jangkauan tayang ke member resmi MB INA</p>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin:3px 0 0 0;">Data analitik riil penayangan iklan, klik pengguna, dan ketercapaian target audiens MB INA</p>
           </div>
-          <button class="btn-primary" style="font-weight:700; font-size:0.8rem; padding:8px 18px; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:6px;" onclick="SponsorPortalEngine.downloadSponsorReportPDF()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download Laporan PDF
-          </button>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <select id="spnd-analytics-filter-select" class="form-input" style="font-size:0.8rem; font-weight:700; color:var(--accent-gold); background:#0b1120; border:1px solid rgba(245,158,11,0.4); border-radius:10px; padding:6px 12px; cursor:pointer;" onchange="M6Engine.onAnalyticsFilterChange(this.value)">
+              <!-- Diisi dinamis oleh renderSponsorSummaryContracts() -->
+            </select>
+            <button class="btn-primary" style="font-weight:700; font-size:0.8rem; padding:8px 18px; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:6px;" onclick="SponsorPortalEngine.downloadSponsorReportPDF()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Laporan PDF
+            </button>
+          </div>
         </div>
 
         <!-- METRICS GRID -->
@@ -6697,11 +6702,8 @@
 
           <div class="glass-card" style="padding:18px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:14px;">
             <h4 style="color:var(--accent-gold); font-size:0.92rem; font-weight:700; margin-top:0; margin-bottom:12px;">Insights & Rekomendasi Efektivitas</h4>
-            <div style="font-size:0.82rem; color:var(--text-main); line-height:1.7;">
-              • Banner Anda telah dilihat sebanyak <strong style="color:var(--accent-gold);">12.450 kali</strong>.<br>
-              • Sebanyak <strong style="color:#60a5fa;">1.234 pengguna</strong> mengklik banner untuk mengunjungi situs web Anda.<br>
-              • Engagement rate <strong style="color:#34d399;">9.9%</strong> berada di atas rata-rata industri otomotif.<br>
-              • Mayoritas interaksi berasal dari klub wilayah DKI Jakarta, Jawa Barat, dan Jawa Timur.
+            <div id="spnd-insights-content" style="font-size:0.82rem; color:var(--text-main); line-height:1.7;">
+              • Menghitung performa analitik tayangan iklan riil...
             </div>
           </div>
         </div>
@@ -10367,7 +10369,7 @@
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="js/auth.js?v=20260903_v88_mbux"></script>
-  <script src="js/app.js?v=20260904_v121_menu_sponsorship_title_manajemen_sponsorship"></script>
+  <script src="js/app.js?v=20260904_v122_real_live_statistical_analytics"></script>
   <script>
     lucide.createIcons();
     try {
