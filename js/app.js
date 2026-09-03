@@ -329,39 +329,7 @@ const AppEngine = {
   },
 
   openPortalSponsor(email = null) {
-    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
-    const spDash = document.getElementById('view-sponsor-dashboard');
-    if (spDash) {
-      spDash.style.display = 'block';
-    }
-
-    const sidebar = document.getElementById('app-sidebar');
-    const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'none';
-    if (btnHamburger) btnHamburger.style.display = 'none';
-    document.body.classList.remove('yt-has-sidebar');
-
-    if (typeof this.updateHeaderNavPillsActive === 'function') {
-      this.updateHeaderNavPillsActive('nav-btn-sponsor-portal');
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    if (window.SponsorPortalEngine && typeof window.SponsorPortalEngine.switchMainTab === 'function') {
-      window.SponsorPortalEngine.switchMainTab('summary');
-    }
-    if (window.M6Engine && typeof window.M6Engine.renderSponsorshipModule === 'function') {
-      window.M6Engine.renderSponsorshipModule();
-    }
-
-    // Populate dynamic company name
-    const userObj = this.currentUser || {};
-    const userEmail = (email && email !== 'bni@sponsor.com') ? email : (userObj.email || 'sponsor@shell.co.id');
-    const companyName = userObj.name || (userEmail.includes('fdr') ? 'FDR Tyre Indonesia' : (userEmail.includes('mandiri') || userEmail.includes('bni') ? 'Bank Mandiri' : 'Shell Indonesia'));
-
-    const titleEl = document.getElementById('sponsor-dash-welcome-title');
-    if (titleEl) {
-      titleEl.innerText = 'Manajemen Sponsorship';
-    }
+    this.switchAdminTab('m6_sponsorship');
   },
 
   openMemberKoperasi(fromView = 'member') {
@@ -4156,13 +4124,34 @@ const AppEngine = {
       }
     });
 
+    const spDash = document.getElementById('view-sponsor-dashboard');
+
+    if (tab === 'm6_sponsorship') {
+      // Show Sponsorship View with full active Sidebar
+      document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+      if (spDash) spDash.style.display = 'block';
+      this.closeMobileSidebar();
+      if (typeof this.updateHeaderNavPillsActive === 'function') {
+        this.updateHeaderNavPillsActive('nav-btn-sponsor-portal');
+      }
+      if (window.SponsorPortalEngine && typeof window.SponsorPortalEngine.switchMainTab === 'function') {
+        window.SponsorPortalEngine.switchMainTab(window.SponsorPortalEngine.currentTab || 'summary');
+      } else if (window.M6Engine && typeof window.M6Engine.renderSponsorConfirmTable === 'function') {
+        window.M6Engine.renderSponsorConfirmTable();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Normal Admin Tabs: Hide spDash and show view-admin-dashboard
+    if (spDash) spDash.style.display = 'none';
+    if (adminView) adminView.style.display = 'block';
+
     document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
     
     let targetId = `admin-tab-${tab}`;
     if (tab === 'dashboard' || tab === 'users' || tab === 'audit' || tab === 'settings' || tab === 'm1_portal') {
       targetId = 'admin-tab-m1_portal';
-    } else if (tab === 'm6_sponsorship') {
-      targetId = 'admin-tab-m6_event';
     } else if (tab === 'm7_donation') {
       targetId = 'admin-tab-m7_donation';
     } else if (tab === 'm8_finance' || tab === 'm8_iklan' || tab === 'm8_endorse') {
@@ -25093,6 +25082,14 @@ window.SponsorPortalEngine = {
 
   switchMainTab: function(tabKey) {
     this.currentTab = tabKey;
+
+    // Ensure sidebar is always visible and functional across all sponsorship tabs
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
     const tabList = ['summary', 'packages', 'confirm', 'ads', 'reports'];
     
     tabList.forEach(k => {
