@@ -242,6 +242,17 @@ const AppEngine = {
     });
   },
 
+  navigateHomeForUser() {
+    const isAdminRole = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB'].includes(this.currentRole);
+    if (isAdminRole) {
+      this.openPortalAdmin();
+    } else if (this.currentRole === 'SPONSOR') {
+      this.openPortalSponsor();
+    } else {
+      this.navigateToHome();
+    }
+  },
+
   navigateToHome() {
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
     const landingView = document.getElementById('view-landing-page');
@@ -4293,6 +4304,24 @@ const AppEngine = {
         if (roleEl) roleEl.innerText = this.formatRoleName(this.currentRole);
         if (ddNameEl) ddNameEl.innerText = this.currentUser.name;
         if (ddEmailEl) ddEmailEl.innerText = this.currentUser.email || this.currentUser.username || 'Member MB INA';
+
+        const ddHomeLabel = document.getElementById('dropdown-label-home');
+        const ddHomeIcon = document.getElementById('dropdown-icon-home');
+        const ddPublicBtn = document.getElementById('dropdown-item-public-web');
+
+        if (isAdminRole) {
+          if (ddHomeLabel) ddHomeLabel.innerText = 'Halaman Utama (Portal Admin)';
+          if (ddHomeIcon) ddHomeIcon.innerHTML = '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>';
+          if (ddPublicBtn) ddPublicBtn.style.display = 'flex';
+        } else if (this.currentRole === 'SPONSOR') {
+          if (ddHomeLabel) ddHomeLabel.innerText = 'Halaman Utama (Portal Sponsor)';
+          if (ddHomeIcon) ddHomeIcon.innerHTML = '<rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>';
+          if (ddPublicBtn) ddPublicBtn.style.display = 'flex';
+        } else {
+          if (ddHomeLabel) ddHomeLabel.innerText = 'Halaman Utama (Beranda)';
+          if (ddHomeIcon) ddHomeIcon.innerHTML = '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>';
+          if (ddPublicBtn) ddPublicBtn.style.display = 'none';
+        }
 
         if (navAvatar && this.currentUser && this.currentUser.name) {
           navAvatar.innerText = this.currentUser.name.substring(0, 2).toUpperCase();
