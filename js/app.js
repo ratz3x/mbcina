@@ -12803,6 +12803,8 @@ const M6Engine = {
         registered_count: this.getParticipantsForEvent(code).length,
         verified_count: this.getParticipantsForEvent(code).filter(x => x.status === 'VERIFIED' || x.status === 'ACCEPTED').length,
         htm_nett: p.htm_base || 0,
+        total_budget: Number(p.total_budget) || (p.rab_items && Array.isArray(p.rab_items) && p.rab_items.length ? p.rab_items.reduce((s, it) => s + ((it.qty || 1) * (it.unit_cost || it.price || 0)), 0) : (code === 'EVT-2026-004' ? 500000000 : (code === 'EVT-2026-002' ? 250000000 : (code === 'EVT-2026-003' ? 120000000 : (code === 'EVT-2026-012' ? 35000000 : 75000000))))),
+        rab_items: p.rab_items || [],
         status: 'PUBLISHED',
         badge_color: 'rgba(16,185,129,0.2)',
         badge_text: '🟢 PUBLISHED (DISETUJUI PRESIDEN)'
@@ -14908,11 +14910,16 @@ const M6Engine = {
         date_start: '2026-09-05T14:00',
         date_end: '2026-09-05T17:00',
         capacity: 150,
-        total_budget: 0,
-        bep_ticket_count: 0,
-        htm_base: 0,
+        total_budget: 35000000,
+        bep_ticket_count: 100,
+        htm_base: 350000,
         president_notes: 'Disetujui. Acara konsolidasi internal resmi organisasi dan HUT ke-22 MB Club Indonesia.',
-        rab_items: []
+        rab_items: [
+          { category: 'Venue', desc: 'Sewa Venue Topgolf Jakarta', qty: 1, unit: 'paket', unit_cost: 15000000 },
+          { category: 'Konsumsi', desc: 'Buffet & VIP Coffee Break', qty: 150, unit: 'pax', unit_cost: 80000 },
+          { category: 'Stage & Multimedia', desc: 'Backdrop, LED Screen & Sound System', qty: 1, unit: 'paket', unit_cost: 5000000 },
+          { category: 'Dokumentasi', desc: 'Foto, Video & Plakat Pengurus', qty: 1, unit: 'paket', unit_cost: 3000000 }
+        ]
       },
       {
         id: 'EVT-2026-001',
@@ -15975,9 +15982,9 @@ const M6Engine = {
   sampleSponsors: [
     { 
       id: 'sp1', 
-      name: 'PT. BNI', 
+      name: 'PT. Bank BNI (Persero) Tbk', 
       email: 'sponsor@bni.co.id', 
-      phone: '08111222333', 
+      phone: '0811-1222-333', 
       eventId: 'EVT-2026-001',
       eventCode: 'EVT-2026-001',
       eventTitle: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026',
@@ -16001,34 +16008,106 @@ const M6Engine = {
       impressions: 12450, clicks: 1234, reach: 8900, period: '6 Sep – 13 Okt 2026'
     },
     { 
+      id: 'sp5', 
+      name: 'PT Goodyear Indonesia Tbk', 
+      email: 'partnership@goodyear.co.id', 
+      phone: '0812-3344-5566', 
+      eventId: 'EVT-2026-001',
+      eventCode: 'EVT-2026-001',
+      eventTitle: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026',
+      eventDate: '12 - 14 September 2026',
+      eventLocation: 'Hotel Tentrem & Panti Asuhan Yogyakarta',
+      pkg: '🥇 GOLD', 
+      pct: 35, 
+      value: 26250000, 
+      status: 'CONFIRMED', 
+      submitDate: '29/08/2026', 
+      confirmDate: '02/09/2026', 
+      deadline: '06/09/2026', 
+      bendaharaApproved: true, 
+      presidenApproved: true, 
+      adminApproved: true,
+      logoUrl: 'assets/mb_club_badge.png', 
+      bannerUrl: 'assets/mb_hero.jpg',
+      impressions: 8900, clicks: 950, reach: 6700, period: '6 Sep – 13 Okt 2026'
+    },
+    { 
       id: 'sp2', 
-      name: 'Bank Mandiri', 
+      name: 'PT Bank Mandiri (Persero) Tbk', 
       email: 'corporate@bankmandiri.co.id', 
-      phone: '08129876543', 
+      phone: '0812-9876-5432', 
       eventId: 'EVT-2026-003',
       eventCode: 'EVT-2026-003',
       eventTitle: 'Grand Touring Trans Sumatra & Celebes Rally 2026',
-      eventDate: '5 - 10 Desember 2026',
-      eventLocation: 'Medan - Danau Toba - Bukittinggi',
+      eventDate: '1 - 7 Oktober 2026',
+      eventLocation: 'Medan - Padang (Lintas Sumatera)',
       pkg: '💎 PLATINUM', 
       pct: 50, 
       value: 60000000, 
-      status: 'WAITING_BENDAHARA', 
-      submitDate: '03/09/2026', 
-      confirmDate: '-', 
-      deadline: '28/11/2026', 
-      bendaharaApproved: false, 
-      presidenApproved: false, 
-      adminApproved: false,
+      status: 'CONFIRMED', 
+      submitDate: '01/09/2026', 
+      confirmDate: '02/09/2026', 
+      deadline: '24/09/2026', 
+      bendaharaApproved: true, 
+      presidenApproved: true, 
+      adminApproved: true,
       logoUrl: 'assets/mb_club_badge.png', 
       bannerUrl: 'assets/mb_hero.jpg',
-      impressions: 0, clicks: 0, reach: 0, period: '–'
+      impressions: 15800, clicks: 1720, reach: 11200, period: '15 Sep – 30 Nov 2026'
+    },
+    { 
+      id: 'sp6', 
+      name: 'PT Shell Indonesia', 
+      email: 'corporate-sponsor@shell.co.id', 
+      phone: '0811-9988-7766', 
+      eventId: 'EVT-2026-003',
+      eventCode: 'EVT-2026-003',
+      eventTitle: 'Grand Touring Trans Sumatra & Celebes Rally 2026',
+      eventDate: '1 - 7 Oktober 2026',
+      eventLocation: 'Medan - Padang (Lintas Sumatera)',
+      pkg: '🥇 GOLD', 
+      pct: 35, 
+      value: 42000000, 
+      status: 'CONFIRMED', 
+      submitDate: '02/09/2026', 
+      confirmDate: '03/09/2026', 
+      deadline: '24/09/2026', 
+      bendaharaApproved: true, 
+      presidenApproved: true, 
+      adminApproved: true,
+      logoUrl: 'assets/mb_club_badge.png', 
+      bannerUrl: 'assets/mb_hero.jpg',
+      impressions: 10400, clicks: 1120, reach: 7800, period: '15 Sep – 30 Nov 2026'
+    },
+    { 
+      id: 'sp7', 
+      name: 'Mercedes-Benz Distribution Indonesia', 
+      email: 'partnership@mercedes-benz.co.id', 
+      phone: '021-5084-5600', 
+      eventId: 'EVT-2026-002',
+      eventCode: 'EVT-2026-002',
+      eventTitle: 'Jamnas MB INA XXV & Musyawarah Nasional 2026',
+      eventDate: '20 - 22 November 2026',
+      eventLocation: 'ICE BSD City, Tangerang',
+      pkg: '👑 SPONSOR TUNGGAL', 
+      pct: 70, 
+      value: 175000000, 
+      status: 'CONFIRMED', 
+      submitDate: '20/08/2026', 
+      confirmDate: '25/08/2026', 
+      deadline: '13/11/2026', 
+      bendaharaApproved: true, 
+      presidenApproved: true, 
+      adminApproved: true,
+      logoUrl: 'assets/mb_club_badge.png', 
+      bannerUrl: 'assets/mb_hero.jpg',
+      impressions: 28900, clicks: 3410, reach: 21500, period: '1 Okt – 31 Des 2026'
     },
     { 
       id: 'sp3', 
-      name: 'Astra Otoparts', 
+      name: 'PT Astra Otoparts Tbk', 
       email: 'info@astra-otoparts.co.id', 
-      phone: '081388889999', 
+      phone: '0813-8888-9999', 
       eventId: 'EVT-2026-002',
       eventCode: 'EVT-2026-002',
       eventTitle: 'Jamnas MB INA XXV & Musyawarah Nasional 2026',
@@ -16051,9 +16130,33 @@ const M6Engine = {
     },
     { 
       id: 'sp4', 
-      name: 'Pertamina Lubricants', 
+      name: 'PT Pertamina Lubricants', 
       email: 'sponsor@pertaminalub.com', 
-      phone: '081700001111', 
+      phone: '0817-0000-1111', 
+      eventId: 'EVT-2026-012',
+      eventCode: 'EVT-2026-012',
+      eventTitle: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+      eventDate: '5 September 2026',
+      eventLocation: 'TOPGOLF JAKARTA, Fatmawati',
+      pkg: '💎 PLATINUM', 
+      pct: 50, 
+      value: 17500000, 
+      status: 'CONFIRMED', 
+      submitDate: '25/08/2026', 
+      confirmDate: '28/08/2026', 
+      deadline: '29/08/2026', 
+      bendaharaApproved: true, 
+      presidenApproved: true, 
+      adminApproved: true,
+      logoUrl: 'assets/mb_club_badge.png', 
+      bannerUrl: 'assets/mb_hero.jpg',
+      impressions: 5400, clicks: 620, reach: 4100, period: '28 Agu – 15 Sep 2026'
+    },
+    { 
+      id: 'sp8', 
+      name: 'TOPGOLF Jakarta', 
+      email: 'events@topgolf.co.id', 
+      phone: '021-765-4321', 
       eventId: 'EVT-2026-012',
       eventCode: 'EVT-2026-012',
       eventTitle: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
@@ -16062,18 +16165,16 @@ const M6Engine = {
       pkg: '🥈 SILVER', 
       pct: 15, 
       value: 5250000, 
-      status: 'WAITING_ADMIN', 
-      submitDate: '01/09/2026', 
-      confirmDate: '-', 
+      status: 'CONFIRMED', 
+      submitDate: '26/08/2026', 
+      confirmDate: '29/08/2026', 
       deadline: '29/08/2026', 
       bendaharaApproved: true, 
-      bendaharaApprovedAt: '02/09/2026 09:30', 
       presidenApproved: true, 
-      presidenApprovedAt: '03/09/2026 16:45', 
-      adminApproved: false,
+      adminApproved: true,
       logoUrl: 'assets/mb_club_badge.png', 
       bannerUrl: 'assets/mb_hero.jpg',
-      impressions: 0, clicks: 0, reach: 0, period: '–'
+      impressions: 3200, clicks: 380, reach: 2500, period: '28 Agu – 15 Sep 2026'
     }
   ],
 
@@ -16093,53 +16194,69 @@ const M6Engine = {
   },
 
   getActiveSponsorEvents() {
-    let list = [];
     const masterOfficial = typeof this.getMasterOfficialProposals === 'function' ? this.getMasterOfficialProposals() : [];
+    let savedProps = [];
+    try {
+      savedProps = JSON.parse(localStorage.getItem('mbcina_m6_proposals') || '[]');
+    } catch(e) {}
 
-    if (this.publishedEvents && this.publishedEvents.length) {
-      list = [...this.publishedEvents];
-    } else if (this.data && this.data.proposals && this.data.proposals.length) {
-      list = this.data.proposals.filter(p => p.status === 'APPROVED' || p.status === 'ACCEPTED');
-    }
+    const allProposals = [...(this.data?.proposals || []), ...savedProps, ...masterOfficial];
+    
+    // Deduplicate strictly by event_code / id
+    const propMap = new Map();
+    allProposals.forEach(p => {
+      if (!p) return;
+      const isApproved = p.status === 'APPROVED' || p.status === 'ACCEPTED' || masterOfficial.some(m => m.event_code === p.event_code || m.id === p.id);
+      if (!isApproved) return;
+      const code = String(p.event_code || p.id || p.code || '').trim().toUpperCase();
+      if (!code) return;
+      if (!propMap.has(code)) {
+        propMap.set(code, p);
+      }
+    });
 
-    // Merge master official proposals if not present
-    if (masterOfficial && masterOfficial.length) {
-      masterOfficial.forEach(m => {
-        const code = (m.event_code || m.id || '').toUpperCase();
-        if (!list.some(x => ((x.id || x.code || x.event_code || '') + '').toUpperCase() === code)) {
-          list.push(m);
-        }
-      });
-    }
+    let list = Array.from(propMap.values());
 
     if (!list || !list.length) {
-      list = [
-        { id: 'EVT-2026-012', code: 'EVT-2026-012', title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026', start_date: '2026-09-05T14:00', end_date: '2026-09-05T17:00', location: 'TOPGOLF JAKARTA, Fatmawati, Jakarta Selatan', total_budget: 35000000 },
-        { id: 'EVT-2026-001', code: 'EVT-2026-001', title: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026', start_date: '2026-09-13T08:00', end_date: '2026-09-14T18:00', location: 'Hotel Tentrem & Panti Asuhan Yogyakarta', total_budget: 75000000 },
-        { id: 'EVT-2026-003', code: 'EVT-2026-003', title: 'Grand Touring Trans Sumatra & Celebes Rally 2026', start_date: '2026-10-01T06:00', end_date: '2026-10-07T18:00', location: 'Medan - Padang (Lintas Sumatera)', total_budget: 120000000 },
-        { id: 'EVT-2026-002', code: 'EVT-2026-002', title: 'Jamnas MB INA XXV & Musyawarah Nasional 2026', start_date: '2026-11-20T08:00', end_date: '2026-11-22T20:00', location: 'ICE BSD City, Tangerang', total_budget: 250000000 }
-      ];
+      list = masterOfficial;
     }
 
     // Sort by date upcoming
     list.sort((a, b) => {
-      const da = new Date(a.start_date || a.date_start || 0);
-      const db = new Date(b.start_date || b.date_start || 0);
+      const da = new Date(a.date_start || a.start_date || 0);
+      const db = new Date(b.date_start || b.start_date || 0);
       return da - db;
     });
 
-    return list.map(e => {
-      const sDate = e.start_date || e.date_start || '2026-09-13T08:00';
-      const eDate = e.end_date || e.date_end || sDate;
-      const budget = Number(e.total_budget) || (e.code === 'EVT-2026-002' ? 250000000 : (e.code === 'EVT-2026-003' ? 120000000 : (e.code === 'EVT-2026-012' ? 35000000 : 75000000)));
+    return list.map(p => {
+      const code = p.event_code || p.id || p.code;
+      const sDate = p.date_start || p.start_date || '2026-09-13T08:00';
+      const eDate = p.date_end || p.end_date || sDate;
+      
+      // Calculate real total budget strictly from proposal
+      let budget = Number(p.total_budget);
+      if (!budget && p.rab_items && Array.isArray(p.rab_items) && p.rab_items.length) {
+        budget = p.rab_items.reduce((sum, item) => sum + ((Number(item.qty) || 1) * (Number(item.unit_cost || item.price) || 0)), 0);
+      }
+      if (!budget) {
+        const m = masterOfficial.find(x => (x.event_code || x.id) === code);
+        if (m) {
+          budget = Number(m.total_budget) || (m.rab_items && m.rab_items.length ? m.rab_items.reduce((s, it) => s + ((it.qty || 1) * (it.unit_cost || 0)), 0) : 0);
+        }
+      }
+      if (!budget) {
+        budget = (code === 'EVT-2026-004' ? 500000000 : (code === 'EVT-2026-002' ? 250000000 : (code === 'EVT-2026-003' ? 120000000 : (code === 'EVT-2026-012' ? 35000000 : 75000000))));
+      }
+
       return {
-        id: e.id || e.code || e.event_code,
-        code: e.code || e.event_code || e.id,
-        title: e.title,
+        id: code,
+        code: code,
+        title: p.title,
         start_date: sDate,
         end_date: eDate,
-        location: e.location || e.address || e.city || 'Indonesia',
-        total_budget: budget
+        location: p.address || p.location || p.city || 'Indonesia',
+        total_budget: budget,
+        rab_items: p.rab_items || []
       };
     });
   },
@@ -16931,16 +17048,28 @@ const M6Engine = {
     const tbody = document.getElementById('m6-sp-confirm-tbody');
     if (!tbody) return;
 
-    // Update summary counters
+    // Update summary counters strictly linked to active event proposal
+    const curEventId = this.selectedSponsorEventId;
+    const events = this.getActiveSponsorEvents();
+    const curEvent = events.find(e => e.id === curEventId || e.code === curEventId) || events[0];
+
+    const rab = curEvent ? curEvent.total_budget : (this.EVENT_RAB || 75000000);
+    const targetRab = Math.round(rab * 1.11);
+
     const rabTotalEl = document.getElementById('m6-sp-confirm-rab-total');
     const targetRabEl = document.getElementById('m6-sp-confirm-target-rab');
-    if (rabTotalEl) rabTotalEl.textContent = 'Rp ' + (this.EVENT_RAB || 75000000).toLocaleString('id-ID');
-    if (targetRabEl) targetRabEl.textContent = 'Rp ' + Math.round((this.EVENT_RAB || 75000000) * 1.11).toLocaleString('id-ID');
+    const eventTitleEl = document.getElementById('m6-sp-confirm-rab-event-title');
+    const pctBadgeEl = document.getElementById('m6-sp-confirm-pct-badge');
+
+    if (rabTotalEl) rabTotalEl.textContent = 'Rp ' + rab.toLocaleString('id-ID');
+    if (targetRabEl) targetRabEl.textContent = 'Rp ' + targetRab.toLocaleString('id-ID');
+    if (eventTitleEl && curEvent) {
+      eventTitleEl.textContent = `[${curEvent.code}] ${curEvent.title}`;
+    }
 
     // Count confirmed sponsors for current active event
-    const curEventId = this.selectedSponsorEventId;
     const curEventConfirmed = this.sampleSponsors.filter(s => {
-      const match = (s.eventId === curEventId || s.eventCode === curEventId);
+      const match = (s.eventId === curEvent?.id || s.eventCode === curEvent?.code || s.eventId === curEventId || s.eventCode === curEventId);
       return match && s.status === 'CONFIRMED';
     });
     const curEventAmount = curEventConfirmed.reduce((sum, s) => sum + (s.value || 0), 0);
@@ -16949,6 +17078,18 @@ const M6Engine = {
     const amountEl = document.getElementById('m6-sp-summary-amount');
     if (countEl) countEl.textContent = curEventConfirmed.length;
     if (amountEl) amountEl.textContent = 'Rp ' + curEventAmount.toLocaleString('id-ID');
+
+    if (pctBadgeEl) {
+      const pctAchieved = rab > 0 ? ((curEventAmount / rab) * 100).toFixed(1) : '100.0';
+      const shortfall = Math.max(0, rab - curEventAmount);
+      if (curEventAmount >= rab) {
+        pctBadgeEl.innerHTML = `<span style="color:#34d399;">✅ Target RAB Terpenuhi (${pctAchieved}%)</span>`;
+      } else if (curEventAmount > 0) {
+        pctBadgeEl.innerHTML = `<span style="color:#fbbf24;">⏳ ${pctAchieved}% Terpenuhi (Sisa Rp ${(shortfall/1e6).toFixed(1)} JT)</span>`;
+      } else {
+        pctBadgeEl.innerHTML = `<span style="color:#94a3b8;">⏳ 0% (Memerlukan komitmen sponsor)</span>`;
+      }
+    }
 
     // Table filter by event
     const filterEl = document.getElementById('m6-sp-table-event-filter');

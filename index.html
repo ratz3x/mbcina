@@ -7013,19 +7013,22 @@
 
             </div>
 
-            <!-- SUMMARY PANEL -->
-              <div style="background:rgba(0,0,0,0.4); border:1px solid var(--accent-gold); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; text-align:center;">
-                <div>
-                  <div style="font-size:0.75rem; color:var(--text-muted);">Total RAB Event</div>
-                  <div id="m6-sp-confirm-rab-total" style="font-size:1.2rem; font-weight:900; color:#fff;">Rp 75.000.000</div>
+            <!-- SUMMARY PANEL: PERSENTASE & KESESUAIAN RAB PROPOSAL EVENT -->
+              <div style="background:rgba(10,14,23,0.85); border:1px solid rgba(245,158,11,0.35); border-radius:14px; padding:18px 24px; margin-bottom:24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:18px; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,0.35);">
+                <div style="border-right:1px solid rgba(255,255,255,0.08); padding-right:12px;">
+                  <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Total Pagu RAB Proposal</div>
+                  <div id="m6-sp-confirm-rab-total" style="font-size:1.35rem; font-weight:900; color:#fff; margin-top:2px;">Rp 75.000.000</div>
+                  <div id="m6-sp-confirm-rab-event-title" style="font-size:0.72rem; color:#fbbf24; margin-top:4px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">[EVT-2026-001] Touring & Bakti Sosial</div>
+                </div>
+                <div style="border-right:1px solid rgba(255,255,255,0.08); padding-right:12px;">
+                  <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Target Sponsor (111% RAB)</div>
+                  <div id="m6-sp-confirm-target-rab" style="font-size:1.35rem; font-weight:900; color:var(--accent-gold); margin-top:2px;">Rp 83.250.000</div>
+                  <div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">Target Penuh + PPN 11%</div>
                 </div>
                 <div>
-                  <div style="font-size:0.75rem; color:var(--text-muted);">Target Sponsor (111%)</div>
-                  <div id="m6-sp-confirm-target-rab" style="font-size:1.2rem; font-weight:900; color:var(--accent-gold);">Rp 83.250.000</div>
-                </div>
-                <div>
-                  <div style="font-size:0.75rem; color:var(--text-muted);">Terkumpul (<span id="m6-sp-summary-count">2</span> Sponsor)</div>
-                  <div style="font-size:1.2rem; font-weight:900; color:var(--primary-emerald);" id="m6-sp-summary-amount">Rp 63.700.000</div>
+                  <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Terkumpul (<span id="m6-sp-summary-count" style="color:#fff; font-weight:800;">2</span> Sponsor Resmi)</div>
+                  <div style="font-size:1.35rem; font-weight:900; color:var(--primary-emerald); margin-top:2px;" id="m6-sp-summary-amount">Rp 63.750.000</div>
+                  <div id="m6-sp-confirm-pct-badge" style="font-size:0.72rem; font-weight:700; color:var(--primary-emerald); margin-top:4px;">✅ 85.0% Terpenuhi</div>
                 </div>
               </div>
 
@@ -10352,7 +10355,7 @@
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="js/auth.js?v=20260903_v88_mbux"></script>
-  <script src="js/app.js?v=20260904_v115_stacked_confirm_and_table"></script>
+  <script src="js/app.js?v=20260904_v116_real_proposal_rab_binding"></script>
   <script>
     lucide.createIcons();
     try {
