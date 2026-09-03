@@ -12694,6 +12694,15 @@ const M6Engine = {
   },
 
   switchSubtab(subtab) {
+    if (subtab === '6_4_sponsorship') {
+      if (typeof AppEngine.openPortalSponsor === 'function') {
+        AppEngine.openPortalSponsor();
+        if (window.SponsorPortalEngine && typeof window.SponsorPortalEngine.switchMainTab === 'function') {
+          window.SponsorPortalEngine.switchMainTab('packages');
+        }
+      }
+      return;
+    }
     this.data.activeSubtab = subtab;
     // Toggle only M6 subtab buttons (data-m6-subtab)
     document.querySelectorAll('[data-m6-subtab]').forEach(btn => {
@@ -17993,8 +18002,11 @@ const M6Engine = {
     if (spDash) {
       spDash.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      if (window.SponsorPortalEngine) {
-        window.SponsorPortalEngine.switchTab('beranda');
+      if (window.SponsorPortalEngine && typeof window.SponsorPortalEngine.switchMainTab === 'function') {
+        window.SponsorPortalEngine.switchMainTab('summary');
+      }
+      if (window.M6Engine && typeof window.M6Engine.renderSponsorshipModule === 'function') {
+        window.M6Engine.renderSponsorshipModule();
       }
 
       // Check current user object or fallback
@@ -24455,7 +24467,50 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 // SPONSOR PORTAL ENGINE (FULL DASHBOARD HANDLER)
 // ─────────────────────────────────────────────────────────────────────
 window.SponsorPortalEngine = {
-  currentTab: 'beranda',
+  currentTab: 'summary',
+
+  switchMainTab: function(tabKey) {
+    this.currentTab = tabKey;
+    const tabBtns = ['summary', 'packages', 'confirm', 'ads', 'reports'];
+    tabBtns.forEach(k => {
+      const btn = document.getElementById('spnd-tab-btn-' + k);
+      if (btn) {
+        if (k === tabKey) {
+          btn.style.background = 'rgba(245,158,11,0.12)';
+          btn.style.color = '#fbbf24';
+          btn.style.borderColor = 'rgba(245,158,11,0.35)';
+          btn.style.fontWeight = '600';
+        } else {
+          btn.style.background = 'rgba(255,255,255,0.03)';
+          btn.style.color = '#94a3b8';
+          btn.style.borderColor = 'rgba(255,255,255,0.08)';
+          btn.style.fontWeight = '500';
+        }
+      }
+    });
+
+    const summarySec = document.getElementById('spnd-section-summary');
+    const packagesSec = document.getElementById('spnd-section-packages');
+
+    if (tabKey === 'summary') {
+      if (summarySec) summarySec.style.display = 'block';
+      if (packagesSec) packagesSec.style.display = 'none';
+    } else {
+      if (summarySec) summarySec.style.display = 'none';
+      if (packagesSec) packagesSec.style.display = 'block';
+      
+      const subtabMapping = {
+        'packages': '641',
+        'confirm': '643',
+        'ads': '644',
+        'reports': '646'
+      };
+      const innerTabId = subtabMapping[tabKey] || '641';
+      if (window.M6Engine && typeof window.M6Engine.switchSponsorInnerTab === 'function') {
+        window.M6Engine.switchSponsorInnerTab(innerTabId);
+      }
+    }
+  },
 
   openEditProfileModal: function() {
     const userObj = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');

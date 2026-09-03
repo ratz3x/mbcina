@@ -2324,17 +2324,20 @@
       <div id="admin-tab-m6_event" class="admin-tab-content" style="display:none;">
         <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
           <div style="margin-bottom:20px;">
-            <h3 style="font-size:1.25rem; margin:0;" class="text-gradient">Manajemen Event & Sponsorship</h3>
-            <p style="font-size:0.82rem; color:var(--text-muted); margin:4px 0 0 0;">Pusat kendali kegiatan resmi MB INA, registrasi peserta, check-in QR, dan kemitraan sponsorship</p>
+            <h3 style="font-size:1.25rem; margin:0;" class="text-gradient">Manajemen Event</h3>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin:4px 0 0 0;">Pusat kendali kegiatan resmi MB INA, registrasi peserta, check-in QR, dan dokumentasi kegiatan</p>
           </div>
 
           <!-- EVENT SUB-NAVIGATION TAB BAR - SUB-TAB PILL BUTTONS -->
-          <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none;" class="subtab-bar-container">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none;" class="subtab-bar-container">
             <button class="sub-tab-btn active" data-m6-subtab="6_1_proposal" onclick="M6Engine.switchSubtab('6_1_proposal')">Proposal & RAB Event</button>
             <button class="sub-tab-btn" data-m6-subtab="6_2_approval" onclick="M6Engine.switchSubtab('6_2_approval')">Persetujuan Presiden</button>
             <button class="sub-tab-btn" data-m6-subtab="6_3_publish" onclick="M6Engine.switchSubtab('6_3_publish')">Publikasi & Tiket Peserta</button>
-            <button class="sub-tab-btn" data-m6-subtab="6_4_sponsorship" onclick="M6Engine.switchSubtab('6_4_sponsorship')">Manajemen Sponsorship</button>
             <button class="sub-tab-btn" data-m6-subtab="6_5_gallery" onclick="M6Engine.switchSubtab('6_5_gallery')">Dokumentasi & Galeri</button>
+            <button type="button" class="btn-outline" style="margin-left:auto; font-size:0.75rem; padding:6px 14px; border-radius:12px; color:var(--accent-gold); border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine.openPortalSponsor()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <span>Portal Mitra & Sponsorship →</span>
+            </button>
           </div>
 
           <!-- SUBTAB 5.1: PROPOSAL EVENT -->
@@ -2610,513 +2613,7 @@
           </div>
 
           <!-- SUBTAB 5.4: SPONSORSHIP MANAGEMENT -->
-          <div id="m6-subtab-6_4_sponsorship" class="m6-subtab-content" style="display:none;">
-
-            <!-- ── SUBTAB HEADER & NAVIGATION PILLS ── -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
-              <div>
-                <h4 style="color:var(--accent-gold); font-size:1.15rem; margin:0; font-weight:700;">Kelola Sponsorship</h4>
-                <p style="font-size:0.75rem; color:#94a3b8; margin:3px 0 0 0;">Pusat pengelolaan paket sponsor, konfirmasi mitra, penempatan banner iklan, dan laporan efektivitas.</p>
-              </div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button id="m6-sp-inner-btn-641" style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; box-shadow:0 1px 3px rgba(0,0,0,0.2); cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('641')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
-                  <span>Paket Sponsor</span>
-                </button>
-                <button id="m6-sp-inner-btn-643" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('643')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                  <span>Konfirmasi Sponsor</span>
-                </button>
-                <button id="m6-sp-inner-btn-644" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('644')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                  <span>Penempatan Iklan</span>
-                </button>
-                <button id="m6-sp-inner-btn-645" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('645')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-                  <span>Dashboard Sponsor</span>
-                </button>
-                <button id="m6-sp-inner-btn-646" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('646')">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-                  <span>Laporan Efektivitas</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- ╔═════════════════════════════════════════════════════╗ -->
-            <!-- ║  6.4.1 BUAT PAKET SPONSOR                           ║ -->
-            <!-- ╚═════════════════════════════════════════════════════╝ -->
-            <div id="m6-sp-inner-641" style="display:block;">
-
-              <!-- BATAS KONFIRMASI ALERT -->
-              <div style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(234,88,12,0.08)); border:1px solid var(--accent-gold); border-radius:14px; padding:14px 20px; margin-bottom:20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-                <div style="font-size:1.8rem;">⏰</div>
-                <div style="flex:1;">
-                  <div style="font-weight:800; color:var(--accent-gold); font-size:0.9rem;">BATAS KONFIRMASI SPONSOR: <span id="m6-sp-deadline-display">6 September 2026</span> (1 minggu sebelum event)</div>
-                  <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">✅ Sponsor konfirmasi sebelum 6 September → DITERIMA &nbsp;|&nbsp; ❌ Setelah 6 September → DITOLAK OTOMATIS SISTEM</div>
-                </div>
-                <div id="m6-sp-deadline-badge" style="font-weight:900; font-size:0.82rem; padding:6px 14px; border-radius:20px; background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); white-space:nowrap;">🟢 MASIH TERBUKA</div>
-              </div>
-
-              <div style="display:grid; grid-template-columns:1.1fr 1.3fr; gap:20px; align-items:flex-start;">
-
-                <!-- FORM BUAT/EDIT PAKET -->
-                <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold);">
-                  <h5 style="color:var(--accent-gold); font-size:1.05rem; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
-                    <span id="m6-sp-form-title-icon">📦</span> <span id="m6-sp-form-title">BUAT PAKET SPONSOR</span>
-                  </h5>
-
-                  <form id="m6-sp-package-form" onsubmit="event.preventDefault(); M6Engine.saveSponsorPackage(); return false;">
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; margin-bottom:12px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
-                      ─── IDENTITAS PAKET ───
-                    </div>
-
-                    <div class="form-group">
-                      <label class="form-label" style="font-size:0.78rem;">Nama Paket *</label>
-                      <select id="m6-sp-pkg-name" class="form-input" style="font-weight:700;" onchange="M6Engine.onSponsorPkgNameChange()">
-                        <option value="👑 SPONSOR TUNGGAL">👑 SPONSOR TUNGGAL</option>
-                        <option value="💎 PLATINUM" selected>💎 PLATINUM</option>
-                        <option value="🥇 GOLD">🥇 GOLD</option>
-                        <option value="🥈 SILVER">🥈 SILVER</option>
-                        <option value="🥉 BRONZE">🥉 BRONZE</option>
-                        <option value="__custom__">✏️ Nama Khusus (Custom)...</option>
-                      </select>
-                      <input type="text" id="m6-sp-pkg-name-custom" class="form-input" placeholder="Ketik nama paket custom..." style="display:none; margin-top:6px; font-weight:700;">
-                    </div>
-
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.78rem;">% dari RAB *</label>
-                        <input type="number" id="m6-sp-pkg-pct" class="form-input" placeholder="50" value="50" min="1" max="100" oninput="M6Engine.calcSponsorPkgValue()">
-                      </div>
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.78rem;">Nilai Rp (Auto dari RAB)</label>
-                        <input type="text" id="m6-sp-pkg-val-calc" class="form-input" readonly style="color:var(--accent-gold); font-weight:800;" value="Rp 37.500.000">
-                      </div>
-                    </div>
-
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; margin-bottom:12px; margin-top:14px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
-                      ─── LAMA TAYANG ───
-                    </div>
-
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.78rem;">Sebelum Event *</label>
-                        <select id="m6-sp-pkg-before" class="form-input">
-                          <option value="1" selected>1 Minggu Sebelum</option>
-                          <option value="2">2 Minggu Sebelum</option>
-                          <option value="4">4 Minggu Sebelum</option>
-                          <option value="8">8 Minggu Sebelum</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.78rem;">Sesudah Event *</label>
-                        <select id="m6-sp-pkg-after" class="form-input">
-                          <option value="1">1 Minggu Sesudah</option>
-                          <option value="2">2 Minggu Sesudah</option>
-                          <option value="3">3 Minggu Sesudah</option>
-                          <option value="4" selected>4 Minggu Sesudah (1 Bulan)</option>
-                          <option value="8">2 Bulan Sesudah (8 Minggu)</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <!-- WEB BENEFITS -->
-                    <div style="margin-top:14px; margin-bottom:14px;">
-                      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; margin-bottom:10px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
-                        ─── BENEFIT WEB ───
-                      </div>
-                      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.78rem;">
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-hero" checked style="accent-color:var(--accent-gold);"> Hero Landing Page</label>
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-header" checked style="accent-color:var(--accent-gold);"> Header Event Page</label>
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-sidebar" checked style="accent-color:var(--accent-gold);"> Sidebar Event Page</label>
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-dashboard" checked style="accent-color:var(--accent-gold);"> Member Dashboard</label>
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-footer" checked style="accent-color:var(--accent-gold);"> Footer Event Page</label>
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-slide" checked style="accent-color:var(--accent-gold);"> Slide Presentasi</label>
-                      </div>
-                    </div>
-
-                    <!-- PHYSICAL BENEFITS -->
-                    <div style="margin-bottom:18px;">
-                      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; margin-bottom:10px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
-                        ─── BENEFIT EVENT FISIK ───
-                      </div>
-                      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.78rem;">
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-f-backdrop" checked style="accent-color:var(--primary-emerald);"> Backdrop Utama</label>
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-f-banner" checked style="accent-color:var(--primary-emerald);"> Banner Venue</label>
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-f-sticker" checked style="accent-color:var(--primary-emerald);"> Sticker Mobil</label>
-                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-f-opening" checked style="accent-color:var(--primary-emerald);"> Disebut di Opening Ceremony</label>
-                      </div>
-                    </div>
-
-                    <div style="display:flex; justify-content:flex-end; gap:10px;">
-                      <button type="button" class="btn-outline" style="padding:8px 16px; font-size:0.8rem;" onclick="M6Engine.resetSponsorPackageForm()">BATAL</button>
-                      <button type="submit" class="btn-primary" style="padding:8px 22px; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;">💾 SIMPAN PAKET</button>
-                    </div>
-                  </form>
-                </div>
-
-                <!-- DAFTAR PAKET TABLE -->
-                <div class="glass-card" style="padding:22px; border:1px solid var(--chrome-border);">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-                    <h5 style="color:var(--accent-gold); font-size:1rem; margin:0;">⭐ DAFTAR PAKET SPONSOR</h5>
-                    <button class="btn-primary" style="font-size:0.78rem; padding:5px 14px;" onclick="M6Engine.resetSponsorPackageForm()">➕ TAMBAH PAKET</button>
-                  </div>
-                  <div style="overflow-x:auto;">
-                    <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.82rem;">
-                      <thead>
-                        <tr style="border-bottom:2px solid var(--accent-gold); color:var(--accent-gold); text-align:left;">
-                          <th style="padding:10px 8px;">Paket</th>
-                          <th style="padding:10px 8px; text-align:center;">% RAB</th>
-                          <th style="padding:10px 8px; text-align:center;">Sebelum</th>
-                          <th style="padding:10px 8px; text-align:center;">Sesudah</th>
-                          <th style="padding:10px 8px; text-align:center;">Total</th>
-                          <th style="padding:10px 8px; text-align:center;">Aksi</th>
-                        </tr>
-                      </thead>
-                      <tbody id="m6-sp-packages-tbody">
-                        <tr style="border-bottom:1px solid var(--chrome-border);">
-                          <td style="padding:10px 8px; font-weight:800; color:#fff;">👑 SPONSOR TUNGGAL</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">70%</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">2 bln</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">9 mgg</td>
-                          <td style="padding:10px 8px; text-align:center;">
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_tunggal')">✏️</button>
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_tunggal')">🗑️</button>
-                          </td>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--chrome-border);">
-                          <td style="padding:10px 8px; font-weight:800; color:#fff;">💎 PLATINUM</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">50%</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">4 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">5 mgg</td>
-                          <td style="padding:10px 8px; text-align:center;">
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_plat')">✏️</button>
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_plat')">🗑️</button>
-                          </td>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--chrome-border);">
-                          <td style="padding:10px 8px; font-weight:800; color:#fff;">🥇 GOLD</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">35%</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">3 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">4 mgg</td>
-                          <td style="padding:10px 8px; text-align:center;">
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_gold')">✏️</button>
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_gold')">🗑️</button>
-                          </td>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--chrome-border);">
-                          <td style="padding:10px 8px; font-weight:800; color:#fff;">🥈 SILVER</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">15%</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">2 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">3 mgg</td>
-                          <td style="padding:10px 8px; text-align:center;">
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_silv')">✏️</button>
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_silv')">🗑️</button>
-                          </td>
-                        </tr>
-                        <tr style="border-bottom:1px solid var(--chrome-border);">
-                          <td style="padding:10px 8px; font-weight:800; color:#fff;">🥉 BRONZE</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">5%</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
-                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">2 mgg</td>
-                          <td style="padding:10px 8px; text-align:center;">
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_brz')">✏️</button>
-                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_brz')">🗑️</button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <!-- ╔═════════════════════════════════════════════════════╗ -->
-            <!-- ║  6.4.2 PROPOSAL & APPROVAL                          ║ -->
-            <!-- ╚═════════════════════════════════════════════════════╝ -->
-            <!-- ╚═════════════════════════════════════════════════════╝ -->
-                        <div id="m6-sp-inner-643" style="display:none;">
-              
-              <!-- SUMMARY PANEL -->
-              <div style="background:rgba(0,0,0,0.4); border:1px solid var(--accent-gold); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; text-align:center;">
-                <div>
-                  <div style="font-size:0.75rem; color:var(--text-muted);">Total RAB Event</div>
-                  <div style="font-size:1.2rem; font-weight:900; color:#fff;">Rp 75.000.000</div>
-                </div>
-                <div>
-                  <div style="font-size:0.75rem; color:var(--text-muted);">Target Sponsor (111%)</div>
-                  <div style="font-size:1.2rem; font-weight:900; color:var(--accent-gold);">Rp 83.250.000</div>
-                </div>
-                <div>
-                  <div style="font-size:0.75rem; color:var(--text-muted);">Terkumpul (<span id="m6-sp-summary-count">2</span> Sponsor)</div>
-                  <div style="font-size:1.2rem; font-weight:900; color:var(--primary-emerald);" id="m6-sp-summary-amount">Rp 63.700.000</div>
-                </div>
-              </div>
-
-              <!-- ACTION BAR -->
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-                <h5 style="color:var(--accent-gold); font-size:1rem; margin:0;">✅ KONFIRMASI SPONSOR</h5>
-                <div style="display:flex; gap:8px;">
-                  <button class="btn-primary" style="font-size:0.8rem; padding:6px 14px;" onclick="M6Engine.resetSponsorConfirmForm()">➕ TAMBAH SPONSOR</button>
-                  <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px;" onclick="M6Engine.switchSponsorInnerTab('646')">📊 LAPORAN</button>
-                </div>
-              </div>
-
-              <div style="display:grid; grid-template-columns:1.1fr 1.3fr; gap:20px; align-items:flex-start;">
-                
-                <!-- FORM KONFIRMASI SPONSOR -->
-                <div class="glass-card" style="padding:20px; border:1px solid var(--accent-gold);">
-                  <h6 style="color:var(--accent-gold); font-size:0.95rem; margin-bottom:14px;">✅ FORM KONFIRMASI SPONSOR</h6>
-                  
-                  <form id="m6-sp-confirm-form" onsubmit="M6Engine.saveSponsorFromForm(event)">
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── DATA PERUSAHAAN ───</div>
-                    <div class="form-group">
-                      <label class="form-label" style="font-size:0.75rem;">Nama Perusahaan *</label>
-                      <input type="text" id="m6-sp-form-company-name" class="form-input" required placeholder="Contoh: Universitas Adiwangsa Jambi / PT Bank Mandiri">
-                    </div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Contact Person *</label>
-                        <input type="text" id="m6-sp-form-contact-person" class="form-input" required placeholder="Nama kontak...">
-                      </div>
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Contact Phone *</label>
-                        <input type="text" id="m6-sp-form-contact-phone" class="form-input" required placeholder="Nomor telepon...">
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label" style="font-size:0.75rem;">Contact Email *</label>
-                      <input type="email" id="m6-sp-form-contact-email" class="form-input" required placeholder="Email resmi...">
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label" style="font-size:0.75rem;">Website URL</label>
-                      <input type="url" id="m6-sp-form-website-url" class="form-input" placeholder="https://www.unaja.co.id">
-                    </div>
-
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── PAKET SPONSOR ───</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Pilih Paket *</label>
-                        <select id="m6-sp-form-package-select" class="form-input" style="font-weight:700;" onchange="M6Engine.onSponsorConfirmPkgChange()">
-                          <option value="💎 PLATINUM" data-pct="50" selected>💎 PLATINUM (50%)</option>
-                          <option value="👑 SPONSOR TUNGGAL" data-pct="70">👑 SPONSOR TUNGGAL (70%)</option>
-                          <option value="🥇 GOLD" data-pct="35">🥇 GOLD (35%)</option>
-                          <option value="🥈 SILVER" data-pct="15">🥈 SILVER (15%)</option>
-                          <option value="🥉 BRONZE" data-pct="5">🥉 BRONZE (5%)</option>
-                        </select>
-                      </div>
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Nilai Sponsor (Auto)</label>
-                        <input type="text" id="m6-sp-form-package-value" class="form-input" readonly value="Rp 37.500.000" style="color:var(--accent-gold); font-weight:800;">
-                      </div>
-                    </div>
-
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── DOKUMEN & LOGO ───</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Upload Logo (PNG/JPG)</label>
-                        <input type="file" id="m6-sp-form-logo" class="form-input" style="font-size:0.75rem;">
-                      </div>
-                      <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem;">Upload Banner (JPG/PNG)</label>
-                        <input type="file" id="m6-sp-form-banner" class="form-input" style="font-size:0.75rem;">
-                      </div>
-                    </div>
-
-                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── STATUS ───</div>
-                    <div class="form-group">
-                      <select id="m6-sp-form-status-select" class="form-input" style="font-weight:800; color:var(--primary-emerald);">
-                        <option value="CONFIRMED" selected>✅ CONFIRMED</option>
-                        <option value="PENDING">⏳ PENDING</option>
-                        <option value="REJECTED">❌ REJECTED</option>
-                      </select>
-                    </div>
-
-                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
-                      <button type="button" class="btn-outline" style="padding:6px 14px; font-size:0.78rem;" onclick="M6Engine.resetSponsorConfirmForm()">BATAL</button>
-                      <button type="submit" class="btn-primary" style="padding:6px 18px; font-weight:800; font-size:0.78rem; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;">💾 SIMPAN</button>
-                    </div>
-                  </form>
-                </div>
-
-                <!-- TABEL DAFTAR SPONSOR TERDAFTAR -->
-                <div class="glass-card" style="padding:20px; border:1px solid var(--chrome-border);">
-                  <h6 style="color:var(--accent-gold); font-size:0.95rem; margin-bottom:14px;">📋 DAFTAR SPONSOR TERDAFTAR</h6>
-                  <div style="overflow-x:auto;">
-                    <table class="admin-table" style="width:100%; font-size:0.8rem;">
-                      <thead>
-                        <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
-                          <th style="padding:8px;">Sponsor</th>
-                          <th style="padding:8px;">Paket</th>
-                          <th style="padding:8px; text-align:right;">Nilai</th>
-                          <th style="padding:8px; text-align:center;">Status</th>
-                          <th style="padding:8px; text-align:center;">Aksi</th>
-                        </tr>
-                      </thead>
-                      <tbody id="m6-sp-confirm-tbody">
-                        <!-- Rendered dynamically by M6Engine.renderSponsorConfirmTable() -->
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-              </div><!-- END GRID -->
-            </div><!-- END m6-sp-inner-643 -->
-
-            <!-- ╔═════════════════════════════════════════════════════╗ -->
-            <!-- ║  6.4.3 PASANG IKLAN BANNER                          ║ -->
-            <!-- ╚═════════════════════════════════════════════════════╝ -->
-            <div id="m6-sp-inner-644" style="display:none;">
-              <div id="m6-sp-banner-container">
-  <div class="glass-card" style="max-width:780px; margin:0 auto; padding:24px; border:1px solid var(--accent-gold);">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px; border-bottom:1px solid var(--chrome-border); padding-bottom:14px;">
-      <div>
-        <h5 style="color:var(--accent-gold); font-size:1.1rem; margin:0 0 4px 0; font-weight:800;">📷 PASANG BANNER SPONSOR</h5>
-        <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">Pilih sponsor terdaftar untuk mengatur posisi penayangan banner & jadwal tayang.</p>
-      </div>
-      <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px; color:var(--accent-red); border-color:var(--accent-red); font-weight:800;" onclick="M6Engine.switchSponsorInnerTab('643')">❌ TUTUP / KEMBALI</button>
-    </div>
-
-    <div style="background:rgba(0,0,0,0.3); border:1px solid var(--accent-gold); border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-      <div style="display:flex; align-items:center; gap:10px; flex:1;">
-        <span style="font-size:0.82rem; font-weight:800; color:var(--accent-gold);">🏢 PILIH SPONSOR:</span>
-        <select class="form-input" style="font-weight:800; max-width:280px; font-size:0.82rem;" onchange="M6Engine.selectSponsor(this.value)">
-          <option value="sp1" selected>PT. Bank Mandiri (💎 PLATINUM)</option>
-          <option value="sp2">PT. Pertamina Lubricants (🥇 GOLD)</option>
-          <option value="sp3">PT. Asuransi Sinar Mas (🥈 SILVER)</option>
-        </select>
-      </div>
-      <div style="font-size:0.8rem; color:var(--text-muted);">
-        Paket: <strong style="color:var(--accent-gold);">💎 PLATINUM</strong> &nbsp;|&nbsp; Nilai: <strong style="color:var(--primary-emerald);">Rp 37.500.000</strong>
-      </div>
-    </div>
-
-    <form onsubmit="event.preventDefault(); window.showToast('Banner iklan berhasil disimpan dan dipasang!', 'success'); return false;">
-      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── DOKUMEN BANNER ───</div>
-      <div style="display:flex; gap:14px; align-items:center; margin-bottom:14px; flex-wrap:wrap;">
-        <div style="flex:1;">
-          <label class="form-label" style="font-size:0.75rem;">Upload Banner (JPG/PNG, Max 2MB)</label>
-          <input type="file" class="form-input" style="font-size:0.75rem;">
-        </div>
-        <button type="button" class="btn-outline" style="padding:6px 14px; font-size:0.78rem;" onclick="alert('🖼️ Preview Banner Sponsor PT. Bank Mandiri tampil sempurna!')">🖼️ Preview Banner</button>
-      </div>
-
-      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── POSISI PENAYANGAN ───</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.8rem; margin-bottom:16px;">
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [✅] HERO (Landing Page)</label>
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [✅] HEADER (Event Page)</label>
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [✅] SIDEBAR (Event Page)</label>
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [✅] FOOTER (Event Page)</label>
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [✅] DASHBOARD (Member Dashboard)</label>
-        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [✅] SLIDE (Presentasi)</label>
-      </div>
-
-      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── JADWAL PENAYANGAN ───</div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
-        <div class="form-group">
-          <label class="form-label" style="font-size:0.75rem;">Start Date *</label>
-          <input type="date" class="form-input" value="2026-09-01" style="font-size:0.8rem;">
-        </div>
-        <div class="form-group">
-          <label class="form-label" style="font-size:0.75rem;">End Date *</label>
-          <input type="date" class="form-input" value="2026-09-30" style="font-size:0.8rem;">
-        </div>
-      </div>
-
-      <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button type="button" class="btn-outline" style="padding:8px 16px; font-size:0.8rem;" onclick="M6Engine.switchSponsorInnerTab('643')">BATAL</button>
-        <button type="submit" class="btn-primary" style="padding:8px 22px; font-weight:800; font-size:0.82rem; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;">💾 PASANG BANNER</button>
-      </div>
-    </form>
-  </div>
-</div>
-            </div>
-
-            <!-- ╔═════════════════════════════════════════════════════╗ -->
-            <!-- ║  6.4.4 SPONSOR DASHBOARD                            ║ -->
-            <!-- ╚═════════════════════════════════════════════════════╝ -->
-            <div id="m6-sp-inner-645" style="display:none;">
-              <div id="m6-sp-dashboard-container">
-  <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold); margin-bottom:20px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid var(--chrome-border); padding-bottom:14px;">
-      <div>
-        <h5 style="color:var(--accent-gold); font-size:1.1rem; margin:0 0 4px 0; font-weight:800;">🤝 SPONSOR DASHBOARD - PT. BANK MANDIRI</h5>
-        <span class="tier-badge" style="background:var(--accent-gold); color:#000; font-weight:800;">💎 PLATINUM PARTNER</span>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size:0.8rem; font-weight:800; color:var(--accent-gold);">🏢 PILIH SPONSOR:</span>
-        <select class="form-input" style="font-weight:800; max-width:260px; font-size:0.8rem;" onchange="M6Engine.selectSponsor(this.value)">
-          <option value="sp1" selected>PT. Bank Mandiri (💎 PLATINUM)</option>
-          <option value="sp2">PT. Pertamina Lubricants (🥇 GOLD)</option>
-          <option value="sp3">PT. Asuransi Sinar Mas (🥈 SILVER)</option>
-        </select>
-      </div>
-    </div>
-
-    <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; margin-bottom:20px;">
-      <div style="font-weight:800; color:var(--accent-gold); font-size:0.85rem; margin-bottom:12px;">📊 Ringkasan Kampanye - PT. Bank Mandiri</div>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px;">
-        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
-          <div style="font-size:0.72rem; color:var(--text-muted);">Impressions</div>
-          <div style="font-size:1.3rem; font-weight:900; color:#fff;">12.450</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
-          <div style="font-size:0.72rem; color:var(--text-muted);">Clicks</div>
-          <div style="font-size:1.3rem; font-weight:900; color:var(--accent-blue);">1.234</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
-          <div style="font-size:0.72rem; color:var(--text-muted);">Reach</div>
-          <div style="font-size:1.3rem; font-weight:900; color:var(--primary-emerald);">8.900</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
-          <div style="font-size:0.72rem; color:var(--text-muted);">Engagement</div>
-          <div style="font-size:1.3rem; font-weight:900; color:var(--accent-gold);">9.9%</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-            </div>
-
-            <!-- ╔═════════════════════════════════════════════════════╗ -->
-            <!-- ║  6.4.5 LAPORAN EFEKTIFITAS                          ║ -->
-            <!-- ╚═════════════════════════════════════════════════════╝ -->
-            <div id="m6-sp-inner-646" style="display:none;">
-              <div id="m6-sp-report-container">
-  <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold); margin-bottom:20px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid var(--chrome-border); padding-bottom:14px;">
-      <div>
-        <h5 style="color:var(--accent-gold); font-size:1.1rem; margin:0 0 4px 0; font-weight:800;">📊 LAPORAN EFEKTIFITAS SPONSORSHIP - MB INA 2026</h5>
-        <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">Ringkasan ROI, performa penayangan banner, dan rekomendasi kemitraan event berikutnya.</p>
-      </div>
-      <button class="btn-primary" style="font-size:0.8rem; padding:8px 16px; font-weight:800;" onclick="alert('📥 Mengunduh Laporan Efektifitas Sponsorship Format PDF...')">📥 DOWNLOAD LAPORAN (PDF)</button>
-    </div>
-
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px; text-align:center;">
-      <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:14px;">
-        <div style="font-size:0.75rem; color:var(--text-muted);">Total Dana Sponsor</div>
-        <div style="font-size:1.3rem; font-weight:900; color:var(--primary-emerald);">Rp 63.700.000</div>
-      </div>
-      <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:14px;">
-        <div style="font-size:0.75rem; color:var(--text-muted);">Total Impressions Banner</div>
-        <div style="font-size:1.3rem; font-weight:900; color:#fff;">28.500</div>
-      </div>
-      <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:14px;">
-        <div style="font-size:0.75rem; color:var(--text-muted);">Rata-rata ROI Partner</div>
-        <div style="font-size:1.3rem; font-weight:900; color:var(--accent-gold);">245%</div>
-      </div>
-    </div>
-  </div>
-</div>
-            </div>
-
-          </div><!-- END m6-subtab-6_4_sponsorship -->
+          
 
           <!-- SUBTAB 6.5: GALERI EVENT -->
           <div id="m6-subtab-6_5_gallery" class="m6-subtab-content" style="display:none;">
@@ -6950,32 +6447,54 @@
     <!-- ================================================================= -->
     <div id="view-sponsor-dashboard" class="view-container" style="max-width:1440px; margin:0 auto; padding:20px; display:none;">
       
-      <!-- 1. TOP HEADER BANNER SPONSOR -->
-      <div class="glass-panel" style="padding:22px 26px; margin-bottom:20px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; box-shadow:0 8px 30px rgba(0,0,0,0.35);">
+      <!-- 1. TOP HEADER BANNER SPONSOR (MODERN LUXURY MERCEDES-BENZ) -->
+      <div class="glass-panel" style="padding:24px 28px; margin-bottom:20px; background:rgba(10,14,23,0.92); border:1px solid rgba(255,255,255,0.08); border-radius:20px; box-shadow:0 12px 40px rgba(0,0,0,0.5); backdrop-filter:blur(24px);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
           <div>
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap;">
-              <span style="font-size:0.95rem; font-weight:800; color:var(--accent-gold); letter-spacing:0.04em;">PORTAL SPONSOR & MITRA RESMI MB INA</span>
-              <span id="sponsor-portal-badge-tier" class="tier-badge" style="background:rgba(245,158,11,0.12); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.75rem; padding:3px 12px; border-radius:20px;">MITRA SPONSOR PLATINUM</span>
+              <span style="font-size:0.75rem; font-weight:700; color:var(--accent-gold); letter-spacing:0.12em; text-transform:uppercase;">PORTAL MITRA & MANAJEMEN SPONSORSHIP</span>
+              <span id="sponsor-portal-badge-tier" class="tier-badge" style="background:rgba(245,158,11,0.12); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.72rem; padding:3px 12px; border-radius:20px;">MITRA RESMI PLATINUM</span>
             </div>
-            <h2 id="sponsor-dash-welcome-title" style="font-size:1.55rem; margin:0; font-weight:800;" class="text-gradient">Selamat Datang, Shell Indonesia!</h2>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin:4px 0 0 0;">Executive Brand Center & Manajemen Layanan Kemitraan Komunitas Mercedes-Benz Club Indonesia</p>
+            <h2 id="sponsor-dash-welcome-title" style="font-size:1.6rem; margin:0; font-weight:800; color:#ffffff; letter-spacing:0.02em;">Manajemen Sponsorship & Kemitraan Resmi</h2>
+            <p style="font-size:0.82rem; color:#94a3b8; margin:4px 0 0 0;">Pusat pengelolaan kemitraan brand, verifikasi dokumen MoU, alokasi media promosi, dan evaluasi ROI Mercedes-Benz Club Indonesia</p>
           </div>
           <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <button class="btn-outline" style="font-size:0.82rem; padding:7px 14px; border-radius:10px; display:flex; align-items:center; gap:6px;" title="Notifikasi Sponsor" onclick="SponsorPortalEngine.showNotifications()">
+            <button class="btn-outline" style="font-size:0.75rem; padding:7px 14px; border-radius:12px; display:inline-flex; align-items:center; gap:6px; color:#cbd5e1; border-color:rgba(255,255,255,0.1);" title="Notifikasi Sponsor" onclick="SponsorPortalEngine.showNotifications()">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
               <span style="background:rgba(244,63,94,0.2); color:#fb7185; border:1px solid rgba(244,63,94,0.3); font-size:0.68rem; padding:1px 6px; border-radius:10px; font-weight:700;">3</span> Notifikasi
             </button>
-            <button class="btn-outline" style="font-size:0.82rem; padding:7px 14px; border-radius:10px; color:var(--accent-gold); border-color:rgba(245,158,11,0.3); font-weight:600; display:flex; align-items:center; gap:6px;" onclick="SponsorPortalEngine.openEditProfileModal()">
+            <button class="btn-outline" style="font-size:0.75rem; padding:7px 14px; border-radius:12px; color:var(--accent-gold); border-color:rgba(245,158,11,0.3); font-weight:600; display:inline-flex; align-items:center; gap:6px;" onclick="SponsorPortalEngine.openEditProfileModal()">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               Profil Perusahaan
             </button>
-            <button class="btn-outline" style="font-size:0.82rem; padding:7px 14px; border-radius:10px; color:#fb7185; border-color:rgba(244,63,94,0.25);" onclick="AuthEngine.logout()">
-              Keluar
+            <button class="btn-outline" style="font-size:0.75rem; padding:7px 14px; border-radius:12px; color:#94a3b8; border-color:rgba(255,255,255,0.08);" onclick="AuthEngine.logout()">
+              Sign Out
             </button>
           </div>
         </div>
+
+        <!-- 2. LUXURY SUB-NAVIGATION PILLS FOR SPONSORSHIP PORTAL -->
+        <div style="display:flex; gap:8px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.08); padding-top:16px; overflow-x:auto; scrollbar-width:none;">
+          <button id="spnd-tab-btn-summary" class="sub-tab-btn active" style="background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.35); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:600; cursor:pointer;" onclick="SponsorPortalEngine.switchMainTab('summary')">
+            Ringkasan & ROI Eksekutif
+          </button>
+          <button id="spnd-tab-btn-packages" class="sub-tab-btn" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; cursor:pointer;" onclick="SponsorPortalEngine.switchMainTab('packages')">
+            Paket Sponsorship
+          </button>
+          <button id="spnd-tab-btn-confirm" class="sub-tab-btn" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; cursor:pointer;" onclick="SponsorPortalEngine.switchMainTab('confirm')">
+            Konfirmasi Mitra & MoU
+          </button>
+          <button id="spnd-tab-btn-ads" class="sub-tab-btn" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; cursor:pointer;" onclick="SponsorPortalEngine.switchMainTab('ads')">
+            Penempatan Banner Iklan
+          </button>
+          <button id="spnd-tab-btn-reports" class="sub-tab-btn" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; cursor:pointer;" onclick="SponsorPortalEngine.switchMainTab('reports')">
+            Laporan Efektivitas
+          </button>
+        </div>
       </div>
+
+      <!-- SECTION 1: RINGKASAN & ROI EKSEKUTIF -->
+      <div id="spnd-section-summary" style="display:block;">
 
       <!-- 2. TOTAL INVESTASI & METRIK ROI EKSEKUTIF (FINANSIAL CARD) -->
       <div class="glass-panel" style="padding:20px 24px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); margin-bottom:24px; border-radius:18px;">
@@ -7228,6 +6747,519 @@
           </div>
         </div>
 
+      </div>
+      <!-- END SECTION 1: RINGKASAN & ROI EKSEKUTIF -->
+
+      <!-- SECTION 2: PAKET SPONSORSHIP, KONFIRMASI, PENEMPATAN IKLAN, & LAPORAN -->
+      <div id="spnd-section-packages" style="display:none;">
+        <div class="glass-panel" style="padding:24px; background:rgba(10,14,23,0.92); border:1px solid rgba(255,255,255,0.08); border-radius:20px; box-shadow:0 12px 40px rgba(0,0,0,0.5);">
+          <!-- We insert m6-subtab-6_4_sponsorship container here with dark mode styling -->
+          <div id="m6-subtab-6_4_sponsorship" class="m6-subtab-content" style="display:block;">
+            <!-- ── SUBTAB HEADER & NAVIGATION PILLS ── -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h4 style="color:var(--accent-gold); font-size:1.15rem; margin:0; font-weight:700;">Kelola Sponsorship</h4>
+                <p style="font-size:0.75rem; color:#94a3b8; margin:3px 0 0 0;">Pusat pengelolaan paket sponsor, konfirmasi mitra, penempatan banner iklan, dan laporan efektivitas.</p>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button id="m6-sp-inner-btn-641" style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; box-shadow:0 1px 3px rgba(0,0,0,0.2); cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('641')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                  <span>Paket Sponsor</span>
+                </button>
+                <button id="m6-sp-inner-btn-643" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('643')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  <span>Konfirmasi Sponsor</span>
+                </button>
+                <button id="m6-sp-inner-btn-644" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('644')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                  <span>Penempatan Iklan</span>
+                </button>
+                <button id="m6-sp-inner-btn-645" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('645')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                  <span>Dashboard Sponsor</span>
+                </button>
+                <button id="m6-sp-inner-btn-646" style="background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;" onclick="M6Engine.switchSponsorInnerTab('646')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                  <span>Laporan Efektivitas</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ╔═════════════════════════════════════════════════════╗ -->
+            <!-- ║  6.4.1 BUAT PAKET SPONSOR                           ║ -->
+            <!-- ╚═════════════════════════════════════════════════════╝ -->
+            <div id="m6-sp-inner-641" style="display:block;">
+
+              <!-- BATAS KONFIRMASI ALERT -->
+              <div style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(234,88,12,0.08)); border:1px solid var(--accent-gold); border-radius:14px; padding:14px 20px; margin-bottom:20px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                <div style="font-size:1.8rem;"></div>
+                <div style="flex:1;">
+                  <div style="font-weight:800; color:var(--accent-gold); font-size:0.9rem;">BATAS KONFIRMASI SPONSOR: <span id="m6-sp-deadline-display">6 September 2026</span> (1 minggu sebelum event)</div>
+                  <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;"> Sponsor konfirmasi sebelum 6 September → DITERIMA &nbsp;|&nbsp;  Setelah 6 September → DITOLAK OTOMATIS SISTEM</div>
+                </div>
+                <div id="m6-sp-deadline-badge" style="font-weight:900; font-size:0.82rem; padding:6px 14px; border-radius:20px; background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); white-space:nowrap;"> MASIH TERBUKA</div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1.1fr 1.3fr; gap:20px; align-items:flex-start;">
+
+                <!-- FORM BUAT/EDIT PAKET -->
+                <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold);">
+                  <h5 style="color:var(--accent-gold); font-size:1.05rem; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+                    <span id="m6-sp-form-title-icon"></span> <span id="m6-sp-form-title">BUAT PAKET SPONSOR</span>
+                  </h5>
+
+                  <form id="m6-sp-package-form" onsubmit="event.preventDefault(); M6Engine.saveSponsorPackage(); return false;">
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; margin-bottom:12px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
+                      ─── IDENTITAS PAKET ───
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label" style="font-size:0.78rem;">Nama Paket *</label>
+                      <select id="m6-sp-pkg-name" class="form-input" style="font-weight:700;" onchange="M6Engine.onSponsorPkgNameChange()">
+                        <option value=" SPONSOR TUNGGAL"> SPONSOR TUNGGAL</option>
+                        <option value=" PLATINUM" selected> PLATINUM</option>
+                        <option value=" GOLD"> GOLD</option>
+                        <option value=" SILVER"> SILVER</option>
+                        <option value=" BRONZE"> BRONZE</option>
+                        <option value="__custom__">✏️ Nama Khusus (Custom)...</option>
+                      </select>
+                      <input type="text" id="m6-sp-pkg-name-custom" class="form-input" placeholder="Ketik nama paket custom..." style="display:none; margin-top:6px; font-weight:700;">
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.78rem;">% dari RAB *</label>
+                        <input type="number" id="m6-sp-pkg-pct" class="form-input" placeholder="50" value="50" min="1" max="100" oninput="M6Engine.calcSponsorPkgValue()">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.78rem;">Nilai Rp (Auto dari RAB)</label>
+                        <input type="text" id="m6-sp-pkg-val-calc" class="form-input" readonly style="color:var(--accent-gold); font-weight:800;" value="Rp 37.500.000">
+                      </div>
+                    </div>
+
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; margin-bottom:12px; margin-top:14px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
+                      ─── LAMA TAYANG ───
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.78rem;">Sebelum Event *</label>
+                        <select id="m6-sp-pkg-before" class="form-input">
+                          <option value="1" selected>1 Minggu Sebelum</option>
+                          <option value="2">2 Minggu Sebelum</option>
+                          <option value="4">4 Minggu Sebelum</option>
+                          <option value="8">8 Minggu Sebelum</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.78rem;">Sesudah Event *</label>
+                        <select id="m6-sp-pkg-after" class="form-input">
+                          <option value="1">1 Minggu Sesudah</option>
+                          <option value="2">2 Minggu Sesudah</option>
+                          <option value="3">3 Minggu Sesudah</option>
+                          <option value="4" selected>4 Minggu Sesudah (1 Bulan)</option>
+                          <option value="8">2 Bulan Sesudah (8 Minggu)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- WEB BENEFITS -->
+                    <div style="margin-top:14px; margin-bottom:14px;">
+                      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; margin-bottom:10px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
+                        ─── BENEFIT WEB ───
+                      </div>
+                      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.78rem;">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-hero" checked style="accent-color:var(--accent-gold);"> Hero Landing Page</label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-header" checked style="accent-color:var(--accent-gold);"> Header Event Page</label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-sidebar" checked style="accent-color:var(--accent-gold);"> Sidebar Event Page</label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-dashboard" checked style="accent-color:var(--accent-gold);"> Member Dashboard</label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-footer" checked style="accent-color:var(--accent-gold);"> Footer Event Page</label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-b-slide" checked style="accent-color:var(--accent-gold);"> Slide Presentasi</label>
+                      </div>
+                    </div>
+
+                    <!-- PHYSICAL BENEFITS -->
+                    <div style="margin-bottom:18px;">
+                      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:6px; margin-bottom:10px; font-size:0.8rem; font-weight:800; color:var(--accent-gold);">
+                        ─── BENEFIT EVENT FISIK ───
+                      </div>
+                      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.78rem;">
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-f-backdrop" checked style="accent-color:var(--primary-emerald);"> Backdrop Utama</label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-f-banner" checked style="accent-color:var(--primary-emerald);"> Banner Venue</label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-f-sticker" checked style="accent-color:var(--primary-emerald);"> Sticker Mobil</label>
+                        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="m6-sp-f-opening" checked style="accent-color:var(--primary-emerald);"> Disebut di Opening Ceremony</label>
+                      </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:10px;">
+                      <button type="button" class="btn-outline" style="padding:8px 16px; font-size:0.8rem;" onclick="M6Engine.resetSponsorPackageForm()">BATAL</button>
+                      <button type="submit" class="btn-primary" style="padding:8px 22px; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;"> SIMPAN PAKET</button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- DAFTAR PAKET TABLE -->
+                <div class="glass-card" style="padding:22px; border:1px solid var(--chrome-border);">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <h5 style="color:var(--accent-gold); font-size:1rem; margin:0;">⭐ DAFTAR PAKET SPONSOR</h5>
+                    <button class="btn-primary" style="font-size:0.78rem; padding:5px 14px;" onclick="M6Engine.resetSponsorPackageForm()">➕ TAMBAH PAKET</button>
+                  </div>
+                  <div style="overflow-x:auto;">
+                    <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.82rem;">
+                      <thead>
+                        <tr style="border-bottom:2px solid var(--accent-gold); color:var(--accent-gold); text-align:left;">
+                          <th style="padding:10px 8px;">Paket</th>
+                          <th style="padding:10px 8px; text-align:center;">% RAB</th>
+                          <th style="padding:10px 8px; text-align:center;">Sebelum</th>
+                          <th style="padding:10px 8px; text-align:center;">Sesudah</th>
+                          <th style="padding:10px 8px; text-align:center;">Total</th>
+                          <th style="padding:10px 8px; text-align:center;">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody id="m6-sp-packages-tbody">
+                        <tr style="border-bottom:1px solid var(--chrome-border);">
+                          <td style="padding:10px 8px; font-weight:800; color:#fff;"> SPONSOR TUNGGAL</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">70%</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">2 bln</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">9 mgg</td>
+                          <td style="padding:10px 8px; text-align:center;">
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_tunggal')">✏️</button>
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_tunggal')">Hapus</button>
+                          </td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--chrome-border);">
+                          <td style="padding:10px 8px; font-weight:800; color:#fff;"> PLATINUM</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">50%</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">4 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">5 mgg</td>
+                          <td style="padding:10px 8px; text-align:center;">
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_plat')">✏️</button>
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_plat')">Hapus</button>
+                          </td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--chrome-border);">
+                          <td style="padding:10px 8px; font-weight:800; color:#fff;"> GOLD</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">35%</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">3 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">4 mgg</td>
+                          <td style="padding:10px 8px; text-align:center;">
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_gold')">✏️</button>
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_gold')">Hapus</button>
+                          </td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--chrome-border);">
+                          <td style="padding:10px 8px; font-weight:800; color:#fff;"> SILVER</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">15%</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">2 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">3 mgg</td>
+                          <td style="padding:10px 8px; text-align:center;">
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_silv')">✏️</button>
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_silv')">Hapus</button>
+                          </td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--chrome-border);">
+                          <td style="padding:10px 8px; font-weight:800; color:#fff;"> BRONZE</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--accent-gold); font-weight:800;">5%</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--text-muted);">1 mgg</td>
+                          <td style="padding:10px 8px; text-align:center; color:var(--primary-emerald); font-weight:800;">2 mgg</td>
+                          <td style="padding:10px 8px; text-align:center;">
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem;" onclick="M6Engine.editSponsorPackage('pkg_brz')">✏️</button>
+                            <button class="btn-outline" style="padding:3px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSponsorPackage('pkg_brz')">Hapus</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ╔═════════════════════════════════════════════════════╗ -->
+            <!-- ║  6.4.2 PROPOSAL & APPROVAL                          ║ -->
+            <!-- ╚═════════════════════════════════════════════════════╝ -->
+            <!-- ╚═════════════════════════════════════════════════════╝ -->
+                        <div id="m6-sp-inner-643" style="display:none;">
+              
+              <!-- SUMMARY PANEL -->
+              <div style="background:rgba(0,0,0,0.4); border:1px solid var(--accent-gold); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; text-align:center;">
+                <div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">Total RAB Event</div>
+                  <div style="font-size:1.2rem; font-weight:900; color:#fff;">Rp 75.000.000</div>
+                </div>
+                <div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">Target Sponsor (111%)</div>
+                  <div style="font-size:1.2rem; font-weight:900; color:var(--accent-gold);">Rp 83.250.000</div>
+                </div>
+                <div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">Terkumpul (<span id="m6-sp-summary-count">2</span> Sponsor)</div>
+                  <div style="font-size:1.2rem; font-weight:900; color:var(--primary-emerald);" id="m6-sp-summary-amount">Rp 63.700.000</div>
+                </div>
+              </div>
+
+              <!-- ACTION BAR -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+                <h5 style="color:var(--accent-gold); font-size:1rem; margin:0;"> KONFIRMASI SPONSOR</h5>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn-primary" style="font-size:0.8rem; padding:6px 14px;" onclick="M6Engine.resetSponsorConfirmForm()">➕ TAMBAH SPONSOR</button>
+                  <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px;" onclick="M6Engine.switchSponsorInnerTab('646')"> LAPORAN</button>
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:1.1fr 1.3fr; gap:20px; align-items:flex-start;">
+                
+                <!-- FORM KONFIRMASI SPONSOR -->
+                <div class="glass-card" style="padding:20px; border:1px solid var(--accent-gold);">
+                  <h6 style="color:var(--accent-gold); font-size:0.95rem; margin-bottom:14px;"> FORM KONFIRMASI SPONSOR</h6>
+                  
+                  <form id="m6-sp-confirm-form" onsubmit="M6Engine.saveSponsorFromForm(event)">
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── DATA PERUSAHAAN ───</div>
+                    <div class="form-group">
+                      <label class="form-label" style="font-size:0.75rem;">Nama Perusahaan *</label>
+                      <input type="text" id="m6-sp-form-company-name" class="form-input" required placeholder="Contoh: Universitas Adiwangsa Jambi / PT Bank Mandiri">
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Contact Person *</label>
+                        <input type="text" id="m6-sp-form-contact-person" class="form-input" required placeholder="Nama kontak...">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Contact Phone *</label>
+                        <input type="text" id="m6-sp-form-contact-phone" class="form-input" required placeholder="Nomor telepon...">
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" style="font-size:0.75rem;">Contact Email *</label>
+                      <input type="email" id="m6-sp-form-contact-email" class="form-input" required placeholder="Email resmi...">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" style="font-size:0.75rem;">Website URL</label>
+                      <input type="url" id="m6-sp-form-website-url" class="form-input" placeholder="https://www.unaja.co.id">
+                    </div>
+
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── PAKET SPONSOR ───</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Pilih Paket *</label>
+                        <select id="m6-sp-form-package-select" class="form-input" style="font-weight:700;" onchange="M6Engine.onSponsorConfirmPkgChange()">
+                          <option value=" PLATINUM" data-pct="50" selected> PLATINUM (50%)</option>
+                          <option value=" SPONSOR TUNGGAL" data-pct="70"> SPONSOR TUNGGAL (70%)</option>
+                          <option value=" GOLD" data-pct="35"> GOLD (35%)</option>
+                          <option value=" SILVER" data-pct="15"> SILVER (15%)</option>
+                          <option value=" BRONZE" data-pct="5"> BRONZE (5%)</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Nilai Sponsor (Auto)</label>
+                        <input type="text" id="m6-sp-form-package-value" class="form-input" readonly value="Rp 37.500.000" style="color:var(--accent-gold); font-weight:800;">
+                      </div>
+                    </div>
+
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── DOKUMEN & LOGO ───</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Upload Logo (PNG/JPG)</label>
+                        <input type="file" id="m6-sp-form-logo" class="form-input" style="font-size:0.75rem;">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Upload Banner (JPG/PNG)</label>
+                        <input type="file" id="m6-sp-form-banner" class="form-input" style="font-size:0.75rem;">
+                      </div>
+                    </div>
+
+                    <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; margin-top:12px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── STATUS ───</div>
+                    <div class="form-group">
+                      <select id="m6-sp-form-status-select" class="form-input" style="font-weight:800; color:var(--primary-emerald);">
+                        <option value="CONFIRMED" selected> CONFIRMED</option>
+                        <option value="PENDING">⏳ PENDING</option>
+                        <option value="REJECTED"> REJECTED</option>
+                      </select>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+                      <button type="button" class="btn-outline" style="padding:6px 14px; font-size:0.78rem;" onclick="M6Engine.resetSponsorConfirmForm()">BATAL</button>
+                      <button type="submit" class="btn-primary" style="padding:6px 18px; font-weight:800; font-size:0.78rem; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;"> SIMPAN</button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- TABEL DAFTAR SPONSOR TERDAFTAR -->
+                <div class="glass-card" style="padding:20px; border:1px solid var(--chrome-border);">
+                  <h6 style="color:var(--accent-gold); font-size:0.95rem; margin-bottom:14px;"> DAFTAR SPONSOR TERDAFTAR</h6>
+                  <div style="overflow-x:auto;">
+                    <table class="admin-table" style="width:100%; font-size:0.8rem;">
+                      <thead>
+                        <tr style="border-bottom:1px solid var(--chrome-border); text-align:left; color:var(--text-muted);">
+                          <th style="padding:8px;">Sponsor</th>
+                          <th style="padding:8px;">Paket</th>
+                          <th style="padding:8px; text-align:right;">Nilai</th>
+                          <th style="padding:8px; text-align:center;">Status</th>
+                          <th style="padding:8px; text-align:center;">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody id="m6-sp-confirm-tbody">
+                        <!-- Rendered dynamically by M6Engine.renderSponsorConfirmTable() -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div><!-- END GRID -->
+            </div><!-- END m6-sp-inner-643 -->
+
+            <!-- ╔═════════════════════════════════════════════════════╗ -->
+            <!-- ║  6.4.3 PASANG IKLAN BANNER                          ║ -->
+            <!-- ╚═════════════════════════════════════════════════════╝ -->
+            <div id="m6-sp-inner-644" style="display:none;">
+              <div id="m6-sp-banner-container">
+  <div class="glass-card" style="max-width:780px; margin:0 auto; padding:24px; border:1px solid var(--accent-gold);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px; border-bottom:1px solid var(--chrome-border); padding-bottom:14px;">
+      <div>
+        <h5 style="color:var(--accent-gold); font-size:1.1rem; margin:0 0 4px 0; font-weight:800;"> PASANG BANNER SPONSOR</h5>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">Pilih sponsor terdaftar untuk mengatur posisi penayangan banner & jadwal tayang.</p>
+      </div>
+      <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px; color:var(--accent-red); border-color:var(--accent-red); font-weight:800;" onclick="M6Engine.switchSponsorInnerTab('643')"> TUTUP / KEMBALI</button>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.3); border:1px solid var(--accent-gold); border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:10px; flex:1;">
+        <span style="font-size:0.82rem; font-weight:800; color:var(--accent-gold);"> PILIH SPONSOR:</span>
+        <select class="form-input" style="font-weight:800; max-width:280px; font-size:0.82rem;" onchange="M6Engine.selectSponsor(this.value)">
+          <option value="sp1" selected>PT. Bank Mandiri ( PLATINUM)</option>
+          <option value="sp2">PT. Pertamina Lubricants ( GOLD)</option>
+          <option value="sp3">PT. Asuransi Sinar Mas ( SILVER)</option>
+        </select>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted);">
+        Paket: <strong style="color:var(--accent-gold);"> PLATINUM</strong> &nbsp;|&nbsp; Nilai: <strong style="color:var(--primary-emerald);">Rp 37.500.000</strong>
+      </div>
+    </div>
+
+    <form onsubmit="event.preventDefault(); window.showToast('Banner iklan berhasil disimpan dan dipasang!', 'success'); return false;">
+      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── DOKUMEN BANNER ───</div>
+      <div style="display:flex; gap:14px; align-items:center; margin-bottom:14px; flex-wrap:wrap;">
+        <div style="flex:1;">
+          <label class="form-label" style="font-size:0.75rem;">Upload Banner (JPG/PNG, Max 2MB)</label>
+          <input type="file" class="form-input" style="font-size:0.75rem;">
+        </div>
+        <button type="button" class="btn-outline" style="padding:6px 14px; font-size:0.78rem;" onclick="alert(' Preview Banner Sponsor PT. Bank Mandiri tampil sempurna!')"> Preview Banner</button>
+      </div>
+
+      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── POSISI PENAYANGAN ───</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.8rem; margin-bottom:16px;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [] HERO (Landing Page)</label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [] HEADER (Event Page)</label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [] SIDEBAR (Event Page)</label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [] FOOTER (Event Page)</label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [] DASHBOARD (Member Dashboard)</label>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--accent-gold);"> [] SLIDE (Presentasi)</label>
+      </div>
+
+      <div style="border-bottom:1px solid var(--chrome-border); padding-bottom:4px; margin-bottom:10px; font-size:0.78rem; font-weight:800; color:var(--accent-gold);">─── JADWAL PENAYANGAN ───</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+        <div class="form-group">
+          <label class="form-label" style="font-size:0.75rem;">Start Date *</label>
+          <input type="date" class="form-input" value="2026-09-01" style="font-size:0.8rem;">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size:0.75rem;">End Date *</label>
+          <input type="date" class="form-input" value="2026-09-30" style="font-size:0.8rem;">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn-outline" style="padding:8px 16px; font-size:0.8rem;" onclick="M6Engine.switchSponsorInnerTab('643')">BATAL</button>
+        <button type="submit" class="btn-primary" style="padding:8px 22px; font-weight:800; font-size:0.82rem; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000;"> PASANG BANNER</button>
+      </div>
+    </form>
+  </div>
+</div>
+            </div>
+
+            <!-- ╔═════════════════════════════════════════════════════╗ -->
+            <!-- ║  6.4.4 SPONSOR DASHBOARD                            ║ -->
+            <!-- ╚═════════════════════════════════════════════════════╝ -->
+            <div id="m6-sp-inner-645" style="display:none;">
+              <div id="m6-sp-dashboard-container">
+  <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold); margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid var(--chrome-border); padding-bottom:14px;">
+      <div>
+        <h5 style="color:var(--accent-gold); font-size:1.1rem; margin:0 0 4px 0; font-weight:800;"> SPONSOR DASHBOARD - PT. BANK MANDIRI</h5>
+        <span class="tier-badge" style="background:var(--accent-gold); color:#000; font-weight:800;"> PLATINUM PARTNER</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:0.8rem; font-weight:800; color:var(--accent-gold);"> PILIH SPONSOR:</span>
+        <select class="form-input" style="font-weight:800; max-width:260px; font-size:0.8rem;" onchange="M6Engine.selectSponsor(this.value)">
+          <option value="sp1" selected>PT. Bank Mandiri ( PLATINUM)</option>
+          <option value="sp2">PT. Pertamina Lubricants ( GOLD)</option>
+          <option value="sp3">PT. Asuransi Sinar Mas ( SILVER)</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; margin-bottom:20px;">
+      <div style="font-weight:800; color:var(--accent-gold); font-size:0.85rem; margin-bottom:12px;"> Ringkasan Kampanye - PT. Bank Mandiri</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px;">
+        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
+          <div style="font-size:0.72rem; color:var(--text-muted);">Impressions</div>
+          <div style="font-size:1.3rem; font-weight:900; color:#fff;">12.450</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
+          <div style="font-size:0.72rem; color:var(--text-muted);">Clicks</div>
+          <div style="font-size:1.3rem; font-weight:900; color:var(--accent-blue);">1.234</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
+          <div style="font-size:0.72rem; color:var(--text-muted);">Reach</div>
+          <div style="font-size:1.3rem; font-weight:900; color:var(--primary-emerald);">8.900</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:8px; text-align:center;">
+          <div style="font-size:0.72rem; color:var(--text-muted);">Engagement</div>
+          <div style="font-size:1.3rem; font-weight:900; color:var(--accent-gold);">9.9%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+            </div>
+
+            <!-- ╔═════════════════════════════════════════════════════╗ -->
+            <!-- ║  6.4.5 LAPORAN EFEKTIFITAS                          ║ -->
+            <!-- ╚═════════════════════════════════════════════════════╝ -->
+            <div id="m6-sp-inner-646" style="display:none;">
+              <div id="m6-sp-report-container">
+  <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold); margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; border-bottom:1px solid var(--chrome-border); padding-bottom:14px;">
+      <div>
+        <h5 style="color:var(--accent-gold); font-size:1.1rem; margin:0 0 4px 0; font-weight:800;"> LAPORAN EFEKTIFITAS SPONSORSHIP - MB INA 2026</h5>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">Ringkasan ROI, performa penayangan banner, dan rekomendasi kemitraan event berikutnya.</p>
+      </div>
+      <button class="btn-primary" style="font-size:0.8rem; padding:8px 16px; font-weight:800;" onclick="alert(' Mengunduh Laporan Efektifitas Sponsorship Format PDF...')"> DOWNLOAD LAPORAN (PDF)</button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px; text-align:center;">
+      <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:14px;">
+        <div style="font-size:0.75rem; color:var(--text-muted);">Total Dana Sponsor</div>
+        <div style="font-size:1.3rem; font-weight:900; color:var(--primary-emerald);">Rp 63.700.000</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:14px;">
+        <div style="font-size:0.75rem; color:var(--text-muted);">Total Impressions Banner</div>
+        <div style="font-size:1.3rem; font-weight:900; color:#fff;">28.500</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.3); border:1px solid var(--chrome-border); border-radius:12px; padding:14px;">
+        <div style="font-size:0.75rem; color:var(--text-muted);">Rata-rata ROI Partner</div>
+        <div style="font-size:1.3rem; font-weight:900; color:var(--accent-gold);">245%</div>
+      </div>
+    </div>
+  </div>
+</div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -10260,7 +10292,7 @@
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="js/auth.js?v=20260903_v88_mbux"></script>
-  <script src="js/app.js?v=20260904_v106_user_dropdown_items"></script>
+  <script src="js/app.js?v=20260904_v107_sponsorship_portal"></script>
   <script>
     lucide.createIcons();
     try {
