@@ -10026,9 +10026,9 @@ const AppEngine = {
                 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:7px;">
                   <span style="color:#94A3B8;">Rincian Kontribusi:</span>
                   <span style="color:#CBD5E1; font-size:0.75rem; text-align:right;">
-                    Donasi: <strong style="color:#FFFFFF; font-family:monospace;">Rp \${new Intl.NumberFormat('id-ID').format(m.total_donation || 0)}</strong>
-                    \${m.event_tickets_total ? \` • Tiket: <strong style="color:#FFFFFF; font-family:monospace;">Rp \${new Intl.NumberFormat('id-ID').format(m.event_tickets_total)}</strong>\` : ''}
-                    \${m.lapak_fee_total ? \` • Lapak: <strong style="color:#FFFFFF; font-family:monospace;">Rp \${new Intl.NumberFormat('id-ID').format(m.lapak_fee_total)}</strong>\` : ''}
+                    Donasi: <strong style="color:#FFFFFF; font-family:monospace;">Rp ${new Intl.NumberFormat('id-ID').format(m.total_donation || 0)}</strong>
+                    ${m.event_tickets_total ? ` • Tiket: <strong style="color:#FFFFFF; font-family:monospace;">Rp ${new Intl.NumberFormat('id-ID').format(m.event_tickets_total)}</strong>` : ''}
+                    ${m.lapak_fee_total ? ` • Lapak: <strong style="color:#FFFFFF; font-family:monospace;">Rp ${new Intl.NumberFormat('id-ID').format(m.lapak_fee_total)}</strong>` : ''}
                   </span>
                 </div>
 
@@ -10039,15 +10039,15 @@ const AppEngine = {
                     <span>Riwayat Tier:</span>
                   </span>
                   <div style="text-align:right;">
-                    \${tierHistory.length === 0
+                    ${tierHistory.length === 0
                       ? '<span style="color:#CBD5E1; font-size:0.78rem;">Terdaftar awal sebagai Tier <strong style="color:#D97706;">Bronze</strong>.</span>'
-                      : \`<div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end;">
-                          \${tierHistory.map(th => \`
+                      : `<div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end;">
+                          ${tierHistory.map(th => `
                             <span style="background:rgba(255,255,255,0.03); border:1px solid rgba(226,232,240,0.12); padding:2px 8px; border-radius:6px; font-size:0.72rem; color:#F8FAFC;">
-                              Tier <strong>\${th.tier}</strong> (\${th.year}) • <span style="color:#E2C38E; font-family:monospace;">Rp \${new Intl.NumberFormat('id-ID').format(th.total_donation)}</span>
+                              Tier <strong>${th.tier}</strong> (${th.year}) • <span style="color:#E2C38E; font-family:monospace;">Rp ${new Intl.NumberFormat('id-ID').format(th.total_donation)}</span>
                             </span>
-                          \`).join('')}
-                        </div>\`
+                          `).join('')}
+                        </div>`
                     }
                   </div>
                 </div>
@@ -10060,7 +10060,7 @@ const AppEngine = {
               <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.1); padding:10px 8px; border-radius:10px; text-align:center;" title="Total Kontribusi Penentu Tier: 1. Donasi + 2. Tiket Event + 3. Sewa Lapak">
                 <div style="font-size:0.68rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Total Kontribusi</div>
                 <div style="font-size:0.88rem; font-weight:700; font-family:monospace; color:#E2C38E;">
-                  Rp \${new Intl.NumberFormat('id-ID').format(m.total_contribution || m.total_donation || 0)}
+                  Rp ${new Intl.NumberFormat('id-ID').format(m.total_contribution || m.total_donation || 0)}
                 </div>
               </div>
 
