@@ -230,7 +230,7 @@ const AppEngine = {
   },
 
   updateHeaderNavPillsActive(activeId) {
-    ['nav-btn-home', 'nav-btn-member-portal', 'nav-link-admin'].forEach(id => {
+    ['nav-btn-home', 'nav-btn-member-portal', 'nav-btn-sponsor-portal', 'nav-link-admin'].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         if (id === activeId) {
@@ -4259,16 +4259,13 @@ const AppEngine = {
     const landingView = document.getElementById('view-landing-page');
     const navLinkAdmin = document.getElementById('nav-link-admin');
     const navBtnMember = document.getElementById('nav-btn-member-portal');
+    const navBtnSponsor = document.getElementById('nav-btn-sponsor-portal');
 
     const isAdminRole = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB'].includes(this.currentRole);
 
-    if (navLinkAdmin) {
-      navLinkAdmin.style.display = isAdminRole ? 'inline-block' : 'none';
-    }
-    const isSponsorRole = this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR');
-    if (navBtnMember) {
-      navBtnMember.style.display = (this.currentRole && this.currentRole !== 'GUEST' && !isSponsorRole) ? 'inline-block' : 'none';
-    }
+    if (navBtnMember) navBtnMember.style.display = 'inline-flex';
+    if (navBtnSponsor) navBtnSponsor.style.display = 'inline-flex';
+    if (navLinkAdmin) navLinkAdmin.style.display = 'inline-flex';
 
     const sidebar = document.getElementById('app-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
@@ -4277,7 +4274,6 @@ const AppEngine = {
       if (userProfileWidget) userProfileWidget.style.display = 'none';
       if (btnLogout) btnLogout.style.display = 'none';
       if (btnLogin) btnLogin.style.display = 'inline-flex';
-      if (navBtnMember) navBtnMember.style.display = 'none';
 
       if (adminView) adminView.style.display = 'none';
       if (landingView) landingView.style.display = 'block';
@@ -17964,8 +17960,7 @@ const M6Engine = {
   async openPortalSponsor(email = null) {
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
     const spDash = document.getElementById('view-sponsor-dashboard');
-    const navBtnMember = document.getElementById('nav-btn-member-portal');
-    if (navBtnMember) navBtnMember.style.display = 'none';
+    this.updateHeaderNavPillsActive('nav-btn-sponsor-portal');
     if (spDash) {
       spDash.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
