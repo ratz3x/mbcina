@@ -287,11 +287,14 @@ photo_url: sbUser.user_metadata?.picture || '',
       m.style.setProperty('display', 'none', 'important');
       m.style.setProperty('opacity', '0', 'important');
       m.style.setProperty('pointer-events', 'none', 'important');
-      m.style.visibility = 'hidden';
+      m.style.setProperty('visibility', 'hidden', 'important');
     });
     const loader = document.getElementById('global-app-loader');
     if (loader) loader.style.setProperty('display', 'none', 'important');
+    // ALWAYS restore scroll - even if no active modal
     document.body.style.overflow = '';
+    document.body.style.removeProperty('overflow');
+    document.documentElement.style.overflow = '';
   },
 
   selectRoleOption(role) {

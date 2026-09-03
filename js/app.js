@@ -165,6 +165,8 @@ const AppEngine = {
     const el = document.getElementById('global-app-loader');
     if (el) el.style.setProperty('display', 'none', 'important');
     document.body.style.overflow = '';
+    document.body.style.removeProperty('overflow');
+    document.documentElement.style.overflow = '';
   },
 
   switchView(viewId) {
@@ -19014,46 +19016,85 @@ const M6Engine = {
   },
 
   openDigitalReceiptModalByDonationId(donationId) {
-    let rcpt = this.donationData.receipts.find(r => r.donation_id === donationId);
+    // Use AppEngine.donationData as fallback (M6Engine binding issue)
+    const dataSource = (this.donationData && this.donationData.receipts)
+      ? this.donationData
+      : (window.AppEngine && window.AppEngine.donationData && window.AppEngine.donationData.receipts ? window.AppEngine.donationData : null);
+    if (!dataSource) { console.warn('[MBCINA] openDigitalReceiptModalByDonationId: no donationData'); return; }
+    let rcpt = dataSource.receipts.find(r => r.donation_id === donationId || r.donation_id === String(donationId));
     if (!rcpt) {
       rcpt = {
         id: 'rec_' + Date.now(),
         donation_id: donationId,
         receipt_number: 'REC-2026-' + Math.floor(1000 + Math.random() * 9000),
-        created_at: '10/08/2026'
+        created_at: new Date().toLocaleDateString('id-ID')
       };
-      this.donationData.receipts.unshift(rcpt);
+      dataSource.receipts.unshift(rcpt);
+      if (window.AppEngine && window.AppEngine.donationData) window.AppEngine.donationData.receipts = dataSource.receipts;
     }
-    this.openDigitalReceiptModal(rcpt.id);
+    this.openDigitalReceiptModal(rcpt.id, dataSource);
   },
 
-  openDigitalReceiptModal(receiptId) {
-    const rcpt = this.donationData.receipts.find(r => r.id === receiptId) || this.donationData.receipts[0] || {};
-    const don  = this.donationData.donations.find(d => d.id === rcpt.donation_id) || this.donationData.donations[0] || {};
-    const camp = this.donationData.campaigns.find(c => c.id === don.campaign_id) || this.donationData.campaigns[0] || {};
+  openDigitalReceiptModal(receiptId, dataSource) {
+    // Accept dataSource param from openDigitalReceiptModalByDonationId, or fallback
+    const ds = dataSource
+      || (this.donationData && this.donationData.receipts ? this.donationData : null)
+      || (window.AppEngine && window.AppEngine.donationData ? window.AppEngine.donationData : null)
+      || { receipts: [], donations: [], campaigns: [] };
+
+    const rcpt = ds.receipts.find(r => r.id === receiptId) || ds.receipts[0] || {};
+    const don  = ds.donations.find(d => d.id === rcpt.donation_id) || ds.donations[0] || {};
+    const camp = ds.campaigns.find(c => c.id === don.campaign_id) || ds.campaigns[0] || {};
 
     this.activeReceiptId = receiptId;
+    if (window.AppEngine) window.AppEngine.activeReceiptId = receiptId;
 
-    document.getElementById('rcpt-num').innerText        = rcpt.receipt_number || 'REC-2026-0001';
-    document.getElementById('rcpt-date').innerText       = rcpt.created_at || '10/08/2026';
-    document.getElementById('rcpt-donor-name').innerText = don.donor_name || 'Andi Pratama';
-    document.getElementById('rcpt-member-id').innerText  = don.member_id || 'MBINA-JKT-2026-000005';
-    document.getElementById('rcpt-camp-title').innerText = camp.title || 'Donasi Bakti Sosial Yogyakarta 2026';
-    document.getElementById('rcpt-method').innerText     = don.payment_method || 'QRIS';
-    document.getElementById('rcpt-amount').innerText     = 'Rp ' + parseFloat(don.amount || 2000000).toLocaleString('id-ID');
+    const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+    setTxt('rcpt-num',        rcpt.receipt_number || 'REC-2026-0001');
+    setTxt('rcpt-date',       rcpt.created_at || new Date().toLocaleDateString('id-ID'));
+    setTxt('rcpt-donor-name', don.donor_name || 'Hamba Allah');
+    setTxt('rcpt-member-id',  don.member_id || 'Non-Member');
+    setTxt('rcpt-camp-title', camp.title || 'Donasi Bakti Sosial MB INA 2026');
+    setTxt('rcpt-method',     don.payment_method || 'TRANSFER');
+    setTxt('rcpt-amount',     'Rp ' + parseFloat(don.amount || 0).toLocaleString('id-ID'));
 
-    AuthEngine.openModal('modal-digital-receipt');
+    // FORCE SHOW modal - same pattern as openDonationVerifyModal
+    const _modal = document.getElementById('modal-digital-receipt');
+    if (_modal) {
+      document.querySelectorAll('.modal-backdrop, .modal-overlay').forEach(function(m) {
+        if (m.id !== 'modal-digital-receipt') {
+          m.classList.remove('active');
+          m.style.setProperty('display', 'none', 'important');
+          m.style.setProperty('opacity', '0', 'important');
+          m.style.setProperty('pointer-events', 'none', 'important');
+        }
+      });
+      _modal.style.removeProperty('display');
+      _modal.style.removeProperty('opacity');
+      _modal.style.removeProperty('pointer-events');
+      _modal.style.removeProperty('visibility');
+      _modal.style.setProperty('display', 'flex', 'important');
+      _modal.style.setProperty('opacity', '1', 'important');
+      _modal.style.setProperty('pointer-events', 'auto', 'important');
+      _modal.style.setProperty('visibility', 'visible', 'important');
+      _modal.style.setProperty('z-index', '99999', 'important');
+      _modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    } else {
+      console.error('[MBCINA] #modal-digital-receipt NOT FOUND in DOM');
+    }
   },
 
   downloadDigitalReceiptPdf() {
-    const num = document.getElementById('rcpt-num').innerText;
-    alert(`📥 MENGUNDUH DIGITAL RECEIPT PDF...\n\nFile '${num}_MB_INA.pdf' berhasil di-generate dan diunduh!`);
+    const num = (document.getElementById('rcpt-num') || {}).innerText || 'REC-2026-0001';
+    if (window.showToast) window.showToast('📥 Digital Receipt PDF ' + num + '_MB_INA.pdf berhasil di-generate!', 'success');
+    window.print();
   },
 
   sendDigitalReceiptEmail() {
-    const num = document.getElementById('rcpt-num').innerText;
-    const name = document.getElementById('rcpt-donor-name').innerText;
-    alert(`📧 DIGITAL RECEIPT TERKIRIM!\n\nReceipt '${num}' untuk donatur ${name} berhasil dikirim ke alamat email terdaftar.`);
+    const num = (document.getElementById('rcpt-num') || {}).innerText || 'REC-2026-0001';
+    const name = (document.getElementById('rcpt-donor-name') || {}).innerText || 'Donatur';
+    if (window.showToast) window.showToast('📧 Receipt ' + num + ' untuk ' + name + ' berhasil dikirim ke email!', 'success');
   },
 
   printDigitalReceipt() {
@@ -19061,11 +19102,11 @@ const M6Engine = {
   },
 
   exportDonationsExcel() {
-    alert('📥 EXPORT DONATIONS EXCEL...\n\nData seluruh donatur berhasil di-export ke file \'Laporan_Donasi_MB_INA_2026.xlsx\'.');
+    if (window.showToast) window.showToast('📥 Export Excel: Laporan_Donasi_MB_INA_2026.xlsx berhasil di-generate!', 'success');
   },
 
   exportDonationsPdf() {
-    alert('📥 EXPORT DONATIONS PDF...\n\nDokumen ringkasan donatur berhasil di-export ke file \'Laporan_Donasi_MB_INA_2026.pdf\'.');
+    if (window.showToast) window.showToast('📥 Export PDF: Laporan_Donasi_MB_INA_2026.pdf berhasil di-generate!', 'success');
   },
 
   sendThankYouToAllDonors() {
