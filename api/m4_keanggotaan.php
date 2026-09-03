@@ -452,6 +452,24 @@ switch ($action) {
             $donStmt->execute([':uid' => $id]);
             $donations = $donStmt->fetchAll();
 
+            // Calculate exact total_donation from verified donations
+            $realTotalDonation = 0;
+            foreach ($donations as $don) {
+                if (in_array(strtoupper($don['status'] ?? ''), ['SUCCESS', 'CONFIRMED'])) {
+                    $realTotalDonation += intval($don['amount'] ?? 0);
+                }
+            }
+            $member['total_donation'] = $realTotalDonation;
+            if ($realTotalDonation >= 9000000) {
+                $member['tier'] = 'PLATINUM';
+            } elseif ($realTotalDonation >= 4500000) {
+                $member['tier'] = 'GOLD';
+            } elseif ($realTotalDonation >= 1500000) {
+                $member['tier'] = 'SILVER';
+            } else {
+                $member['tier'] = 'BRONZE';
+            }
+
             // Tier history
             $thStmt = $sPdo->prepare("SELECT * FROM tier_history WHERE user_id = :uid ORDER BY created_at DESC");
             $thStmt->execute([':uid' => $id]);

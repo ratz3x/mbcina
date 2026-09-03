@@ -10070,14 +10070,11 @@ const AppEngine = {
 
         <!-- MIDDLE SECTION: RIWAYAT DONASI (LEBAR PENUH / FULL WIDTH — ZERO HORIZONTAL SCROLL) -->
         <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:20px; margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
+          <div style="margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
             <h4 style="margin:0; font-size:0.82rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
               <span>Riwayat Donasi Anggota</span>
             </h4>
-            <button type="button" class="mbux-btn-stroke" style="padding:4px 12px; font-size:0.75rem; border-radius:6px;" onclick="AppEngine.openM3AddDonationModal('${m.id}')">
-              + Donasi
-            </button>
           </div>
           ${donations.length === 0 ? '<p style="font-size:0.8rem; color:#64748B; margin:16px 0; text-align:center;">Belum ada riwayat donasi tercatat.</p>' : `
             <div style="max-height:180px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
