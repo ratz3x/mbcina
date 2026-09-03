@@ -1,34 +1,23 @@
 /**
  * ============================================================================
- * MB CLUB INDONESIA - STANDALONE DONATION & PHILANTHROPY ENGINE (V2 REBUILD)
+ * MERCEDES-BENZ LUXURY DARK MODE — MBUX CORE UI DONATION ENGINE (V3 ULTIMATE)
  * ============================================================================
- * Fitur Utama:
- * 1. Monitoring & Progress Program Donasi (KPI & Progress Bar).
- * 2. Daftar Donatur & Verifikasi:
- *    - PENGURUS/ADMIN WAJIB MELIHAT BUKTI TRANSFER sebelum menyetujui.
- *    - Modal verifikasi menampilkan bukti transfer secara jelas + tombol zoom.
- *    - Approval menambahkan total donasi donatur dan MENAIKKAN TIER OTOMATIS:
- *      * BRONZE   : Rp 0 - Rp 1.499.999
- *      * SILVER   : Rp 1.500.000 - Rp 4.499.999
- *      * GOLD     : Rp 4.500.000 - Rp 8.999.999
- *      * PLATINUM : >= Rp 9.000.000
- *    - Penolakan donasi (REJECTED) hanya menampilkan tombol "Lihat Bukti" tanpa centang.
- * 3. Log Digital Receipt resmi dengan cetak (print) & unduh PDF.
- * 4. Matriks Tier Anggota & Evaluasi Otomatis.
- * 5. Buat Program Donasi Baru.
- * 6. Bebas dari freeze/hang, tidak mengunci scrollbar body.
+ * Precision digital interface inspired by Mercedes-Benz digital cockpits.
+ * Pure Silver/Chrome aesthetic, dark charcoal baseline (#0A0B10), glassmorphic
+ * surfaces, crisp geometric typography, zero cartoon emojis, and direct-to-body
+ * viewport modal mounting ensuring zero off-screen displacement.
  * ============================================================================
  */
 
 (function(window, document) {
   'use strict';
 
-  // ─── TIER CALCULATION SPECIFICATION ─────────────────────────────────────────
+  // ─── TIER THRESHOLDS & MBUX LUXURY PALETTE ──────────────────────────────────
   const TIER_THRESHOLDS = [
-    { tier: 'PLATINUM', min: 9000000, icon: '💎', color: '#38bdf8', bg: 'rgba(56,189,248,0.15)', border: 'rgba(56,189,248,0.3)' },
-    { tier: 'GOLD',     min: 4500000, icon: '🥇', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)' },
-    { tier: 'SILVER',   min: 1500000, icon: '🥈', color: '#94a3b8', bg: 'rgba(148,163,184,0.15)', border: 'rgba(148,163,184,0.3)' },
-    { tier: 'BRONZE',   min: 0,       icon: '🥉', color: '#d97706', bg: 'rgba(217,119,6,0.15)', border: 'rgba(217,119,6,0.3)' }
+    { tier: 'PLATINUM', min: 9000000, label: 'PLATINUM', badgeBg: 'rgba(226,232,240,0.12)', badgeText: '#F8FAFC', border: 'rgba(226,232,240,0.4)', iconSvg: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 3 6-3 6 3v6l-6 6-6-6V3z"/><path d="m18 9-6 6-6-6"/></svg>' },
+    { tier: 'GOLD',     min: 4500000, label: 'GOLD',     badgeBg: 'rgba(245,158,11,0.12)',  badgeText: '#FBBF24', border: 'rgba(245,158,11,0.35)',  iconSvg: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>' },
+    { tier: 'SILVER',   min: 1500000, label: 'SILVER',   badgeBg: 'rgba(148,163,184,0.12)', badgeText: '#CBD5E1', border: 'rgba(148,163,184,0.3)',  iconSvg: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>' },
+    { tier: 'BRONZE',   min: 0,       label: 'BRONZE',   badgeBg: 'rgba(217,119,6,0.12)',   badgeText: '#F59E0B', border: 'rgba(217,119,6,0.3)',    iconSvg: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>' }
   ];
 
   function calcTier(amount) {
@@ -44,7 +33,7 @@
     {
       id: 'camp_yogya_2026',
       title: 'Donasi Bakti Sosial Yogyakarta 2026',
-      description: 'Bantu kami berbagi kebahagiaan dengan masyarakat dan panti asuhan Yogyakarta dalam rangka Jamnas & Touring MB INA 2026.',
+      description: 'Pemberian santunan dan paket kebutuhan pokok bagi masyarakat serta panti asuhan Yogyakarta dalam rangka Jamnas & Touring MB INA 2026.',
       target_amount: 20000000,
       collected_amount: 14500000,
       start_date: '2026-09-01',
@@ -54,7 +43,7 @@
     {
       id: 'camp_bencana_2026',
       title: 'Peduli Bencana & Kemanusiaan Nasional',
-      description: 'Program tanggap darurat dan santunan korban bencana alam di berbagai wilayah nusantara bersama MB Club Indonesia.',
+      description: 'Program tanggap darurat dan santunan kemanusiaan korban bencana alam di berbagai wilayah nusantara bersama MB Club Indonesia.',
       target_amount: 50000000,
       collected_amount: 27500000,
       start_date: '2026-08-01',
@@ -75,7 +64,6 @@
       payment_method: 'TRANSFER',
       payment_proof_url: 'assets/mb_hero.jpg',
       status: 'PENDING',
-      notes: 'Donasi paket sembako baksos Yogyakarta',
       created_at: '2026-09-02 10:15'
     },
     {
@@ -89,7 +77,6 @@
       payment_method: 'TRANSFER',
       payment_proof_url: 'assets/mb_hero.jpg',
       status: 'PENDING',
-      notes: 'Partisipasi santunan anak yatim',
       created_at: '2026-09-02 11:30'
     },
     {
@@ -103,7 +90,6 @@
       payment_method: 'TRANSFER',
       payment_proof_url: 'assets/mb_hero.jpg',
       status: 'SUCCESS',
-      notes: 'Baksos Jamnas MB INA 2026',
       created_at: '2026-08-28 09:00'
     },
     {
@@ -117,7 +103,6 @@
       payment_method: 'QRIS',
       payment_proof_url: 'assets/mb_hero.jpg',
       status: 'SUCCESS',
-      notes: 'Donasi pendidikan anak asuh',
       created_at: '2026-08-25 14:20'
     },
     {
@@ -131,7 +116,6 @@
       payment_method: 'TRANSFER',
       payment_proof_url: 'assets/mb_hero.jpg',
       status: 'REJECTED',
-      notes: 'Bukti transfer buram/tidak terbaca',
       created_at: '2026-08-20 16:45'
     }
   ];
@@ -161,14 +145,13 @@
     }
   ];
 
-  // ─── CORE DONATION MANAGER ─────────────────────────────────────────────────
+  // ─── MERCEDES-BENZ LUXURY DONATION MANAGER ENGINE ──────────────────────────
   const DonationManager = {
     activeSubtab: 'monitoring',
     filterCampaign: 'ALL',
     filterStatus: 'ALL',
     searchQuery: '',
     selectedDonationId: null,
-    selectedReceiptId: null,
 
     data: {
       campaigns: [],
@@ -176,12 +159,10 @@
       receipts: []
     },
 
-    // ─── INITIALIZATION ──────────────────────────────────────────────────────
     init() {
-      console.log('[DonationManager] Initializing clean V2 module...');
       this.loadStoredData();
       this.fetchLiveData();
-      this.injectContainerStyles();
+      this.injectMBUXStyles();
       this.renderModuleUI();
       this.syncAllMemberTiers();
     },
@@ -209,10 +190,7 @@
     saveStoredData() {
       try {
         localStorage.setItem('mbcina_v2_donations', JSON.stringify(this.data));
-      } catch (e) {
-        console.warn('[DonationManager] Failed to save to localStorage:', e);
-      }
-      // Sinkronkan ke AppEngine & M6Engine jika ada
+      } catch (e) {}
       if (window.AppEngine) window.AppEngine.donationData = this.data;
       if (window.M6Engine)  window.M6Engine.donationData  = this.data;
     },
@@ -227,181 +205,293 @@
           this.saveStoredData();
           this.renderActiveSubtab();
         }
-      } catch (e) {
-        // Fallback local ok
-      }
+      } catch (e) {}
     },
 
-    // ─── CSS INJECTION (ISOLATED, NO CONFLICTS) ──────────────────────────────
-    injectContainerStyles() {
-      if (document.getElementById('don-v2-isolated-styles')) return;
+    // ─── MBUX DESIGN SYSTEM CSS ──────────────────────────────────────────────
+    injectMBUXStyles() {
+      if (document.getElementById('mbux-donation-styles')) return;
       const st = document.createElement('style');
-      st.id = 'don-v2-isolated-styles';
+      st.id = 'mbux-donation-styles';
       st.innerHTML = `
-        .don-v2-container {
-          color: #f1f5f9;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        /* MBUX CORE THEME BASELINE */
+        .mbux-root {
+          background: #0A0B10;
+          color: #F8FAFC;
+          font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+          letter-spacing: -0.01em;
+          border-radius: 20px;
         }
-        .don-v2-nav-tabs {
+
+        /* METALLIC SILVER ACCENTS */
+        .mbux-chrome-text {
+          background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 50%, #94A3B8 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        /* FLAT LUXURY TABS */
+        .mbux-tab-bar {
           display: flex;
-          gap: 8px;
+          gap: 24px;
+          border-bottom: 1px solid rgba(226, 232, 240, 0.08);
           margin-bottom: 24px;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
-          padding-bottom: 12px;
           overflow-x: auto;
           scrollbar-width: none;
         }
-        .don-v2-tab-btn {
-          background: rgba(255,255,255,0.03);
-          color: #94a3b8;
-          border: 1px solid rgba(255,255,255,0.08);
-          padding: 10px 18px;
-          border-radius: 12px;
+        .mbux-tab-link {
+          background: transparent;
+          border: none;
+          color: #94A3B8;
           font-size: 0.85rem;
-          font-weight: 600;
+          font-weight: 500;
+          padding: 12px 2px 14px;
           cursor: pointer;
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          transition: all 0.2s ease;
+          position: relative;
+          transition: color 0.2s ease;
           white-space: nowrap;
         }
-        .don-v2-tab-btn:hover {
-          background: rgba(255,255,255,0.08);
-          color: #fff;
+        .mbux-tab-link:hover {
+          color: #F1F5F9;
         }
-        .don-v2-tab-btn.active {
-          background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(217,119,6,0.1));
-          color: #fbbf24;
-          border-color: rgba(245,158,11,0.4);
-          box-shadow: 0 4px 15px rgba(245,158,11,0.15);
+        .mbux-tab-link.active {
+          color: #FFFFFF;
+          font-weight: 600;
         }
-        .don-kpi-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-          gap: 16px;
-          margin-bottom: 24px;
+        .mbux-tab-link.active::after {
+          content: '';
+          position: absolute;
+          bottom: -1px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, #E2E8F0, #94A3B8);
+          box-shadow: 0 0 10px rgba(226, 232, 240, 0.5);
+          border-radius: 2px;
         }
-        .don-kpi-card {
-          background: rgba(15,23,42,0.65);
-          border: 1px solid rgba(255,255,255,0.08);
-          backdrop-filter: blur(10px);
+
+        /* GLASSMORPHISM DATA CARDS */
+        .mbux-glass-card {
+          background: rgba(18, 21, 31, 0.65);
+          border: 1px solid rgba(226, 232, 240, 0.09);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
           border-radius: 16px;
-          padding: 18px;
-          display: flex;
-          align-items: center;
-          gap: 14px;
+          transition: border-color 0.2s ease, transform 0.2s ease;
         }
-        .don-kpi-icon {
-          width: 48px;
-          height: 48px;
-          border-radius: 14px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.3rem;
+        .mbux-glass-card:hover {
+          border-color: rgba(226, 232, 240, 0.18);
         }
-        .don-action-btn {
-          border: none;
-          padding: 6px 14px;
-          border-radius: 8px;
+
+        /* CHROME STROKE BUTTON */
+        .mbux-btn-stroke {
+          background: rgba(255, 255, 255, 0.03);
+          color: #F8FAFC;
+          border: 1px solid rgba(226, 232, 240, 0.22);
+          border-radius: 10px;
+          padding: 7px 14px;
           font-size: 0.78rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.2s ease;
+          text-decoration: none;
+        }
+        .mbux-btn-stroke:hover {
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.4);
+          transform: translateY(-1px);
+        }
+
+        .mbux-btn-primary {
+          background: linear-gradient(135deg, #F8FAFC 0%, #CBD5E1 100%);
+          color: #0A0B10;
+          border: none;
+          border-radius: 10px;
+          padding: 8px 18px;
+          font-size: 0.8rem;
           font-weight: 700;
           cursor: pointer;
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          transition: all 0.15s ease;
+          box-shadow: 0 4px 14px rgba(226, 232, 240, 0.15);
+          transition: all 0.2s ease;
         }
-        .don-action-btn:hover {
+        .mbux-btn-primary:hover {
+          background: #FFFFFF;
+          box-shadow: 0 6px 20px rgba(226, 232, 240, 0.25);
           transform: translateY(-1px);
         }
-        /* ISOLATED MODAL (NEVER HANGS, NEVER LOCKS SCROLL) */
-        .don-modal-root {
-          position: fixed;
-          inset: 0;
-          z-index: 100000;
-          background: rgba(4, 7, 13, 0.88);
-          backdrop-filter: blur(12px);
-          display: flex;
+
+        /* FORM INPUTS */
+        .mbux-input {
+          background: rgba(10, 11, 16, 0.6);
+          border: 1px solid rgba(226, 232, 240, 0.14);
+          color: #F8FAFC;
+          border-radius: 10px;
+          padding: 8px 14px;
+          font-size: 0.82rem;
+          outline: none;
+          transition: border-color 0.2s ease;
+        }
+        .mbux-input:focus {
+          border-color: rgba(226, 232, 240, 0.4);
+          box-shadow: 0 0 0 2px rgba(226, 232, 240, 0.08);
+        }
+
+        /* STATUS BADGES */
+        .mbux-badge-success {
+          background: rgba(16, 185, 129, 0.08);
+          color: #34D399;
+          border: 1px solid rgba(16, 185, 129, 0.22);
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 3px 10px;
+          border-radius: 9999px;
+          display: inline-flex;
           align-items: center;
-          justify-content: center;
-          padding: 16px;
+          gap: 5px;
+        }
+        .mbux-badge-pending {
+          background: rgba(217, 119, 6, 0.1);
+          color: #FBBF24;
+          border: 1px solid rgba(217, 119, 6, 0.25);
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 3px 10px;
+          border-radius: 9999px;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+        }
+        .mbux-badge-rejected {
+          background: rgba(244, 63, 94, 0.08);
+          color: #FB7185;
+          border: 1px solid rgba(244, 63, 94, 0.22);
+          font-size: 0.7rem;
+          font-weight: 600;
+          padding: 3px 10px;
+          border-radius: 9999px;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        /* FULLSCREEN BODY PORTAL MODAL (100% VISIBLE, NEVER OFFSCREEN) */
+        .mbux-modal-overlay {
+          position: fixed !important;
+          inset: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          z-index: 9999999 !important;
+          background: rgba(4, 5, 8, 0.88) !important;
+          backdrop-filter: blur(14px) !important;
+          -webkit-backdrop-filter: blur(14px) !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 20px !important;
+          box-sizing: border-box !important;
+        }
+        .mbux-modal-dialog {
+          background: #0D0F18 !important;
+          border: 1px solid rgba(226, 232, 240, 0.16) !important;
+          border-radius: 20px !important;
+          width: 100% !important;
+          max-width: 660px !important;
+          max-height: 88vh !important;
+          display: flex !important;
+          flex-direction: column !important;
+          box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+          overflow: hidden !important;
+          animation: mbuxModalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        @keyframes mbuxModalIn {
+          from { opacity: 0; transform: scale(0.97); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .mbux-modal-header {
+          padding: 20px 24px;
+          border-bottom: 1px solid rgba(226, 232, 240, 0.08);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .mbux-modal-body {
+          padding: 24px;
           overflow-y: auto;
         }
-        .don-modal-box {
-          background: #0b111e;
-          border: 1px solid rgba(255,255,255,0.12);
-          border-radius: 20px;
-          width: 100%;
-          max-width: 640px;
-          box-shadow: 0 25px 60px rgba(0,0,0,0.85);
-          overflow: hidden;
-          animation: donModalPop 0.2s ease-out;
-        }
-        @keyframes donModalPop {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
+        .mbux-modal-footer {
+          padding: 16px 24px;
+          border-top: 1px solid rgba(226, 232, 240, 0.08);
+          background: rgba(10, 11, 16, 0.5);
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
         }
       `;
       document.head.appendChild(st);
     },
 
-    // ─── RENDER MAIN SHELL ───────────────────────────────────────────────────
+    // ─── RENDER MAIN INTERFACE ───────────────────────────────────────────────
     renderModuleUI() {
       const container = document.getElementById('admin-tab-m7_donation');
-      if (!container) {
-        console.error('[DonationManager] Target #admin-tab-m7_donation not found!');
-        return;
-      }
+      if (!container) return;
 
       container.innerHTML = `
-        <div class="don-v2-container" style="padding: 10px 4px 30px;">
+        <div class="mbux-root" style="padding: 12px 6px 36px;">
           <!-- HEADER -->
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
             <div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:1.6rem;">❤️</span>
-                <h2 style="margin:0; font-size:1.4rem; font-weight:800; background:linear-gradient(135deg,#fff,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
-                  Manajemen Donasi & Filantropi
-                </h2>
-                <span style="font-size:0.7rem; background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); padding:3px 8px; border-radius:9999px; font-weight:700;">
-                  OFFICIAL ENGINE V2
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
+                <h1 class="mbux-chrome-text" style="margin:0; font-size:1.5rem; font-weight:700; letter-spacing:-0.02em;">
+                  Manajemen Donasi &amp; Filantropi
+                </h1>
+                <span style="font-family:monospace; font-size:0.65rem; color:#CBD5E1; border:1px solid rgba(226,232,240,0.2); background:rgba(255,255,255,0.03); padding:3px 8px; border-radius:6px; letter-spacing:0.08em; text-transform:uppercase;">
+                  MBUX CORE // V3
                 </span>
               </div>
-              <p style="margin:6px 0 0; font-size:0.82rem; color:#94a3b8;">
-                Verifikasi bukti transfer donatur, otomatisasi kenaikan Tier Keanggotaan, penerbitan Digital Receipt resmi, dan monitoring program sosial MB INA.
+              <p style="margin:0; font-size:0.82rem; color:#94A3B8; max-width:760px; line-height:1.5;">
+                Pusat verifikasi bukti transfer donasi, penyesuaian otomatis Tier Keanggotaan, penerbitan Digital Receipt resmi, dan monitoring program sosial Mercedes-Benz Club Indonesia.
               </p>
             </div>
-            <div style="display:flex; gap:8px;">
-              <button type="button" class="don-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1);" onclick="window.DonationManager.syncAllMemberTiers(true)">
-                <span>🔄 Sinkronisasi Tier</span>
+            <div>
+              <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.syncAllMemberTiers(true)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                <span>Sinkronisasi Tier Anggota</span>
               </button>
             </div>
           </div>
 
-          <!-- SUBTABS BAR -->
-          <div class="don-v2-nav-tabs">
-            <button class="don-v2-tab-btn ${this.activeSubtab === 'monitoring' ? 'active' : ''}" onclick="window.DonationManager.switchTab('monitoring')">
-              <span>📊 Progress &amp; Monitoring Donasi</span>
+          <!-- FLAT LUXURY TABS -->
+          <div class="mbux-tab-bar">
+            <button class="mbux-tab-link ${this.activeSubtab === 'monitoring' ? 'active' : ''}" onclick="window.DonationManager.switchTab('monitoring')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              <span>Progress &amp; Monitoring</span>
             </button>
-            <button class="don-v2-tab-btn ${this.activeSubtab === 'campaign_form' ? 'active' : ''}" onclick="window.DonationManager.switchTab('campaign_form')">
-              <span>➕ Buat Program Donasi Baru</span>
+            <button class="mbux-tab-link ${this.activeSubtab === 'campaign_form' ? 'active' : ''}" onclick="window.DonationManager.switchTab('campaign_form')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+              <span>Buat Program Baru</span>
             </button>
-            <button class="don-v2-tab-btn ${this.activeSubtab === 'receipts' ? 'active' : ''}" onclick="window.DonationManager.switchTab('receipts')">
-              <span>🧾 Log Digital Receipt (${this.data.receipts.length})</span>
+            <button class="mbux-tab-link ${this.activeSubtab === 'receipts' ? 'active' : ''}" onclick="window.DonationManager.switchTab('receipts')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+              <span>Log Digital Receipt (${this.data.receipts.length})</span>
             </button>
-            <button class="don-v2-tab-btn ${this.activeSubtab === 'tier_matrix' ? 'active' : ''}" onclick="window.DonationManager.switchTab('tier_matrix')">
-              <span>🏅 Matriks Tier &amp; Status Anggota</span>
+            <button class="mbux-tab-link ${this.activeSubtab === 'tier_matrix' ? 'active' : ''}" onclick="window.DonationManager.switchTab('tier_matrix')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+              <span>Matriks Tier &amp; Status Anggota</span>
             </button>
           </div>
 
-          <!-- TAB CONTENT CONTAINER -->
-          <div id="don-v2-tab-body"></div>
+          <!-- ACTIVE CONTENT SHELL -->
+          <div id="mbux-tab-content"></div>
         </div>
-
-        <!-- ISOLATED MODALS MOUNT POINT -->
-        <div id="don-v2-modal-mount"></div>
       `;
 
       this.renderActiveSubtab();
@@ -409,30 +499,29 @@
 
     switchTab(tabKey) {
       this.activeSubtab = tabKey;
-      document.querySelectorAll('.don-v2-tab-btn').forEach(btn => {
+      document.querySelectorAll('.mbux-tab-link').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${tabKey}'`));
       });
       this.renderActiveSubtab();
     },
 
     renderActiveSubtab() {
-      const body = document.getElementById('don-v2-tab-body');
-      if (!body) return;
+      const container = document.getElementById('mbux-tab-content');
+      if (!container) return;
 
       if (this.activeSubtab === 'monitoring') {
-        this.renderMonitoringTab(body);
+        this.renderMonitoringTab(container);
       } else if (this.activeSubtab === 'campaign_form') {
-        this.renderCampaignFormTab(body);
+        this.renderCampaignFormTab(container);
       } else if (this.activeSubtab === 'receipts') {
-        this.renderReceiptsLogTab(body);
+        this.renderReceiptsLogTab(container);
       } else if (this.activeSubtab === 'tier_matrix') {
-        this.renderTierMatrixTab(body);
+        this.renderTierMatrixTab(container);
       }
     },
 
-    // ─── TAB 1: MONITORING & DAFTAR DONATUR ───────────────────────────────────
+    // ─── TAB 1: MONITORING & DAFTAR TRANSAKSI (MBUX STYLE) ───────────────────
     renderMonitoringTab(container) {
-      // Hitung KPI
       let totalCollected = 0;
       let pendingCount = 0;
       let successCount = 0;
@@ -448,7 +537,6 @@
         }
       });
 
-      // Filtered Donors List
       let filtered = [...this.data.donations];
       if (this.filterCampaign !== 'ALL') {
         filtered = filtered.filter(d => d.campaign_id === this.filterCampaign);
@@ -466,73 +554,104 @@
       }
 
       container.innerHTML = `
-        <!-- KPI METRICS -->
-        <div class="don-kpi-grid">
-          <div class="don-kpi-card">
-            <div class="don-kpi-icon" style="background:rgba(16,185,129,0.15); color:#34d399;">💰</div>
-            <div>
-              <div style="font-size:0.75rem; color:#94a3b8; font-weight:600; text-transform:uppercase;">Dana Terkumpul</div>
-              <div style="font-size:1.3rem; font-weight:800; color:#34d399; font-family:monospace;">Rp ${totalCollected.toLocaleString('id-ID')}</div>
+        <!-- KPI CARDS (DATA TILES) -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:28px;">
+          <!-- Tile 1 -->
+          <div class="mbux-glass-card" style="padding:20px 22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Dana Terkumpul</span>
+              <div style="color:#CBD5E1;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
             </div>
+            <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
+              Rp ${totalCollected.toLocaleString('id-ID')}
+            </div>
+            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">${successCount} transaksi terverifikasi</div>
           </div>
-          <div class="don-kpi-card">
-            <div class="don-kpi-icon" style="background:rgba(245,158,11,0.15); color:#fbbf24;">⏳</div>
-            <div>
-              <div style="font-size:0.75rem; color:#94a3b8; font-weight:600; text-transform:uppercase;">Menunggu Verifikasi</div>
-              <div style="font-size:1.3rem; font-weight:800; color:#fbbf24; font-family:monospace;">${pendingCount} Transaksi</div>
+
+          <!-- Tile 2 -->
+          <div class="mbux-glass-card" style="padding:20px 22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Menunggu Verifikasi</span>
+              <div style="color:#FBBF24;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
             </div>
+            <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
+              ${pendingCount}
+            </div>
+            <div style="font-size:0.72rem; color:#94A3B8; margin-top:4px;">Struk menunggu peninjauan</div>
           </div>
-          <div class="don-kpi-card">
-            <div class="don-kpi-icon" style="background:rgba(56,189,248,0.15); color:#38bdf8;">👥</div>
-            <div>
-              <div style="font-size:0.75rem; color:#94a3b8; font-weight:600; text-transform:uppercase;">Total Donatur</div>
-              <div style="font-size:1.3rem; font-weight:800; color:#ffffff; font-family:monospace;">${donorSet.size} Anggota</div>
+
+          <!-- Tile 3 -->
+          <div class="mbux-glass-card" style="padding:20px 22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Total Donatur</span>
+              <div style="color:#CBD5E1;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
             </div>
+            <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
+              ${donorSet.size}
+            </div>
+            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">Anggota terdaftar</div>
           </div>
-          <div class="don-kpi-card">
-            <div class="don-kpi-icon" style="background:rgba(168,85,247,0.15); color:#c084fc;">🎯</div>
-            <div>
-              <div style="font-size:0.75rem; color:#94a3b8; font-weight:600; text-transform:uppercase;">Program Aktif</div>
-              <div style="font-size:1.3rem; font-weight:800; color:#ffffff; font-family:monospace;">${this.data.campaigns.filter(c => c.is_active !== false).length} Campaign</div>
+
+          <!-- Tile 4 -->
+          <div class="mbux-glass-card" style="padding:20px 22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Program Aktif</span>
+              <div style="color:#CBD5E1;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              </div>
             </div>
+            <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
+              ${this.data.campaigns.filter(c => c.is_active !== false).length}
+            </div>
+            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">Inisiatif baksos nasional</div>
           </div>
         </div>
 
-        <!-- CAMPAIGN CARDS -->
-        <div style="margin-bottom:28px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h4 style="margin:0; font-size:1rem; color:#fbbf24; display:flex; align-items:center; gap:8px;">
-              <span>🎯</span> PROGRAM DONASI AKTIF
-            </h4>
-            <button type="button" class="don-action-btn" style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3);" onclick="window.DonationManager.switchTab('campaign_form')">
-              <span>+ Buat Program Baru</span>
+        <!-- SECTION: PROGRAM DONASI AKTIF -->
+        <div style="margin-bottom:32px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h2 style="margin:0; font-size:0.95rem; font-weight:600; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
+              <span>Program Donasi Aktif</span>
+            </h2>
+            <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.switchTab('campaign_form')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Buat Program Baru</span>
             </button>
           </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:18px;">
             ${this.data.campaigns.map(c => {
               const col = Number(c.collected_amount || 0);
               const tar = Number(c.target_amount || 1);
               const pct = Math.min(100, Math.round((col / tar) * 100));
               return `
-                <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:18px; display:flex; flex-direction:column; justify-content:space-between;">
+                <div class="mbux-glass-card" style="padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
                   <div>
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px;">
-                      <h4 style="margin:0; font-size:0.95rem; font-weight:700; color:#fff;">${c.title}</h4>
-                      <span style="font-size:0.68rem; padding:2px 8px; border-radius:9999px; font-weight:700; background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);">AKTIF</span>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;">
+                      <h3 style="margin:0; font-size:1rem; font-weight:600; color:#F8FAFC; line-height:1.4;">${c.title}</h3>
+                      <span class="mbux-badge-success">AKTIF</span>
                     </div>
-                    <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 14px; line-height:1.5;">${c.description || '-'}</p>
+                    <p style="font-size:0.8rem; color:#94A3B8; margin:0 0 16px; line-height:1.5;">${c.description || '-'}</p>
                   </div>
                   <div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:6px;">
-                      <span style="color:#94a3b8;">Terkumpul: <strong style="color:#34d399;">Rp ${col.toLocaleString('id-ID')}</strong></span>
-                      <span style="color:#cbd5e1;">Target: Rp ${tar.toLocaleString('id-ID')}</span>
+                    <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:8px;">
+                      <span style="color:#94A3B8;">Terkumpul: <strong style="color:#FFFFFF; font-family:monospace;">Rp ${col.toLocaleString('id-ID')}</strong></span>
+                      <span style="color:#64748B;">Target: <span style="font-family:monospace; color:#CBD5E1;">Rp ${tar.toLocaleString('id-ID')}</span></span>
                     </div>
-                    <div style="height:8px; background:rgba(255,255,255,0.06); border-radius:9999px; overflow:hidden; margin-bottom:8px;">
-                      <div style="height:100%; width:${pct}%; background:linear-gradient(90deg, #f59e0b, #10b981); border-radius:9999px;"></div>
+                    <!-- MERCEDES CHROME GRADIENT PROGRESS BAR -->
+                    <div style="height:6px; background:rgba(255,255,255,0.06); border-radius:9999px; overflow:hidden; margin-bottom:8px;">
+                      <div style="height:100%; width:${pct}%; background:linear-gradient(90deg, #94A3B8, #F8FAFC); border-radius:9999px; box-shadow:0 0 8px rgba(248,250,252,0.4);"></div>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:#94a3b8;">
-                      <span>Progres Capaian: <strong style="color:#fbbf24;">${pct}%</strong></span>
-                      <span>Periode: s/d ${c.end_date || '2026'}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:#64748B;">
+                      <span>Capaian: <strong style="color:#F8FAFC;">${pct}%</strong></span>
+                      <span>Periode s/d: ${c.end_date || '2026'}</span>
                     </div>
                   </div>
                 </div>
@@ -541,71 +660,77 @@
           </div>
         </div>
 
-        <!-- DONOR LIST & VERIFICATION TABLE -->
-        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px;">
-          <!-- FILTER & SEARCH BAR -->
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+        <!-- SECTION: TABEL DAFTAR TRANSAKSI -->
+        <div class="mbux-glass-card" style="padding:22px;">
+          <!-- FILTER & SEARCH HEADER -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px;">
             <div>
-              <h4 style="margin:0; font-size:1.05rem; font-weight:800; color:#fbbf24; display:flex; align-items:center; gap:8px;">
-                <span>👥</span> DAFTAR TRANSAKSI &amp; VERIFIKASI DONATUR
-              </h4>
-              <p style="margin:3px 0 0; font-size:0.75rem; color:#94a3b8;">
-                Klik tombol <strong>Periksa Bukti</strong> untuk meninjau bukti transfer sebelum menyetujui transaksi donasi.
+              <h2 style="margin:0; font-size:0.95rem; font-weight:600; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span>Daftar Transaksi Donasi</span>
+              </h2>
+              <p style="margin:4px 0 0; font-size:0.75rem; color:#64748B;">
+                Pemeriksaan bukti transfer wajib dilakukan sebelum persetujuan transaksi dan pembaruan Tier Anggota.
               </p>
             </div>
 
             <!-- CONTROLS -->
-            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
               <!-- Search -->
-              <input type="text" placeholder="🔍 Cari nama/ID..." value="${this.searchQuery}"
-                oninput="window.DonationManager.handleSearch(this.value)"
-                style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.12); color:#fff; padding:6px 12px; border-radius:8px; font-size:0.78rem; width:150px;">
-              
-              <!-- Filter Campaign -->
-              <select onchange="window.DonationManager.handleCampaignFilter(this.value)"
-                style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); color:#fbbf24; padding:6px 10px; border-radius:8px; font-size:0.78rem; font-weight:600;">
+              <div style="position:relative;">
+                <input type="text" class="mbux-input" placeholder="Cari nama / ID..." value="${this.searchQuery}"
+                  oninput="window.DonationManager.handleSearch(this.value)"
+                  style="padding-left:32px; width:160px;">
+                <div style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#64748B; pointer-events:none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+              </div>
+
+              <!-- Filter Program -->
+              <select class="mbux-input" onchange="window.DonationManager.handleCampaignFilter(this.value)" style="font-weight:500;">
                 <option value="ALL" ${this.filterCampaign === 'ALL' ? 'selected' : ''}>Semua Program</option>
                 ${this.data.campaigns.map(c => `<option value="${c.id}" ${this.filterCampaign === c.id ? 'selected' : ''}>${c.title}</option>`).join('')}
               </select>
 
               <!-- Filter Status -->
-              <select onchange="window.DonationManager.handleStatusFilter(this.value)"
-                style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); color:#fff; padding:6px 10px; border-radius:8px; font-size:0.78rem;">
+              <select class="mbux-input" onchange="window.DonationManager.handleStatusFilter(this.value)">
                 <option value="ALL" ${this.filterStatus === 'ALL' ? 'selected' : ''}>Semua Status</option>
-                <option value="PENDING" ${this.filterStatus === 'PENDING' ? 'selected' : ''}>⏳ Pending</option>
-                <option value="SUCCESS" ${this.filterStatus === 'SUCCESS' ? 'selected' : ''}>✅ Success</option>
-                <option value="REJECTED" ${this.filterStatus === 'REJECTED' ? 'selected' : ''}>❌ Rejected</option>
+                <option value="PENDING" ${this.filterStatus === 'PENDING' ? 'selected' : ''}>Menunggu (Pending)</option>
+                <option value="SUCCESS" ${this.filterStatus === 'SUCCESS' ? 'selected' : ''}>Berhasil (Success)</option>
+                <option value="REJECTED" ${this.filterStatus === 'REJECTED' ? 'selected' : ''}>Ditolak (Rejected)</option>
               </select>
 
-              <!-- Export -->
-              <button type="button" class="don-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1);" onclick="window.DonationManager.exportExcel()">
-                <span>📤 Excel</span>
+              <!-- Exports -->
+              <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.exportExcel()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Excel</span>
               </button>
-              <button type="button" class="don-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1);" onclick="window.DonationManager.exportPdf()">
-                <span>📄 PDF</span>
+              <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.exportPdf()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                <span>PDF</span>
               </button>
             </div>
           </div>
 
           <!-- TABLE -->
           <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; font-size:0.82rem; min-width:850px;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.82rem; min-width:880px;">
               <thead>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#94a3b8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em;">
+                <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em;">
                   <th style="padding:12px 10px; text-align:center; width:40px;">No</th>
                   <th style="padding:12px 10px; text-align:left;">Kode Trx</th>
                   <th style="padding:12px 10px; text-align:left;">Donatur &amp; Member ID</th>
-                  <th style="padding:12px 10px; text-align:left;">Program Donasi</th>
+                  <th style="padding:12px 10px; text-align:left;">Program</th>
                   <th style="padding:12px 10px; text-align:right;">Nominal (Rp)</th>
                   <th style="padding:12px 10px; text-align:center;">Metode</th>
                   <th style="padding:12px 10px; text-align:center;">Status</th>
-                  <th style="padding:12px 10px; text-align:center; width:170px;">Aksi Verifikasi</th>
+                  <th style="padding:12px 10px; text-align:center; width:180px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 ${filtered.length === 0 ? `
                   <tr>
-                    <td colspan="8" style="text-align:center; padding:36px; color:#64748b;">
+                    <td colspan="8" style="text-align:center; padding:38px; color:#64748B;">
                       Tidak ada transaksi donasi yang sesuai kriteria pencarian.
                     </td>
                   </tr>
@@ -615,73 +740,66 @@
                   const isSuccess = d.status === 'SUCCESS' || d.status === 'CONFIRMED';
                   const isRejected = d.status === 'REJECTED';
 
-                  // Status badge pill
                   let badgeHtml = '';
                   if (isSuccess) {
-                    badgeHtml = `<span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); font-size:0.72rem; padding:3px 10px; border-radius:9999px; font-weight:700;">✅ SUCCESS</span>`;
+                    badgeHtml = `<span class="mbux-badge-success">SUCCESS</span>`;
                   } else if (isRejected) {
-                    badgeHtml = `<span style="background:rgba(244,63,94,0.15); color:#fb7185; border:1px solid rgba(244,63,94,0.3); font-size:0.72rem; padding:3px 10px; border-radius:9999px; font-weight:700;">❌ REJECTED</span>`;
+                    badgeHtml = `<span class="mbux-badge-rejected">REJECTED</span>`;
                   } else {
-                    badgeHtml = `<span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-size:0.72rem; padding:3px 10px; border-radius:9999px; font-weight:700;">⏳ PENDING</span>`;
+                    badgeHtml = `<span class="mbux-badge-pending">PENDING</span>`;
                   }
 
-                  // Action Buttons:
-                  // 1. PENDING: Wajib 'Periksa Bukti' (membuka modal verifikasi berisi foto bukti transfer)
-                  // 2. SUCCESS: 'Bukti' dan 'Kwitansi'
-                  // 3. REJECTED: Hanya 'Lihat Bukti' (tanpa opsi approve)
                   let actionHtml = '';
                   if (isPending) {
                     actionHtml = `
-                      <button type="button" class="don-action-btn"
-                        style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; font-weight:800; box-shadow:0 2px 8px rgba(245,158,11,0.25);"
-                        onclick="window.DonationManager.openVerifyModal('${d.id}')"
-                        title="Tinjau Bukti Transfer untuk verifikasi">
-                        <span>🔍 Periksa Bukti</span>
+                      <button type="button" class="mbux-btn-stroke"
+                        style="border-color:rgba(226,232,240,0.35); background:rgba(255,255,255,0.06);"
+                        onclick="window.DonationManager.openVerifyModal('${d.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <span>Periksa Bukti</span>
                       </button>
                     `;
                   } else if (isSuccess) {
                     actionHtml = `
                       <div style="display:flex; gap:6px; justify-content:center;">
-                        <button type="button" class="don-action-btn"
-                          style="background:rgba(255,255,255,0.05); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1);"
-                          onclick="window.DonationManager.openVerifyModal('${d.id}')"
-                          title="Lihat Bukti Transfer">
-                          <span>👁️ Bukti</span>
+                        <button type="button" class="mbux-btn-stroke"
+                          onclick="window.DonationManager.openVerifyModal('${d.id}')" title="Tinjau Bukti">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                          <span>Bukti</span>
                         </button>
-                        <button type="button" class="don-action-btn"
-                          style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);"
-                          onclick="window.DonationManager.openReceiptModalByDonation('${d.id}')"
-                          title="Buka Digital Receipt Resmi">
-                          <span>🧾 Kwitansi</span>
+                        <button type="button" class="mbux-btn-stroke"
+                          onclick="window.DonationManager.openReceiptModalByDonation('${d.id}')" title="Lihat Digital Receipt">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+                          <span>Kwitansi</span>
                         </button>
                       </div>
                     `;
                   } else {
                     actionHtml = `
-                      <button type="button" class="don-action-btn"
-                        style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.25);"
-                        onclick="window.DonationManager.openVerifyModal('${d.id}')"
-                        title="Lihat Bukti Transfer (Ditolak)">
-                        <span>👁️ Lihat Bukti</span>
+                      <button type="button" class="mbux-btn-stroke"
+                        style="color:#CBD5E1;"
+                        onclick="window.DonationManager.openVerifyModal('${d.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Lihat Bukti</span>
                       </button>
                     `;
                   }
 
                   return `
-                    <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
-                      <td style="padding:12px 10px; text-align:center; color:#64748b; font-family:monospace;">${idx + 1}</td>
-                      <td style="padding:12px 10px; font-family:monospace; color:#94a3b8; font-size:0.75rem;">${d.trx_code || d.id}</td>
-                      <td style="padding:12px 10px;">
-                        <div style="font-weight:700; color:#fff;">${d.donor_name || 'Hamba Allah'}</div>
-                        <div style="font-size:0.72rem; color:#fbbf24; font-family:monospace;">${d.member_id || 'Non-Member'}</div>
+                    <tr style="border-bottom:1px solid rgba(226,232,240,0.05); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                      <td style="padding:14px 10px; text-align:center; color:#64748B; font-family:monospace;">${idx + 1}</td>
+                      <td style="padding:14px 10px; font-family:monospace; color:#94A3B8; font-size:0.75rem;">${d.trx_code || d.id}</td>
+                      <td style="padding:14px 10px;">
+                        <div style="font-weight:600; color:#FFFFFF;">${d.donor_name || 'Hamba Allah'}</div>
+                        <div style="font-size:0.72rem; color:#CBD5E1; font-family:monospace;">${d.member_id || '-'}</div>
                       </td>
-                      <td style="padding:12px 10px; color:#cbd5e1; font-size:0.78rem;">${camp.title || d.campaign_id}</td>
-                      <td style="padding:12px 10px; text-align:right; font-family:monospace; font-weight:700; color:#34d399; font-size:0.88rem;">
+                      <td style="padding:14px 10px; color:#CBD5E1; font-size:0.78rem;">${camp.title || d.campaign_id}</td>
+                      <td style="padding:14px 10px; text-align:right; font-family:monospace; font-weight:700; color:#FFFFFF; font-size:0.9rem;">
                         Rp ${Number(d.amount || 0).toLocaleString('id-ID')}
                       </td>
-                      <td style="padding:12px 10px; text-align:center; font-size:0.75rem; color:#38bdf8; font-weight:600;">${d.payment_method || 'TRANSFER'}</td>
-                      <td style="padding:12px 10px; text-align:center;">${badgeHtml}</td>
-                      <td style="padding:12px 10px; text-align:center;">${actionHtml}</td>
+                      <td style="padding:14px 10px; text-align:center; font-size:0.75rem; color:#CBD5E1; font-weight:500;">${d.payment_method || 'TRANSFER'}</td>
+                      <td style="padding:14px 10px; text-align:center;">${badgeHtml}</td>
+                      <td style="padding:14px 10px; text-align:center;">${actionHtml}</td>
                     </tr>
                   `;
                 }).join('')}
@@ -694,75 +812,72 @@
 
     handleSearch(val) {
       this.searchQuery = val;
-      const body = document.getElementById('don-v2-tab-body');
-      if (body) this.renderMonitoringTab(body);
+      const container = document.getElementById('mbux-tab-content');
+      if (container) this.renderMonitoringTab(container);
     },
 
     handleCampaignFilter(val) {
       this.filterCampaign = val;
-      const body = document.getElementById('don-v2-tab-body');
-      if (body) this.renderMonitoringTab(body);
+      const container = document.getElementById('mbux-tab-content');
+      if (container) this.renderMonitoringTab(container);
     },
 
     handleStatusFilter(val) {
       this.filterStatus = val;
-      const body = document.getElementById('don-v2-tab-body');
-      if (body) this.renderMonitoringTab(body);
+      const container = document.getElementById('mbux-tab-content');
+      if (container) this.renderMonitoringTab(container);
     },
 
     // ─── TAB 2: BUAT PROGRAM DONASI BARU ─────────────────────────────────────
     renderCampaignFormTab(container) {
       container.innerHTML = `
-        <div style="max-width:720px; margin:0 auto; background:rgba(15,23,42,0.7); border:1px solid rgba(245,158,11,0.3); border-radius:20px; padding:28px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
-            <h3 style="margin:0; font-size:1.15rem; color:#fbbf24; display:flex; align-items:center; gap:8px;">
-              <span>➕</span> BUAT PROGRAM DONASI BARU
-            </h3>
-            <button type="button" class="don-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1;" onclick="window.DonationManager.switchTab('monitoring')">✕ Batal</button>
+        <div class="mbux-glass-card" style="max-width:720px; margin:0 auto; padding:28px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:14px;">
+            <h2 style="margin:0; font-size:1.1rem; font-weight:700; color:#F8FAFC; display:flex; align-items:center; gap:8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+              <span>Buat Program Donasi Baru</span>
+            </h2>
+            <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.switchTab('monitoring')">Batal</button>
           </div>
 
-          <form id="don-create-campaign-form" onsubmit="window.DonationManager.handleCreateCampaign(event)">
-            <div style="margin-bottom:16px;">
-              <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">Judul Program Donasi *</label>
-              <input type="text" id="new-camp-title" required placeholder="Contoh: Donasi MB INA Peduli Gempa & Bencana 2026"
-                style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); color:#fff; padding:10px 14px; border-radius:10px; font-size:0.85rem;">
+          <form onsubmit="window.DonationManager.handleCreateCampaign(event)">
+            <div style="margin-bottom:18px;">
+              <label style="display:block; font-size:0.75rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Judul Program *</label>
+              <input type="text" id="mbux-camp-title" class="mbux-input" required placeholder="Contoh: Donasi MB INA Peduli Gempa & Bencana 2026" style="width:100%; box-sizing:border-box;">
             </div>
 
-            <div style="margin-bottom:16px;">
-              <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">Deskripsi &amp; Tujuan Program *</label>
-              <textarea id="new-camp-desc" rows="3" required placeholder="Jelaskan peruntukan donasi dan sasaran penerima manfaat secara transparan..."
-                style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); color:#fff; padding:10px 14px; border-radius:10px; font-size:0.85rem;"></textarea>
+            <div style="margin-bottom:18px;">
+              <label style="display:block; font-size:0.75rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Deskripsi &amp; Sasaran Donasi *</label>
+              <textarea id="mbux-camp-desc" class="mbux-input" rows="3" required placeholder="Jelaskan tujuan penyaluran bantuan sosial secara komprehensif..." style="width:100%; box-sizing:border-box;"></textarea>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:18px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px;">
               <div>
-                <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">Target Dana (Rp) *</label>
-                <input type="number" id="new-camp-target" min="500000" step="500000" required value="25000000"
-                  style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.4); border:1px solid rgba(245,158,11,0.4); color:#fbbf24; padding:10px 14px; border-radius:10px; font-size:0.9rem; font-weight:700; font-family:monospace;">
+                <label style="display:block; font-size:0.75rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Target Dana (Rp) *</label>
+                <input type="number" id="mbux-camp-target" class="mbux-input" min="500000" step="500000" required value="25000000" style="width:100%; box-sizing:border-box; font-family:monospace; font-weight:700;">
               </div>
               <div>
-                <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">Tanggal Mulai *</label>
-                <input type="date" id="new-camp-start" required value="${new Date().toISOString().slice(0,10)}"
-                  style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); color:#fff; padding:10px 14px; border-radius:10px; font-size:0.85rem;">
+                <label style="display:block; font-size:0.75rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Tanggal Mulai *</label>
+                <input type="date" id="mbux-camp-start" class="mbux-input" required value="${new Date().toISOString().slice(0,10)}" style="width:100%; box-sizing:border-box;">
               </div>
               <div>
-                <label style="display:block; font-size:0.75rem; font-weight:700; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">Tanggal Berakhir *</label>
-                <input type="date" id="new-camp-end" required value="2026-12-31"
-                  style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); color:#fff; padding:10px 14px; border-radius:10px; font-size:0.85rem;">
+                <label style="display:block; font-size:0.75rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Tanggal Berakhir *</label>
+                <input type="date" id="mbux-camp-end" class="mbux-input" required value="2026-12-31" style="width:100%; box-sizing:border-box;">
               </div>
             </div>
 
-            <div style="margin-bottom:24px;">
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#34d399; font-size:0.85rem; font-weight:700;">
-                <input type="checkbox" id="new-camp-active" checked style="width:18px; height:18px; accent-color:#10b981;">
-                <span>Publikasikan &amp; Aktifkan Segera untuk Menerima Donasi</span>
+            <div style="margin-bottom:26px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#CBD5E1; font-size:0.82rem; font-weight:500;">
+                <input type="checkbox" id="mbux-camp-active" checked style="width:16px; height:16px; accent-color:#E2E8F0;">
+                <span>Aktifkan dan publikasikan program ini di portal donasi anggota</span>
               </label>
             </div>
 
-            <div style="display:flex; justify-content:flex-end; gap:10px;">
-              <button type="button" class="don-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1;" onclick="window.DonationManager.switchTab('monitoring')">Batal</button>
-              <button type="submit" class="don-action-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; padding:10px 24px; font-size:0.88rem; font-weight:800;">
-                💾 Simpan &amp; Rilis Program
+            <div style="display:flex; justify-content:flex-end; gap:12px;">
+              <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.switchTab('monitoring')">Batal</button>
+              <button type="submit" class="mbux-btn-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <span>Simpan Program</span>
               </button>
             </div>
           </form>
@@ -772,12 +887,12 @@
 
     handleCreateCampaign(e) {
       e.preventDefault();
-      const title = document.getElementById('new-camp-title').value.trim();
-      const desc  = document.getElementById('new-camp-desc').value.trim();
-      const target= parseFloat(document.getElementById('new-camp-target').value) || 0;
-      const start = document.getElementById('new-camp-start').value;
-      const end   = document.getElementById('new-camp-end').value;
-      const active= document.getElementById('new-camp-active').checked;
+      const title = document.getElementById('mbux-camp-title').value.trim();
+      const desc  = document.getElementById('mbux-camp-desc').value.trim();
+      const target= parseFloat(document.getElementById('mbux-camp-target').value) || 0;
+      const start = document.getElementById('mbux-camp-start').value;
+      const end   = document.getElementById('mbux-camp-end').value;
+      const active= document.getElementById('mbux-camp-active').checked;
 
       const newC = {
         id: 'camp_' + Date.now(),
@@ -792,21 +907,22 @@
 
       this.data.campaigns.unshift(newC);
       this.saveStoredData();
-      this.notifyToast(`✅ Program Donasi '${title}' berhasil dibuat!`, 'success');
+      this.notifyToast(`Program donasi '${title}' berhasil disimpan.`, 'success');
       this.switchTab('monitoring');
     },
 
     // ─── TAB 3: LOG DIGITAL RECEIPT ──────────────────────────────────────────
     renderReceiptsLogTab(container) {
       container.innerHTML = `
-        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+        <div class="mbux-glass-card" style="padding:22px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
             <div>
-              <h4 style="margin:0; font-size:1.05rem; font-weight:800; color:#fbbf24; display:flex; align-items:center; gap:8px;">
-                <span>🧾</span> LOG DIGITAL RECEIPT RESMI
-              </h4>
-              <p style="margin:3px 0 0; font-size:0.75rem; color:#94a3b8;">
-                Arsip kuitansi digital resmi ber-QR dan stempel MB Club Indonesia yang diterbitkan otomatis saat donasi disetujui.
+              <h2 style="margin:0; font-size:0.95rem; font-weight:600; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+                <span>Arsip Digital Receipt Resmi</span>
+              </h2>
+              <p style="margin:4px 0 0; font-size:0.75rem; color:#64748B;">
+                Setiap transaksi yang diverifikasi sukses secara otomatis menerbitkan dokumen tanda terima digital resmi berstandar Mercedes-Benz Club Indonesia.
               </p>
             </div>
           </div>
@@ -814,33 +930,34 @@
           <div style="overflow-x:auto;">
             <table style="width:100%; border-collapse:collapse; font-size:0.82rem; min-width:800px;">
               <thead>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#94a3b8; font-size:0.72rem; text-transform:uppercase;">
+                <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em;">
                   <th style="padding:12px 10px; text-align:center; width:40px;">No</th>
                   <th style="padding:12px 10px; text-align:left;">No. Receipt</th>
                   <th style="padding:12px 10px; text-align:left;">Donatur</th>
-                  <th style="padding:12px 10px; text-align:left;">Program</th>
+                  <th style="padding:12px 10px; text-align:left;">Alokasi Program</th>
                   <th style="padding:12px 10px; text-align:right;">Nominal</th>
-                  <th style="padding:12px 10px; text-align:center;">Tanggal Terbit</th>
-                  <th style="padding:12px 10px; text-align:center; width:120px;">Aksi</th>
+                  <th style="padding:12px 10px; text-align:center;">Waktu Terbit</th>
+                  <th style="padding:12px 10px; text-align:center; width:130px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 ${this.data.receipts.length === 0 ? `
-                  <tr><td colspan="7" style="text-align:center; padding:30px; color:#64748b;">Belum ada kuitansi yang diterbitkan.</td></tr>
+                  <tr><td colspan="7" style="text-align:center; padding:32px; color:#64748B;">Belum ada arsip Digital Receipt yang diterbitkan.</td></tr>
                 ` : this.data.receipts.map((r, idx) => `
-                  <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                    <td style="padding:12px 10px; text-align:center; color:#64748b; font-family:monospace;">${idx + 1}</td>
-                    <td style="padding:12px 10px; font-family:monospace; color:#fbbf24; font-weight:700;">${r.receipt_number}</td>
+                  <tr style="border-bottom:1px solid rgba(226,232,240,0.05);">
+                    <td style="padding:12px 10px; text-align:center; color:#64748B; font-family:monospace;">${idx + 1}</td>
+                    <td style="padding:12px 10px; font-family:monospace; color:#CBD5E1; font-weight:600;">${r.receipt_number}</td>
                     <td style="padding:12px 10px;">
-                      <div style="font-weight:700; color:#fff;">${r.donor_name}</div>
-                      <div style="font-size:0.72rem; color:#94a3b8; font-family:monospace;">${r.member_id || '-'}</div>
+                      <div style="font-weight:600; color:#FFFFFF;">${r.donor_name}</div>
+                      <div style="font-size:0.72rem; color:#94A3B8; font-family:monospace;">${r.member_id || '-'}</div>
                     </td>
-                    <td style="padding:12px 10px; color:#cbd5e1; font-size:0.78rem;">${r.campaign_title || '-'}</td>
-                    <td style="padding:12px 10px; text-align:right; font-family:monospace; color:#34d399; font-weight:700;">Rp ${Number(r.amount || 0).toLocaleString('id-ID')}</td>
-                    <td style="padding:12px 10px; text-align:center; color:#94a3b8; font-size:0.75rem;">${r.created_at}</td>
+                    <td style="padding:12px 10px; color:#CBD5E1; font-size:0.78rem;">${r.campaign_title || '-'}</td>
+                    <td style="padding:12px 10px; text-align:right; font-family:monospace; color:#FFFFFF; font-weight:700;">Rp ${Number(r.amount || 0).toLocaleString('id-ID')}</td>
+                    <td style="padding:12px 10px; text-align:center; color:#94A3B8; font-size:0.75rem;">${r.created_at}</td>
                     <td style="padding:12px 10px; text-align:center;">
-                      <button type="button" class="don-action-btn" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);" onclick="window.DonationManager.openReceiptModalById('${r.id}')">
-                        <span>👁️ Lihat Kuitansi</span>
+                      <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.openReceiptModalById('${r.id}')">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Lihat Kwitansi</span>
                       </button>
                     </td>
                   </tr>
@@ -857,54 +974,58 @@
       const members = this.getAllMembers();
 
       container.innerHTML = `
-        <!-- TIER EXPLANATION CARDS -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-bottom:24px;">
+        <!-- TIER SPECIFICATION TILES -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:24px;">
           ${TIER_THRESHOLDS.map(t => `
-            <div style="background:${t.bg}; border:1px solid ${t.border}; border-radius:16px; padding:18px;">
+            <div class="mbux-glass-card" style="padding:20px; border-color:${t.border};">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="font-size:1.8rem;">${t.icon}</span>
-                <span style="font-size:0.8rem; font-weight:800; color:${t.color}; text-transform:uppercase;">${t.tier} TIER</span>
+                <span style="font-size:0.8rem; font-weight:700; color:${t.badgeText}; letter-spacing:0.06em; text-transform:uppercase; display:flex; align-items:center; gap:6px;">
+                  ${t.iconSvg} <span>${t.label}</span>
+                </span>
+                <span style="font-size:0.65rem; color:#94A3B8; font-family:monospace;">LEVEL</span>
               </div>
-              <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:4px;">Batas Minimal Donasi:</div>
-              <div style="font-size:1.05rem; font-weight:800; color:#fff; font-family:monospace; margin-bottom:8px;">
-                ${t.min === 0 ? 'Rp 0 (Standar)' : `Rp ${t.min.toLocaleString('id-ID')}`}
+              <div style="font-size:0.72rem; color:#94A3B8; margin-bottom:4px;">Batas Akumulasi Donasi:</div>
+              <div style="font-size:1.15rem; font-weight:700; color:#FFFFFF; font-family:monospace; margin-bottom:8px;">
+                ${t.min === 0 ? 'Rp 0' : `Rp ${t.min.toLocaleString('id-ID')}`}
               </div>
-              <div style="font-size:0.7rem; color:#cbd5e1; line-height:1.4;">
-                ${t.tier === 'PLATINUM' ? 'Akses VIP penuh, diskon 30% event, merchandise eksklusif, meet & greet' :
-                  t.tier === 'GOLD' ? 'Diskon 20% event, prioritas registrasi touring, badge gold' :
-                  t.tier === 'SILVER' ? 'Diskon 10% event, akses forum khusus, badge silver' :
-                  'Akses reguler forum, newsletter, dan kegiatan klub'}
+              <div style="font-size:0.72rem; color:#CBD5E1; line-height:1.4;">
+                ${t.tier === 'PLATINUM' ? 'Akses VIP penuh, diskon 30% event, merchandise eksekutif' :
+                  t.tier === 'GOLD' ? 'Diskon 20% event, prioritas registrasi touring nasional' :
+                  t.tier === 'SILVER' ? 'Diskon 10% event, akses forum diskusi regional' :
+                  'Akses anggota standar dan newsletter resmi klub'}
               </div>
             </div>
           `).join('')}
         </div>
 
         <!-- MEMBER TIERS TABLE -->
-        <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+        <div class="mbux-glass-card" style="padding:22px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
             <div>
-              <h4 style="margin:0; font-size:1.05rem; font-weight:800; color:#fbbf24; display:flex; align-items:center; gap:8px;">
-                <span>🏅</span> STATUS AKUMULASI DONASI &amp; LEVEL TIER ANGGOTA
-              </h4>
-              <p style="margin:3px 0 0; font-size:0.75rem; color:#94a3b8;">
-                Tier keanggotaan terupdate secara real-time berdasarkan total akumulasi donasi yang telah disetujui.
+              <h2 style="margin:0; font-size:0.95rem; font-weight:600; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                <span>Akumulasi Donasi &amp; Peringkat Anggota</span>
+              </h2>
+              <p style="margin:4px 0 0; font-size:0.75rem; color:#64748B;">
+                Level keanggotaan diperbarui otomatis secara real-time saat transaksi donasi diverifikasi sukses.
               </p>
             </div>
-            <button type="button" class="don-action-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; font-weight:800;" onclick="window.DonationManager.syncAllMemberTiers(true)">
-              <span>🔄 Hitung Ulang Semua Tier</span>
+            <button type="button" class="mbux-btn-primary" onclick="window.DonationManager.syncAllMemberTiers(true)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              <span>Hitung Ulang Semua Tier</span>
             </button>
           </div>
 
           <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; font-size:0.82rem; min-width:750px;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.82rem; min-width:760px;">
               <thead>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#94a3b8; font-size:0.72rem; text-transform:uppercase;">
+                <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em;">
                   <th style="padding:12px 10px; text-align:center; width:40px;">No</th>
                   <th style="padding:12px 10px; text-align:left;">Member ID</th>
-                  <th style="padding:12px 10px; text-align:left;">Nama Lengkap</th>
+                  <th style="padding:12px 10px; text-align:left;">Nama Anggota</th>
                   <th style="padding:12px 10px; text-align:right;">Akumulasi Donasi</th>
                   <th style="padding:12px 10px; text-align:center;">Tier Saat Ini</th>
-                  <th style="padding:12px 10px; text-align:left;">Target Tier Berikutnya</th>
+                  <th style="padding:12px 10px; text-align:left;">Target Peningkatan Tier</th>
                 </tr>
               </thead>
               <tbody>
@@ -915,20 +1036,20 @@
                   const diff   = nextT ? (nextT.min - donAmt) : 0;
 
                   return `
-                    <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                      <td style="padding:12px 10px; text-align:center; color:#64748b; font-family:monospace;">${idx + 1}</td>
-                      <td style="padding:12px 10px; font-family:monospace; color:#fbbf24; font-weight:700;">${m.member_id || m.memberId || '-'}</td>
-                      <td style="padding:12px 10px; font-weight:700; color:#fff;">${m.name || m.username || '-'}</td>
-                      <td style="padding:12px 10px; text-align:right; font-family:monospace; color:#34d399; font-weight:700;">
+                    <tr style="border-bottom:1px solid rgba(226,232,240,0.05);">
+                      <td style="padding:12px 10px; text-align:center; color:#64748B; font-family:monospace;">${idx + 1}</td>
+                      <td style="padding:12px 10px; font-family:monospace; color:#CBD5E1; font-weight:600;">${m.member_id || m.memberId || '-'}</td>
+                      <td style="padding:12px 10px; font-weight:600; color:#FFFFFF;">${m.name || m.username || '-'}</td>
+                      <td style="padding:12px 10px; text-align:right; font-family:monospace; color:#FFFFFF; font-weight:700;">
                         Rp ${donAmt.toLocaleString('id-ID')}
                       </td>
                       <td style="padding:12px 10px; text-align:center;">
-                        <span style="background:${tInfo.bg}; color:${tInfo.color}; border:1px solid ${tInfo.border}; font-size:0.75rem; padding:3px 12px; border-radius:9999px; font-weight:800; display:inline-flex; align-items:center; gap:5px;">
-                          <span>${tInfo.icon}</span> <span>${tInfo.tier}</span>
+                        <span style="background:${tInfo.badgeBg}; color:${tInfo.badgeText}; border:1px solid ${tInfo.border}; font-size:0.72rem; padding:3px 12px; border-radius:9999px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+                          ${tInfo.iconSvg} <span>${tInfo.label}</span>
                         </span>
                       </td>
-                      <td style="padding:12px 10px; font-size:0.75rem; color:#94a3b8;">
-                        ${nextT ? `Kurang <strong style="color:#fbbf24;">Rp ${diff.toLocaleString('id-ID')}</strong> menuju <strong>${nextT.tier}</strong>` : `<span style="color:#38bdf8; font-weight:700;">🏆 Pangkat Maksimal (PLATINUM)</span>`}
+                      <td style="padding:12px 10px; font-size:0.75rem; color:#94A3B8;">
+                        ${nextT ? `Membutuhkan <strong style="color:#FFFFFF; font-family:monospace;">Rp ${diff.toLocaleString('id-ID')}</strong> untuk promosi ke <strong>${nextT.label}</strong>` : `<span style="color:#CBD5E1; font-weight:600;">Tingkatan Maksimal (Platinum)</span>`}
                       </td>
                     </tr>
                   `;
@@ -940,11 +1061,31 @@
       `;
     },
 
-    // ─── MODAL 1: VERIFIKASI BUKTI TRANSFER (ADMIN WAJIB MELIHAT BUKTI) ──────
+    // ─── VIEWPORT-ATTACHED MODAL MOUNTING (NEVER OFFSCREEN) ──────────────────
+    getOrCreateModalPortal() {
+      let portal = document.getElementById('mbux-modal-portal');
+      if (!portal) {
+        portal = document.createElement('div');
+        portal.id = 'mbux-modal-portal';
+        document.body.appendChild(portal);
+      }
+      return portal;
+    },
+
+    closeModal() {
+      const portal = document.getElementById('mbux-modal-portal');
+      if (portal) portal.innerHTML = '';
+      document.body.style.overflow = '';
+      document.body.style.removeProperty('overflow');
+      document.documentElement.style.overflow = '';
+      this.selectedDonationId = null;
+    },
+
+    // ─── MODAL 1: VERIFIKASI BUKTI TRANSFER (WAJIB PERIKSA BUKTI) ─────────────
     openVerifyModal(donationId) {
       const don = this.data.donations.find(d => String(d.id) === String(donationId) || String(d.trx_code) === String(donationId));
       if (!don) {
-        this.notifyToast('Transaksi donasi tidak ditemukan!', 'error');
+        this.notifyToast('Transaksi donasi tidak ditemukan.', 'error');
         return;
       }
       this.selectedDonationId = don.id;
@@ -955,7 +1096,6 @@
       const isSuccess = don.status === 'SUCCESS' || don.status === 'CONFIRMED';
       const isRejected = don.status === 'REJECTED';
 
-      // Hitung simulasi tier
       const member = this.findMemberRecord(don.member_id, don.donor_name);
       const currentDon = Number(member ? (member.total_donation || member.totalDonation || 0) : 0);
       const currentTier = calcTier(currentDon);
@@ -963,132 +1103,129 @@
       const projectedTier = calcTier(projectedDon);
       const willUpgrade = projectedTier.tier !== currentTier.tier && isPending;
 
-      const mount = document.getElementById('don-v2-modal-mount');
-      if (!mount) return;
-
-      mount.innerHTML = `
-        <div class="don-modal-root" id="don-verify-modal-root" onclick="if(event.target===this) window.DonationManager.closeModal()">
-          <div class="don-modal-box" style="max-width:680px;">
-            <!-- MODAL HEADER -->
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid rgba(255,255,255,0.08);">
+      const portal = this.getOrCreateModalPortal();
+      portal.innerHTML = `
+        <div class="mbux-modal-overlay" onclick="if(event.target===this) window.DonationManager.closeModal()">
+          <div class="mbux-modal-dialog">
+            <!-- HEADER -->
+            <div class="mbux-modal-header">
               <div>
-                <h3 style="margin:0; font-size:1.15rem; font-weight:800; color:#fbbf24; display:flex; align-items:center; gap:8px;">
-                  <span>🔍</span> Verifikasi Bukti Transfer Donasi
+                <h3 style="margin:0; font-size:1.1rem; font-weight:700; color:#FFFFFF;">
+                  Pemeriksaan Bukti Transfer Donasi
                 </h3>
-                <span style="font-size:0.75rem; color:#94a3b8; font-family:monospace;">ID: ${don.trx_code || don.id}</span>
+                <span style="font-size:0.72rem; color:#94A3B8; font-family:monospace;">TRX ID: ${don.trx_code || don.id}</span>
               </div>
-              <button type="button" class="don-action-btn" style="background:transparent; color:#94a3b8; font-size:1.2rem; padding:4px 8px;" onclick="window.DonationManager.closeModal()">✕</button>
+              <button type="button" class="mbux-btn-stroke" style="padding:5px 9px;" onclick="window.DonationManager.closeModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
 
-            <!-- MODAL BODY -->
-            <div style="padding:24px; max-height:75vh; overflow-y:auto;">
-              <!-- 1. BUKTI TRANSFER (WAJIB DILIHAT SECARA JELAS) -->
+            <!-- BODY -->
+            <div class="mbux-modal-body">
+              <!-- 1. BUKTI TRANSFER IMAGE (PROMINENT DISPLAY) -->
               <div style="margin-bottom:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                  <span style="font-size:0.75rem; font-weight:800; color:#fbbf24; text-transform:uppercase; letter-spacing:0.05em;">
-                    📸 FOTO BUKTI TRANSFER PEMBAYARAN:
+                  <span style="font-size:0.72rem; font-weight:600; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.04em;">
+                    Struk / Dokumen Pembayaran:
                   </span>
-                  <a href="${proofUrl}" target="_blank" style="font-size:0.75rem; color:#38bdf8; text-decoration:none; font-weight:600;">
-                    🔍 Buka Gambar Penuh (Tab Baru)
+                  <a href="${proofUrl}" target="_blank" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    <span>Buka Ukuran Penuh</span>
                   </a>
                 </div>
-                <div style="background:#020617; border:2px dashed rgba(245,158,11,0.4); border-radius:14px; padding:8px; text-align:center; overflow:hidden;">
+                <div style="background:#05060A; border:1px solid rgba(226,232,240,0.18); border-radius:14px; padding:10px; text-align:center; overflow:hidden;">
                   <img src="${proofUrl}" alt="Bukti Transfer Donasi" onerror="this.src='assets/mb_hero.jpg'"
-                    style="max-height:260px; max-width:100%; border-radius:10px; object-fit:contain; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
-                </div>
-                <div style="font-size:0.7rem; color:#94a3b8; text-align:center; margin-top:6px;">
-                  ℹ️ Mohon periksa kecocokan nominal transfer, nama pengirim, dan tanggal transaksi pada struk di atas.
+                    style="max-height:240px; max-width:100%; border-radius:8px; object-fit:contain; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
                 </div>
               </div>
 
-              <!-- 2. DETAIL TRANSAKSI & PREVIEW TIER -->
-              <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; margin-bottom:20px;">
+              <!-- 2. DETAIL INFORMASI TRANSAKSI -->
+              <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.08); border-radius:14px; padding:16px; margin-bottom:16px;">
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; font-size:0.82rem;">
                   <div>
-                    <span style="color:#94a3b8;">Nama Donatur:</span>
-                    <strong style="display:block; color:#fff; font-size:0.95rem;">${don.donor_name || 'Hamba Allah'}</strong>
+                    <span style="color:#94A3B8; font-size:0.72rem;">Nama Donatur:</span>
+                    <strong style="display:block; color:#FFFFFF; font-size:0.95rem; margin-top:2px;">${don.donor_name || 'Hamba Allah'}</strong>
                   </div>
                   <div>
-                    <span style="color:#94a3b8;">Member ID &amp; Tier Saat Ini:</span>
-                    <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
-                      <span style="font-family:monospace; color:#fbbf24; font-weight:700;">${don.member_id || 'Non-Member'}</span>
-                      <span style="background:${currentTier.bg}; color:${currentTier.color}; border:1px solid ${currentTier.border}; font-size:0.68rem; padding:1px 8px; border-radius:9999px; font-weight:800;">
-                        ${currentTier.icon} ${currentTier.tier}
+                    <span style="color:#94A3B8; font-size:0.72rem;">Member ID &amp; Tier Saat Ini:</span>
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:3px;">
+                      <span style="font-family:monospace; color:#CBD5E1; font-weight:600;">${don.member_id || 'Non-Member'}</span>
+                      <span style="background:${currentTier.badgeBg}; color:${currentTier.badgeText}; border:1px solid ${currentTier.border}; font-size:0.68rem; padding:2px 8px; border-radius:9999px; font-weight:700;">
+                        ${currentTier.label}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; font-size:0.82rem;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; font-size:0.82rem;">
                   <div>
-                    <span style="color:#94a3b8;">Program Donasi:</span>
-                    <strong style="display:block; color:#cbd5e1;">${camp.title || don.campaign_id}</strong>
+                    <span style="color:#94A3B8; font-size:0.72rem;">Alokasi Program:</span>
+                    <span style="display:block; color:#CBD5E1; margin-top:2px;">${camp.title || don.campaign_id}</span>
                   </div>
                   <div>
-                    <span style="color:#94a3b8;">Metode &amp; Waktu:</span>
-                    <div style="color:#cbd5e1;">${don.payment_method || 'TRANSFER'} • ${don.created_at || 'Hari Ini'}</div>
+                    <span style="color:#94A3B8; font-size:0.72rem;">Metode &amp; Tanggal:</span>
+                    <span style="display:block; color:#CBD5E1; margin-top:2px;">${don.payment_method || 'TRANSFER'} • ${don.created_at || 'Hari Ini'}</span>
                   </div>
                 </div>
 
-                <div style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:12px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="border-top:1px solid rgba(226,232,240,0.08); padding-top:14px; display:flex; justify-content:space-between; align-items:center;">
                   <div>
-                    <span style="color:#94a3b8; font-size:0.75rem; text-transform:uppercase;">Nominal Donasi:</span>
-                    <div style="font-size:1.3rem; font-weight:800; color:#34d399; font-family:monospace;">
+                    <span style="color:#94A3B8; font-size:0.72rem; text-transform:uppercase;">Nominal Donasi:</span>
+                    <div style="font-size:1.4rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
                       Rp ${Number(don.amount || 0).toLocaleString('id-ID')}
                     </div>
                   </div>
 
-                  <!-- SIMULASI KENAIKAN TIER -->
+                  <!-- SIMULASI PENINGKATAN TIER -->
                   ${isPending ? (willUpgrade ? `
-                    <div style="text-align:right; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.35); padding:8px 14px; border-radius:12px;">
-                      <span style="font-size:0.7rem; color:#fbbf24; font-weight:700; display:block;">🎉 PROYEKSI KENAIKAN TIER:</span>
-                      <span style="font-size:0.85rem; font-weight:800; color:#fff;">
-                        ${currentTier.tier} ➔ <strong style="color:${projectedTier.color};">${projectedTier.icon} ${projectedTier.tier}</strong>
+                    <div style="text-align:right; background:rgba(226,232,240,0.08); border:1px solid rgba(226,232,240,0.25); padding:8px 14px; border-radius:10px;">
+                      <span style="font-size:0.68rem; color:#CBD5E1; font-weight:600; display:block; text-transform:uppercase;">Promosi Tier:</span>
+                      <span style="font-size:0.85rem; font-weight:700; color:#FFFFFF;">
+                        ${currentTier.label} ➔ <span style="color:${projectedTier.badgeText};">${projectedTier.label}</span>
                       </span>
                     </div>
                   ` : `
-                    <div style="text-align:right; font-size:0.75rem; color:#94a3b8;">
-                      Akumulasi Baru: <strong style="color:#fff; font-family:monospace;">Rp ${projectedDon.toLocaleString('id-ID')}</strong><br>
-                      (Tetap Tier <strong>${currentTier.tier}</strong>)
+                    <div style="text-align:right; font-size:0.72rem; color:#94A3B8;">
+                      Akumulasi Baru: <strong style="color:#FFFFFF; font-family:monospace;">Rp ${projectedDon.toLocaleString('id-ID')}</strong><br>
+                      (Tetap Level ${currentTier.label})
                     </div>
                   `) : ''}
                 </div>
               </div>
 
-              <!-- STATUS NOTIF JIKA SUDAH DIPROSES -->
+              <!-- STATUS NOTIFIKASI -->
               ${isSuccess ? `
-                <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); border-radius:12px; padding:12px 16px; color:#34d399; font-size:0.8rem; display:flex; align-items:center; gap:10px;">
-                  <span style="font-size:1.2rem;">✅</span>
-                  <div>Donasi ini telah <strong>disetujui</strong> dan tier keanggotaan donatur telah disesuaikan secara otomatis.</div>
+                <div class="mbux-badge-success" style="width:100%; box-sizing:border-box; justify-content:center; padding:10px; border-radius:10px;">
+                  Transaksi donasi telah diverifikasi sukses.
                 </div>
               ` : (isRejected ? `
-                <div style="background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.25); border-radius:12px; padding:12px 16px; color:#fb7185; font-size:0.8rem; display:flex; align-items:center; gap:10px;">
-                  <span style="font-size:1.2rem;">❌</span>
-                  <div>Donasi ini telah <strong>ditolak</strong>. Tidak ada tombol approval untuk transaksi yang telah ditolak.</div>
+                <div class="mbux-badge-rejected" style="width:100%; box-sizing:border-box; justify-content:center; padding:10px; border-radius:10px;">
+                  Transaksi donasi telah ditolak.
                 </div>
               ` : '')}
             </div>
 
-            <!-- MODAL ACTIONS FOOTER -->
-            <div style="padding:16px 24px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:flex-end; gap:10px; background:rgba(0,0,0,0.2);">
+            <!-- FOOTER ACTION BUTTONS -->
+            <div class="mbux-modal-footer">
               ${isPending ? `
-                <button type="button" class="don-action-btn"
-                  style="background:rgba(244,63,94,0.15); color:#fb7185; border:1px solid rgba(244,63,94,0.3); padding:10px 20px;"
+                <button type="button" class="mbux-btn-stroke" style="color:#FB7185; border-color:rgba(244,63,94,0.3);"
                   onclick="window.DonationManager.processVerification('${don.id}', false)">
-                  <span>✕ Tolak Donasi</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <span>Tolak Donasi</span>
                 </button>
-                <button type="button" class="don-action-btn"
-                  style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-weight:800; padding:10px 24px; box-shadow:0 4px 15px rgba(16,185,129,0.3);"
+                <button type="button" class="mbux-btn-primary"
                   onclick="window.DonationManager.processVerification('${don.id}', true)">
-                  <span>✓ Setujui &amp; Naikkan Tier Donatur</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>Setujui &amp; Perbarui Tier Anggota</span>
                 </button>
               ` : (isSuccess ? `
-                <button type="button" class="don-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1;" onclick="window.DonationManager.closeModal()">Tutup</button>
-                <button type="button" class="don-action-btn" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3);" onclick="window.DonationManager.openReceiptModalByDonation('${don.id}')">
-                  <span>🧾 Buka Kwitansi Resmi</span>
+                <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.closeModal()">Tutup</button>
+                <button type="button" class="mbux-btn-primary" onclick="window.DonationManager.openReceiptModalByDonation('${don.id}')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+                  <span>Buka Kwitansi Resmi</span>
                 </button>
               ` : `
-                <button type="button" class="don-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1;" onclick="window.DonationManager.closeModal()">Tutup</button>
+                <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.closeModal()">Tutup</button>
               `)}
             </div>
           </div>
@@ -1098,7 +1235,7 @@
       document.body.style.overflow = 'hidden';
     },
 
-    // ─── ACTION: VERIFIKASI (APPROVAL & TIER UPGRADE ENGINE) ──────────────────
+    // ─── PROCESS VERIFICATION ────────────────────────────────────────────────
     async processVerification(donationId, isApproved) {
       const don = this.data.donations.find(d => String(d.id) === String(donationId));
       if (!don) return;
@@ -1109,15 +1246,13 @@
       if (isApproved) {
         const donAmt = Number(don.amount || 0);
 
-        // 1. UPDATE CAMPAIGN
         const camp = this.data.campaigns.find(c => c.id === don.campaign_id);
         if (camp) {
           camp.collected_amount = Number(camp.collected_amount || 0) + donAmt;
         }
 
-        // 2. UPGRADE MEMBER TIER DI SELURUH DATABASE
         const member = this.findMemberRecord(don.member_id, don.donor_name);
-        let tierUpgradedMessage = '';
+        let tierNotice = '';
 
         if (member) {
           const oldTot = Number(member.total_donation || member.totalDonation || 0);
@@ -1131,14 +1266,12 @@
           member.tier = newTierObj.tier;
 
           if (newTierObj.tier !== oldTierObj.tier) {
-            tierUpgradedMessage = `\n🎉 Anggota '${member.name || don.donor_name}' NAIK LEVEL ke Tier ${newTierObj.tier} ${newTierObj.icon}!`;
+            tierNotice = ` Donatur dipromosikan ke Tier ${newTierObj.label}.`;
           }
         }
 
-        // Sinkronkan ke users, m3Data, dan currentUser
         this.applyTierToAllEngines(don.member_id, don.donor_name, donAmt);
 
-        // 3. TERBITKAN DIGITAL RECEIPT OTOMATIS
         const existingReceipt = this.data.receipts.find(r => r.donation_id === don.id);
         if (!existingReceipt) {
           const newRec = {
@@ -1155,30 +1288,26 @@
           this.data.receipts.unshift(newRec);
         }
 
-        this.notifyToast(`✅ DONASI DISETUJUI! Digital Receipt diterbitkan.${tierUpgradedMessage}`, 'success');
+        this.notifyToast(`Persetujuan donasi berhasil.${tierNotice}`, 'success');
       } else {
-        this.notifyToast(`❌ Donasi dari ${don.donor_name} telah DITOLAK.`, 'error');
+        this.notifyToast(`Transaksi donasi dari ${don.donor_name} telah ditolak.`, 'error');
       }
 
       this.saveStoredData();
 
-      // Kirim status ke server backend
       try {
         await fetch('api.php?action=verify_donation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ donation_id: donationId, status: newStatus })
         });
-      } catch (e) {
-        // Local persistence sudah tersimpan
-      }
+      } catch (e) {}
 
-      // Tutup modal verifikasi & render ulang
       this.closeModal();
       this.renderActiveSubtab();
     },
 
-    // ─── MODAL 2: DIGITAL RECEIPT RESMI ──────────────────────────────────────
+    // ─── MODAL 2: DIGITAL RECEIPT RESMI (MBUX LUXURY LAYOUT) ─────────────────
     openReceiptModalByDonation(donationId) {
       let rcpt = this.data.receipts.find(r => r.donation_id === donationId);
       if (!rcpt) {
@@ -1206,85 +1335,88 @@
       const rcpt = this.data.receipts.find(r => r.id === receiptId);
       if (!rcpt) return;
 
-      const mount = document.getElementById('don-v2-modal-mount');
-      if (!mount) return;
-
-      mount.innerHTML = `
-        <div class="don-modal-root" id="don-receipt-modal-root" onclick="if(event.target===this) window.DonationManager.closeModal()">
-          <div class="don-modal-box" style="max-width:640px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 22px; border-bottom:1px solid rgba(255,255,255,0.08);">
-              <h3 style="margin:0; font-size:1.1rem; color:#fbbf24; font-weight:800; display:flex; align-items:center; gap:8px;">
-                <span>🧾</span> DIGITAL RECEIPT RESMI - MB INA
-              </h3>
-              <button type="button" class="don-action-btn" style="background:transparent; color:#94a3b8; font-size:1.2rem; padding:4px 8px;" onclick="window.DonationManager.closeModal()">✕</button>
+      const portal = this.getOrCreateModalPortal();
+      portal.innerHTML = `
+        <div class="mbux-modal-overlay" onclick="if(event.target===this) window.DonationManager.closeModal()">
+          <div class="mbux-modal-dialog" style="max-width:620px;">
+            <div class="mbux-modal-header">
+              <div>
+                <h3 style="margin:0; font-size:1.1rem; font-weight:700; color:#FFFFFF;">
+                  Digital Receipt Resmi
+                </h3>
+                <span style="font-size:0.72rem; color:#94A3B8; font-family:monospace;">Mercedes-Benz Club Indonesia</span>
+              </div>
+              <button type="button" class="mbux-btn-stroke" style="padding:5px 9px;" onclick="window.DonationManager.closeModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
 
-            <div style="padding:22px; max-height:75vh; overflow-y:auto;" id="don-printable-receipt">
-              <div style="background:#0f172a; border:2px solid #f59e0b; border-radius:18px; padding:24px; color:#fff; box-shadow:0 15px 35px rgba(0,0,0,0.5);">
-                <!-- BRANDING HEADER -->
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f59e0b; padding-bottom:12px; margin-bottom:16px;">
+            <div class="mbux-modal-body">
+              <div style="background:#090A10; border:1px solid rgba(226,232,240,0.22); border-radius:16px; padding:24px; color:#F8FAFC; box-shadow:0 15px 40px rgba(0,0,0,0.8);">
+                <!-- BRAND HEADER -->
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.18); padding-bottom:16px; margin-bottom:18px;">
                   <div>
-                    <div style="font-size:1.15rem; font-weight:900; color:#fbbf24;">⭐ MERCEDES-BENZ CLUB INDONESIA</div>
-                    <div style="font-size:0.72rem; color:#94a3b8;">Sekretariat Pengurus Pusat • NPWP: 02.704.3975-411.000</div>
+                    <div style="font-size:1.05rem; font-weight:700; letter-spacing:0.04em; color:#FFFFFF;">MERCEDES-BENZ CLUB INDONESIA</div>
+                    <div style="font-size:0.72rem; color:#94A3B8; margin-top:2px;">Sekretariat Pengurus Pusat • NPWP: 02.704.3975-411.000</div>
                   </div>
-                  <img src="assets/mb_badge.jpg" alt="Logo MB INA" style="width:44px; height:44px; border-radius:50%; border:2px solid #f59e0b;">
+                  <img src="assets/mb_badge.jpg" alt="Logo MB INA" style="width:42px; height:42px; border-radius:50%; border:1px solid rgba(226,232,240,0.3);">
                 </div>
 
-                <div style="text-align:center; margin-bottom:18px;">
-                  <h4 style="font-size:1.15rem; margin:0; letter-spacing:1px; color:#fbbf24;">OFFICIAL DIGITAL RECEIPT</h4>
-                  <div style="font-size:0.75rem; color:#94a3b8;">Bukti Penerimaan Donasi &amp; Filantropi Sah</div>
+                <div style="text-align:center; margin-bottom:20px;">
+                  <div style="font-size:0.8rem; font-weight:700; letter-spacing:0.12em; color:#CBD5E1; text-transform:uppercase;">Tanda Terima Donasi Digital</div>
+                  <div style="font-size:0.7rem; color:#64748B;">Dokumen Elektronik Sah Terdaftar</div>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:0.82rem; border-bottom:1px dashed rgba(255,255,255,0.15); padding-bottom:12px; margin-bottom:14px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:0.82rem; border-bottom:1px dashed rgba(226,232,240,0.12); padding-bottom:14px; margin-bottom:14px;">
                   <div>
-                    <span style="color:#94a3b8; font-size:0.72rem;">No. Receipt:</span>
-                    <strong style="display:block; color:#fbbf24; font-family:monospace; font-size:0.95rem;">${rcpt.receipt_number}</strong>
+                    <span style="color:#94A3B8; font-size:0.72rem;">No. Receipt:</span>
+                    <strong style="display:block; color:#FFFFFF; font-family:monospace; font-size:0.9rem; margin-top:2px;">${rcpt.receipt_number}</strong>
                   </div>
                   <div style="text-align:right;">
-                    <span style="color:#94a3b8; font-size:0.72rem;">Tanggal Terbit:</span>
-                    <strong style="display:block; color:#fff;">${rcpt.created_at}</strong>
+                    <span style="color:#94A3B8; font-size:0.72rem;">Tanggal Terbit:</span>
+                    <strong style="display:block; color:#CBD5E1; margin-top:2px;">${rcpt.created_at}</strong>
                   </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:0.82rem; border-bottom:1px dashed rgba(255,255,255,0.15); padding-bottom:12px; margin-bottom:14px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:0.82rem; border-bottom:1px dashed rgba(226,232,240,0.12); padding-bottom:14px; margin-bottom:14px;">
                   <div>
-                    <span style="color:#94a3b8; font-size:0.72rem;">Nama Donatur:</span>
-                    <strong style="display:block; color:#fff; font-size:0.95rem;">${rcpt.donor_name}</strong>
+                    <span style="color:#94A3B8; font-size:0.72rem;">Diterima Dari:</span>
+                    <strong style="display:block; color:#FFFFFF; font-size:0.92rem; margin-top:2px;">${rcpt.donor_name}</strong>
                   </div>
                   <div style="text-align:right;">
-                    <span style="color:#94a3b8; font-size:0.72rem;">Member ID:</span>
-                    <strong style="display:block; font-family:monospace; color:#fbbf24;">${rcpt.member_id || '-'}</strong>
+                    <span style="color:#94A3B8; font-size:0.72rem;">Member ID:</span>
+                    <strong style="display:block; font-family:monospace; color:#CBD5E1; margin-top:2px;">${rcpt.member_id || '-'}</strong>
                   </div>
                 </div>
 
-                <div style="font-size:0.82rem; border-bottom:1px dashed rgba(255,255,255,0.15); padding-bottom:12px; margin-bottom:14px;">
-                  <span style="color:#94a3b8; font-size:0.72rem;">Alokasi Program:</span>
-                  <strong style="display:block; color:#cbd5e1; margin-bottom:8px;">${rcpt.campaign_title || 'Donasi MB INA'}</strong>
+                <div style="font-size:0.82rem; border-bottom:1px dashed rgba(226,232,240,0.12); padding-bottom:14px; margin-bottom:16px;">
+                  <span style="color:#94A3B8; font-size:0.72rem;">Alokasi Program:</span>
+                  <strong style="display:block; color:#FFFFFF; margin:2px 0 10px;">${rcpt.campaign_title || 'Donasi MB INA'}</strong>
                   <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span style="color:#94a3b8;">Metode: <strong>${rcpt.payment_method || 'TRANSFER'}</strong></span>
-                    <div style="font-size:1.25rem; font-weight:900; color:#34d399; font-family:monospace;">
+                    <span style="color:#94A3B8; font-size:0.75rem;">Metode Pembayaran: <strong style="color:#CBD5E1;">${rcpt.payment_method || 'TRANSFER'}</strong></span>
+                    <div style="font-size:1.35rem; font-weight:700; color:#FFFFFF; font-family:monospace;">
                       Rp ${Number(rcpt.amount || 0).toLocaleString('id-ID')}
                     </div>
                   </div>
                 </div>
 
-                <div style="text-align:center; font-size:0.75rem; color:#94a3b8; line-height:1.5;">
-                  ❤️ <strong>Terima kasih atas kontribusi dan kepedulian Anda!</strong><br>
-                  Kuitansi ini diterbitkan secara elektronik oleh MB Club Indonesia dan sah tanpa tanda tangan basah.
+                <div style="text-align:center; font-size:0.72rem; color:#64748B; line-height:1.5;">
+                  Terima kasih atas kepedulian dan kontribusi sosial Anda untuk sesama.<br>
+                  Kuitansi ini diterbitkan secara otomatis dan valid tanpa tanda tangan basah.
                 </div>
               </div>
             </div>
 
-            <div style="padding:14px 22px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; gap:10px; background:rgba(0,0,0,0.2);">
-              <button type="button" class="don-action-btn" style="background:rgba(255,255,255,0.06); color:#cbd5e1;" onclick="window.DonationManager.closeModal()">✕ Tutup</button>
-              <div style="display:flex; gap:8px;">
-                <button type="button" class="don-action-btn" style="background:rgba(56,189,248,0.15); color:#38bdf8; border:1px solid rgba(56,189,248,0.3);" onclick="window.DonationManager.downloadReceiptPdf('${rcpt.receipt_number}')">
-                  <span>📥 Unduh PDF</span>
-                </button>
-                <button type="button" class="don-action-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; font-weight:800;" onclick="window.print()">
-                  <span>🖨️ Cetak Kuitansi</span>
-                </button>
-              </div>
+            <div class="mbux-modal-footer">
+              <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.closeModal()">Tutup</button>
+              <button type="button" class="mbux-btn-stroke" onclick="window.print()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                <span>Cetak</span>
+              </button>
+              <button type="button" class="mbux-btn-primary" onclick="window.DonationManager.downloadReceiptPdf('${rcpt.receipt_number}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Unduh PDF</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1293,26 +1425,15 @@
       document.body.style.overflow = 'hidden';
     },
 
-    downloadReceiptPdf(receiptNumber) {
-      this.notifyToast(`📥 File '${receiptNumber}_MB_INA.pdf' siap dicetak/diunduh. Silakan gunakan opsi Simpan sebagai PDF di menu Cetak.`, 'info');
+    downloadReceiptPdf(num) {
+      this.notifyToast(`Dokumen '${num}' siap dicetak atau disimpan sebagai PDF.`, 'info');
       window.print();
     },
 
-    // ─── CLOSE MODALS & RESTORE SCROLLBAR (CRITICAL: NEVER LOCKS SCREEN) ──────
-    closeModal() {
-      const mount = document.getElementById('don-v2-modal-mount');
-      if (mount) mount.innerHTML = '';
-      document.body.style.overflow = '';
-      document.body.style.removeProperty('overflow');
-      document.documentElement.style.overflow = '';
-      this.selectedDonationId = null;
-    },
-
-    // ─── MEMBER LOOKUP & TIER SYNCHRONIZATION ─────────────────────────────────
+    // ─── MEMBER LOOKUP & ENGINE SYNC ─────────────────────────────────────────
     findMemberRecord(memberId, name) {
       const mid = (memberId || '').toUpperCase();
-      const n = (name || '').toLowerCase();
-
+      const n   = (name || '').toLowerCase();
       const list = this.getAllMembers();
       return list.find(m => {
         const mMid = (m.member_id || m.memberId || '').toUpperCase();
@@ -1367,7 +1488,6 @@
       let updated = 0;
 
       members.forEach(m => {
-        // Hitung akumulasi dari transaksi donasi berstatus SUCCESS
         const mMid = (m.member_id || m.memberId || '').toUpperCase();
         const mN   = (m.name || m.username || '').toLowerCase();
 
@@ -1391,12 +1511,12 @@
       });
 
       if (showToastNotice) {
-        this.notifyToast(`🔄 Evaluasi Tier Selesai! ${updated} anggota disesuaikan tiernya berdasarkan akumulasi donasi.`, 'success');
+        this.notifyToast(`Evaluasi Tier selesai. ${updated} anggota diselaraskan level tiernya.`, 'success');
         this.renderActiveSubtab();
       }
     },
 
-    // ─── EXPORT HELPERS (NO ALERT, SAFE DOWNLOAD) ────────────────────────────
+    // ─── EXPORTS (CLEAN & NON-BLOCKING) ──────────────────────────────────────
     exportExcel() {
       const rows = [
         ['No', 'Kode Transaksi', 'Member ID', 'Nama Donatur', 'Program Donasi', 'Nominal (Rp)', 'Metode', 'Status', 'Tanggal']
@@ -1424,41 +1544,36 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      this.notifyToast('📥 Laporan donasi berhasil di-export ke format CSV / Excel!', 'success');
+      this.notifyToast('Laporan donasi berhasil di-export ke format CSV/Excel.', 'success');
     },
 
     exportPdf() {
-      this.notifyToast('📄 Menyiapkan dokumen laporan donasi untuk dicetak / disimpan sebagai PDF...', 'info');
+      this.notifyToast('Mempersiapkan dokumen laporan untuk dicetak/disimpan sebagai PDF...', 'info');
       window.print();
     },
 
-    // ─── TOAST NOTIFICATION ──────────────────────────────────────────────────
     notifyToast(msg, type = 'info') {
       if (window.showToast) {
         window.showToast(msg, type);
         return;
       }
-      // Fallback floating toast non-blocking
-      let toastBox = document.getElementById('don-floating-toast');
+      let toastBox = document.getElementById('mbux-floating-toast');
       if (!toastBox) {
         toastBox = document.createElement('div');
-        toastBox.id = 'don-floating-toast';
-        toastBox.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:999999; display:flex; flex-direction:column; gap:8px;';
+        toastBox.id = 'mbux-floating-toast';
+        toastBox.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:99999999; display:flex; flex-direction:column; gap:8px;';
         document.body.appendChild(toastBox);
       }
       const item = document.createElement('div');
-      const bg = type === 'success' ? '#059669' : (type === 'error' ? '#e11d48' : '#2563eb');
-      item.style.cssText = `background:${bg}; color:#fff; padding:12px 20px; border-radius:12px; font-size:0.85rem; font-weight:600; box-shadow:0 10px 25px rgba(0,0,0,0.5); display:flex; align-items:center; gap:8px; animation:donModalPop 0.2s;`;
+      item.style.cssText = 'background:#12151F; border:1px solid rgba(226,232,240,0.22); color:#F8FAFC; padding:12px 20px; border-radius:12px; font-size:0.82rem; font-weight:500; box-shadow:0 12px 30px rgba(0,0,0,0.8); display:flex; align-items:center; gap:8px; animation:mbuxModalIn 0.2s;';
       item.innerText = msg;
       toastBox.appendChild(item);
-      setTimeout(() => { item.remove(); }, 4000);
+      setTimeout(() => { item.remove(); }, 3500);
     }
   };
 
-  // Expose to window
   window.DonationManager = DonationManager;
 
-  // Auto-wire with AppEngine tab switching
   function wireToAppEngine() {
     if (window.AppEngine) {
       window.AppEngine.renderDonationModule = function() {
@@ -1495,11 +1610,11 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       wireToAppEngine();
-      setTimeout(wireToAppEngine, 500);
+      setTimeout(wireToAppEngine, 400);
     });
   } else {
     wireToAppEngine();
-    setTimeout(wireToAppEngine, 500);
+    setTimeout(wireToAppEngine, 400);
   }
 
 })(window, document);

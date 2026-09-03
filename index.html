@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260903_v87_rebuild">
+  <link rel="stylesheet" href="css/styles.css?v=20260903_v88_mbux">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -154,38 +154,38 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <span>Portal Member</span>
       </button>
-      <button id="nav-link-admin" class="nav-pill-btn" style="display:none;" onclick="AppEngine.openPortalAdmin()">
+            <button id="nav-link-admin" class="nav-pill-btn" style="display:none;" onclick="AppEngine.openPortalAdmin()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         <span>Admin Portal</span>
       </button>
     </div>
 
-    <!-- User Profile & Controls (Kanan) -->
+    <!-- User Profile & Controls (Mercedes-Benz Executive Styling) -->
     <div style="display:flex; align-items:center; gap:10px;">
-      <!-- Light / Dark Theme Toggle Button -->
-      <button id="theme-toggle-btn" class="btn-outline" style="padding:7px 11px; border-radius:12px; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#cbd5e1; display:flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:600;" onclick="AppEngine.toggleTheme()" title="Beralih Mode Tampilan">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-        <span class="hide-mobile">Light</span>
+      <!-- Mercedes E-Class Minimalist Theme Toggle Button -->
+      <button id="theme-toggle-btn" class="btn-outline" style="padding:6px 10px; border-radius:18px; border:1px solid rgba(226,232,240,0.2); background:rgba(255,255,255,0.03); color:#E2E8F0; display:flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:600;" onclick="AppEngine.toggleTheme()" title="Beralih Mode Tampilan">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        <span class="hide-mobile" style="font-size:0.7rem; letter-spacing:0.04em; text-transform:uppercase;">Theme</span>
       </button>
 
       <!-- Global Notification Center Button -->
-      <button id="global-notif-btn" class="btn-outline" style="position:relative; padding:7px 10px; border-radius:12px; border-color:rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#cbd5e1; display:flex; align-items:center; justify-content:center;" onclick="NotificationEngine.openModal()" title="Pusat Notifikasi">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span id="global-notif-badge" style="position:absolute; top:-4px; right:-4px; background:#f43f5e; color:#fff; font-size:0.62rem; font-weight:800; padding:1px 5px; border-radius:10px; border:2px solid #07090e;">4</span>
+      <button id="global-notif-btn" class="btn-outline" style="position:relative; padding:6px 9px; border-radius:18px; border:1px solid rgba(226,232,240,0.18); background:rgba(255,255,255,0.03); color:#CBD5E1; display:flex; align-items:center; justify-content:center;" onclick="NotificationEngine.openModal()" title="Pusat Notifikasi">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span id="global-notif-badge" style="position:absolute; top:-3px; right:-3px; background:#f43f5e; color:#fff; font-size:0.6rem; font-weight:800; padding:1px 5px; border-radius:10px; border:1.5px solid #0A0B10;">4</span>
       </button>
 
-      <!-- Clean Executive User Profile Header Badge -->
+      <!-- Executive Profile with DE Monogram Avatar -->
       <div style="position:relative;">
         <div id="nav-user-profile" style="display:flex; align-items:center; gap:10px; cursor:pointer; padding:3px 6px; border-radius:24px; transition:background 0.2s;" onclick="AppEngine.toggleUserDropdown()">
           <div style="text-align:right;" class="hide-mobile">
-            <div id="nav-user-name" style="font-weight:700; font-size:0.8rem; color:#ffffff; line-height:1.2;">Derist Touriano</div>
+            <div id="nav-user-name" style="font-weight:600; font-size:0.8rem; color:#FFFFFF; line-height:1.2;">Derist Touriano</div>
             <div style="display:flex; align-items:center; justify-content:flex-end; gap:5px; margin-top:2px;">
-              <span id="nav-user-role-badge" style="background:rgba(245,158,11,0.12); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:600; font-size:0.65rem; padding:1px 7px; border-radius:12px;">Super Admin</span>
-              <span class="tier-badge" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid rgba(16,185,129,0.3); padding:1px 6px; font-size:0.62rem; border-radius:10px;">ACTIVE</span>
+              <span id="nav-user-role-badge" style="background:rgba(255,255,255,0.04); color:#CBD5E1; border:1px solid rgba(226,232,240,0.2); font-weight:600; font-size:0.65rem; padding:1px 7px; border-radius:10px; font-family:monospace;">SUPER ADMIN</span>
+              <span class="tier-badge" style="background:rgba(16,185,129,0.1); color:#34D399; border:1px solid rgba(16,185,129,0.25); padding:1px 6px; font-size:0.62rem; border-radius:10px;">ACTIVE</span>
             </div>
           </div>
-          <div id="nav-user-avatar" style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-weight:800; font-size:0.82rem; border:1.5px solid rgba(245,158,11,0.5); box-shadow:0 0 10px rgba(245,158,11,0.25);">
-            DT
+          <div id="nav-user-avatar" style="width:36px; height:36px; border-radius:50%; background:#141824; display:flex; align-items:center; justify-content:center; color:#F8FAFC; font-weight:700; font-size:0.82rem; letter-spacing:0.5px; border:1px solid rgba(226,232,240,0.35); box-shadow:0 2px 10px rgba(0,0,0,0.5);">
+            DE
           </div>
         </div>
 
@@ -10192,8 +10192,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260903_v87_rebuild"></script>
-  <script src="js/app.js?v=20260903_v87_rebuild"></script>
+  <script src="js/auth.js?v=20260903_v88_mbux"></script>
+  <script src="js/app.js?v=20260903_v88_mbux"></script>
   <script>
     lucide.createIcons();
     try {
@@ -10271,6 +10271,6 @@
 
 
   
-  <script src="js/donation_manager.js?v=20260903_v87_rebuild"></script>
+  <script src="js/donation_manager.js?v=20260903_v88_mbux"></script>
 </body>
 </html>
