@@ -1279,6 +1279,19 @@
       reader.readAsDataURL(file);
     },
 
+    
+    _proofZoomLevel: 1.0,
+    zoomProofImage(delta) {
+      this._proofZoomLevel = Math.max(0.5, Math.min(3.0, (this._proofZoomLevel || 1.0) + delta));
+      const img = document.getElementById('mbux-verify-proof-img');
+      if (img) img.style.transform = 'scale(' + this._proofZoomLevel + ')';
+    },
+    resetProofZoom() {
+      this._proofZoomLevel = 1.0;
+      const img = document.getElementById('mbux-verify-proof-img');
+      if (img) img.style.transform = 'scale(1.0)';
+    },
+
     openVerifyModal(donationId) {
       const don = this.data.donations.find(d => String(d.id) === String(donationId) || String(d.trx_code) === String(donationId));
       if (!don) {
@@ -1320,27 +1333,74 @@
 
             <!-- BODY -->
             <div class="mbux-modal-body">
-              <!-- 1. BUKTI TRANSFER IMAGE (PROMINENT DISPLAY) -->
-              <div style="margin-bottom:20px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                  <span style="font-size:0.72rem; font-weight:600; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.04em;">
-                    Struk / Dokumen Pembayaran:
+              <!-- PERINGATAN VERIFIKASI KETAT PENGURUS -->
+              <div style="background:rgba(217,119,6,0.08); border:1px solid rgba(217,119,6,0.3); border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; align-items:flex-start; gap:12px;">
+                <div style="color:#FBBF24; font-size:1.1rem; line-height:1; margin-top:2px;">⚠️</div>
+                <div style="font-size:0.75rem; color:#CBD5E1; line-height:1.5;">
+                  <strong style="color:#FBBF24; display:block; margin-bottom:2px; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.04em;">Perhatian Verifikasi Ketat Pengurus</strong>
+                  Bukti transfer ini adalah bukti sah bahwa donatur telah mengirim sejumlah uang. Periksa nominal, tanggal, nomor referensi mutasi bank, dan pastikan dana telah masuk ke rekening kas MB INA sebelum menyetujui.
+                </div>
+              </div>
+
+              <!-- 1. BUKTI TRANSFER IMAGE DENGAN INSPECTION TOOLBAR -->
+              <div style="margin-bottom:18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                  <span style="font-size:0.72rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    <span>Struk / Bukti Transfer Bank (Inspeksi Fisik):</span>
                   </span>
                   <div style="display:flex; gap:6px;">
-                    <button type="button" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;" onclick="document.getElementById('modal-verify-upload-proof').click()">
+                    <!-- Zoom Controls -->
+                    <button type="button" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;" onclick="window.DonationManager.zoomProofImage(0.25)" title="Perbesar Gambar">
+                      <span>🔍 +</span>
+                    </button>
+                    <button type="button" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;" onclick="window.DonationManager.zoomProofImage(-0.25)" title="Perkecil Gambar">
+                      <span>🔍 -</span>
+                    </button>
+                    <button type="button" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;" onclick="window.DonationManager.resetProofZoom()" title="Reset Ukuran">
+                      <span>⟲ Reset</span>
+                    </button>
+                    <button type="button" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;" onclick="document.getElementById('modal-verify-upload-proof').click()" title="Unggah bukti struk transfer baru">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                      <span>Ganti / Upload Bukti Baru</span>
+                      <span>Unggah Struk Baru</span>
                     </button>
                     <input type="file" id="modal-verify-upload-proof" accept="image/*" style="display:none;" onchange="window.DonationManager.handleUpdateVerifyProof(event, '${don.id}')">
-                    <a href="${displayProofUrl}" target="_blank" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;">
+                    <a href="${displayProofUrl}" target="_blank" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;" title="Buka gambar di tab terpisah">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                      <span>Ukuran Penuh</span>
+                      <span>Tab Baru</span>
                     </a>
                   </div>
                 </div>
-                <div style="background:#05060A; border:1px solid rgba(226,232,240,0.18); border-radius:14px; padding:10px; text-align:center; overflow:hidden;">
+
+                <!-- CONTAINER INSPEKSI GAMBAR DENGAN OVERFLOW SCROLL & ZOOM -->
+                <div id="mbux-proof-zoom-container" style="background:#05060A; border:1px solid rgba(226,232,240,0.18); border-radius:14px; padding:12px; text-align:center; overflow:auto; max-height:280px;">
                   <img id="mbux-verify-proof-img" src="${displayProofUrl}" alt="Bukti Transfer Donasi" onerror="this.src='assets/struk_transfer_sample.svg'"
-                    style="max-height:240px; max-width:100%; border-radius:8px; object-fit:contain; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+                    style="max-height:250px; max-width:100%; border-radius:8px; object-fit:contain; box-shadow:0 8px 24px rgba(0,0,0,0.6); transition:transform 0.15s ease; transform-origin:center top;">
+                </div>
+              </div>
+
+              <!-- CHECKLIST VERIFIKASI KETAT PENGURUS -->
+              <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.12); border-radius:12px; padding:14px 16px; margin-bottom:18px;">
+                <div style="font-size:0.75rem; font-weight:700; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;">
+                  Checklist Verifikasi Mutasi Kas Bank:
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.75rem;">
+                  <label style="display:flex; align-items:center; gap:8px; color:#E2E8F0; cursor:pointer;">
+                    <input type="checkbox" id="chk-verify-amt" style="width:15px; height:15px; accent-color:#34D399;">
+                    <span>Nominal Cocok: <strong>Rp ${Number(don.amount || 0).toLocaleString('id-ID')}</strong></span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:8px; color:#E2E8F0; cursor:pointer;">
+                    <input type="checkbox" id="chk-verify-acc" style="width:15px; height:15px; accent-color:#34D399;">
+                    <span>Tujuan: <strong>Rekening MB INA</strong></span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:8px; color:#E2E8F0; cursor:pointer;">
+                    <input type="checkbox" id="chk-verify-sender" style="width:15px; height:15px; accent-color:#34D399;">
+                    <span>Pengirim: <strong>${don.donor_name || 'Donatur'}</strong></span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:8px; color:#E2E8F0; cursor:pointer;">
+                    <input type="checkbox" id="chk-verify-mutation" style="width:15px; height:15px; accent-color:#34D399;">
+                    <span>Mutasi Masuk Terkonfirmasi</span>
+                  </label>
                 </div>
               </div>
 
@@ -1579,11 +1639,11 @@
 
             <div class="mbux-modal-footer">
               <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.closeModal()">Tutup</button>
-              <button type="button" class="mbux-btn-stroke" onclick="window.print()">
+              <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.printOfficialReceipt('${rcpt.id}')">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
                 <span>Cetak</span>
               </button>
-              <button type="button" class="mbux-btn-primary" onclick="window.DonationManager.downloadReceiptPdf('${rcpt.receipt_number}')">
+              <button type="button" class="mbux-btn-primary" onclick="window.DonationManager.printOfficialReceipt('${rcpt.id}')">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Unduh PDF</span>
               </button>
@@ -1595,10 +1655,202 @@
       document.body.style.overflow = 'hidden';
     },
 
-    downloadReceiptPdf(num) {
-      this.notifyToast(`Dokumen '${num}' siap dicetak atau disimpan sebagai PDF.`, 'info');
-      window.print();
+    
+    printOfficialReceipt(receiptId) {
+      const rcpt = this.data.receipts.find(r => r.id === receiptId || r.receipt_number === receiptId);
+      if (!rcpt) return;
+
+      const printWin = window.open('', '_blank', 'width=850,height=950');
+      if (!printWin) {
+        this.notifyToast('Pop-up terblokir. Mohon izinkan pop-up browser untuk mencetak kuitansi.', 'error');
+        return;
+      }
+
+      const formattedAmount = Number(rcpt.amount || 0).toLocaleString('id-ID');
+      const dateStr = rcpt.created_at ? new Date(rcpt.created_at).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) : new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+
+      printWin.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Digital Receipt - ${rcpt.receipt_number}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm 15mm;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #0F172A;
+      background: #FFFFFF;
+      margin: 0;
+      padding: 20px 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .receipt-card {
+      max-width: 680px;
+      margin: 0 auto;
+      border: 2px solid #0F172A;
+      border-radius: 12px;
+      padding: 28px 32px;
+      background: #FFFFFF;
+      page-break-inside: avoid;
+    }
+    .header-table { width: 100%; border-bottom: 2px solid #0F172A; padding-bottom: 14px; margin-bottom: 18px; }
+    .title { font-size: 17px; font-weight: 800; letter-spacing: 0.05em; color: #000000; }
+    .subtitle { font-size: 11px; color: #475569; margin-top: 3px; line-height: 1.4; }
+    .doc-title { text-align: center; margin: 16px 0 22px; }
+    .doc-title h2 { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #0F172A; }
+    .doc-title p { margin: 4px 0 0; font-size: 12px; font-family: monospace; color: #475569; }
+    .info-grid { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12.5px; }
+    .info-grid td { padding: 8px 6px; border-bottom: 1px dashed #CBD5E1; }
+    .info-grid td.label { width: 34%; color: #475569; font-weight: 500; }
+    .info-grid td.val { width: 66%; color: #0F172A; font-weight: 700; }
+    .amount-box {
+      background: #F8FAFC;
+      border: 1.5px solid #0F172A;
+      border-radius: 8px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .amount-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #475569; }
+    .amount-val { font-size: 20px; font-weight: 800; font-family: monospace; color: #0F172A; }
+    .footer-table { width: 100%; margin-top: 24px; font-size: 11px; color: #64748B; }
+    .stamp-box {
+      border: 1.5px solid #10B981;
+      color: #059669;
+      padding: 6px 12px;
+      border-radius: 6px;
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .no-print-bar {
+      max-width: 680px;
+      margin: 0 auto 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0F172A;
+      color: #FFFFFF;
+      padding: 10px 16px;
+      border-radius: 8px;
+    }
+    .print-btn {
+      background: #F8FAFC;
+      color: #0F172A;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    @media print {
+      body { padding: 0; }
+      .no-print-bar { display: none !important; }
+      .receipt-card { border: 2px solid #000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print-bar">
+    <span style="font-size:12px;">Dokumen Kuitansi Resmi MB INA (Format Cetak 1 Halaman Bersih)</span>
+    <button class="print-btn" onclick="window.print()">Cetak / Simpan PDF (1 Halaman)</button>
+  </div>
+
+  <div class="receipt-card">
+    <table class="header-table">
+      <tr>
+        <td style="vertical-align:middle;">
+          <div class="title">MERCEDES-BENZ CLUB INDONESIA</div>
+          <div class="subtitle">Sekretariat Pengurus Pusat • NPWP: 02.704.3975-411.000</div>
+          <div class="subtitle">Email: secretariat@mercedesbenzclubindonesia.or.id</div>
+        </td>
+        <td style="text-align:right; vertical-align:middle; width:70px;">
+          <img src="assets/mb_badge.jpg" style="width:52px; height:52px; border-radius:50%;" onerror="this.style.display='none'">
+        </td>
+      </tr>
+    </table>
+
+    <div class="doc-title">
+      <h2>Tanda Terima Donasi Sah (Digital Receipt)</h2>
+      <p>NO: ${rcpt.receipt_number}</p>
+    </div>
+
+    <table class="info-grid">
+      <tr>
+        <td class="label">Tanggal Diterbitkan</td>
+        <td class="val">${dateStr}</td>
+      </tr>
+      <tr>
+        <td class="label">Nama Donatur</td>
+        <td class="val">${rcpt.donor_name || 'Hamba Allah'}</td>
+      </tr>
+      <tr>
+        <td class="label">Nomor Anggota (Member ID)</td>
+        <td class="val" style="font-family:monospace;">${rcpt.member_id || 'Non-Member'}</td>
+      </tr>
+      <tr>
+        <td class="label">Alokasi Program Donasi</td>
+        <td class="val">${rcpt.campaign_title || 'Donasi &amp; Bakti Sosial MB INA'}</td>
+      </tr>
+      <tr>
+        <td class="label">Metode Pembayaran</td>
+        <td class="val">${rcpt.payment_method || 'TRANSFER BANK'}</td>
+      </tr>
+      <tr>
+        <td class="label">Status Verifikasi</td>
+        <td class="val" style="color:#059669;">TERVERIFIKASI &amp; DITERIMA KAS MB INA</td>
+      </tr>
+    </table>
+
+    <div class="amount-box">
+      <div class="amount-label">Jumlah Donasi Diterima</div>
+      <div class="amount-val">Rp ${formattedAmount}</div>
+    </div>
+
+    <table class="footer-table">
+      <tr>
+        <td style="width:60%; vertical-align:bottom;">
+          <div class="stamp-box">
+            ✓ SAH - VERIFIKASI PENGURUS PUSAT
+          </div>
+          <p style="margin:8px 0 0; font-size:10px; line-height:1.4;">
+            Dokumen tanda terima ini diterbitkan secara elektronik dan sah diakui oleh Pengurus Pusat Mercedes-Benz Club Indonesia.
+          </p>
+        </td>
+        <td style="text-align:right; vertical-align:bottom;">
+          <div style="font-weight:700; color:#0F172A; margin-bottom:45px;">Departemen Sosial &amp; Filantropi</div>
+          <div style="border-top:1px solid #0F172A; padding-top:4px; font-weight:700; color:#0F172A;">Pengurus Pusat MB INA</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.focus();
+        window.print();
+      }, 300);
+    };
+  </script>
+</body>
+</html>`);
+      printWin.document.close();
     },
+
+    downloadReceiptPdf(receiptId) {
+      this.printOfficialReceipt(receiptId);
+    },
+
 
     // ─── MEMBER LOOKUP & ENGINE SYNC ─────────────────────────────────────────
     findMemberRecord(memberId, name) {
