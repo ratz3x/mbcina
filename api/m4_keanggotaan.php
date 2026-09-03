@@ -465,12 +465,35 @@ switch ($action) {
                     $realTotalDonation += intval($don['amount'] ?? 0);
                 }
             }
+
+            // Query verified event tickets paid by member
+            $eventTicketTotal = 0;
+            $eventCount = 0;
+            try {
+                $eventStmt = $sPdo->prepare("
+                    SELECT COALESCE(SUM(fee_paid), 0) AS event_total, COUNT(*) AS event_count
+                    FROM event_participants
+                    WHERE user_id = :uid AND payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+                ");
+                $eventStmt->execute([':uid' => $id]);
+                $eventRow = $eventStmt->fetch();
+                $eventTicketTotal = intval($eventRow['event_total'] ?? 0);
+                $eventCount = intval($eventRow['event_count'] ?? 0);
+            } catch (Exception $eEvt) {}
+
+            // Total Contribution = Verified Donations + Verified Event Tickets
+            $totalContribution = $realTotalDonation + $eventTicketTotal;
             $member['total_donation'] = $realTotalDonation;
-            if ($realTotalDonation >= 9000000) {
+            $member['event_tickets_total'] = $eventTicketTotal;
+            $member['total_contribution'] = $totalContribution;
+            $member['total_events'] = $eventCount;
+
+            // Tier evaluation based on Total Contribution (Donations + Event Tickets)
+            if ($totalContribution >= 9000000) {
                 $member['tier'] = 'PLATINUM';
-            } elseif ($realTotalDonation >= 4500000) {
+            } elseif ($totalContribution >= 4500000) {
                 $member['tier'] = 'GOLD';
-            } elseif ($realTotalDonation >= 1500000) {
+            } elseif ($totalContribution >= 1500000) {
                 $member['tier'] = 'SILVER';
             } else {
                 $member['tier'] = 'BRONZE';

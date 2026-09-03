@@ -323,6 +323,12 @@ switch ($action) {
                 END;
             ");
 
+            // Award 50 bonus check-in points
+            try {
+                $sPdo->prepare("UPDATE users SET points = points + 50, total_events = (SELECT COUNT(*) FROM event_participants WHERE user_id = :uid AND payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')) WHERE id = :uid")->execute([':uid' => $userId]);
+                $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'EVENT', 'Check-In Event Berhasil', 'Hadir di event MB INA (+50 Poin Kehadiran).')")->execute([':id' => 'act_' . uniqid(), ':uid' => $userId]);
+            } catch (Exception $ePts) {}
+
             // Log checkin
             $logId = 'chk_' . uniqid();
             $sPdo->exec("INSERT INTO event_checkin_logs (id, event_id, user_id, scanned_by) VALUES ('$logId', '$eventId', '$userId', 'usr_superadmin')");
@@ -353,29 +359,39 @@ switch ($action) {
             $stmt = $sPdo->prepare("UPDATE event_participants SET payment_status = :status WHERE id = :pid OR user_id = :pid OR id LIKE :pidlike");
             $stmt->execute([':status' => $status, ':pid' => $partId, ':pidlike' => "%$partId%"]);
 
-            // Auto-recalculate total_donation & tier in database SQL
-            $sPdo->exec("
-                UPDATE users u
-                SET total_donation = COALESCE((
-                    SELECT SUM(d.amount)
-                    FROM donations d
-                    WHERE d.user_id = u.id
-                      AND d.status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
-                ), 0) + COALESCE((
-                    SELECT SUM(p.fee_paid)
-                    FROM event_participants p
-                    WHERE p.user_id = u.id
-                      AND p.payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
-                ), 0);
+            // Fetch participant record to award points & log activity
+            $pStmt = $sPdo->prepare("SELECT user_id, fee_paid, event_id FROM event_participants WHERE id = :pid OR user_id = :pid OR id LIKE :pidlike LIMIT 1");
+            $pStmt->execute([':pid' => $partId, ':pidlike' => "%$partId%"]);
+            $pRow = $pStmt->fetch();
 
-                UPDATE users u
-                SET tier = CASE
-                    WHEN u.total_donation >= 9000000 THEN 'PLATINUM'
-                    WHEN u.total_donation >= 4500000 THEN 'GOLD'
-                    WHEN u.total_donation >= 1500000 THEN 'SILVER'
-                    ELSE 'BRONZE'
-                END;
-            ");
+            if ($pRow && in_array(strtoupper($status), ['VERIFIED', 'SUCCESS', 'CONFIRMED'])) {
+                $uid = $pRow['user_id'];
+                $feePaid = (int)($pRow['fee_paid'] ?? 0);
+                $pts = max(1, intval($feePaid / 10000));
+
+                // Add points and update total_events
+                $sPdo->prepare("
+                    UPDATE users 
+                    SET points = points + :pts,
+                        total_events = (
+                            SELECT COUNT(*) FROM event_participants 
+                            WHERE user_id = :uid AND payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
+                        )
+                    WHERE id = :uid
+                ")->execute([':pts' => $pts, ':uid' => $uid]);
+
+                // Log to user_activities
+                try {
+                    $sPdo->prepare("
+                        INSERT INTO user_activities (id, user_id, activity_type, title, detail)
+                        VALUES (:id, :uid, 'EVENT', 'Pembayaran Tiket Event Berhasil', :det)
+                    ")->execute([
+                        ':id' => 'act_' . uniqid(),
+                        ':uid' => $uid,
+                        ':det' => 'Tiket event Rp ' . number_format($feePaid, 0, ',', '.') . " terverifikasi (+{$pts} Poin Reward)."
+                    ]);
+                } catch (Exception $eAct) {}
+            }
 
             logAudit('usr_superadmin', 'UPDATE', 'M6_VERIFY_PARTICIPANT', ['participant_id' => $partId, 'status' => $status]);
             echo json_encode(['success' => true, 'message' => "Status verifikasi peserta berhasil diperbarui ke $status di database Supabase!"]);
