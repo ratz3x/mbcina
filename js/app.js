@@ -328,6 +328,42 @@ const AppEngine = {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
+  openPortalSponsor(email = null) {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const spDash = document.getElementById('view-sponsor-dashboard');
+    if (spDash) {
+      spDash.style.display = 'block';
+    }
+
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'none';
+    if (btnHamburger) btnHamburger.style.display = 'none';
+    document.body.classList.remove('yt-has-sidebar');
+
+    if (typeof this.updateHeaderNavPillsActive === 'function') {
+      this.updateHeaderNavPillsActive('nav-btn-sponsor-portal');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (window.SponsorPortalEngine && typeof window.SponsorPortalEngine.switchMainTab === 'function') {
+      window.SponsorPortalEngine.switchMainTab('summary');
+    }
+    if (window.M6Engine && typeof window.M6Engine.renderSponsorshipModule === 'function') {
+      window.M6Engine.renderSponsorshipModule();
+    }
+
+    // Populate dynamic company name
+    const userObj = this.currentUser || {};
+    const userEmail = (email && email !== 'bni@sponsor.com') ? email : (userObj.email || 'sponsor@shell.co.id');
+    const companyName = userObj.name || (userEmail.includes('fdr') ? 'FDR Tyre Indonesia' : (userEmail.includes('mandiri') || userEmail.includes('bni') ? 'Bank Mandiri' : 'Shell Indonesia'));
+
+    const titleEl = document.getElementById('sponsor-dash-welcome-title');
+    if (titleEl) {
+      titleEl.innerText = 'Manajemen Sponsorship — ' + companyName;
+    }
+  },
+
   openMemberKoperasi(fromView = 'member') {
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
     const adminView = document.getElementById('view-admin-dashboard');
@@ -17996,9 +18032,11 @@ const M6Engine = {
   },
 
   async openPortalSponsor(email = null) {
+    if (window.AppEngine && typeof window.AppEngine.openPortalSponsor === 'function') {
+      return window.AppEngine.openPortalSponsor(email);
+    }
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
     const spDash = document.getElementById('view-sponsor-dashboard');
-    this.updateHeaderNavPillsActive('nav-btn-sponsor-portal');
     if (spDash) {
       spDash.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -19248,9 +19286,7 @@ if (typeof M6Engine !== 'undefined') {
   if (typeof M6Engine.saveSponsorProfile === 'function') {
     AppEngine.saveSponsorProfile = M6Engine.saveSponsorProfile.bind(M6Engine);
   }
-  if (typeof M6Engine.openPortalSponsor === 'function') {
-    AppEngine.openPortalSponsor = M6Engine.openPortalSponsor.bind(M6Engine);
-  }
+  // AppEngine.openPortalSponsor is natively defined on AppEngine to prevent crash
   if (typeof M6Engine.openSponsorDashboardSim === 'function') {
     AppEngine.openSponsorDashboardSim = M6Engine.openSponsorDashboardSim.bind(M6Engine);
   }
@@ -24476,9 +24512,9 @@ window.SponsorPortalEngine = {
       const btn = document.getElementById('spnd-tab-btn-' + k);
       if (btn) {
         if (k === tabKey) {
-          btn.style.background = 'rgba(245,158,11,0.12)';
+          btn.style.background = 'rgba(245,158,11,0.15)';
           btn.style.color = '#fbbf24';
-          btn.style.borderColor = 'rgba(245,158,11,0.35)';
+          btn.style.borderColor = 'rgba(245,158,11,0.4)';
           btn.style.fontWeight = '600';
         } else {
           btn.style.background = 'rgba(255,255,255,0.03)';
