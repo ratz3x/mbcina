@@ -9890,7 +9890,7 @@ const AppEngine = {
     const container = document.getElementById('m3-detail-content-body');
     if (!container) return;
 
-    container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--accent-gold);">⏳ Memuat detail profil member dari Supabase Cloud...</div>`;
+    container.innerHTML = `<div style="text-align:center; padding:40px; color:#94A3B8; font-size:0.85rem;">Memuat detail profil member dari database...</div>`;
     AuthEngine.openModal('modal-m3-member-detail');
 
     try {
@@ -9901,7 +9901,7 @@ const AppEngine = {
       }).then(r => r.json());
 
       if (!res.success) {
-        container.innerHTML = `<div style="color:var(--accent-red); padding:20px;">Gagal memuat detail member: ${res.message}</div>`;
+        container.innerHTML = `<div style="color:#FB7185; padding:20px; text-align:center; font-size:0.85rem;">Gagal memuat detail member: ${res.message}</div>`;
         return;
       }
 
@@ -9911,120 +9911,178 @@ const AppEngine = {
       const activities = res.activities || [];
 
       const getTierBadge = (t) => {
-        if (t === 'PLATINUM') return '<span class="tier-badge" style="background:rgba(168,85,247,0.2); color:#A855F7; border:1px solid #A855F7;">💎 PLATINUM</span>';
-        if (t === 'GOLD') return '<span class="tier-badge" style="background:rgba(212,175,55,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">🥇 GOLD</span>';
-        if (t === 'SILVER') return '<span class="tier-badge" style="background:rgba(192,192,192,0.2); color:#C0C0C0; border:1px solid #C0C0C0;">🥈 SILVER</span>';
-        return '<span class="tier-badge" style="background:rgba(205,127,50,0.2); color:#CD7F32; border:1px solid #CD7F32;">🥉 BRONZE</span>';
+        const tier = (t || 'BRONZE').toUpperCase();
+        if (tier === 'PLATINUM') {
+          return '<span style="font-family:monospace; font-size:0.72rem; font-weight:700; color:#F8FAFC; background:rgba(226,232,240,0.1); border:1px solid rgba(226,232,240,0.3); padding:3px 12px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Platinum</span></span>';
+        }
+        if (tier === 'GOLD') {
+          return '<span style="font-family:monospace; font-size:0.72rem; font-weight:700; color:#E2C38E; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); padding:3px 12px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg><span>Gold</span></span>';
+        }
+        if (tier === 'SILVER') {
+          return '<span style="font-family:monospace; font-size:0.72rem; font-weight:700; color:#CBD5E1; background:rgba(148,163,184,0.1); border:1px solid rgba(148,163,184,0.25); padding:3px 12px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg><span>Silver</span></span>';
+        }
+        return '<span style="font-family:monospace; font-size:0.72rem; font-weight:700; color:#D97706; background:rgba(217,119,6,0.1); border:1px solid rgba(217,119,6,0.25); padding:3px 12px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg><span>Bronze</span></span>';
       };
 
-      container.innerHTML = `
-        <div style="display:grid; grid-template-columns:240px 1fr; gap:24px; margin-bottom:28px;">
-          <!-- PROFILE PHOTO CARD -->
-          <div class="glass-card" style="padding:24px; text-align:center; display:flex; flex-direction:column; align-items:center; border-top:4px solid var(--accent-gold);">
+      const initials = (m.name || 'MB').trim().split(/\s+/).map(n => n[0]).slice(0,2).join('').toUpperCase();
 
-            <!-- FOTO / AVATAR -->
-            <div style="position:relative; margin-bottom:14px;">
+      container.innerHTML = `
+        <!-- TOP SECTION: IDENTITAS (KIRI) & INFORMASI LENGKAP (KANAN) -->
+        <div style="display:grid; grid-template-columns:230px 1fr; gap:20px; margin-bottom:24px;">
+          <!-- 1. KARTU IDENTITAS UTAMA (SISI KIRI) -->
+          <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:24px 18px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <!-- AVATAR CENTERED DENGAN RING CHROME SILVER -->
+            <div style="position:relative; width:92px; height:92px; margin-bottom:14px; display:flex; align-items:center; justify-content:center;">
               ${m.photo_url
                 ? `<img src="${m.photo_url}" alt="Foto ${m.name}"
-                     style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid var(--accent-gold); box-shadow:0 0 20px rgba(245,158,11,0.4);"
+                     style="width:92px; height:92px; border-radius:50%; object-fit:cover; border:2px solid rgba(226,232,240,0.35); box-shadow:0 8px 24px rgba(0,0,0,0.6);"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                   <div style="display:none; width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,var(--accent-gold),#b45309); align-items:center; justify-content:center; color:#fff; font-size:2.2rem; font-weight:900; border:3px solid var(--accent-gold); box-shadow:0 0 20px rgba(245,158,11,0.4);">
-                     ${(m.name || 'MB').substring(0,2).toUpperCase()}
+                   <div style="display:none; width:92px; height:92px; border-radius:50%; background:#10131E; border:2px solid rgba(226,232,240,0.35); align-items:center; justify-content:center; color:#FFFFFF; font-size:1.8rem; font-weight:800; letter-spacing:0.05em; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+                     ${initials}
                    </div>`
-                : `<div style="width:100px; height:100px; border-radius:50%; background:linear-gradient(135deg,var(--accent-gold),#b45309); display:flex; align-items:center; justify-content:center; color:#fff; font-size:2.2rem; font-weight:900; border:3px solid var(--accent-gold); box-shadow:0 0 20px rgba(245,158,11,0.4);">
-                     ${(m.name || 'MB').substring(0,2).toUpperCase()}
+                : `<div style="width:92px; height:92px; border-radius:50%; background:#10131E; border:2px solid rgba(226,232,240,0.35); display:flex; align-items:center; justify-content:center; color:#FFFFFF; font-size:1.8rem; font-weight:800; letter-spacing:0.05em; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+                     ${initials}
                    </div>`
               }
-              <!-- Badge kamera overlay -->
+              <!-- Tombol Kamera Minimalis -->
               <label for="m3-photo-upload-${m.id}" title="Ganti Foto Member"
-                style="position:absolute; bottom:2px; right:2px; width:26px; height:26px; border-radius:50%; background:var(--accent-gold); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.4); font-size:0.75rem; border:2px solid #0b0e14;">
-                📷
+                style="position:absolute; bottom:2px; right:2px; width:26px; height:26px; border-radius:50%; background:#1A2030; border:1px solid rgba(226,232,240,0.3); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#CBD5E1; box-shadow:0 2px 8px rgba(0,0,0,0.5);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               </label>
-              <input type="file" id="m3-photo-upload-${m.id}" accept="image/jpeg,image/png,image/webp"
-                style="display:none;" onchange="AppEngine.uploadMemberPhoto(event, '${m.id}')">
+              <input type="file" id="m3-photo-upload-${m.id}" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="AppEngine.uploadMemberPhoto(event, '${m.id}')">
             </div>
 
-            <h3 style="font-size:1.1rem; margin-bottom:4px;" class="text-gradient">${m.name}</h3>
-            <span style="font-size:0.8rem; color:var(--accent-gold); font-weight:700;">@${m.username || 'member'}</span>
-            <div style="margin-top:12px; margin-bottom:12px;">${getTierBadge(m.tier)}</div>
-            <span style="font-family:monospace; font-size:0.8rem; font-weight:800; color:var(--text-main); background:rgba(0,0,0,0.15); padding:4px 10px; border-radius:6px; border:1px solid var(--chrome-border);">
-              ${m.member_id || '[PENDING ID]'}
-            </span>
+            <!-- NAMA LENGKAP -->
+            <h3 style="margin:0 0 6px; font-size:1.05rem; font-weight:700; color:#FFFFFF; line-height:1.3;">${m.name}</h3>
 
-            <!-- INFO UPLOAD FOTO -->
-            <div style="margin-top:14px; padding:10px 12px; background:rgba(255,255,255,0.04); border:1px solid var(--chrome-border); border-radius:8px; text-align:left; width:100%;">
-              <div style="font-size:0.7rem; color:var(--accent-gold); font-weight:700; margin-bottom:5px;">📷 Ketentuan Foto Profil</div>
-              <div style="font-size:0.68rem; color:var(--text-muted); line-height:1.6;">
-                • Format: <strong style="color:var(--text-main);">JPG / PNG / WebP</strong><br>
-                • Maks. ukuran: <strong style="color:var(--primary-emerald);">2 MB</strong><br>
-                • Resolusi min: <strong style="color:var(--text-main);">200 × 200 px</strong><br>
-                • Rasio ideal: <strong style="color:var(--text-main);">1:1 (persegi)</strong>
-              </div>
+            <!-- USERNAME MINIMALIS SILVER TAG -->
+            <div style="margin-bottom:12px;">
+              <span style="font-family:monospace; font-size:0.75rem; color:#94A3B8; background:rgba(255,255,255,0.03); border:1px solid rgba(226,232,240,0.12); padding:3px 10px; border-radius:6px;">
+                @${m.username || 'member'}
+              </span>
             </div>
 
-            <!-- STATUS FOTO -->
-            <div id="m3-photo-status-${m.id}" style="margin-top:8px; font-size:0.7rem; color:var(--text-muted);">
-              ${m.photo_url ? '✅ Foto terpasang' : '⚠️ Belum ada foto — klik 📷 untuk upload'}
+            <!-- BADGE TIER -->
+            <div style="margin-bottom:12px;">
+              ${getTierBadge(m.tier)}
+            </div>
+
+            <!-- MEMBER ID KROM -->
+            <div>
+              <span style="font-family:monospace; font-size:0.75rem; font-weight:700; color:#CBD5E1; background:#05060A; padding:4px 12px; border-radius:6px; border:1px solid rgba(226,232,240,0.15); letter-spacing:0.04em;">
+                ${m.member_id || '[PENDING ID]'}
+              </span>
             </div>
           </div>
 
-          <!-- PROFILE DETAILS TABLE -->
-          <div class="glass-card" style="padding:24px;">
-            <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:16px;">─── 3.4.1 Informasi Lengkap Member ───</h4>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:0.85rem;">
-              <div><strong>Email:</strong> ${m.email}</div>
-              <div><strong>WhatsApp:</strong> ${m.phone || '-'}</div>
-              <div><strong>Klub / Chapter:</strong> ${m.club || 'HQ MB INA'}</div>
-              <div><strong>Domisili:</strong> ${m.city || '-'}, ${m.province || '-'}</div>
-              <div><strong>Jenis Kelamin:</strong> ${m.gender || 'Pria'}</div>
-              <div><strong>Tanggal Lahir:</strong> ${m.birth_date || '-'}</div>
-              <div><strong>Tanggal Bergabung:</strong> ${m.created_at ? new Date(m.created_at).toLocaleDateString('id-ID') : '-'}</div>
-              <div><strong>Status Verifikasi:</strong> <strong style="color:var(--primary-emerald);">${m.status}</strong></div>
+          <!-- 2. KARTU INFORMASI LENGKAP MEMBER (SISI KANAN TANPA REPETISI) -->
+          <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:22px 24px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <!-- HEADER SECTION INFORMASI -->
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:18px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:12px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span style="font-size:0.82rem; font-weight:700; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.05em;">Informasi Member</span>
+              </div>
+
+              <!-- DATA KONTAK & DOMISILI (HORIZONTAL ALIGNED) -->
+              <div style="display:flex; flex-direction:column; gap:11px; font-size:0.82rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:8px;">
+                  <span style="color:#94A3B8;">Email:</span>
+                  <span style="color:#FFFFFF; font-weight:500;">${m.email || '-'}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:8px;">
+                  <span style="color:#94A3B8;">WhatsApp:</span>
+                  <span style="color:#FFFFFF; font-family:monospace; font-weight:500;">${m.phone || '-'}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:8px;">
+                  <span style="color:#94A3B8;">Klub / Chapter:</span>
+                  <span style="color:#FFFFFF; font-weight:500;">${m.club || 'HQ MB INA'}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:8px;">
+                  <span style="color:#94A3B8;">Domisili:</span>
+                  <span style="color:#FFFFFF; font-weight:500;">${m.city ? m.city + ', ' + (m.province || '') : (m.province || '-')}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:2px;">
+                  <span style="color:#94A3B8;">Status Verifikasi:</span>
+                  <span style="background:rgba(16,185,129,0.1); color:#34D399; border:1px solid rgba(16,185,129,0.25); font-size:0.72rem; font-weight:600; padding:2px 10px; border-radius:9999px;">
+                    ${m.status === 'VERIFIED' || m.status === 'ACTIVE' ? 'Active / Terverifikasi' : m.status}
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <!-- STATISTIK BOX -->
-            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-top:20px; border-top:1px solid var(--chrome-border); padding-top:16px;">
-              <div style="background:rgba(16,185,129,0.1); border:1px solid var(--primary-emerald); padding:10px; border-radius:8px; text-align:center;">
-                <div style="font-size:0.72rem; color:var(--text-muted);">Total Donasi</div>
-                <div style="font-size:0.9rem; font-weight:800; color:var(--primary-emerald);">Rp ${new Intl.NumberFormat('id-ID').format(m.total_donation || 0)}</div>
+            <!-- 4 KARTU METRIK GLASSMORPHISM PERAK & EMAS DIREDAM -->
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-top:16px; border-top:1px solid rgba(226,232,240,0.08); padding-top:14px;">
+              <!-- 1. Total Donasi -->
+              <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.1); padding:10px 8px; border-radius:10px; text-align:center;">
+                <div style="font-size:0.68rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Total Donasi</div>
+                <div style="font-size:0.88rem; font-weight:700; font-family:monospace; color:#E2C38E;">
+                  Rp ${new Intl.NumberFormat('id-ID').format(m.total_donation || 0)}
+                </div>
               </div>
-              <div style="background:rgba(59,130,246,0.1); border:1px solid var(--accent-blue); padding:10px; border-radius:8px; text-align:center;">
-                <div style="font-size:0.72rem; color:var(--text-muted);">Total Event</div>
-                <div style="font-size:0.95rem; font-weight:800; color:var(--accent-blue);">${m.total_events || 0}</div>
+
+              <!-- 2. Total Event -->
+              <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.1); padding:10px 8px; border-radius:10px; text-align:center;">
+                <div style="font-size:0.68rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Total Event</div>
+                <div style="font-size:0.95rem; font-weight:700; font-family:monospace; color:#E2C38E;">
+                  ${m.total_events || 0}
+                </div>
               </div>
-              <div style="background:rgba(245,158,11,0.1); border:1px solid var(--accent-gold); padding:10px; border-radius:8px; text-align:center;">
-                <div style="font-size:0.72rem; color:var(--text-muted);">Loyalty Points</div>
-                <div style="font-size:0.95rem; font-weight:800; color:var(--accent-gold);">${m.points || 0} pts</div>
+
+              <!-- 3. Loyalty Points -->
+              <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.1); padding:10px 8px; border-radius:10px; text-align:center;">
+                <div style="font-size:0.68rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Loyalty Points</div>
+                <div style="font-size:0.95rem; font-weight:700; font-family:monospace; color:#E2C38E;">
+                  ${m.points || 0} pts
+                </div>
               </div>
-              <div style="background:rgba(168,85,247,0.1); border:1px solid #A855F7; padding:10px; border-radius:8px; text-align:center;">
-                <div style="font-size:0.72rem; color:var(--text-muted);">Thread Forum</div>
-                <div style="font-size:0.95rem; font-weight:800; color:#A855F7;">${m.forum_threads_count || 0}</div>
+
+              <!-- 4. Thread Forum -->
+              <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.1); padding:10px 8px; border-radius:10px; text-align:center;">
+                <div style="font-size:0.68rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Thread Forum</div>
+                <div style="font-size:0.95rem; font-weight:700; font-family:monospace; color:#E2C38E;">
+                  ${m.forum_threads_count || 0}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- RIWAYAT TIER TIMELINE & DONASI -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px;">
+        <!-- BOTTOM SECTION: RIWAYAT DONASI & RIWAYAT TIER -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
           <!-- 3.4.3 RIWAYAT DONASI -->
-          <div class="glass-card" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <h4 style="font-size:1rem; color:var(--accent-gold);">💰 3.4.3 Riwayat Donasi</h4>
-              <button class="role-pill-btn" style="border-color:var(--primary-emerald); color:var(--primary-emerald);" onclick="AppEngine.openM3AddDonationModal('${m.id}')">+ Donasi</button>
+          <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
+              <h4 style="margin:0; font-size:0.82rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+                <span>Riwayat Donasi</span>
+              </h4>
+              <button type="button" class="mbux-btn-stroke" style="padding:4px 10px; font-size:0.75rem; border-radius:6px;" onclick="AppEngine.openM3AddDonationModal('${m.id}')">
+                + Donasi
+              </button>
             </div>
-            ${donations.length === 0 ? '<p style="font-size:0.82rem; color:var(--text-muted);">Belum ada riwayat donasi.</p>' : `
-              <div style="max-height:180px; overflow-y:auto;">
-                <table class="data-table" style="font-size:0.78rem; width:100%;">
+            ${donations.length === 0 ? '<p style="font-size:0.8rem; color:#64748B; margin:16px 0; text-align:center;">Belum ada riwayat donasi.</p>' : `
+              <div style="max-height:170px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
                   <thead>
-                    <tr><th>TANGGAL</th><th>JUMLAH</th><th>METODE</th><th>STATUS</th></tr>
+                    <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em;">
+                      <th style="padding:8px 6px; text-align:left; font-weight:600;">Tanggal</th>
+                      <th style="padding:8px 6px; text-align:right; font-weight:600;">Jumlah</th>
+                      <th style="padding:8px 6px; text-align:center; font-weight:600;">Metode</th>
+                      <th style="padding:8px 6px; text-align:center; font-weight:600;">Status</th>
+                    </tr>
                   </thead>
                   <tbody>
                     ${donations.map(d => `
-                      <tr>
-                        <td>${new Date(d.created_at).toLocaleDateString('id-ID')}</td>
-                        <td style="font-weight:700; color:var(--primary-emerald);">Rp ${new Intl.NumberFormat('id-ID').format(d.amount)}</td>
-                        <td>${d.payment_method}</td>
-                        <td><span style="color:var(--primary-emerald); font-weight:800;">${d.status}</span></td>
+                      <tr style="border-bottom:1px solid rgba(226,232,240,0.04); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                        <td style="padding:9px 6px; color:#94A3B8; font-family:monospace;">${new Date(d.created_at).toLocaleDateString('id-ID')}</td>
+                        <td style="padding:9px 6px; text-align:right; font-weight:700; font-family:monospace; color:#FFFFFF;">Rp ${new Intl.NumberFormat('id-ID').format(d.amount)}</td>
+                        <td style="padding:9px 6px; text-align:center; color:#CBD5E1;">${d.payment_method || 'Transfer'}</td>
+                        <td style="padding:9px 6px; text-align:center;">
+                          <span style="background:rgba(16,185,129,0.1); color:#34D399; border:1px solid rgba(16,185,129,0.22); font-size:0.68rem; font-weight:600; padding:2px 8px; border-radius:9999px;">
+                            ${d.status === 'SUCCESS' ? 'Success' : (d.status === 'PENDING' ? 'Pending' : d.status)}
+                          </span>
+                        </td>
                       </tr>
                     `).join('')}
                   </tbody>
@@ -10033,17 +10091,22 @@ const AppEngine = {
             `}
           </div>
 
-          <!-- RIWAYAT TIER TIMELINE -->
-          <div class="glass-card" style="padding:20px;">
-            <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:12px;">🏅 Riwayat Tier Member</h4>
+          <!-- RIWAYAT TIER MEMBER -->
+          <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:20px;">
+            <div style="margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
+              <h4 style="margin:0; font-size:0.82rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Riwayat Tier Member</span>
+              </h4>
+            </div>
             ${tierHistory.length === 0 ? `
-              <p style="font-size:0.82rem; color:var(--text-muted);">Awal mendaftar sebagai Tier 🥉 BRONZE.</p>
+              <p style="font-size:0.8rem; color:#64748B; margin:16px 0; text-align:center;">Terdaftar awal sebagai Tier Bronze.</p>
             ` : `
-              <ul style="font-size:0.82rem; list-style:none; padding:0; display:flex; flex-direction:column; gap:8px;">
+              <ul style="font-size:0.78rem; list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; max-height:170px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
                 ${tierHistory.map(th => `
-                  <li style="background:var(--bg-card); border:1px solid var(--chrome-border); padding:8px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <span>Tier <strong>${th.tier}</strong> (${th.year})</span>
-                    <span style="color:var(--text-muted); font-size:0.75rem;">Total: Rp ${new Intl.NumberFormat('id-ID').format(th.total_donation)}</span>
+                  <li style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.08); padding:8px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:#F8FAFC;">Tier <strong>${th.tier}</strong> (${th.year})</span>
+                    <span style="color:#E2C38E; font-family:monospace; font-size:0.75rem;">Total: Rp ${new Intl.NumberFormat('id-ID').format(th.total_donation)}</span>
                   </li>
                 `).join('')}
               </ul>
@@ -10051,21 +10114,30 @@ const AppEngine = {
           </div>
         </div>
 
-        <!-- 3.4.2 RIWAYAT AKTIVITAS TIMELINE -->
-        <div class="glass-card" style="padding:20px;">
-          <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:12px;">📋 3.4.2 Log Riwayat Aktivitas Member</h4>
-          ${activities.length === 0 ? '<p style="font-size:0.82rem; color:var(--text-muted);">Belum ada aktivitas tercatat.</p>' : `
-            <div style="max-height:200px; overflow-y:auto;">
-              <table class="data-table" style="font-size:0.78rem; width:100%;">
+        <!-- 3.4.2 LOG RIWAYAT AKTIVITAS MEMBER -->
+        <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:20px;">
+          <div style="margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
+            <h4 style="margin:0; font-size:0.82rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Log Riwayat Aktivitas Member</span>
+            </h4>
+          </div>
+          ${activities.length === 0 ? '<p style="font-size:0.8rem; color:#64748B; margin:16px 0; text-align:center;">Belum ada aktivitas tercatat.</p>' : `
+            <div style="max-height:190px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
                 <thead>
-                  <tr><th>WAKTU</th><th>AKTIVITAS</th><th>DETAIL KETERANGAN</th></tr>
+                  <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em;">
+                    <th style="padding:8px 8px; text-align:left; font-weight:600; width:130px;">Waktu</th>
+                    <th style="padding:8px 8px; text-align:left; font-weight:600; width:190px;">Aktivitas</th>
+                    <th style="padding:8px 8px; text-align:left; font-weight:600;">Detail Keterangan</th>
+                  </tr>
                 </thead>
                 <tbody>
                   ${activities.map(a => `
-                    <tr>
-                      <td style="color:var(--text-muted);">${new Date(a.created_at).toLocaleString('id-ID')}</td>
-                      <td style="font-weight:700; color:var(--accent-gold);">${a.title}</td>
-                      <td>${a.detail}</td>
+                    <tr style="border-bottom:1px solid rgba(226,232,240,0.04); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                      <td style="padding:9px 8px; color:#64748B; font-family:monospace; font-size:0.72rem;">${new Date(a.created_at).toLocaleString('id-ID')}</td>
+                      <td style="padding:9px 8px; font-weight:600; color:#F8FAFC;">${a.title || 'Aktivitas'}</td>
+                      <td style="padding:9px 8px; color:#94A3B8;">${a.detail || '-'}</td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -10076,11 +10148,11 @@ const AppEngine = {
       `;
 
     } catch (err) {
-      container.innerHTML = `<div style="color:var(--accent-red); padding:20px;">Error: ${err.message}</div>`;
+      container.innerHTML = `<div style="color:#FB7185; padding:20px; text-align:center; font-size:0.85rem;">Error: ${err.message}</div>`;
     }
   },
 
-  openM3AddDonationModal(id) {
+    openM3AddDonationModal(id) {
     const m = this.m3Data.members.find(x => x.id === id);
     if (!m) return;
 
