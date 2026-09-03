@@ -24507,14 +24507,21 @@ window.SponsorPortalEngine = {
 
   switchMainTab: function(tabKey) {
     this.currentTab = tabKey;
-    const tabBtns = ['summary', 'packages', 'confirm', 'ads', 'reports'];
-    tabBtns.forEach(k => {
+    const tabList = ['summary', 'packages', 'confirm', 'ads', 'reports'];
+    
+    tabList.forEach(k => {
       const btn = document.getElementById('spnd-tab-btn-' + k);
+      const sec = document.getElementById('spnd-section-' + k);
+      const isActive = (k === tabKey);
+      
+      if (sec) {
+        sec.style.display = isActive ? 'block' : 'none';
+      }
       if (btn) {
-        if (k === tabKey) {
-          btn.style.background = 'rgba(245,158,11,0.15)';
+        if (isActive) {
+          btn.style.background = 'rgba(245,158,11,0.18)';
           btn.style.color = '#fbbf24';
-          btn.style.borderColor = 'rgba(245,158,11,0.4)';
+          btn.style.borderColor = 'rgba(245,158,11,0.45)';
           btn.style.fontWeight = '600';
         } else {
           btn.style.background = 'rgba(255,255,255,0.03)';
@@ -24525,25 +24532,19 @@ window.SponsorPortalEngine = {
       }
     });
 
-    const summarySec = document.getElementById('spnd-section-summary');
-    const packagesSec = document.getElementById('spnd-section-packages');
-
-    if (tabKey === 'summary') {
-      if (summarySec) summarySec.style.display = 'block';
-      if (packagesSec) packagesSec.style.display = 'none';
-    } else {
-      if (summarySec) summarySec.style.display = 'none';
-      if (packagesSec) packagesSec.style.display = 'block';
-      
-      const subtabMapping = {
-        'packages': '641',
-        'confirm': '643',
-        'ads': '644',
-        'reports': '646'
-      };
-      const innerTabId = subtabMapping[tabKey] || '641';
-      if (window.M6Engine && typeof window.M6Engine.switchSponsorInnerTab === 'function') {
-        window.M6Engine.switchSponsorInnerTab(innerTabId);
+    if (window.M6Engine) {
+      if (tabKey === 'packages') {
+        window.M6Engine.renderSponsorPackagesTable();
+        window.M6Engine.calcSponsorPkgValue();
+      } else if (tabKey === 'confirm') {
+        window.M6Engine.renderSponsorConfirmTable();
+        if (typeof window.M6Engine.renderSponsorApprovalTable === 'function') {
+          window.M6Engine.renderSponsorApprovalTable();
+        }
+      } else if (tabKey === 'ads') {
+        window.M6Engine.renderSponsorBannerSetup();
+      } else if (tabKey === 'reports') {
+        window.M6Engine.renderSponsorEffectivenessReport();
       }
     }
   },
