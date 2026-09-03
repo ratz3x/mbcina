@@ -9927,8 +9927,8 @@ const AppEngine = {
       const initials = (m.name || 'MB').trim().split(/\s+/).map(n => n[0]).slice(0,2).join('').toUpperCase();
 
       container.innerHTML = `
-        <!-- TOP SECTION: IDENTITAS (KIRI) & INFORMASI LENGKAP (KANAN) -->
-        <div style="display:grid; grid-template-columns:230px 1fr; gap:20px; margin-bottom:24px;">
+        <!-- TOP SECTION: IDENTITAS (KIRI) & INFORMASI LENGKAP + RIWAYAT TIER (KANAN) -->
+        <div style="display:grid; grid-template-columns:230px 1fr; gap:20px; margin-bottom:22px;">
           <!-- 1. KARTU IDENTITAS UTAMA (SISI KIRI) -->
           <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:24px 18px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
             <!-- AVATAR CENTERED DENGAN RING CHROME SILVER -->
@@ -9975,44 +9975,64 @@ const AppEngine = {
             </div>
           </div>
 
-          <!-- 2. KARTU INFORMASI LENGKAP MEMBER (SISI KANAN TANPA REPETISI) -->
+          <!-- 2. KARTU INFORMASI LENGKAP MEMBER + RIWAYAT TIER (SISI KANAN) -->
           <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:22px 24px; display:flex; flex-direction:column; justify-content:space-between;">
             <div>
               <!-- HEADER SECTION INFORMASI -->
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:18px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <span style="font-size:0.82rem; font-weight:700; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.05em;">Informasi Member</span>
               </div>
 
-              <!-- DATA KONTAK & DOMISILI (HORIZONTAL ALIGNED) -->
-              <div style="display:flex; flex-direction:column; gap:11px; font-size:0.82rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:8px;">
+              <!-- DATA KONTAK & DOMISILI -->
+              <div style="display:flex; flex-direction:column; gap:9px; font-size:0.82rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:7px;">
                   <span style="color:#94A3B8;">Email:</span>
                   <span style="color:#FFFFFF; font-weight:500;">${m.email || '-'}</span>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:7px;">
                   <span style="color:#94A3B8;">WhatsApp:</span>
                   <span style="color:#FFFFFF; font-family:monospace; font-weight:500;">${m.phone || '-'}</span>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:7px;">
                   <span style="color:#94A3B8;">Klub / Chapter:</span>
                   <span style="color:#FFFFFF; font-weight:500;">${m.club || 'HQ MB INA'}</span>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:7px;">
                   <span style="color:#94A3B8;">Domisili:</span>
                   <span style="color:#FFFFFF; font-weight:500;">${m.city ? m.city + ', ' + (m.province || '') : (m.province || '-')}</span>
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center; padding-top:2px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(226,232,240,0.04); padding-bottom:7px;">
                   <span style="color:#94A3B8;">Status Verifikasi:</span>
                   <span style="background:rgba(16,185,129,0.1); color:#34D399; border:1px solid rgba(16,185,129,0.25); font-size:0.72rem; font-weight:600; padding:2px 10px; border-radius:9999px;">
                     ${m.status === 'VERIFIED' || m.status === 'ACTIVE' ? 'Active / Terverifikasi' : m.status}
                   </span>
                 </div>
+
+                <!-- RIWAYAT TIER MEMBER (INTEGRATED INTO INFORMASI MEMBER) -->
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; padding-top:2px;">
+                  <span style="color:#94A3B8; display:flex; align-items:center; gap:5px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Riwayat Tier:</span>
+                  </span>
+                  <div style="text-align:right;">
+                    ${tierHistory.length === 0
+                      ? '<span style="color:#CBD5E1; font-size:0.78rem;">Terdaftar awal sebagai Tier <strong style="color:#D97706;">Bronze</strong>.</span>'
+                      : `<div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end;">
+                          ${tierHistory.map(th => `
+                            <span style="background:rgba(255,255,255,0.03); border:1px solid rgba(226,232,240,0.12); padding:2px 8px; border-radius:6px; font-size:0.72rem; color:#F8FAFC;">
+                              Tier <strong>${th.tier}</strong> (${th.year}) • <span style="color:#E2C38E; font-family:monospace;">Rp ${new Intl.NumberFormat('id-ID').format(th.total_donation)}</span>
+                            </span>
+                          `).join('')}
+                        </div>`
+                    }
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- 4 KARTU METRIK GLASSMORPHISM PERAK & EMAS DIREDAM -->
-            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-top:16px; border-top:1px solid rgba(226,232,240,0.08); padding-top:14px;">
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-top:14px; border-top:1px solid rgba(226,232,240,0.08); padding-top:14px;">
               <!-- 1. Total Donasi -->
               <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.1); padding:10px 8px; border-radius:10px; text-align:center;">
                 <div style="font-size:0.68rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">Total Donasi</div>
@@ -10048,73 +10068,50 @@ const AppEngine = {
           </div>
         </div>
 
-        <!-- BOTTOM SECTION: RIWAYAT DONASI & RIWAYAT TIER -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
-          <!-- 3.4.3 RIWAYAT DONASI -->
-          <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
-              <h4 style="margin:0; font-size:0.82rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
-                <span>Riwayat Donasi</span>
-              </h4>
-              <button type="button" class="mbux-btn-stroke" style="padding:4px 10px; font-size:0.75rem; border-radius:6px;" onclick="AppEngine.openM3AddDonationModal('${m.id}')">
-                + Donasi
-              </button>
-            </div>
-            ${donations.length === 0 ? '<p style="font-size:0.8rem; color:#64748B; margin:16px 0; text-align:center;">Belum ada riwayat donasi.</p>' : `
-              <div style="max-height:170px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
-                <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
-                  <thead>
-                    <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em;">
-                      <th style="padding:8px 6px; text-align:left; font-weight:600;">Tanggal</th>
-                      <th style="padding:8px 6px; text-align:right; font-weight:600;">Jumlah</th>
-                      <th style="padding:8px 6px; text-align:center; font-weight:600;">Metode</th>
-                      <th style="padding:8px 6px; text-align:center; font-weight:600;">Status</th>
+        <!-- MIDDLE SECTION: RIWAYAT DONASI (LEBAR PENUH / FULL WIDTH — ZERO HORIZONTAL SCROLL) -->
+        <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:20px; margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
+            <h4 style="margin:0; font-size:0.82rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>
+              <span>Riwayat Donasi Anggota</span>
+            </h4>
+            <button type="button" class="mbux-btn-stroke" style="padding:4px 12px; font-size:0.75rem; border-radius:6px;" onclick="AppEngine.openM3AddDonationModal('${m.id}')">
+              + Donasi
+            </button>
+          </div>
+          ${donations.length === 0 ? '<p style="font-size:0.8rem; color:#64748B; margin:16px 0; text-align:center;">Belum ada riwayat donasi tercatat.</p>' : `
+            <div style="max-height:180px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+                <thead>
+                  <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em;">
+                    <th style="padding:10px 10px; text-align:left; font-weight:600; width:130px;">Tanggal</th>
+                    <th style="padding:10px 10px; text-align:left; font-weight:600;">Program Alokasi Donasi</th>
+                    <th style="padding:10px 10px; text-align:right; font-weight:600; width:160px;">Nominal Donasi</th>
+                    <th style="padding:10px 10px; text-align:center; font-weight:600; width:110px;">Metode</th>
+                    <th style="padding:10px 10px; text-align:center; font-weight:600; width:100px;">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${donations.map(d => `
+                    <tr style="border-bottom:1px solid rgba(226,232,240,0.04); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                      <td style="padding:10px 10px; color:#94A3B8; font-family:monospace;">${new Date(d.created_at).toLocaleDateString('id-ID')}</td>
+                      <td style="padding:10px 10px; color:#CBD5E1;">${d.campaign_title || d.campaign_id || 'Donasi MB INA Peduli'}</td>
+                      <td style="padding:10px 10px; text-align:right; font-weight:700; font-family:monospace; color:#FFFFFF;">Rp ${new Intl.NumberFormat('id-ID').format(d.amount)}</td>
+                      <td style="padding:10px 10px; text-align:center; color:#CBD5E1;">${d.payment_method || 'Transfer'}</td>
+                      <td style="padding:10px 10px; text-align:center;">
+                        <span style="background:rgba(16,185,129,0.1); color:#34D399; border:1px solid rgba(16,185,129,0.22); font-size:0.68rem; font-weight:600; padding:2px 8px; border-radius:9999px;">
+                          ${d.status === 'SUCCESS' ? 'Success' : (d.status === 'PENDING' ? 'Pending' : d.status)}
+                        </span>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    ${donations.map(d => `
-                      <tr style="border-bottom:1px solid rgba(226,232,240,0.04); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
-                        <td style="padding:9px 6px; color:#94A3B8; font-family:monospace;">${new Date(d.created_at).toLocaleDateString('id-ID')}</td>
-                        <td style="padding:9px 6px; text-align:right; font-weight:700; font-family:monospace; color:#FFFFFF;">Rp ${new Intl.NumberFormat('id-ID').format(d.amount)}</td>
-                        <td style="padding:9px 6px; text-align:center; color:#CBD5E1;">${d.payment_method || 'Transfer'}</td>
-                        <td style="padding:9px 6px; text-align:center;">
-                          <span style="background:rgba(16,185,129,0.1); color:#34D399; border:1px solid rgba(16,185,129,0.22); font-size:0.68rem; font-weight:600; padding:2px 8px; border-radius:9999px;">
-                            ${d.status === 'SUCCESS' ? 'Success' : (d.status === 'PENDING' ? 'Pending' : d.status)}
-                          </span>
-                        </td>
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
-              </div>
-            `}
-          </div>
-
-          <!-- RIWAYAT TIER MEMBER -->
-          <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:20px;">
-            <div style="margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
-              <h4 style="margin:0; font-size:0.82rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span>Riwayat Tier Member</span>
-              </h4>
+                  `).join('')}
+                </tbody>
+              </table>
             </div>
-            ${tierHistory.length === 0 ? `
-              <p style="font-size:0.8rem; color:#64748B; margin:16px 0; text-align:center;">Terdaftar awal sebagai Tier Bronze.</p>
-            ` : `
-              <ul style="font-size:0.78rem; list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; max-height:170px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
-                ${tierHistory.map(th => `
-                  <li style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.08); padding:8px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <span style="color:#F8FAFC;">Tier <strong>${th.tier}</strong> (${th.year})</span>
-                    <span style="color:#E2C38E; font-family:monospace; font-size:0.75rem;">Total: Rp ${new Intl.NumberFormat('id-ID').format(th.total_donation)}</span>
-                  </li>
-                `).join('')}
-              </ul>
-            `}
-          </div>
+          `}
         </div>
 
-        <!-- 3.4.2 LOG RIWAYAT AKTIVITAS MEMBER -->
+        <!-- BOTTOM SECTION: LOG RIWAYAT AKTIVITAS MEMBER (LEBAR PENUH) -->
         <div style="background:rgba(18,21,31,0.65); border:1px solid rgba(226,232,240,0.1); border-radius:16px; padding:20px;">
           <div style="margin-bottom:12px; border-bottom:1px solid rgba(226,232,240,0.08); padding-bottom:10px;">
             <h4 style="margin:0; font-size:0.82rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
@@ -10123,21 +10120,21 @@ const AppEngine = {
             </h4>
           </div>
           ${activities.length === 0 ? '<p style="font-size:0.8rem; color:#64748B; margin:16px 0; text-align:center;">Belum ada aktivitas tercatat.</p>' : `
-            <div style="max-height:190px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
-              <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+            <div style="max-height:180px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(226,232,240,0.2) transparent;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
                 <thead>
-                  <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em;">
-                    <th style="padding:8px 8px; text-align:left; font-weight:600; width:130px;">Waktu</th>
-                    <th style="padding:8px 8px; text-align:left; font-weight:600; width:190px;">Aktivitas</th>
-                    <th style="padding:8px 8px; text-align:left; font-weight:600;">Detail Keterangan</th>
+                  <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em;">
+                    <th style="padding:10px 10px; text-align:left; font-weight:600; width:140px;">Waktu</th>
+                    <th style="padding:10px 10px; text-align:left; font-weight:600; width:220px;">Aktivitas</th>
+                    <th style="padding:10px 10px; text-align:left; font-weight:600;">Detail Keterangan</th>
                   </tr>
                 </thead>
                 <tbody>
                   ${activities.map(a => `
                     <tr style="border-bottom:1px solid rgba(226,232,240,0.04); transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
-                      <td style="padding:9px 8px; color:#64748B; font-family:monospace; font-size:0.72rem;">${new Date(a.created_at).toLocaleString('id-ID')}</td>
-                      <td style="padding:9px 8px; font-weight:600; color:#F8FAFC;">${a.title || 'Aktivitas'}</td>
-                      <td style="padding:9px 8px; color:#94A3B8;">${a.detail || '-'}</td>
+                      <td style="padding:10px 10px; color:#64748B; font-family:monospace; font-size:0.72rem;">${new Date(a.created_at).toLocaleString('id-ID')}</td>
+                      <td style="padding:10px 10px; font-weight:600; color:#F8FAFC;">${a.title || 'Aktivitas'}</td>
+                      <td style="padding:10px 10px; color:#94A3B8;">${a.detail || '-'}</td>
                     </tr>
                   `).join('')}
                 </tbody>
