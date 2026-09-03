@@ -16196,45 +16196,26 @@ const M6Engine = {
   },
 
   getActiveSponsorEvents() {
-    const masterOfficial = typeof this.getMasterOfficialProposals === 'function' ? this.getMasterOfficialProposals() : [];
     let savedProps = [];
     try {
       savedProps = JSON.parse(localStorage.getItem('mbcina_m6_proposals') || '[]');
     } catch(e) {}
 
-    const allProposals = [...(this.data?.proposals || []), ...savedProps, ...masterOfficial];
-    
-    // Priority mapping: masterOfficial baseline, updated by savedProps, updated by live this.data.proposals
-    const propMap = new Map();
-    masterOfficial.forEach(m => {
-      const code = String(m.event_code || m.id || '').trim().toUpperCase();
-      if (code) propMap.set(code, m);
-    });
-    savedProps.forEach(p => {
-      if (!p) return;
-      const code = String(p.event_code || p.id || '').trim().toUpperCase();
-      if (code) propMap.set(code, p);
-    });
-    (this.data?.proposals || []).forEach(p => {
-      if (!p) return;
-      const code = String(p.event_code || p.id || '').trim().toUpperCase();
-      if (code) propMap.set(code, p);
-    });
+    // 1. Ambil data proposal langsung dari pipeline yang sama persis dengan Tabel Persetujuan Presiden (Subtab 6.2)
+    const allProposals = typeof this.sanitizeProposals === 'function' ? this.sanitizeProposals(savedProps) : (this.data?.proposals || []);
+    this.data.proposals = allProposals;
 
-    // ⛔ STRICT PRESIDENT CONFIRMATION FILTER:
-    // Only proposals with status 'APPROVED' or 'ACCEPTED' and confirmed by President are permitted!
-    // Proposals with status PENDING, REVISION, REJECTED, or DRAFT are completely excluded.
-    const confirmedProposals = Array.from(propMap.values()).filter(p => {
+    // 2. ⛔ FILTER KETAT PERSETUJUAN PRESIDEN:
+    // Hanya proposal yang berstatus 'APPROVED' atau 'ACCEPTED' (Diterima / Disahkan Presiden) di Tabel Persetujuan Presiden
+    const confirmedProposals = allProposals.filter(p => {
       if (!p) return false;
       const st = String(p.status || '').trim().toUpperCase();
-      if (st === 'PENDING' || st === 'REVISION' || st === 'REJECTED' || st === 'DRAFT') {
-        return false;
-      }
-      return st === 'APPROVED' || st === 'ACCEPTED' || st === 'CONFIRMED';
+      return st === 'APPROVED' || st === 'ACCEPTED';
     });
 
     let list = confirmedProposals;
     if (!list || !list.length) {
+      const masterOfficial = typeof this.getMasterOfficialProposals === 'function' ? this.getMasterOfficialProposals() : [];
       list = masterOfficial.filter(m => m.status === 'APPROVED' || m.status === 'ACCEPTED');
     }
 
