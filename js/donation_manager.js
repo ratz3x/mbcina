@@ -1118,6 +1118,11 @@
                   <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Lampirkan Bukti Transfer (Foto/Struk) *</label>
                   <input type="file" id="donate-modal-proof-file" accept="image/*" class="mbux-input" style="width:100%; box-sizing:border-box; padding:6px;" onchange="window.DonationManager.handleProofFileSelect(event)">
                   <div style="font-size:0.7rem; color:#64748B; margin-top:4px;">Format: JPG, PNG, WEBP. Admin wajib memverifikasi struk ini sebelum persetujuan.</div>
+                  <div id="donate-proof-preview-box" style="margin-top:10px; display:none; text-align:center; background:#05060A; border:1px solid rgba(226,232,240,0.18); border-radius:12px; padding:10px;">
+                    <span style="font-size:0.7rem; color:#94A3B8; display:block; margin-bottom:6px;">Preview Struk Transfer Terpilih:</span>
+                    <img id="donate-proof-preview-img" src="" style="max-height:180px; max-width:100%; border-radius:8px; object-fit:contain; box-shadow:0 4px 14px rgba(0,0,0,0.6);">
+                    <div style="font-size:0.72rem; color:#34D399; margin-top:6px; font-weight:600;">✓ Foto struk siap dikirim ke database</div>
+                  </div>
                 </div>
 
                 <!-- NOTES -->
@@ -1148,6 +1153,12 @@
       const reader = new FileReader();
       reader.onload = (evt) => {
         this._stagedProofUrl = evt.target.result;
+        const box = document.getElementById('donate-proof-preview-box');
+        const img = document.getElementById('donate-proof-preview-img');
+        if (box && img) {
+          img.src = this._stagedProofUrl;
+          box.style.display = 'block';
+        }
       };
       reader.readAsDataURL(file);
     },
@@ -1233,6 +1244,41 @@
     },
 
     // ─── MODAL 1: VERIFIKASI BUKTI TRANSFER (WAJIB PERIKSA BUKTI) ─────────────
+    
+    async handleUpdateVerifyProof(e, donationId) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        const base64 = evt.target.result;
+        try {
+          const res = await fetch('api.php?action=update_donation_proof', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              donation_id: donationId,
+              payment_proof_url: base64
+            })
+          }).then(r => r.json());
+
+          if (res && res.success) {
+            const newUrl = res.payment_proof_url || base64;
+            const don = this.data.donations.find(d => String(d.id) === String(donationId));
+            if (don) don.payment_proof_url = newUrl;
+            const img = document.getElementById('mbux-verify-proof-img');
+            if (img) img.src = newUrl;
+            this.notifyToast('✓ Bukti struk transfer berhasil diperbarui di database!', 'success');
+            await this.fetchLiveData();
+          } else {
+            this.notifyToast('Gagal memperbarui bukti transfer: ' + ((res && res.message) || 'Error'), 'error');
+          }
+        } catch(err) {
+          this.notifyToast('Gagal terhubung ke server database.', 'error');
+        }
+      };
+      reader.readAsDataURL(file);
+    },
+
     openVerifyModal(donationId) {
       const don = this.data.donations.find(d => String(d.id) === String(donationId) || String(d.trx_code) === String(donationId));
       if (!don) {
@@ -1242,7 +1288,8 @@
       this.selectedDonationId = don.id;
 
       const camp = this.data.campaigns.find(c => c.id === don.campaign_id) || {};
-      const proofUrl = don.payment_proof_url || 'assets/mb_hero.jpg';
+      const proofUrl = don.payment_proof_url || '';
+      const displayProofUrl = (!proofUrl || proofUrl.includes('mb_hero.jpg')) ? 'assets/struk_transfer_sample.svg' : proofUrl;
       const isPending = don.status === 'PENDING';
       const isSuccess = don.status === 'SUCCESS' || don.status === 'CONFIRMED';
       const isRejected = don.status === 'REJECTED';
@@ -1279,13 +1326,20 @@
                   <span style="font-size:0.72rem; font-weight:600; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.04em;">
                     Struk / Dokumen Pembayaran:
                   </span>
-                  <a href="${proofUrl}" target="_blank" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    <span>Buka Ukuran Penuh</span>
-                  </a>
+                  <div style="display:flex; gap:6px;">
+                    <button type="button" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;" onclick="document.getElementById('modal-verify-upload-proof').click()">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      <span>Ganti / Upload Bukti Baru</span>
+                    </button>
+                    <input type="file" id="modal-verify-upload-proof" accept="image/*" style="display:none;" onchange="window.DonationManager.handleUpdateVerifyProof(event, '${don.id}')">
+                    <a href="${displayProofUrl}" target="_blank" class="mbux-btn-stroke" style="font-size:0.72rem; padding:3px 8px;">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      <span>Ukuran Penuh</span>
+                    </a>
+                  </div>
                 </div>
                 <div style="background:#05060A; border:1px solid rgba(226,232,240,0.18); border-radius:14px; padding:10px; text-align:center; overflow:hidden;">
-                  <img src="${proofUrl}" alt="Bukti Transfer Donasi" onerror="this.src='assets/mb_hero.jpg'"
+                  <img id="mbux-verify-proof-img" src="${displayProofUrl}" alt="Bukti Transfer Donasi" onerror="this.src='assets/struk_transfer_sample.svg'"
                     style="max-height:240px; max-width:100%; border-radius:8px; object-fit:contain; box-shadow:0 8px 24px rgba(0,0,0,0.6);">
                 </div>
               </div>

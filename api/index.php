@@ -182,6 +182,7 @@ $moduleMap = [
     'create_donation_campaign' => 'm7_donasi',
     'submit_donation' => 'm7_donasi',
     'verify_donation' => 'm7_donasi',
+    'update_donation_proof' => 'm7_donasi',
     'get_m7_data' => 'm8_marketplace',
     'delete_lapak' => 'm8_marketplace',
     'create_lapak' => 'm8_marketplace',

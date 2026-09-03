@@ -149,13 +149,61 @@ switch ($action) {
             } else {
                 $seq = 1;
             }
+            // If proofUrl is a base64 string, write file to uploads/donations/
+            if (!empty($proofUrl) && strpos($proofUrl, 'data:image/') === 0) {
+                $dir = __DIR__ . '/../uploads/donations';
+                if (!is_dir($dir)) @mkdir($dir, 0777, true);
+                $parts = explode(',', $proofUrl);
+                $ext = 'jpg';
+                if (strpos($parts[0], 'image/png') !== false) $ext = 'png';
+                else if (strpos($parts[0], 'image/webp') !== false) $ext = 'webp';
+                $filename = 'proof_' . date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+                $saved = @file_put_contents($dir . '/' . $filename, base64_decode($parts[1]));
+                if ($saved !== false) {
+                    $proofUrl = 'uploads/donations/' . $filename;
+                }
+            }
+
             $id = 'DON-TRX-' . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
             $stmt = $sPdo->prepare("INSERT INTO donations (id, campaign_id, user_id, amount, payment_method, status, payment_status, payment_proof_url, notes) VALUES (?, ?, ?, ?, ?, 'PENDING', 'PENDING', ?, ?)");
             $stmt->execute([$id, $campaignId, $userId, $amount, $paymentMethod, $proofUrl, $notes]);
 
             logAudit($userId, 'CREATE', 'DONATION', ['donation_id' => $id, 'amount' => $amount, 'method' => $paymentMethod]);
 
-            echo json_encode(['success' => true, 'message' => 'Donasi berhasil dikirim dan menunggu verifikasi Admin sesuai bukti transfer!', 'id' => $id]);
+            echo json_encode(['success' => true, 'message' => 'Donasi berhasil dikirim dan menunggu verifikasi Admin sesuai bukti transfer!', 'id' => $id, 'payment_proof_url' => $proofUrl]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'update_donation_proof':
+        try {
+            $donationId = $input['donation_id'] ?? '';
+            $proofUrl   = $input['payment_proof_url'] ?? '';
+
+            if (empty($donationId) || empty($proofUrl)) {
+                echo json_encode(['success' => false, 'message' => 'Donation ID dan Bukti Transfer wajib diisi!']);
+                exit;
+            }
+
+            if (strpos($proofUrl, 'data:image/') === 0) {
+                $dir = __DIR__ . '/../uploads/donations';
+                if (!is_dir($dir)) @mkdir($dir, 0777, true);
+                $parts = explode(',', $proofUrl);
+                $ext = 'jpg';
+                if (strpos($parts[0], 'image/png') !== false) $ext = 'png';
+                else if (strpos($parts[0], 'image/webp') !== false) $ext = 'webp';
+                $filename = 'proof_' . date('Ymd_His') . '_' . uniqid() . '.' . $ext;
+                $saved = @file_put_contents($dir . '/' . $filename, base64_decode($parts[1]));
+                if ($saved !== false) {
+                    $proofUrl = 'uploads/donations/' . $filename;
+                }
+            }
+
+            $stmt = $sPdo->prepare("UPDATE donations SET payment_proof_url = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$proofUrl, $donationId]);
+
+            echo json_encode(['success' => true, 'message' => 'Bukti transfer berhasil diperbarui!', 'payment_proof_url' => $proofUrl]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
