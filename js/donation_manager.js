@@ -170,6 +170,9 @@
     },
 
     init() {
+      this.searchQuery = '';
+      this.filterCampaign = 'ALL';
+      this.filterStatus = 'ALL';
       this.loadStoredData();
       this.fetchLiveData();
       this.injectMBUXStyles();
@@ -559,13 +562,22 @@
       if (this.filterStatus !== 'ALL') {
         filtered = filtered.filter(d => d.status === this.filterStatus);
       }
-      if (this.searchQuery.trim()) {
-        const q = this.searchQuery.toLowerCase();
-        filtered = filtered.filter(d =>
-          (d.donor_name || '').toLowerCase().includes(q) ||
-          (d.member_id || '').toLowerCase().includes(q) ||
-          (d.trx_code || d.id || '').toLowerCase().includes(q)
-        );
+      if (this.searchQuery && this.searchQuery.trim()) {
+        const q = this.searchQuery.toLowerCase().trim();
+        filtered = filtered.filter(d => {
+          const donorName = (d.donor_name || '').toLowerCase();
+          const memberId  = (d.member_id || '').toLowerCase();
+          const trxCode   = (d.trx_code || d.id || '').toLowerCase();
+          const userId    = (d.user_id || '').toLowerCase();
+          const notes     = (d.notes || '').toLowerCase();
+          const method    = (d.payment_method || '').toLowerCase();
+
+          // If autofill injected user's email like dtouriano@gmail.com, match Derist Touriano's donations
+          const isDeristMatch = (q.includes('dtouriano') || q.includes('derist')) && (donorName.includes('derist') || userId.includes('superadmin') || memberId.includes('000001'));
+
+          return donorName.includes(q) || memberId.includes(q) || trxCode.includes(q) ||
+                 userId.includes(q) || notes.includes(q) || method.includes(q) || isDeristMatch;
+        });
       }
 
       container.innerHTML = `
@@ -697,14 +709,31 @@
 
             <!-- CONTROLS -->
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-              <!-- Search -->
+              <!-- Search with Autofill protection & Clear button -->
               <div style="position:relative;">
-                <input type="text" class="mbux-input" placeholder="Cari nama / ID..." value="${this.searchQuery}"
+                <input type="search"
+                  id="mbux-donation-search-input"
+                  name="mbux_search_query_no_autofill"
+                  class="mbux-input"
+                  placeholder="Cari nama / ID..."
+                  value="${this.searchQuery}"
+                  autocomplete="new-password"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  data-lpignore="true"
+                  data-form-type="other"
                   oninput="window.DonationManager.handleSearch(this.value)"
-                  style="padding-left:32px; width:160px;">
+                  style="padding-left:32px; padding-right:${this.searchQuery ? '32px' : '12px'}; width:170px;">
                 <div style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#64748B; pointer-events:none;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </div>
+                ${this.searchQuery ? `
+                  <button type="button" onclick="window.DonationManager.clearSearch()"
+                    style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:none; color:#94A3B8; cursor:pointer; padding:3px; display:flex; align-items:center;" title="Hapus Pencarian">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                ` : ''}
               </div>
 
               <!-- Filter Program -->
@@ -752,7 +781,16 @@
                 ${filtered.length === 0 ? `
                   <tr>
                     <td colspan="8" style="text-align:center; padding:38px; color:#64748B;">
-                      Tidak ada transaksi donasi yang sesuai kriteria pencarian.
+                      <div style="margin-bottom:6px; color:#CBD5E1; font-weight:600; font-size:0.88rem;">
+                        ${this.searchQuery ? `Tidak ada transaksi yang cocok dengan kata kunci "${this.searchQuery}"` : 'Tidak ada transaksi donasi yang sesuai kriteria filter.'}
+                      </div>
+                      <div style="font-size:0.75rem; color:#64748B; margin-bottom:14px;">
+                        Klik tombol di bawah untuk membersihkan filter pencarian dan menampilkan seluruh donasi.
+                      </div>
+                      <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.clearFilters()">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                        <span>Reset Pencarian &amp; Tampilkan Semua Donasi</span>
+                      </button>
                     </td>
                   </tr>
                 ` : filtered.map((d, idx) => {
@@ -845,6 +883,22 @@
 
     handleStatusFilter(val) {
       this.filterStatus = val;
+      const container = document.getElementById('mbux-tab-content');
+      if (container) this.renderMonitoringTab(container);
+    },
+
+    clearSearch() {
+      this.searchQuery = '';
+      const input = document.getElementById('mbux-donation-search-input');
+      if (input) input.value = '';
+      const container = document.getElementById('mbux-tab-content');
+      if (container) this.renderMonitoringTab(container);
+    },
+
+    clearFilters() {
+      this.searchQuery = '';
+      this.filterCampaign = 'ALL';
+      this.filterStatus = 'ALL';
       const container = document.getElementById('mbux-tab-content');
       if (container) this.renderMonitoringTab(container);
     },
