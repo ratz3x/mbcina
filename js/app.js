@@ -745,37 +745,37 @@ const AppEngine = {
       return `${parts[2]} ${months[parseInt(parts[1])-1]}`;
     };
 
-    el.innerHTML = `<div style="display:flex; gap:10px; flex-wrap:wrap;">` + events.slice(0, 2).map(e => {
+    el.innerHTML = events.slice(0, 2).map(e => {
       const isFull = (e.registered_count || 0) >= (e.capacity || 0);
       const loc = e.city || e.location || 'Jakarta';
       const rawPrice = e.ticket_online_price ?? e.ticket_price ?? e.htm_nett ?? 0;
       const dateStr = e.start_date || e.date_start || '';
       return `
-      <div style="flex:1; min-width:230px; padding:12px 14px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; display:flex; flex-direction:column; justify-content:space-between;">
+      <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:8px; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px; gap:8px;">
-            <span style="font-size:0.78rem; font-weight:700; color:#fff; line-height:1.3; overflow:hidden; text-overflow:ellipsis;" title="${e.title}">${e.title}</span>
-            <span style="font-size:0.68rem; color:var(--accent-gold); font-weight:700; flex-shrink:0; background:rgba(245,158,11,0.1); padding:2px 6px; border-radius:4px; border:1px solid rgba(245,158,11,0.2);">${fmtDate(dateStr)}</span>
+            <span style="font-size:0.78rem; font-weight:700; color:#ffffff; line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical;" title="${e.title}">${e.title}</span>
+            <span style="font-size:0.68rem; color:#fbbf24; font-weight:600; flex-shrink:0; background:rgba(245,158,11,0.08); padding:2px 6px; border-radius:4px; border:1px solid rgba(245,158,11,0.2); font-family:monospace;">${fmtDate(dateStr)}</span>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:var(--text-muted); margin-bottom:8px;">
-            <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:130px;">📍 ${loc}</span>
-            <span style="color:${rawPrice === 0 ? 'var(--primary-emerald)' : 'var(--accent-gold)'}; font-weight:700;">${fmtRp(rawPrice)}</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:#94a3b8; margin-bottom:8px;">
+            <span style="display:flex; align-items:center; gap:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>${loc}</span>
+            </span>
+            <span style="color:${rawPrice === 0 ? '#34d399' : '#fbbf24'}; font-weight:600; font-family:monospace;">${fmtRp(rawPrice)}</span>
           </div>
         </div>
-        <div style="display:flex; gap:6px; align-items:center;">
-          <button style="padding:4px 8px; font-size:0.7rem; font-weight:600; background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); border-radius:6px; cursor:pointer;" onclick="AppEngine.openMemberEventDetailModal('${e.id}')">
-            👁️ View
+        <div style="display:flex; justify-content:space-between; align-items:center; pt-1;">
+          <button type="button" style="padding:4px 10px; font-size:0.7rem; font-weight:500; background:rgba(255,255,255,0.04); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); border-radius:8px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'" onclick="AppEngine.openMemberEventDetailModal('${e.id}')">
+            Detail Agenda
           </button>
           ${!isFull ? `
-          <button style="padding:4px 10px; font-size:0.7rem; font-weight:700; background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); border-radius:6px; cursor:pointer;" onclick="AppEngine.openMemberEventRegisterModal('${e.id}','ONLINE')">
-            Daftar Online
-          </button>
-          <button style="padding:4px 10px; font-size:0.7rem; font-weight:600; background:rgba(255,255,255,0.05); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); border-radius:6px; cursor:pointer;" onclick="AppEngine.openMemberEventRegisterModal('${e.id}','OFFLINE')">
-            Offline
-          </button>` : `<span style="font-size:0.68rem; color:#f87171; font-weight:700;">KUOTA PENUH</span>`}
+          <button type="button" style="padding:4px 10px; font-size:0.7rem; font-weight:600; background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); border-radius:8px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.12)'" onclick="AppEngine.openMemberEventRegisterModal('${e.id}','ONLINE')">
+            Daftar Event
+          </button>` : `<span style="font-size:0.68rem; color:#f87171; font-weight:600; background:rgba(239,68,68,0.1); padding:2px 8px; border-radius:6px; border:1px solid rgba(239,68,68,0.2);">Kuota Penuh</span>`}
         </div>
       </div>`;
-    }).join('') + `</div>`;
+    }).join('');
   },
 
   // ── DETAIL EVENT MODAL (PORTAL MEMBER) ──
@@ -829,11 +829,11 @@ const AppEngine = {
         <div class="modal-body" style="padding:16px 20px;">
           <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; margin-bottom:14px;">
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.82rem;">
-              <div><span style="color:var(--text-muted);">📅 Waktu & Tanggal:</span><br><strong style="color:#fff;">${dateFormatted} (${timeFormatted})</strong></div>
-              <div><span style="color:var(--text-muted);">🎟️ Biaya Pendaftaran:</span><br><strong>${priceDisplay}</strong></div>
-              <div style="grid-column:1 / -1;"><span style="color:var(--text-muted);">📍 Lokasi & Alamat:</span><br><strong style="color:#fff;">${evt.location || evt.address || 'TOPGOLF Fatmawati, Jakarta'}</strong></div>
-              <div><span style="color:var(--text-muted);">👥 Kapasitas Peserta:</span><br><strong style="color:var(--accent-gold);">${evt.capacity || 150} Orang</strong></div>
-              <div><span style="color:var(--text-muted);">🟢 Status Kegiatan:</span><br><span style="color:var(--primary-emerald); font-weight:700;">Resmi Disetujui Presiden</span></div>
+              <div><span style="color:var(--text-muted);">Waktu & Tanggal:</span><br><strong style="color:#fff;">${dateFormatted} (${timeFormatted})</strong></div>
+              <div><span style="color:var(--text-muted);">Biaya Pendaftaran:</span><br><strong>${priceDisplay}</strong></div>
+              <div style="grid-column:1 / -1;"><span style="color:var(--text-muted);">Lokasi & Alamat:</span><br><strong style="color:#fff;">${evt.location || evt.address || 'TOPGOLF Fatmawati, Jakarta'}</strong></div>
+              <div><span style="color:var(--text-muted);">Kapasitas Peserta:</span><br><strong style="color:var(--accent-gold);">${evt.capacity || 150} Orang</strong></div>
+              <div><span style="color:var(--text-muted);">Status Kegiatan:</span><br><span style="color:var(--primary-emerald); font-weight:700;">Resmi Disetujui</span></div>
             </div>
           </div>
           <div style="margin-bottom:16px;">
@@ -841,8 +841,8 @@ const AppEngine = {
             <div style="font-size:0.82rem; color:#cbd5e1; background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); white-space:pre-line; line-height:1.6;">${evt.description || 'Kegiatan resmi Mercedes-Benz Club Indonesia.'}</div>
           </div>
           <div style="display:flex; gap:10px; justify-content:flex-end;">
-            <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','ONLINE');">🎟️ Daftar Online</button>
-            <button class="btn-primary" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); font-weight:600; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','OFFLINE');">📝 Daftar Offline</button>
+            <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','ONLINE');">Daftar Online</button>
+            <button class="btn-primary" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); font-weight:600; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','OFFLINE');">Daftar Offline</button>
           </div>
         </div>
       </div>
@@ -852,7 +852,7 @@ const AppEngine = {
     modal.style.display = 'flex';
   },
 
-  // ── KARTU 2: DONASI — tampilkan campaign AKTIF ──
+  // ── KARTU 2: DONASI — tampilkan campaign AKTIF (LUXURY BENTO CARD) ──
   _renderMemberDonasiCard() {
     const el = document.getElementById('member-donasi-card-body');
     if (!el) return;
@@ -866,37 +866,41 @@ const AppEngine = {
     }
     if (!campaigns.length) {
       campaigns = [
-        { id: 'camp_yogya_2026', title: 'Dana Touring & Bakti Sosial Yogyakarta 2026', target_amount: 50000000, goal_amount: 50000000, collected_amount: 32450000, status: 'ACTIVE', deadline: '2026-08-31', category: 'SOSIAL', donors_count: 48, donor_count: 48 },
-        { id: 'camp_jamnas_2026', title: 'Sponsorship Jamnas MB INA XXV 2026', target_amount: 150000000, goal_amount: 150000000, collected_amount: 78000000, status: 'ACTIVE', deadline: '2026-10-31', category: 'EVENT', donors_count: 112, donor_count: 112 }
+        { id: 'camp_yogya_2026', title: 'Dana Baksos & Peduli Sesama Yogyakarta 2026', target_amount: 50000000, goal_amount: 50000000, collected_amount: 32450000, status: 'ACTIVE', deadline: '2026-08-31', category: 'SOSIAL', donors_count: 48, donor_count: 48 }
       ];
     }
 
     const fmtRp = v => 'Rp ' + Number(v || 0).toLocaleString('id-ID');
+    const c = campaigns[0] || {};
+    const targetVal = Number(c.target_amount || c.goal_amount || c.target || 50000000);
+    const collectedVal = Number(c.collected_amount || 0);
+    const pct = Math.min(100, Math.round((collectedVal / (targetVal || 1)) * 100));
 
-    el.innerHTML = `<div style="display:flex; gap:10px; flex-wrap:wrap;">` + campaigns.slice(0, 2).map(c => {
-      const targetVal = Number(c.target_amount || c.goal_amount || c.target || 50000000);
-      const collectedVal = Number(c.collected_amount || 0);
-      const pct = Math.min(100, Math.round((collectedVal / (targetVal || 1)) * 100));
-      return `
-      <div style="flex:1; min-width:230px; padding:10px 14px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
-        <div style="font-size:0.78rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:4px;">${c.title}</div>
-        <div style="display:flex; justify-content:space-between; font-size:0.68rem; color:var(--text-muted); margin-bottom:6px;">
-          <span>Terkumpul: <strong style="color:#34d399;">${fmtRp(collectedVal)}</strong></span>
-          <span style="color:#34d399; font-weight:700;">${pct}%</span>
+    el.innerHTML = `
+      <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:14px; border-radius:12px;">
+        <div style="font-size:0.8rem; font-weight:700; color:#ffffff; line-height:1.3; margin-bottom:8px; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical;" title="${c.title || 'Program Donasi MB INA'}">
+          ${c.title || 'Donasi MB INA Peduli Sesama'}
         </div>
-        <div style="background:rgba(255,255,255,0.06); border-radius:999px; height:5px; overflow:hidden; margin-bottom:8px;">
-          <div style="height:100%; width:${pct}%; background:linear-gradient(90deg,#10b981,#059669); border-radius:999px;"></div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+          <div>
+            <span style="font-size:0.68rem; color:#94a3b8; display:block;">Terkumpul:</span>
+            <span style="font-family:monospace; font-size:0.95rem; font-weight:700; color:#34d399;">${fmtRp(collectedVal)}</span>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:0.68rem; color:#94a3b8; display:block;">Target: ${fmtRp(targetVal)}</span>
+            <span style="font-family:monospace; font-size:0.8rem; font-weight:700; color:#fbbf24;">${pct}%</span>
+          </div>
         </div>
-        <div style="display:flex; gap:6px;">
-          <button style="font-size:0.7rem; padding:4px 10px; background:transparent; color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); border-radius:6px; font-weight:600; cursor:pointer;" onclick="AppEngine.openDonationDetailModal('${c.id}')">
-            Detail
-          </button>
-          <button style="flex:1; font-size:0.7rem; padding:4px 10px; background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); border-radius:6px; font-weight:700; cursor:pointer;" onclick="AppEngine.openMemberDonationModal('${c.id}')">
-            Donasi Sekarang
-          </button>
+        <!-- Slim Gradient Progress Bar -->
+        <div style="height:6px; border-radius:9999px; background:rgba(255,255,255,0.08); overflow:hidden; margin:8px 0 6px;">
+          <div style="height:100%; border-radius:9999px; width:${pct}%; background:linear-gradient(90deg, #f59e0b 0%, #10b981 100%); transition:width 0.5s ease;"></div>
         </div>
-      </div>`;
-    }).join('');
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:#64748b; margin-top:4px;">
+          <span>${c.donors_count || c.donor_count || 48} Donatur Berpartisipasi</span>
+          <a href="javascript:void(0)" onclick="AppEngine.openDonationDetailModal('${c.id || 'camp_yogya_2026'}')" style="color:#94a3b8; text-decoration:none; font-weight:500;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">Detail Program</a>
+        </div>
+      </div>
+    `;
   },
 
   // ── MODAL REGISTER EVENT MEMBER ──
