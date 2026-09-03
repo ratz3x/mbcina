@@ -16085,19 +16085,23 @@ const M6Engine = {
 
   switchSponsorInnerTab(tabId) {
     this.currentSponsorInnerTab = tabId;
-    ['641','643','644','645','646'].forEach(id => {
-      const panel = document.getElementById('m6-sp-inner-' + id);
-      const btn   = document.getElementById('m6-sp-inner-btn-' + id);
-      if (panel) panel.style.display = id === tabId ? 'block' : 'none';
-      if (btn) {
-        if (id === tabId) {
-          btn.style.cssText = 'background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:600; display:inline-flex; align-items:center; gap:6px; box-shadow:0 1px 3px rgba(0,0,0,0.2); cursor:pointer; transition:all 0.2s;';
-        } else {
-          btn.style.cssText = 'background:rgba(255,255,255,0.03); color:#94a3b8; border:1px solid rgba(255,255,255,0.08); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.2s;';
-        }
-      }
-    });
-    this.renderCurrentSponsorInnerTab();
+    const tabMap = {
+      '641': 'packages',
+      '643': 'confirm',
+      '644': 'ads',
+      '645': 'summary',
+      '646': 'reports'
+    };
+    const mainTab = tabMap[tabId] || 'packages';
+    if (window.SponsorPortalEngine && typeof window.SponsorPortalEngine.switchMainTab === 'function') {
+      window.SponsorPortalEngine.switchMainTab(mainTab);
+    } else {
+      ['641','643','644','645','646'].forEach(id => {
+        const panel = document.getElementById('m6-sp-inner-' + id);
+        if (panel) panel.style.display = 'block';
+      });
+      this.renderCurrentSponsorInnerTab();
+    }
   },
 
   renderCurrentSponsorInnerTab() {
@@ -16403,9 +16407,12 @@ const M6Engine = {
 
   calcSponsorPkgValue() {
     const pct = parseFloat(document.getElementById('m6-sp-pkg-pct')?.value || 50);
-    const val = Math.round((pct / 100) * this.EVENT_RAB);
-    const el  = document.getElementById('m6-sp-pkg-value-display');
-    if (el) el.value = 'Rp ' + val.toLocaleString('id-ID');
+    const val = Math.round((pct / 100) * (this.EVENT_RAB || 75000000));
+    const str = 'Rp ' + val.toLocaleString('id-ID');
+    const el1 = document.getElementById('m6-sp-pkg-val-calc');
+    const el2 = document.getElementById('m6-sp-pkg-value-display');
+    if (el1) el1.value = str;
+    if (el2) el2.value = str;
   },
 
   resetSponsorPackageForm() {
@@ -16413,9 +16420,9 @@ const M6Engine = {
     const ti = document.getElementById('m6-sp-form-title');
     const ic = document.getElementById('m6-sp-form-title-icon');
     if (ti) ti.textContent = 'Buat Paket Sponsor Baru';
-    if (ic) ic.textContent = '📦';
+    if (ic) ic.textContent = '';
     const fields = {
-      'm6-sp-pkg-name': '💎 PLATINUM',
+      'm6-sp-pkg-name': ' PLATINUM',
       'm6-sp-pkg-pct':  '50',
     };
     Object.entries(fields).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val; });
@@ -16426,6 +16433,10 @@ const M6Engine = {
     if (beforeSel) beforeSel.value = '4';
     if (afterSel)  afterSel.value  = '4';
     this.calcSponsorPkgValue();
+  },
+
+  resetSponsorPkgForm() {
+    this.resetSponsorPackageForm();
   },
 
   saveSponsorPackage() {
