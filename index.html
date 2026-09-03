@@ -6757,78 +6757,8 @@
             </button>
           </div>
           <div id="m6-sp-inner-641" style="display:block;">
-            <!-- PILIHAN EVENT RESMI & BATAS KONFIRMASI SPONSOR -->
-            <div id="m6-sp-event-container" class="glass-card" style="padding:22px; margin-bottom:24px; border:1px solid rgba(245,158,11,0.3); border-radius:18px; background:linear-gradient(135deg, rgba(15,23,42,0.96), rgba(30,41,59,0.85)); box-shadow:0 8px 32px rgba(0,0,0,0.45);">
-              
-              <!-- 1. Header Bar Pemilihan Event Aktif -->
-              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:16px;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                  <div style="width:42px; height:42px; border-radius:12px; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-size:1.3rem;">
-                    📅
-                  </div>
-                  <div>
-                    <h5 style="color:#ffffff; font-size:1rem; margin:0; font-weight:700; display:flex; align-items:center; gap:8px;">
-                      Pilih Event Resmi MB Club INA Yang Dituju
-                      <span id="m6-sp-event-count-badge" style="font-size:0.7rem; padding:2px 8px; border-radius:12px; background:rgba(255,255,255,0.1); color:#cbd5e1; font-weight:600;">Event Aktif</span>
-                    </h5>
-                    <p style="font-size:0.76rem; color:#94a3b8; margin:3px 0 0 0;">Pilih kegiatan resmi yang masih aktif untuk menyesuaikan perhitungan persentase RAB, batas akhir pendaftaran H-7, serta evaluasi kesiapan logistik.</p>
-                  </div>
-                </div>
-
-                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                  <label for="m6-sp-event-select" style="font-size:0.78rem; color:#cbd5e1; font-weight:700;">Kegiatan Aktif:</label>
-                  <select id="m6-sp-event-select" class="form-input" style="min-width:340px; font-weight:700; color:#fbbf24; background:#0b1120; border:1px solid rgba(245,158,11,0.45); border-radius:12px; padding:9px 14px; font-size:0.82rem; cursor:pointer;" onchange="M6Engine.onSponsorEventChange(this.value)">
-                    <!-- Diisi secara dinamis oleh M6Engine.renderSponsorEventSelector() -->
-                  </select>
-                </div>
-              </div>
-
-              <!-- 2. Grid Indikator Ringkas Event Terpilih -->
-              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:18px;">
-                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 16px;">
-                  <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">📍 Lokasi Pelaksanaan</div>
-                  <div id="m6-sp-event-location" style="font-size:0.83rem; color:#ffffff; font-weight:700; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">-</div>
-                </div>
-
-                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 16px;">
-                  <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">🗓️ Tanggal Pelaksanaan</div>
-                  <div id="m6-sp-event-date" style="font-size:0.83rem; color:#ffffff; font-weight:700; margin-top:4px;">-</div>
-                </div>
-
-                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 16px;">
-                  <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">💰 Total Anggaran RAB</div>
-                  <div id="m6-sp-event-rab-display" style="font-size:0.86rem; color:var(--accent-gold); font-weight:800; margin-top:4px;">-</div>
-                </div>
-
-                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 16px;">
-                  <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">⏰ Batas Konfirmasi H-7</div>
-                  <div id="m6-sp-deadline-display" style="font-size:0.83rem; color:#fbbf24; font-weight:700; margin-top:4px;">-</div>
-                </div>
-              </div>
-
-              <!-- 3. Dynamic Warning / Operational Status Banner -->
-              <div id="m6-sp-deadline-banner-box" style="border-radius:14px; padding:16px 20px; display:flex; align-items:flex-start; gap:16px; transition:all 0.3s ease; border:1px solid rgba(245,158,11,0.3); background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(234,88,12,0.08));">
-                <div id="m6-sp-status-icon" style="font-size:1.8rem; line-height:1.1;">⚠️</div>
-                <div style="flex:1;">
-                  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
-                    <div id="m6-sp-status-heading" style="font-weight:800; font-size:0.92rem; color:#fbbf24;">
-                      BATAS KONFIRMASI SPONSOR
-                    </div>
-                    <div id="m6-sp-deadline-badge" style="font-weight:800; font-size:0.75rem; padding:4px 14px; border-radius:20px; white-space:nowrap;">
-                      MASIH TERBUKA
-                    </div>
-                  </div>
-                  <div id="m6-sp-status-desc" style="font-size:0.78rem; line-height:1.6; color:#cbd5e1;">
-                    <!-- Konten dinamis dari M6Engine -->
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-              <div style="display:grid; grid-template-columns:1.1fr 1.3fr; gap:20px; align-items:flex-start;">
-
-                <!-- FORM BUAT/EDIT PAKET -->
+            <div style="display:grid; grid-template-columns:1.1fr 1.3fr; gap:20px; align-items:flex-start;">
+              <!-- FORM BUAT/EDIT PAKET -->
                 <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold);">
                   <h5 style="color:var(--accent-gold); font-size:1.05rem; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
                     <span id="m6-sp-form-title-icon"></span> <span id="m6-sp-form-title">BUAT PAKET SPONSOR</span>
@@ -7028,15 +6958,84 @@
             </button>
           </div>
           <div id="m6-sp-inner-643" style="display:block;">
+            <!-- PILIHAN EVENT RESMI & BATAS KONFIRMASI SPONSOR -->
+            <div id="m6-sp-event-container" class="glass-card" style="padding:22px; margin-bottom:24px; border:1px solid rgba(245,158,11,0.3); border-radius:18px; background:linear-gradient(135deg, rgba(15,23,42,0.96), rgba(30,41,59,0.85)); box-shadow:0 8px 32px rgba(0,0,0,0.45);">
+              
+              <!-- 1. Header Bar Pemilihan Event Aktif -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:18px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:16px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div style="width:42px; height:42px; border-radius:12px; background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-size:1.3rem;">
+                    📅
+                  </div>
+                  <div>
+                    <h5 style="color:#ffffff; font-size:1rem; margin:0; font-weight:700; display:flex; align-items:center; gap:8px;">
+                      Pilih Event Resmi MB Club INA Yang Dituju
+                      <span id="m6-sp-event-count-badge" style="font-size:0.7rem; padding:2px 8px; border-radius:12px; background:rgba(255,255,255,0.1); color:#cbd5e1; font-weight:600;">Event Aktif</span>
+                    </h5>
+                    <p style="font-size:0.76rem; color:#94a3b8; margin:3px 0 0 0;">Pilih kegiatan resmi yang masih aktif untuk menyesuaikan perhitungan persentase RAB, batas akhir pendaftaran H-7, serta evaluasi kesiapan logistik.</p>
+                  </div>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                  <label for="m6-sp-event-select" style="font-size:0.78rem; color:#cbd5e1; font-weight:700;">Kegiatan Aktif:</label>
+                  <select id="m6-sp-event-select" class="form-input" style="min-width:340px; font-weight:700; color:#fbbf24; background:#0b1120; border:1px solid rgba(245,158,11,0.45); border-radius:12px; padding:9px 14px; font-size:0.82rem; cursor:pointer;" onchange="M6Engine.onSponsorEventChange(this.value)">
+                    <!-- Diisi secara dinamis oleh M6Engine.renderSponsorEventSelector() -->
+                  </select>
+                </div>
+              </div>
+
+              <!-- 2. Grid Indikator Ringkas Event Terpilih -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:18px;">
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 16px;">
+                  <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">📍 Lokasi Pelaksanaan</div>
+                  <div id="m6-sp-event-location" style="font-size:0.83rem; color:#ffffff; font-weight:700; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">-</div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 16px;">
+                  <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">🗓️ Tanggal Pelaksanaan</div>
+                  <div id="m6-sp-event-date" style="font-size:0.83rem; color:#ffffff; font-weight:700; margin-top:4px;">-</div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 16px;">
+                  <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">💰 Total Anggaran RAB</div>
+                  <div id="m6-sp-event-rab-display" style="font-size:0.86rem; color:var(--accent-gold); font-weight:800; margin-top:4px;">-</div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 16px;">
+                  <div style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">⏰ Batas Konfirmasi H-7</div>
+                  <div id="m6-sp-deadline-display" style="font-size:0.83rem; color:#fbbf24; font-weight:700; margin-top:4px;">-</div>
+                </div>
+              </div>
+
+              <!-- 3. Dynamic Warning / Operational Status Banner -->
+              <div id="m6-sp-deadline-banner-box" style="border-radius:14px; padding:16px 20px; display:flex; align-items:flex-start; gap:16px; transition:all 0.3s ease; border:1px solid rgba(245,158,11,0.3); background:linear-gradient(135deg, rgba(245,158,11,0.12), rgba(234,88,12,0.08));">
+                <div id="m6-sp-status-icon" style="font-size:1.8rem; line-height:1.1;">⚠️</div>
+                <div style="flex:1;">
+                  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+                    <div id="m6-sp-status-heading" style="font-weight:800; font-size:0.92rem; color:#fbbf24;">
+                      BATAS KONFIRMASI SPONSOR
+                    </div>
+                    <div id="m6-sp-deadline-badge" style="font-weight:800; font-size:0.75rem; padding:4px 14px; border-radius:20px; white-space:nowrap;">
+                      MASIH TERBUKA
+                    </div>
+                  </div>
+                  <div id="m6-sp-status-desc" style="font-size:0.78rem; line-height:1.6; color:#cbd5e1;">
+                    <!-- Konten dinamis dari M6Engine -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
             <!-- SUMMARY PANEL -->
               <div style="background:rgba(0,0,0,0.4); border:1px solid var(--accent-gold); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; text-align:center;">
                 <div>
                   <div style="font-size:0.75rem; color:var(--text-muted);">Total RAB Event</div>
-                  <div style="font-size:1.2rem; font-weight:900; color:#fff;">Rp 75.000.000</div>
+                  <div id="m6-sp-confirm-rab-total" style="font-size:1.2rem; font-weight:900; color:#fff;">Rp 75.000.000</div>
                 </div>
                 <div>
                   <div style="font-size:0.75rem; color:var(--text-muted);">Target Sponsor (111%)</div>
-                  <div style="font-size:1.2rem; font-weight:900; color:var(--accent-gold);">Rp 83.250.000</div>
+                  <div id="m6-sp-confirm-target-rab" style="font-size:1.2rem; font-weight:900; color:var(--accent-gold);">Rp 83.250.000</div>
                 </div>
                 <div>
                   <div style="font-size:0.75rem; color:var(--text-muted);">Terkumpul (<span id="m6-sp-summary-count">2</span> Sponsor)</div>
@@ -10318,7 +10317,7 @@
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="js/auth.js?v=20260903_v88_mbux"></script>
-  <script src="js/app.js?v=20260904_v112_dynamic_sponsor_events_deadline"></script>
+  <script src="js/app.js?v=20260904_v113_event_selector_in_confirm_tab"></script>
   <script>
     lucide.createIcons();
     try {

@@ -16247,9 +16247,13 @@ const M6Engine = {
       }
     }
 
-    // Refresh dynamic calculation in package table and form
+    // Refresh dynamic calculation in package table, form, and confirm table
     this.renderSponsorPackagesTable();
     this.calcSponsorPkgValue();
+    this.renderSponsorConfirmTable();
+    if (typeof this.renderSponsorApprovalTable === 'function') {
+      this.renderSponsorApprovalTable();
+    }
   },
 
   renderSponsorshipModule() {
@@ -16801,6 +16805,11 @@ const M6Engine = {
     if (!tbody) return;
 
     // Update summary counters
+    const rabTotalEl = document.getElementById('m6-sp-confirm-rab-total');
+    const targetRabEl = document.getElementById('m6-sp-confirm-target-rab');
+    if (rabTotalEl) rabTotalEl.textContent = 'Rp ' + (this.EVENT_RAB || 75000000).toLocaleString('id-ID');
+    if (targetRabEl) targetRabEl.textContent = 'Rp ' + Math.round((this.EVENT_RAB || 75000000) * 1.11).toLocaleString('id-ID');
+
     const countEl = document.getElementById('m6-sp-summary-count');
     const amountEl = document.getElementById('m6-sp-summary-amount');
     const confirmedList = this.sampleSponsors.filter(s => s.status === 'CONFIRMED');
@@ -24752,13 +24761,12 @@ window.SponsorPortalEngine = {
 
     if (window.M6Engine) {
       if (tabKey === 'packages') {
+        window.M6Engine.renderSponsorPackagesTable();
+        window.M6Engine.calcSponsorPkgValue();
+      } else if (tabKey === 'confirm') {
         if (typeof window.M6Engine.renderSponsorEventSelector === 'function') {
           window.M6Engine.renderSponsorEventSelector();
-        } else {
-          window.M6Engine.renderSponsorPackagesTable();
-          window.M6Engine.calcSponsorPkgValue();
         }
-      } else if (tabKey === 'confirm') {
         window.M6Engine.renderSponsorConfirmTable();
         if (typeof window.M6Engine.renderSponsorApprovalTable === 'function') {
           window.M6Engine.renderSponsorApprovalTable();
