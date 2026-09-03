@@ -16020,33 +16020,240 @@ const M6Engine = {
   editingPackageId: null,
   currentApprovalFilterRole: 'ALL',
 
-  // RAB total (Rp 75.000.000)
+  // RAB total & Selected Event for Sponsorship
   EVENT_RAB: 75000000,
-  // Event date: 13 Sep 2026
   EVENT_DATE: new Date('2026-09-13'),
-  // Deadline = 7 days before
   SPONSOR_DEADLINE: new Date('2026-09-06'),
+  selectedSponsorEventId: 'EVT-2026-001',
 
-  renderSponsorshipModule() {
-    // Init deadline badge
+  formatDateIndo(d) {
+    if (!d || isNaN(d.getTime())) return '-';
+    const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  },
+
+  getActiveSponsorEvents() {
+    let list = [];
+    const masterOfficial = typeof this.getMasterOfficialProposals === 'function' ? this.getMasterOfficialProposals() : [];
+
+    if (this.publishedEvents && this.publishedEvents.length) {
+      list = [...this.publishedEvents];
+    } else if (this.data && this.data.proposals && this.data.proposals.length) {
+      list = this.data.proposals.filter(p => p.status === 'APPROVED' || p.status === 'ACCEPTED');
+    }
+
+    // Merge master official proposals if not present
+    if (masterOfficial && masterOfficial.length) {
+      masterOfficial.forEach(m => {
+        const code = (m.event_code || m.id || '').toUpperCase();
+        if (!list.some(x => ((x.id || x.code || x.event_code || '') + '').toUpperCase() === code)) {
+          list.push(m);
+        }
+      });
+    }
+
+    if (!list || !list.length) {
+      list = [
+        { id: 'EVT-2026-012', code: 'EVT-2026-012', title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026', start_date: '2026-09-05T14:00', end_date: '2026-09-05T17:00', location: 'TOPGOLF JAKARTA, Fatmawati, Jakarta Selatan', total_budget: 35000000 },
+        { id: 'EVT-2026-001', code: 'EVT-2026-001', title: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026', start_date: '2026-09-13T08:00', end_date: '2026-09-14T18:00', location: 'Hotel Tentrem & Panti Asuhan Yogyakarta', total_budget: 75000000 },
+        { id: 'EVT-2026-003', code: 'EVT-2026-003', title: 'Grand Touring Trans Sumatra & Celebes Rally 2026', start_date: '2026-10-01T06:00', end_date: '2026-10-07T18:00', location: 'Medan - Padang (Lintas Sumatera)', total_budget: 120000000 },
+        { id: 'EVT-2026-002', code: 'EVT-2026-002', title: 'Jamnas MB INA XXV & Musyawarah Nasional 2026', start_date: '2026-11-20T08:00', end_date: '2026-11-22T20:00', location: 'ICE BSD City, Tangerang', total_budget: 250000000 }
+      ];
+    }
+
+    // Sort by date upcoming
+    list.sort((a, b) => {
+      const da = new Date(a.start_date || a.date_start || 0);
+      const db = new Date(b.start_date || b.date_start || 0);
+      return da - db;
+    });
+
+    return list.map(e => {
+      const sDate = e.start_date || e.date_start || '2026-09-13T08:00';
+      const eDate = e.end_date || e.date_end || sDate;
+      const budget = Number(e.total_budget) || (e.code === 'EVT-2026-002' ? 250000000 : (e.code === 'EVT-2026-003' ? 120000000 : (e.code === 'EVT-2026-012' ? 35000000 : 75000000)));
+      return {
+        id: e.id || e.code || e.event_code,
+        code: e.code || e.event_code || e.id,
+        title: e.title,
+        start_date: sDate,
+        end_date: eDate,
+        location: e.location || e.address || e.city || 'Indonesia',
+        total_budget: budget
+      };
+    });
+  },
+
+  renderSponsorEventSelector() {
+    const sel = document.getElementById('m6-sp-event-select');
+    const badge = document.getElementById('m6-sp-event-count-badge');
+    const events = this.getActiveSponsorEvents();
+    if (badge) badge.textContent = `${events.length} Event Aktif`;
+    if (!sel) return;
+
+    if (!this.selectedSponsorEventId || !events.some(e => e.id === this.selectedSponsorEventId || e.code === this.selectedSponsorEventId)) {
+      this.selectedSponsorEventId = events[0]?.id || 'EVT-2026-001';
+    }
+
+    sel.innerHTML = events.map(ev => {
+      const d = new Date(ev.start_date);
+      const isSel = (ev.id === this.selectedSponsorEventId || ev.code === this.selectedSponsorEventId);
+      return `<option value="${ev.id}" ${isSel ? 'selected' : ''}>[${ev.code}] ${ev.title} (${this.formatDateIndo(d)})</option>`;
+    }).join('');
+
+    this.onSponsorEventChange(sel.value);
+  },
+
+  onSponsorEventChange(eventId) {
+    const events = this.getActiveSponsorEvents();
+    const ev = events.find(e => e.id === eventId || e.code === eventId) || events[0];
+    if (!ev) return;
+    this.selectedSponsorEventId = ev.id;
+
+    // Dynamically update RAB and dates
+    this.EVENT_RAB = ev.total_budget || 75000000;
+    this.EVENT_DATE = new Date(ev.start_date);
+    this.SPONSOR_DEADLINE = new Date(this.EVENT_DATE.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    // Update Quick Indicator Grid
+    const locEl = document.getElementById('m6-sp-event-location');
+    const dateEl = document.getElementById('m6-sp-event-date');
+    const rabEl = document.getElementById('m6-sp-event-rab-display');
     const deadlineEl = document.getElementById('m6-sp-deadline-display');
-    const badgeEl    = document.getElementById('m6-sp-deadline-badge');
-    if (deadlineEl) deadlineEl.textContent = '6 September 2026';
-    if (badgeEl) {
-      const now = new Date();
-      if (now > this.SPONSOR_DEADLINE) {
-        badgeEl.style.background = 'rgba(239,68,68,0.2)';
-        badgeEl.style.color      = 'var(--accent-red)';
-        badgeEl.style.borderColor= 'var(--accent-red)';
-        badgeEl.textContent      = '🔴 DITUTUP SISTEM';
-      } else {
+
+    if (locEl) locEl.textContent = ev.location;
+    if (dateEl) {
+      const s = new Date(ev.start_date);
+      const e = new Date(ev.end_date);
+      dateEl.textContent = (s.toDateString() === e.toDateString()) ? this.formatDateIndo(s) : `${s.getDate()} - ${this.formatDateIndo(e)}`;
+    }
+    if (rabEl) rabEl.textContent = 'Rp ' + this.EVENT_RAB.toLocaleString('id-ID');
+    if (deadlineEl) deadlineEl.textContent = this.formatDateIndo(this.SPONSOR_DEADLINE);
+
+    // Evaluate timing relative to now
+    const now = new Date();
+    const diffMsEvent = this.EVENT_DATE.getTime() - now.getTime();
+    const diffDaysEvent = Math.ceil(diffMsEvent / (1000 * 60 * 60 * 24));
+    const diffMsDeadline = this.SPONSOR_DEADLINE.getTime() - now.getTime();
+    const diffDaysDeadline = Math.ceil(diffMsDeadline / (1000 * 60 * 60 * 24));
+
+    const box = document.getElementById('m6-sp-deadline-banner-box');
+    const iconEl = document.getElementById('m6-sp-status-icon');
+    const headEl = document.getElementById('m6-sp-status-heading');
+    const badgeEl = document.getElementById('m6-sp-deadline-badge');
+    const descEl = document.getElementById('m6-sp-status-desc');
+
+    if (diffDaysEvent < 0) {
+      // EVENT CLOSED
+      if (box) {
+        box.style.background = 'rgba(100,116,139,0.14)';
+        box.style.border = '1px solid rgba(100,116,139,0.35)';
+        box.style.boxShadow = 'none';
+      }
+      if (iconEl) iconEl.textContent = '🔒';
+      if (headEl) {
+        headEl.style.color = '#94a3b8';
+        headEl.textContent = 'PENDAFTARAN SPONSORSHIP RESMI DITUTUP (KEGIATAN SELESAI)';
+      }
+      if (badgeEl) {
+        badgeEl.style.background = 'rgba(100,116,139,0.25)';
+        badgeEl.style.color = '#94a3b8';
+        badgeEl.style.border = '1px solid #64748b';
+        badgeEl.textContent = '🔴 EVENT TELAH BERLALU';
+      }
+      if (descEl) {
+        descEl.innerHTML = `Kegiatan ini telah selesai dilaksanakan pada <strong>${this.formatDateIndo(this.EVENT_DATE)}</strong>. Sistem menolak pendaftaran kemitraan baru secara otomatis.`;
+      }
+    } else if (diffDaysEvent <= 7) {
+      // CRITICAL WARNING: LESS THAN 1 WEEK!
+      if (box) {
+        box.style.background = 'linear-gradient(135deg, rgba(239,68,68,0.18), rgba(245,158,11,0.14))';
+        box.style.border = '1px solid #ef4444';
+        box.style.boxShadow = '0 6px 24px rgba(239,68,68,0.25)';
+      }
+      if (iconEl) iconEl.textContent = '⚠️';
+      if (headEl) {
+        headEl.style.color = '#f87171';
+        headEl.textContent = `PERINGATAN KRITIS: EVENT TINGGAL ${diffDaysEvent} HARI LAGI (BATAS H-7 TELAH TERLEWAT)`;
+      }
+      if (badgeEl) {
+        badgeEl.style.background = 'rgba(239,68,68,0.25)';
+        badgeEl.style.color = '#f87171';
+        badgeEl.style.border = '1px solid #ef4444';
+        badgeEl.textContent = `⚠️ KURANG DARI 1 MINGGU (H-${diffDaysEvent})`;
+      }
+      if (descEl) {
+        descEl.innerHTML = `
+          <div style="color:#fecaca; font-weight:700; margin-bottom:6px;">
+            ⚠️ Standar batas konfirmasi persiapan promosi (H-7) telah berakhir pada <strong>${this.formatDateIndo(this.SPONSOR_DEADLINE)}</strong>.
+          </div>
+          <div style="background:rgba(0,0,0,0.4); border-left:3px solid #ef4444; padding:10px 14px; border-radius:8px; font-size:0.75rem; color:#e2e8f0; line-height:1.6;">
+            <div style="font-weight:800; color:#fbbf24; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+              <span>🚨</span> KONSEKUENSI & BATASAN OPERASIONAL JIKA SPONSOR TETAP MEMAKSAKAN BERGABUNG:
+            </div>
+            <ul style="margin:4px 0 0 16px; padding:0; list-style-type:disc; color:#cbd5e1;">
+              <li><strong>Produksi Logistik Fisik Ditiadakan / Terbatas:</strong> Backdrop panggung utama, stiker mobil peserta, umbul-umbul, dan booklet merchandise sudah masuk tahap final percetakan sehingga <em>logo mitra baru tidak dapat dicetak secara fisik</em>.</li>
+              <li><strong>Alokasi Promosi Dialihkan Penuh ke Media Digital:</strong> Seluruh penempatan brand akan dialihkan ke layar LED videotron event, pengumuman berkala oleh MC resmi panggung, serta banner website & Instagram MB Club Indonesia.</li>
+              <li><strong>Persetujuan Darurat & Pembayaran Tunai/Lunas:</strong> Pendaftaran H < 7 hari memerlukan diskresi persetujuan khusus dari Ketua Panitia & Bendahara MB INA, dan dana komitmen sponsorship wajib disetor lunas seketika tanpa termin.</li>
+            </ul>
+          </div>
+        `;
+      }
+    } else if (diffDaysDeadline <= 3) {
+      // EXPIRING SOON: 1-3 DAYS TO H-7 DEADLINE
+      if (box) {
+        box.style.background = 'linear-gradient(135deg, rgba(245,158,11,0.18), rgba(234,88,12,0.12))';
+        box.style.border = '1px solid #f59e0b';
+        box.style.boxShadow = '0 4px 18px rgba(245,158,11,0.2)';
+      }
+      if (iconEl) iconEl.textContent = '⏳';
+      if (headEl) {
+        headEl.style.color = '#fbbf24';
+        headEl.textContent = `MENDEKATI BATAS AKHIR H-7: SISA ${diffDaysDeadline} HARI LAGI`;
+      }
+      if (badgeEl) {
+        badgeEl.style.background = 'rgba(245,158,11,0.25)';
+        badgeEl.style.color = '#fbbf24';
+        badgeEl.style.border = '1px solid #f59e0b';
+        badgeEl.textContent = `⏳ SISA ${diffDaysDeadline} HARI LAGI`;
+      }
+      if (descEl) {
+        descEl.innerHTML = `
+          Batas konfirmasi akhir sponsorship jatuh pada <strong>${this.formatDateIndo(this.SPONSOR_DEADLINE)}</strong> (1 minggu sebelum event). Segera selesaikan upload MoU dan validasi transfer agar materi logo perusahaan sempat masuk dalam antrean cetak backdrop panggung & merchandise peserta.
+        `;
+      }
+    } else {
+      // NORMAL / OPEN PERIOD
+      if (box) {
+        box.style.background = 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(5,150,105,0.08))';
+        box.style.border = '1px solid rgba(16,185,129,0.35)';
+        box.style.boxShadow = 'none';
+      }
+      if (iconEl) iconEl.textContent = '🟢';
+      if (headEl) {
+        headEl.style.color = '#34d399';
+        headEl.textContent = `PERIODE PENDAFTARAN RESMI TERBUKA (H-${diffDaysEvent} Menuju Event)`;
+      }
+      if (badgeEl) {
         badgeEl.style.background = 'rgba(16,185,129,0.2)';
-        badgeEl.style.color      = 'var(--primary-emerald)';
-        badgeEl.style.borderColor= 'var(--primary-emerald)';
-        badgeEl.textContent      = '🟢 MASIH TERBUKA';
+        badgeEl.style.color = 'var(--primary-emerald)';
+        badgeEl.style.border = '1px solid var(--primary-emerald)';
+        badgeEl.textContent = `🟢 MASIH TERBUKA (Sisa ${diffDaysDeadline} Hari Menuju Deadline H-7)`;
+      }
+      if (descEl) {
+        descEl.innerHTML = `
+          Batas konfirmasi sponsor adalah <strong>${this.formatDateIndo(this.SPONSOR_DEADLINE)}</strong>. Pendaftaran pada periode normal ini menjamin seluruh alokasi benefit (promosi fisik panggung, merchandise, media digital, dan liputan pers) dapat diproduksi secara maksimal tanpa hambatan.
+        `;
       }
     }
+
+    // Refresh dynamic calculation in package table and form
     this.renderSponsorPackagesTable();
+    this.calcSponsorPkgValue();
+  },
+
+  renderSponsorshipModule() {
+    this.renderSponsorEventSelector();
     this.renderSponsorConfirmTable();
     this.renderSponsorPortal();
     this.renderSponsorApprovalTable();
@@ -24545,8 +24752,12 @@ window.SponsorPortalEngine = {
 
     if (window.M6Engine) {
       if (tabKey === 'packages') {
-        window.M6Engine.renderSponsorPackagesTable();
-        window.M6Engine.calcSponsorPkgValue();
+        if (typeof window.M6Engine.renderSponsorEventSelector === 'function') {
+          window.M6Engine.renderSponsorEventSelector();
+        } else {
+          window.M6Engine.renderSponsorPackagesTable();
+          window.M6Engine.calcSponsorPkgValue();
+        }
       } else if (tabKey === 'confirm') {
         window.M6Engine.renderSponsorConfirmTable();
         if (typeof window.M6Engine.renderSponsorApprovalTable === 'function') {
