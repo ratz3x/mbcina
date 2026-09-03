@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>MB INA Diagnostic</title>
+<style>body{font-family:monospace;background:#0a0a0a;color:#eee;padding:20px;}
+pre{background:#111;padding:12px;border-radius:8px;white-space:pre-wrap;word-break:break-all;}
+button{background:#1e40af;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin:4px;font-size:1rem;}</style></head>
+<body>
+<h2>MB INA Diagnostic</h2>
+<p>1. Buka <a href="http://localhost/MBCINA/" target="mbcina" style="color:#38bdf8">http://localhost/MBCINA/</a> di tab lain</p>
+<p>2. Login sebagai admin, buka tab Donasi</p>
+<p>3. Klik tombol di bawah ini</p>
+<button onclick="runDiag()">Jalankan Diagnostik</button>
+<button onclick="fixNow()" style="background:#b91c1c">PAKSA FIX Sekarang</button>
+<pre id="out">Klik tombol...</pre>
+<script>
+function runDiag(){
+  var out=document.getElementById("out"),results=[];
+  try{
+    var w=window.open("","mbcina");
+    if(!w||!w.AppEngine){out.textContent="ERROR: Buka dulu http://localhost/MBCINA/ di tab dengan name=mbcina\n\nCoba buka link di atas dulu";return;}
+    var d=w.document;
+    results.push("=== DIAGNOSIS ===");
+    results.push("body.overflow: "+(d.body.style.overflow||"(kosong=OK)"));
+    var modals=d.querySelectorAll(".modal-backdrop,.modal-overlay");
+    results.push("Total modals: "+modals.length);
+    var blocked=0;
+    modals.forEach(function(m){
+      var cs=w.getComputedStyle(m);
+      var disp=cs.getPropertyValue("display");
+      var opac=parseFloat(cs.getPropertyValue("opacity")||"0");
+      var pe=cs.getPropertyValue("pointer-events");
+      if(disp!=="none"&&opac>0.1&&pe!=="none"){
+        blocked++;
+        results.push("BLOCKING: id="+(m.id||"no-id")+" display="+disp+" opacity="+opac.toFixed(2)+" pe="+pe);
+        results.push("  inline: "+m.style.cssText.substring(0,100));
+      }
+    });
+    if(blocked===0)results.push("OK: No blocking modals");
+    var loader=d.getElementById("global-app-loader");
+    if(loader){var lcs=w.getComputedStyle(loader);results.push("loader: "+lcs.display+" op:"+lcs.opacity+" pe:"+lcs.getPropertyValue("pointer-events"));}
+    var btn=d.querySelector("[onclick*=openDonationVerifyModal]");
+    if(btn){
+      var r=btn.getBoundingClientRect();
+      results.push("Bukti btn rect: t="+Math.round(r.top)+" l="+Math.round(r.left)+" w="+Math.round(r.width)+" h="+Math.round(r.height));
+      if(r.width>0&&r.height>0){
+        var cx=r.left+r.width/2, cy=r.top+r.height/2;
+        var topEl=d.elementFromPoint(cx,cy);
+        results.push("Element at btn center: "+(topEl?topEl.tagName+" id="+(topEl.id||"")+" cls="+(topEl.className||"").substring(0,50):"null"));
+        results.push("IS BUTTON ON TOP? "+(topEl===btn?"YES - button not blocked":"NO - BUTTON IS BLOCKED!"));
+        if(topEl&&topEl!==btn){
+          var cs2=w.getComputedStyle(topEl);
+          results.push("  Blocker: "+topEl.tagName+" #"+(topEl.id||"")+" ."+((topEl.className||"").split(" ")[0]));
+          results.push("  computed: disp="+cs2.display+" pe="+cs2.getPropertyValue("pointer-events")+" op="+cs2.opacity);
+          results.push("  inline: "+topEl.style.cssText.substring(0,120));
+          var parent=topEl.parentElement;
+          while(parent&&parent!==d.body){
+            var pcs=w.getComputedStyle(parent);
+            if(pcs.getPropertyValue("pointer-events")==="none")results.push("  Parent PE-NONE: "+parent.tagName+" #"+parent.id);
+            parent=parent.parentElement;
+          }
+        }
+      }else{results.push("Bukti btn NOT in viewport (w=0 or h=0)");}
+    }else{
+      results.push("Tombol Bukti TIDAK ditemukan di DOM");
+      var dt=d.getElementById("admin-tab-m7_donation");
+      if(dt)results.push("  admin-tab-m7_donation display: "+dt.style.display);
+      var st=d.getElementById("m73-subtab-7_3_1_progress");
+      if(st)results.push("  subtab progress display: "+st.style.display);
+    }
+    results.push("AppEngine.activeAdminTab: "+w.AppEngine.activeAdminTab);
+    out.textContent=results.join("\n");
+  }catch(e){out.textContent="Error: "+e.message+"\n\nPastikan MBCINA sudah terbuka di tab yang benar";}
+}
+function fixNow(){
+  var out=document.getElementById("out");
+  try{
+    var w=window.open("","mbcina");
+    var d=w.document;
+    d.querySelectorAll(".modal-backdrop,.modal-overlay,.modal-container-backdrop").forEach(function(m){
+      m.classList.remove("active");
+      m.style.setProperty("display","none","important");
+      m.style.setProperty("opacity","0","important");
+      m.style.setProperty("pointer-events","none","important");
+    });
+    var ldr=d.getElementById("global-app-loader");
+    if(ldr)ldr.style.setProperty("display","none","important");
+    d.body.style.overflow="";
+    if(w.AppEngine)w.AppEngine.switchAdminTab("m7_donation");
+    out.textContent="FIX applied! Semua overlay disembunyikan paksa. Coba klik tombol Bukti sekarang.";
+  }catch(e){out.textContent="Error: "+e.message;}
+}
+</script>
+</body></html>

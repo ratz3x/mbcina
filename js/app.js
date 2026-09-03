@@ -18840,10 +18840,18 @@ const M6Engine = {
   },
 
   openDonationVerifyModal(donationId) {
-    const don = (this.donationData && Array.isArray(this.donationData.donations))
-      ? this.donationData.donations.find(d => String(d.id) === String(donationId) || String(d.trx_code) === String(donationId)) || {}
+    console.log('[MBCINA] openDonationVerifyModal called, id=', donationId);
+    // Use AppEngine.donationData as fallback if this.donationData is empty (M6Engine binding issue)
+    const dataSource = (this.donationData && Array.isArray(this.donationData.donations) && this.donationData.donations.length > 0)
+      ? this.donationData
+      : (window.AppEngine && window.AppEngine.donationData && Array.isArray(window.AppEngine.donationData.donations) ? window.AppEngine.donationData : null);
+    console.log('[MBCINA] dataSource=', dataSource ? 'OK (' + (dataSource.donations||[]).length + ' donations)' : 'NULL');
+    const don = (dataSource && Array.isArray(dataSource.donations))
+      ? dataSource.donations.find(d => String(d.id) === String(donationId) || String(d.trx_code) === String(donationId)) || {}
       : {};
+    console.log('[MBCINA] donation found:', don.id || '(empty)', 'status:', don.status);
     this.activeDonationVerifyId = don.id || donationId;
+    if (window.AppEngine) window.AppEngine.activeDonationVerifyId = don.id || donationId;
 
     const codeEl = document.getElementById('verify-don-code');
     const nameEl = document.getElementById('verify-don-name');
@@ -18856,7 +18864,7 @@ const M6Engine = {
     const proofLink = document.getElementById('verify-don-proof-link');
     const actionsEl = document.getElementById('verify-don-actions');
 
-    const campaignsList = (this.donationData && Array.isArray(this.donationData.campaigns)) ? this.donationData.campaigns : [];
+    const campaignsList = (dataSource && Array.isArray(dataSource.campaigns)) ? dataSource.campaigns : [];
     const campObj = campaignsList.find(c => c.id === don.campaign_id);
     const campTitle = campObj ? campObj.title : (don.campaign_id || 'Donasi Bakti Sosial Yogyakarta 2026');
 
@@ -18920,7 +18928,33 @@ const M6Engine = {
       }
     }
 
-    AuthEngine.openModal('modal-donation-verify');
+    // FORCE SHOW MODAL - bypass AuthEngine CSS cascade issues
+    const _modal = document.getElementById('modal-donation-verify');
+    console.log('[MBCINA] #modal-donation-verify found=', !!_modal);
+    if (_modal) {
+      document.querySelectorAll('.modal-backdrop, .modal-overlay').forEach(function(m) {
+        if (m.id !== 'modal-donation-verify') {
+          m.classList.remove('active');
+          m.style.setProperty('display', 'none', 'important');
+          m.style.setProperty('opacity', '0', 'important');
+          m.style.setProperty('pointer-events', 'none', 'important');
+        }
+      });
+      _modal.style.removeProperty('display');
+      _modal.style.removeProperty('opacity');
+      _modal.style.removeProperty('pointer-events');
+      _modal.style.removeProperty('visibility');
+      _modal.style.setProperty('display', 'flex', 'important');
+      _modal.style.setProperty('opacity', '1', 'important');
+      _modal.style.setProperty('pointer-events', 'auto', 'important');
+      _modal.style.setProperty('visibility', 'visible', 'important');
+      _modal.style.setProperty('z-index', '99999', 'important');
+      _modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      console.log('[MBCINA] modal FORCED OPEN: display=' + _modal.style.display + ' opacity=' + _modal.style.opacity);
+    } else {
+      console.error('[MBCINA] CRITICAL: #modal-donation-verify NOT FOUND in DOM!');
+    }
   },
 
   async confirmVerifyDonation(isApproved) {
