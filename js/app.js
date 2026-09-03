@@ -360,7 +360,7 @@ const AppEngine = {
 
     const titleEl = document.getElementById('sponsor-dash-welcome-title');
     if (titleEl) {
-      titleEl.innerText = 'Manajemen Sponsorship — ' + companyName;
+      titleEl.innerText = 'Manajemen Sponsorship';
     }
   },
 
@@ -18179,7 +18179,7 @@ const M6Engine = {
       const revenueEl = document.getElementById('spnd-card-revenue-amount');
       const roiEl = document.getElementById('spnd-card-roi-percent');
 
-      if (titleEl) titleEl.innerText = `Selamat Datang, ${prof.company}!`;
+      if (titleEl) titleEl.innerText = 'Manajemen Sponsorship';
       if (badgeEl) badgeEl.innerText = prof.tier;
       if (lapakNameEl) lapakNameEl.innerText = prof.lapakName;
       if (lapakCatEl) lapakCatEl.innerText = prof.lapakCat;
@@ -18270,7 +18270,7 @@ const M6Engine = {
     const lapakNameEl = document.getElementById('spnd-card-lapak-name');
     const forumMetaEl = document.getElementById('spnd-card-forum-meta');
 
-    if (titleEl) titleEl.innerText = `Selamat Datang, ${comp}!`;
+    if (titleEl) titleEl.innerText = 'Manajemen Sponsorship';
     if (badgeEl && tier) badgeEl.innerText = tier;
     if (lapakNameEl) lapakNameEl.innerText = `${comp} Official Store`;
     if (forumMetaEl) forumMetaEl.innerText = `💬 18 replies • 👁️ 412 views • Diposting oleh ${comp}`;
@@ -25001,7 +25001,7 @@ window.SponsorPortalEngine = {
 
   downloadSponsorReportPDF: function() {
     const u = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
-    const compName = document.getElementById('sponsor-dash-welcome-title')?.innerText.replace('Selamat Datang, ', '').replace('!', '') || u.name || 'Mitra Sponsor MB INA';
+    const compName = u.name || 'Mitra Sponsor MB INA';
     const tier = document.getElementById('sponsor-portal-badge-tier')?.innerText || '💎 MITRA SPONSOR PLATINUM';
     const invest = document.getElementById('spnd-card-invest-amount')?.innerText || 'Rp 30.000.000';
     const revenue = document.getElementById('spnd-card-revenue-amount')?.innerText || 'Rp 45.000.000';
