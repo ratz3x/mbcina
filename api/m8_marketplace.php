@@ -76,6 +76,20 @@ switch ($action) {
                 exit;
             }
 
+            // Enforce "1 Member = 1 Lapak" rule
+            if ($userId && $userId !== 'usr_superadmin') {
+                $checkExisting = $sPdo->prepare("SELECT id, name, lapak_code FROM lapak WHERE user_id = ?");
+                $checkExisting->execute([$userId]);
+                $existingLapak = $checkExisting->fetch();
+                if ($existingLapak) {
+                    echo json_encode([
+                        'success' => false, 
+                        'message' => "Anda sudah memiliki lapak resmi terdaftar: '{$existingLapak['name']}' ({$existingLapak['lapak_code']}). Sesuai regulasi MB Club INA, 1 member hanya diperbolehkan memiliki 1 lapak resmi untuk memasang banyak produk."
+                    ]);
+                    exit;
+                }
+            }
+
             // Determine whether the creator is a SPONSOR or a regular MEMBER
             $isSponsor = false;
             try {
@@ -581,7 +595,16 @@ switch ($action) {
                 $sPdo->prepare("DELETE FROM lapak WHERE id = 'lapak_004'")->execute();
             }
 
-            // 3. Ambil semua lapak yang tersisa
+            // 3. Bersihkan Lapak Testing Andi Pratama (Official Shell Sponsor Store & Pertamina Lubricants Store)
+            // Sesuai aturan "1 Member = 1 Lapak", Andi Pratama hanya mempertahankan lapak_001 (Andi Parts Store)
+            $testLapakIds = ['lapak_6a8410db861b4_344', 'lapak_6a8410e50f192_263'];
+            foreach ($testLapakIds as $tId) {
+                $sPdo->prepare("UPDATE lapak_products SET lapak_id = 'lapak_001' WHERE lapak_id = ?")->execute([$tId]);
+                $sPdo->prepare("UPDATE lapak_reviews SET lapak_id = 'lapak_001' WHERE lapak_id = ?")->execute([$tId]);
+                $sPdo->prepare("DELETE FROM lapak WHERE id = ?")->execute([$tId]);
+            }
+
+            // 4. Ambil semua lapak yang tersisa
             $lapaks = $sPdo->query("
                 SELECT l.*, u.role as user_role, u.member_id as user_mid 
                 FROM lapak l 

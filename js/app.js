@@ -21839,6 +21839,18 @@ window.M7Engine = {
   },
 
   openSewaLapakModal: function() {
+    const user = AppEngine.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const myLapak = (this.data && Array.isArray(this.data.lapak)) 
+      ? this.data.lapak.find(l => (l.user_id && (l.user_id === user.id || l.user_id === user.userId)) || (l.member_id && l.member_id === user.member_id))
+      : null;
+
+    if (myLapak && user.role !== 'SUPER_ADMIN') {
+      if (confirm(`ℹ️ Anda sudah memiliki lapak resmi: "${myLapak.name}" (${myLapak.lapak_code}).\n\nSesuai regulasi MB Club INA, 1 member hanya diperbolehkan memiliki 1 lapak resmi untuk memasang banyak produk.\n\nApakah Anda ingin membuka form Tambah Produk untuk lapak Anda sekarang?`)) {
+        this.openProductModal(myLapak.id);
+      }
+      return;
+    }
+
     const modal = document.getElementById('modal-sewa-lapak-baru');
     if (modal) {
       modal.style.display = 'flex';
