@@ -3164,30 +3164,30 @@
         <div id="m7-subtab-7_3_verify" class="m7-subtab-content" style="display:none;">
           <div style="margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
-              <h4 style="color:var(--accent-gold); font-size:1.1rem; margin:0;">✅ VERIFIKASI & MODERASI IKLAN - ADMIN</h4>
-              <p style="font-size:0.8rem; color:var(--text-muted); margin:2px 0 0;">Lakukan review, persetujuan (Approve), penolakan (Reject), atau takedown produk yang melanggar aturan MB INA.</p>
+              <h4 style="color:#fbbf24; font-size:1.05rem; margin:0; font-weight:700;">Verifikasi & Moderasi Iklan</h4>
+              <p style="font-size:0.8rem; color:#94a3b8; margin:2px 0 0;">Lakukan review, persetujuan (Approve), penolakan (Reject), atau takedown produk yang melanggar aturan MB INA.</p>
             </div>
 
-            <select id="m7-filter-verify-status" class="form-input" style="font-size:0.8rem; padding:6px 12px; width:220px;" onchange="M7Engine.renderAdminVerifyTable()">
-              <option value="ALL">Filter Status: [Semua ▼]</option>
-              <option value="PENDING" selected>⏳ Menunggu Review (Pending)</option>
-              <option value="APPROVED">✅ Disetujui (Approved)</option>
-              <option value="REJECTED">❌ Ditolak (Rejected)</option>
-              <option value="REVISION">📝 Perlu Revisi (Revision)</option>
+            <select id="m7-filter-verify-status" class="form-input" style="font-size:0.8rem; padding:8px 14px; width:220px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff;" onchange="M7Engine.renderAdminVerifyTable()">
+              <option value="ALL">Status: Semua</option>
+              <option value="PENDING" selected>Menunggu Review (Pending)</option>
+              <option value="APPROVED">Disetujui (Approved)</option>
+              <option value="REJECTED">Ditolak (Rejected)</option>
+              <option value="REVISION">Perlu Revisi (Revision)</option>
             </select>
           </div>
 
-          <div class="glass-card" style="padding:16px; border:1px solid var(--chrome-border); border-radius:14px; overflow-x:auto;">
+          <div class="glass-card" style="padding:16px; border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow-x:auto;">
             <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.83rem;">
               <thead>
-                <tr style="border-bottom:2px solid var(--accent-gold); color:var(--accent-gold); text-align:left;">
-                  <th style="padding:10px 8px; width:40px;">No</th>
-                  <th style="padding:10px 8px;">Nama Produk</th>
-                  <th style="padding:10px 8px;">Lapak & Pemilik</th>
-                  <th style="padding:10px 8px; text-align:right;">Harga (Rp)</th>
-                  <th style="padding:10px 8px;">Kondisi</th>
-                  <th style="padding:10px 8px; text-align:center;">Status</th>
-                  <th style="padding:10px 8px; text-align:center;">Aksi Moderasi</th>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.08); color:#94a3b8; text-align:left; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">
+                  <th style="padding:12px 10px; width:40px; text-align:center;">No</th>
+                  <th style="padding:12px 10px;">Nama Produk</th>
+                  <th style="padding:12px 10px;">Lapak & Pemilik</th>
+                  <th style="padding:12px 10px; text-align:right;">Harga (Rp)</th>
+                  <th style="padding:12px 10px; text-align:center;">Kondisi</th>
+                  <th style="padding:12px 10px; text-align:center;">Status</th>
+                  <th style="padding:12px 10px; text-align:center;">Aksi Moderasi</th>
                 </tr>
               </thead>
               <tbody id="m7-verify-tbody">
@@ -3265,26 +3265,32 @@
           </div>
 
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:12px;">
-            <h4 style="color:var(--accent-gold); font-size:1.05rem; margin:0;">📊 LAPORAN DETAILED PENYEWAAN LAPAK</h4>
+            <h4 style="color:#fbbf24; font-size:1.05rem; margin:0; font-weight:700;">Laporan Penyewaan Lapak</h4>
             <div style="display:flex; gap:8px;">
-              <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px;" onclick="M7Engine.exportSewaExcel()">📤 Export Excel</button>
-              <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px;" onclick="M7Engine.exportSewaPdf()">📤 Export PDF</button>
+              <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.exportSewaExcel()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Export Excel</span>
+              </button>
+              <button class="btn-outline" style="font-size:0.8rem; padding:6px 14px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.exportSewaPdf()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Export PDF</span>
+              </button>
             </div>
           </div>
 
-          <div class="glass-card" style="padding:16px; border:1px solid var(--chrome-border); border-radius:14px; overflow-x:auto;">
+          <div class="glass-card" style="padding:16px; border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow-x:auto;">
             <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.83rem;">
               <thead>
-                <tr style="border-bottom:2px solid var(--accent-gold); color:var(--accent-gold); text-align:left;">
-                  <th style="padding:10px 8px; width:40px;">No</th>
-                  <th style="padding:10px 8px;">Kode Lapak</th>
-                  <th style="padding:10px 8px;">Nama Lapak</th>
-                  <th style="padding:10px 8px;">Pemilik</th>
-                  <th style="padding:10px 8px;">Sewa Mulai</th>
-                  <th style="padding:10px 8px;">Sewa Akhir</th>
-                  <th style="padding:10px 8px; text-align:right;">Biaya Sewa (Rp)</th>
-                  <th style="padding:10px 8px; text-align:center;">Status</th>
-                  <th style="padding:10px 8px; text-align:center;">Aksi</th>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.08); color:#94a3b8; text-align:left; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">
+                  <th style="padding:12px 10px; width:40px; text-align:center;">No</th>
+                  <th style="padding:12px 10px;">Kode Lapak</th>
+                  <th style="padding:12px 10px;">Nama Lapak</th>
+                  <th style="padding:12px 10px;">Pemilik</th>
+                  <th style="padding:12px 10px;">Sewa Mulai</th>
+                  <th style="padding:12px 10px;">Sewa Akhir</th>
+                  <th style="padding:12px 10px; text-align:right;">Biaya Sewa (Rp)</th>
+                  <th style="padding:12px 10px; text-align:center;">Status</th>
+                  <th style="padding:12px 10px; text-align:center;">Aksi</th>
                 </tr>
               </thead>
               <tbody id="m7-reports-tbody">

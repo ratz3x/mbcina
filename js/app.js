@@ -21394,34 +21394,47 @@ window.M7Engine = {
       const memberId = p.member_id || 'MBINA-JKT-2026-000005';
 
       const pStatus = (p.status || 'APPROVED').toUpperCase();
-      let statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold);">⏳ PENDING</span>`;
+      let statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#fbbf24; display:inline-block;"></span>PENDING</span>`;
       if (pStatus === 'APPROVED') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">✅ APPROVED</span>`;
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#34d399; display:inline-block;"></span>APPROVED</span>`;
       } else if (pStatus === 'REJECTED') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red);">❌ REJECTED</span>`;
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#f87171; display:inline-block;"></span>REJECTED</span>`;
       } else if (pStatus === 'REVISION') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.25); color:#3b82f6; border:1px solid #3b82f6;">📝 REVISION</span>`;
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#60a5fa; display:inline-block;"></span>REVISION</span>`;
       }
 
       const priceFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price);
 
       return `
-        <tr style="border-bottom:1px solid var(--chrome-border);">
-          <td style="padding:10px 8px; font-weight:700; text-align:center;">${idx + 1}</td>
-          <td style="padding:10px 8px; font-weight:800; color:#fff;">${p.name}</td>
-          <td style="padding:10px 8px; color:var(--text-main);">
-            <div style="font-weight:700; color:var(--accent-gold);">${storeName}</div>
-            <div style="font-size:0.75rem; color:var(--text-muted);">${ownerName} (${memberId})</div>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <td style="padding:12px 10px; font-weight:600; text-align:center; color:#94a3b8; font-size:0.8rem;">${idx + 1}</td>
+          <td style="padding:12px 10px; font-weight:700; color:#fff; font-size:0.85rem;">${p.name}</td>
+          <td style="padding:12px 10px;">
+            <div style="font-weight:700; color:#fbbf24; font-size:0.83rem;">${storeName}</div>
+            <div style="font-size:0.72rem; color:#94a3b8;">${ownerName} <span style="font-family:monospace; color:#64748b;">(${memberId})</span></div>
           </td>
-          <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald);">${priceFormatted}</td>
-          <td style="padding:10px 8px;">${p.condition === 'NEW' ? 'BARU' : 'BEKAS'}</td>
-          <td style="padding:10px 8px; text-align:center;">${statusBadge}</td>
-          <td style="padding:10px 8px; text-align:center;">
-            <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:wrap;">
-              <button type="button" class="btn-primary" style="padding:5px 10px; font-size:0.75rem; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none; cursor:pointer;" onclick="if(window.M7Engine){window.M7Engine.openAdminVerifyIklanModal('${p.id}');}else if(window.openAdminVerifyIklanModal){window.openAdminVerifyIklanModal('${p.id}');}" title="Buka Detail & Moderasi">👁️ Review</button>
-              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; font-weight:700; color:var(--primary-emerald); border-color:var(--primary-emerald); cursor:pointer;" onclick="M7Engine.verifyProduct('${p.id}', 'APPROVED')" title="Setujui Iklan">✅ Setujui</button>
-              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; font-weight:700; color:var(--accent-red); border-color:var(--accent-red); cursor:pointer;" onclick="M7Engine.promptRejectProduct('${p.id}')" title="Tolak Iklan">❌ Tolak</button>
-              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; color:#ef4444; border-color:#ef4444; cursor:pointer;" onclick="M7Engine.deleteProduct('${p.id}')" title="Takedown / Hapus Permanen">🗑️</button>
+          <td style="padding:12px 10px; text-align:right; font-weight:800; font-family:monospace; color:#34d399; font-size:0.88rem;">${priceFormatted}</td>
+          <td style="padding:12px 10px; text-align:center;">
+            <span style="display:inline-block; padding:2px 8px; border-radius:6px; font-size:0.72rem; font-weight:600; font-family:monospace; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#cbd5e1;">${p.condition === 'NEW' ? 'BARU' : 'BEKAS'}</span>
+          </td>
+          <td style="padding:12px 10px; text-align:center;">${statusBadge}</td>
+          <td style="padding:12px 10px; text-align:center;">
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:nowrap;">
+              <button type="button" class="btn-primary" style="padding:5px 12px; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:8px; cursor:pointer;" onclick="if(window.M7Engine){window.M7Engine.openAdminVerifyIklanModal('${p.id}');}else if(window.openAdminVerifyIklanModal){window.openAdminVerifyIklanModal('${p.id}');}" title="Buka Detail & Moderasi">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>Review</span>
+              </button>
+              <button type="button" class="btn-outline" style="padding:5px 10px; font-size:0.75rem; font-weight:700; color:#34d399; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:8px; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.2s ease;" onclick="M7Engine.verifyProduct('${p.id}', 'APPROVED')" title="Setujui Iklan">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Setujui</span>
+              </button>
+              <button type="button" class="btn-outline" style="padding:5px 10px; font-size:0.75rem; font-weight:700; color:#f87171; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); border-radius:8px; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.2s ease;" onclick="M7Engine.promptRejectProduct('${p.id}')" title="Tolak Iklan">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <span>Tolak</span>
+              </button>
+              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#f87171; border-color:rgba(239,68,68,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s ease;" onclick="M7Engine.deleteProduct('${p.id}')" title="Takedown / Hapus Permanen">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
             </div>
           </td>
         </tr>
@@ -22004,26 +22017,31 @@ window.M7Engine = {
     if (!tbody) return;
 
     tbody.innerHTML = this.data.lapak.map((l, idx) => {
-      const ownerName = l.user_id === 'usr_m3_001' ? 'Andi Pratama' : (l.user_id === 'usr_m3_002' ? 'Siti Rahayu' : 'Budi Santoso');
+      const ownerName = l.pemilik || (l.user_id === 'usr_m3_001' ? 'Andi Pratama' : (l.user_id === 'usr_m3_002' ? 'Siti Rahayu' : (l.user_id === 'usr_m3_003' ? 'Budi Santoso' : (l.created_by || 'Member MB INA'))));
       const isExpired = l.sewa_status === 'EXPIRED' || new Date(l.sewa_end_date) < new Date();
       const statusBadge = isExpired
-        ? `<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red);">🔴 EXPIRED</span>`
-        : `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald);">🟢 AKTIF</span>`;
+        ? `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#f87171; display:inline-block;"></span>EXPIRED</span>`
+        : `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#34d399; display:inline-block;"></span>AKTIF</span>`;
 
       const feeFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(l.sewa_fee || 0);
 
       return `
-        <tr style="border-bottom:1px solid var(--chrome-border);">
-          <td style="padding:10px 8px; font-weight:700;">${idx + 1}</td>
-          <td style="padding:10px 8px; font-weight:800; color:var(--accent-gold);">${l.lapak_code}</td>
-          <td style="padding:10px 8px; font-weight:700; color:#fff;">${l.name}</td>
-          <td style="padding:10px 8px; color:var(--text-main);">${ownerName}</td>
-          <td style="padding:10px 8px;">${l.sewa_start_date}</td>
-          <td style="padding:10px 8px;">${l.sewa_end_date}</td>
-          <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--accent-gold);">${feeFormatted}</td>
-          <td style="padding:10px 8px; text-align:center;">${statusBadge}</td>
-          <td style="padding:10px 8px; text-align:center;">
-            <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem;" onclick="M7Engine.openRenewLapakModal('${l.id}')">✏️ Perpanjang</button>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <td style="padding:12px 10px; font-weight:600; text-align:center; color:#94a3b8; font-size:0.8rem;">${idx + 1}</td>
+          <td style="padding:12px 10px;">
+            <span style="font-family:monospace; font-size:0.78rem; color:#e2e8f0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:3px 8px; border-radius:6px; font-weight:700;">${l.lapak_code}</span>
+          </td>
+          <td style="padding:12px 10px; font-weight:700; color:#fff; font-size:0.85rem;">${l.name}</td>
+          <td style="padding:12px 10px; color:#e2e8f0; font-size:0.83rem;">${ownerName}</td>
+          <td style="padding:12px 10px; font-family:monospace; font-size:0.78rem; color:#94a3b8;">${l.sewa_start_date || '-'}</td>
+          <td style="padding:12px 10px; font-family:monospace; font-size:0.78rem; color:#94a3b8;">${l.sewa_end_date || '-'}</td>
+          <td style="padding:12px 10px; text-align:right; font-family:monospace; font-weight:800; color:#fbbf24; font-size:0.88rem;">${feeFormatted}</td>
+          <td style="padding:12px 10px; text-align:center;">${statusBadge}</td>
+          <td style="padding:12px 10px; text-align:center;">
+            <button type="button" class="btn-outline" style="padding:5px 12px; font-size:0.75rem; font-weight:600; border-radius:8px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Perpanjang Sewa Lapak">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span>Perpanjang</span>
+            </button>
           </td>
         </tr>
       `;
