@@ -263,6 +263,7 @@
           justify-content: center !important;
           padding: 20px !important;
           box-sizing: border-box !important;
+          overflow-y: auto !important;
         }
         .mbux-modal-dialog {
           background: #0D0F18 !important;
@@ -276,21 +277,43 @@
           box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
           overflow: hidden !important;
           animation: mbuxModalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          margin: auto !important;
         }
-        @keyframes mbuxModalIn {
-          from { opacity: 0; transform: scale(0.97); }
-          to { opacity: 1; transform: scale(1); }
+        .mbux-modal-dialog form {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+          overflow: hidden !important;
         }
         .mbux-modal-header {
-          padding: 20px 24px;
+          padding: 18px 24px;
           border-bottom: 1px solid rgba(226, 232, 240, 0.08);
           display: flex;
           justify-content: space-between;
           align-items: center;
+          flex-shrink: 0;
         }
         .mbux-modal-body {
           padding: 24px;
-          overflow-y: auto;
+          overflow-y: auto !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+          overscroll-behavior: contain !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+        .mbux-modal-body::-webkit-scrollbar {
+          width: 6px !important;
+        }
+        .mbux-modal-body::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02) !important;
+        }
+        .mbux-modal-body::-webkit-scrollbar-thumb {
+          background: rgba(245, 158, 11, 0.4) !important;
+          border-radius: 10px !important;
+        }
+        .mbux-modal-body::-webkit-scrollbar-thumb:hover {
+          background: rgba(245, 158, 11, 0.8) !important;
         }
         .mbux-modal-footer {
           padding: 16px 24px;
@@ -299,6 +322,7 @@
           display: flex;
           justify-content: flex-end;
           gap: 10px;
+          flex-shrink: 0;
         }
       `;
       document.head.appendChild(st);
@@ -1057,8 +1081,8 @@
               </button>
             </div>
 
-            <form onsubmit="window.DonationManager.handleSubmitDonation(event)">
-              <div class="mbux-modal-body">
+            <form onsubmit="window.DonationManager.handleSubmitDonation(event)" style="display:flex; flex-direction:column; flex:1 1 auto; min-height:0; overflow:hidden;">
+              <div class="mbux-modal-body" style="overflow-y:auto; flex:1 1 auto; min-height:0;">
                 <!-- CAMPAIGN SELECTOR -->
                 <div style="margin-bottom:16px;">
                   <label style="display:block; font-size:0.72rem; font-weight:600; color:#94A3B8; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Program Donasi *</label>

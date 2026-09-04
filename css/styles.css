@@ -2368,6 +2368,78 @@ body.light-mode input:-webkit-autofill:active {
   caret-color: #0f172a !important;
 }
 
+/* Universal Modal Dialog & Body Scroll Enforcer */
+.mbux-modal-overlay,
+.modal-backdrop,
+.modal-overlay {
+  overflow-y: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  overscroll-behavior: contain !important;
+}
+
+.mbux-modal-dialog,
+.modal-container {
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  margin: auto !important;
+}
+
+.mbux-modal-dialog > form,
+.modal-container > form {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  height: 100% !important;
+}
+
+.mbux-modal-body,
+.modal-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  max-height: calc(90vh - 130px) !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #d4af37 rgba(255, 255, 255, 0.05) !important;
+}
+
+.mbux-modal-body::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar {
+  width: 7px !important;
+  display: block !important;
+}
+
+.mbux-modal-body::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-radius: 8px !important;
+}
+
+.mbux-modal-body::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb {
+  background: #d4af37 !important;
+  border-radius: 8px !important;
+}
+
+.mbux-modal-body::-webkit-scrollbar-thumb:hover,
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b !important;
+}
+
+.mbux-modal-footer,
+.modal-footer {
+  flex-shrink: 0 !important;
+}
+
 
 
 
