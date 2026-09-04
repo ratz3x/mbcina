@@ -16,8 +16,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260905_v127_modal_scroll_fix">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260905_v127_modal_scroll_fix">
+  <link rel="stylesheet" href="css/styles.css?v=20260905_v131_fast_refresh">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260905_v131_fast_refresh">
+  <style id="modal-anti-fouc-guard">
+    /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
+    .modal-backdrop:not(.active),
+    .modal-overlay:not(.active),
+    .mbux-modal-overlay:not(.active),
+    .lx-modal-backdrop:not(.active),
+    [id^="modal-"]:not(.active) {
+      display: none;
+    }
+  </style>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
   
@@ -6411,7 +6421,7 @@
   <!-- ============================================================ -->
   <!-- MODAL M3: EXPORT DATA KEANGGOTAAN                            -->
   <!-- ============================================================ -->
-  <div id="modal-m3-export" class="modal-backdrop">
+  <div id="modal-m3-export" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:500px;">
       <div class="modal-header">
         <h3 class="modal-title" style="color:var(--accent-gold);">📤 Export Data Keanggotaan MB INA</h3>
@@ -7551,7 +7561,7 @@
   <!-- ============================================ -->
   <!-- MODAL 1: LOGIN MEMBER & PENGURUS            -->
   <!-- ============================================ -->
-  <div id="modal-login" class="modal-backdrop">
+  <div id="modal-login" class="modal-backdrop" style="display:none;">
     <div class="modal-container modal-card-padded" style="max-width:440px; padding:32px 28px; position:relative; overflow:hidden;">
       
       <!-- CLOSE BUTTON (X) -->
@@ -7704,7 +7714,7 @@
   <!-- ============================================ -->
   <!-- MODAL 2: PENDAFTARAN MEMBER BARU (WIZARD)   -->
   <!-- ============================================ -->
-  <div id="modal-register" class="modal-backdrop">
+  <div id="modal-register" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:680px;">
       <div class="modal-header">
         <div>
@@ -7894,7 +7904,7 @@
   <!-- ============================================ -->
   <!-- MODAL: DONASI MEMBER MB INA                  -->
   <!-- ============================================ -->
-  <div id="modal-member-donation" class="modal-backdrop">
+  <div id="modal-member-donation" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:620px;">
       <div class="modal-header">
         <h3 class="modal-title" style="color:var(--accent-gold);">💰 FORM DONASI - MB INA</h3>
@@ -8230,7 +8240,7 @@
 
   <!-- MODAL: EDIT / TAMBAH JABATAN PENGURUS PUSAT (2.1.5 & 2.4) -->
   <!-- MODAL: EDIT / TAMBAH JABATAN PENGURUS PUSAT (2.1.5 & 2.4) -->
-  <div id="modal-edit-structure" class="modal-backdrop">
+  <div id="modal-edit-structure" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:560px; border-radius:24px; background:rgba(9,13,22,0.95); border:1px solid rgba(255,255,255,0.08); box-shadow:0 20px 50px rgba(0,0,0,0.8);">
       <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.06); padding:20px 24px;">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -8304,7 +8314,7 @@
   </div>
 
   <!-- MODAL: EDIT / TAMBAH VISI & MISI 2.1.3 -->
-  <div id="modal-edit-vm" class="modal-backdrop">
+  <div id="modal-edit-vm" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:540px;">
       <div class="modal-header">
         <div>
@@ -8354,7 +8364,7 @@
   </div>
 
   <!-- MODAL: EDIT / TAMBAH PRESIDEN MB INA 2.1.4 (FOTO & BIO PRESIDEN) -->
-  <div id="modal-edit-president" class="modal-backdrop">
+  <div id="modal-edit-president" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:580px;">
       <div class="modal-header">
         <div>
@@ -8413,7 +8423,7 @@
   </div>
 
   <!-- MODAL: EDIT PROFIL ORGANISASI MB INA -->
-  <div id="modal-edit-org-profile" class="modal-backdrop">
+  <div id="modal-edit-org-profile" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:580px;">
       <div class="modal-header">
         <div>
@@ -8485,7 +8495,7 @@
   </div>
 
   <!-- MODAL 3.1.4.2: EDIT TIER ⭐ -->
-  <div id="modal-edit-tier" class="modal-backdrop">
+  <div id="modal-edit-tier" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:640px;">
       <div class="modal-header">
         <div>
@@ -8586,7 +8596,7 @@
   </div>
 
   <!-- MODAL MEMBER: TIER SAYA & PROGRESS 🏅 -->
-  <div id="modal-member-my-tier" class="modal-backdrop">
+  <div id="modal-member-my-tier" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:540px;">
       <div class="modal-header">
         <div>
@@ -8602,7 +8612,7 @@
   </div>
 
   <!-- MODAL 3.1.4.3: TAMBAH PROVINSI -->
-  <div id="modal-add-province" class="modal-backdrop">
+  <div id="modal-add-province" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:480px;">
       <div class="modal-header">
         <div>
@@ -8645,7 +8655,7 @@
   </div>
 
   <!-- MODAL 3.1.4.5: EDIT EMAIL TEMPLATE -->
-  <div id="modal-edit-template" class="modal-backdrop">
+  <div id="modal-edit-template" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:580px;">
       <div class="modal-header">
         <div>
@@ -8679,7 +8689,7 @@
   </div>
 
   <!-- MODAL: EDIT USER -->
-  <div id="modal-edit-user" class="modal-backdrop">
+  <div id="modal-edit-user" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:580px;">
       <div class="modal-header">
         <div>
@@ -8803,7 +8813,7 @@
   </div>
 
   <!-- MODAL: TAMBAH USER BARU -->
-  <div id="modal-add-user" class="modal-backdrop">
+  <div id="modal-add-user" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:540px;">
       <div class="modal-header">
         <div>
@@ -8889,7 +8899,7 @@
   </div>
 
   <!-- MODAL: BULK IMPORT CSV -->
-  <div id="modal-import-csv" class="modal-backdrop">
+  <div id="modal-import-csv" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:480px;">
       <div class="modal-header">
         <div>
@@ -9038,7 +9048,7 @@
   
 
   <!-- MODAL M2: KELOLA PASAL SEJARAH ORGANISASI -->
-  <div id="modal-m2-history" class="modal-backdrop">
+  <div id="modal-m2-history" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:680px; border-radius:24px; background:rgba(9,13,22,0.95); border:1px solid rgba(255,255,255,0.08); box-shadow:0 20px 50px rgba(0,0,0,0.8);">
       <div class="modal-header" style="border-bottom:1px solid rgba(255,255,255,0.06); padding:20px 24px;">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -9092,7 +9102,7 @@
   </div>
 
   <!-- MODAL M5: 5.2.1 BUAT THREAD BARU -->
-  <div id="modal-create-thread" class="modal-backdrop">
+  <div id="modal-create-thread" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:680px;">
       <div class="modal-header">
         <div>
@@ -9156,7 +9166,7 @@
   </div>
 
   <!-- MODAL M5: 5.2.4 SHARE THREAD -->
-  <div id="modal-share-thread" class="modal-backdrop">
+  <div id="modal-share-thread" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:460px;">
       <div class="modal-header">
         <div>
@@ -9189,7 +9199,7 @@
   </div>
 
   <!-- MODAL M5: 5.2.5 REPORT SPAM -->
-  <div id="modal-report-thread" class="modal-backdrop">
+  <div id="modal-report-thread" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:480px;">
       <div class="modal-header">
         <div>
@@ -9230,7 +9240,7 @@
   </div>
 
   <!-- MODAL M5: 5.3.1 BUAT BROADCAST -->
-  <div id="modal-create-broadcast" class="modal-backdrop">
+  <div id="modal-create-broadcast" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:580px;">
       <div class="modal-header">
         <div>
@@ -9272,7 +9282,7 @@
   </div>
 
   <!-- MODAL M5: 5.4.3 WARN / BLOCK USER -->
-  <div id="modal-warn-user" class="modal-backdrop">
+  <div id="modal-warn-user" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:480px;">
       <div class="modal-header">
         <div>
@@ -9320,7 +9330,7 @@
   </div>
 
   <!-- MODAL: UPLOAD BULK DAFTAR ANGGOTA (M4) -->
-  <div id="modal-m4-upload-members" class="modal-backdrop">
+  <div id="modal-m4-upload-members" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:540px;">
       <div class="modal-header">
         <div>
@@ -9369,7 +9379,7 @@
   </div>
 
   <!-- MODAL: SUCCESS SUBMISSION KLUB BARU (M4 4.1) -->
-  <div id="modal-m4-submission-success" class="modal-backdrop">
+  <div id="modal-m4-submission-success" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:560px; text-align:center;">
       <div class="modal-header" style="justify-content:center; position:relative; border-bottom:1px solid rgba(16,185,129,0.3);">
         <div>
@@ -9411,7 +9421,7 @@
   </div>
 
   <!-- MODAL: REVIEW & UPDATE STATUS PENGAJUAN KLUB (M4) -->
-  <div id="modal-m4-review" class="modal-backdrop">
+  <div id="modal-m4-review" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:620px;">
       <div class="modal-header">
         <div>
@@ -9452,7 +9462,7 @@
 
 
   <!-- MODAL M2: DETAIL & TOOLTIP INFO KLUB (2.3) -->
-  <div id="modal-club-hover-info" class="modal-backdrop">
+  <div id="modal-club-hover-info" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:580px;">
       <div class="modal-header" style="border-bottom:1px solid var(--accent-gold-glow);">
         <div style="display:flex; align-items:center; gap:12px;">
@@ -9508,7 +9518,7 @@
   <!-- ============================================ -->
   <!-- MODAL: GLOBAL NOTIFICATION CENTER (MB INA)  -->
   <!-- ============================================ -->
-  <div id="modal-notification-center" class="modal-backdrop">
+  <div id="modal-notification-center" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:640px; max-height:85vh; display:flex; flex-direction:column; background:#0b0e14; border:1px solid rgba(255,255,255,0.08); border-radius:24px; box-shadow:0 25px 65px rgba(0,0,0,0.85); overflow:hidden; backdrop-filter:blur(20px);">
       
       <!-- HEADER -->
@@ -9566,7 +9576,7 @@
   </div>
 
   <!-- MODAL M2: FORM TAMBAH & EDIT KLUB / CHAPTER (2.2 & 2.3) -->
-  <div id="modal-edit-club" class="modal-backdrop">
+  <div id="modal-edit-club" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:720px; max-height:90vh; display:flex; flex-direction:column;">
       <div class="modal-header" style="flex-shrink:0;">
         <div>
@@ -9670,7 +9680,7 @@
   </div>
 
   <!-- MODAL M6: PORTAL SPONSOR - PENGAJUAN SPONSOR BARU -->
-  <div id="modal-apply-sponsor" class="modal-backdrop">
+  <div id="modal-apply-sponsor" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:620px;">
       <div class="modal-header">
         <div>
@@ -9747,7 +9757,7 @@
   </div>
 
   <!-- MODAL M6: APPROVAL BERJENJANG SPONSOR (BENDAHARA -> PRESIDEN -> ADMIN) -->
-  <div id="modal-sponsor-approval-review" class="modal-backdrop">
+  <div id="modal-sponsor-approval-review" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:760px; max-height:92vh; display:flex; flex-direction:column;">
       <div class="modal-header" style="flex-shrink:0;">
         <div>
@@ -9764,7 +9774,7 @@
   </div>
 
   <!-- MODAL M6: BUAT & EDIT ALBUM GALERI (6.5.2) -->
-  <div id="modal-m6-create-album" class="modal-backdrop">
+  <div id="modal-m6-create-album" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:540px;">
       <div class="modal-header">
         <div>
@@ -9790,7 +9800,7 @@
   </div>
 
   <!-- MODAL M6: DETAIL & LIGHTBOX MEDIA GALERI (6.5.3 & 6.5.4) -->
-  <div id="modal-m6-media-detail" class="modal-backdrop">
+  <div id="modal-m6-media-detail" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:860px; max-height:92vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border:1px solid var(--accent-gold);">
       <div class="modal-header" style="padding:14px 20px; border-bottom:1px solid var(--chrome-border); flex-shrink:0;">
         <div style="display:flex; align-items:center; gap:10px;">
@@ -9850,7 +9860,7 @@
   </div>
 
   <!-- MODAL EDIT DESKRIPSI & WAKTU EVENT PUBLISHED -->
-  <div id="modal-m6-edit-event-published" class="modal-backdrop">
+  <div id="modal-m6-edit-event-published" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:580px;">
       <div class="modal-header">
         <div>

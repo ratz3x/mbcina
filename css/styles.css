@@ -2383,12 +2383,18 @@ body.light-mode input:-webkit-autofill:active {
   display: none !important;
 }
 
+/* Modals without .active class are hidden by default (prevents FOUC & lag during refresh) */
+.mbux-modal-overlay:not(.active),
+.modal-backdrop:not(.active),
+.modal-overlay:not(.active),
+.lx-modal-backdrop:not(.active) {
+  display: none;
+}
+
 .mbux-modal-overlay.active,
 .modal-backdrop.active,
 .modal-overlay.active,
-.mbux-modal-overlay:not([style*="display: none"]):not([style*="display:none"]),
-.modal-backdrop:not([style*="display: none"]):not([style*="display:none"]),
-.modal-overlay:not([style*="display: none"]):not([style*="display:none"]) {
+.lx-modal-backdrop.active {
   overflow-y: auto !important;
   display: flex !important;
   align-items: center !important;

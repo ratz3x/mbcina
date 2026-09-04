@@ -618,9 +618,7 @@ body.light-mode ::-webkit-scrollbar-thumb:hover {
   background: rgba(180, 83, 9, 0.4);
 }
 
-/* --------------------------------------------------------------------------
-   8. UNIVERSAL MODAL DIALOG & BODY SCROLL ENFORCER
-   -------------------------------------------------------------------------- */
+/* Universal Modal Dialog & Body Scroll Enforcer */
 /* Ensure any closed modal stays strictly hidden */
 .mbux-modal-overlay[style*="display: none"],
 .mbux-modal-overlay[style*="display:none"],
@@ -635,12 +633,18 @@ body.light-mode ::-webkit-scrollbar-thumb:hover {
   display: none !important;
 }
 
+/* Modals without .active class are hidden by default (prevents FOUC & lag during refresh) */
+.mbux-modal-overlay:not(.active),
+.modal-backdrop:not(.active),
+.modal-overlay:not(.active),
+.lx-modal-backdrop:not(.active) {
+  display: none;
+}
+
 .mbux-modal-overlay.active,
 .modal-backdrop.active,
 .modal-overlay.active,
-.mbux-modal-overlay:not([style*="display: none"]):not([style*="display:none"]),
-.modal-backdrop:not([style*="display: none"]):not([style*="display:none"]),
-.modal-overlay:not([style*="display: none"]):not([style*="display:none"]) {
+.lx-modal-backdrop.active {
   overflow-y: auto !important;
   display: flex !important;
   align-items: center !important;
