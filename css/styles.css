@@ -2369,9 +2369,26 @@ body.light-mode input:-webkit-autofill:active {
 }
 
 /* Universal Modal Dialog & Body Scroll Enforcer */
-.mbux-modal-overlay,
-.modal-backdrop,
-.modal-overlay {
+/* Ensure any closed modal stays strictly hidden */
+.mbux-modal-overlay[style*="display: none"],
+.mbux-modal-overlay[style*="display:none"],
+.modal-backdrop[style*="display: none"],
+.modal-backdrop[style*="display:none"],
+.modal-overlay[style*="display: none"],
+.modal-overlay[style*="display:none"],
+.lx-modal-backdrop[style*="display: none"],
+.lx-modal-backdrop[style*="display:none"],
+[id^="modal-"][style*="display: none"],
+[id^="modal-"][style*="display:none"] {
+  display: none !important;
+}
+
+.mbux-modal-overlay.active,
+.modal-backdrop.active,
+.modal-overlay.active,
+.mbux-modal-overlay:not([style*="display: none"]):not([style*="display:none"]),
+.modal-backdrop:not([style*="display: none"]):not([style*="display:none"]),
+.modal-overlay:not([style*="display: none"]):not([style*="display:none"]) {
   overflow-y: auto !important;
   display: flex !important;
   align-items: center !important;

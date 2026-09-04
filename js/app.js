@@ -22238,7 +22238,8 @@ window.M7Engine = {
       if (submitBtn) submitBtn.innerHTML = '📝 TAMBAHKAN PRODUK';
     }
 
-    modal.style.display = 'flex';
+    modal.classList.add('active');
+    modal.style.setProperty('display', 'flex', 'important');
     document.body.style.overflow = 'hidden';
   },
 
@@ -22296,7 +22297,10 @@ window.M7Engine = {
 
   closeProdukModal: function() {
     const modal = document.getElementById('modal-tambah-produk');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.setProperty('display', 'none', 'important');
+    }
     document.body.style.overflow = '';
 
     if (this._returnToSponsorManage) {
