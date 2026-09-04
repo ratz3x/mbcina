@@ -20691,10 +20691,7 @@ window.M7Engine = {
   switchSubtab: function(subtabId) {
     this.activeSubtab = subtabId;
     document.querySelectorAll('.m7-subtab-content').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('[id^="m7-subtab-btn-"]').forEach(btn => {
-      btn.classList.remove('active');
-      btn.className = 'm7-subtab-pill bg-white/[0.03] text-neutral-400 border border-white/[0.06] hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-medium inline-flex items-center gap-2 transition-all cursor-pointer';
-    });
+    document.querySelectorAll('[id^="m7-subtab-btn-"]').forEach(btn => btn.classList.remove('active'));
 
     const btnMap = {
       '7_1_lapak': 'm7-subtab-btn-71',
@@ -20708,10 +20705,7 @@ window.M7Engine = {
     if (targetSub) targetSub.style.display = 'block';
 
     const btn = document.getElementById(btnMap[subtabId]);
-    if (btn) {
-      btn.classList.add('active');
-      btn.className = 'm7-subtab-pill active bg-amber-500/10 text-amber-400 border border-amber-500/30 px-3.5 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-2 transition-all cursor-pointer';
-    }
+    if (btn) btn.classList.add('active');
 
     this.renderAll();
   },
@@ -20742,26 +20736,26 @@ window.M7Engine = {
     });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-xs text-neutral-500">Belum ada data penyewa lapak sesuai filter.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--text-muted); font-size:0.82rem;">Belum ada data penyewa lapak sesuai filter.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = filtered.map((l, idx) => {
       const isExpired = l.sewa_status === 'EXPIRED' || (l.sewa_end_date && new Date(l.sewa_end_date) < new Date());
-      let statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>AKTIF</span>`;
+      let statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#34d399; display:inline-block;"></span>AKTIF</span>`;
 
       if (l.sewa_status === 'ACTIVE' || l.sewa_status === 'APPROVED' || l.status === 'APPROVED' || l.is_active === true || l.is_active === 'true') {
         if (isExpired) {
-          statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>EXPIRED</span>`;
+          statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#f87171; display:inline-block;"></span>EXPIRED</span>`;
         } else {
-          statusBadge = `<span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>AKTIF</span>`;
+          statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#34d399; display:inline-block;"></span>AKTIF</span>`;
         }
       } else if (l.sewa_status === 'REJECTED' || l.status === 'REJECTED') {
-        statusBadge = `<span class="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>DITOLAK</span>`;
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#f87171; display:inline-block;"></span>DITOLAK</span>`;
       } else if (l.sewa_status === 'REVISION' || l.status === 'REVISION') {
-        statusBadge = `<span class="bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>REVISI</span>`;
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#60a5fa; display:inline-block;"></span>REVISI</span>`;
       } else {
-        statusBadge = `<span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] px-2.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>PENDING</span>`;
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#fbbf24; display:inline-block;"></span>PENDING</span>`;
       }
 
       // Owner & Member ID
@@ -20785,45 +20779,47 @@ window.M7Engine = {
       const feeMonthlyFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(feeMonthly) + '/bln';
 
       return `
-        <tr class="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
-          <td class="py-3 px-4 text-center text-xs font-semibold text-neutral-400">${idx + 1}</td>
-          <td class="py-3 px-4">
-            <span class="font-mono text-xs text-neutral-300 bg-white/[0.03] border border-white/[0.08] px-2 py-1 rounded-md font-semibold">${l.lapak_code}</span>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <td style="padding:12px 10px; font-weight:600; text-align:center; color:#94a3b8; font-size:0.8rem;">${idx + 1}</td>
+          <td style="padding:12px 10px;">
+            <span style="font-family:monospace; font-size:0.78rem; color:#e2e8f0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:3px 8px; border-radius:6px; font-weight:700;">${l.lapak_code}</span>
           </td>
-          <td class="py-3 px-4 text-center">
-            <img src="${l.logo_url || 'assets/mb_badge.jpg'}" class="w-9 h-9 rounded-xl object-cover border border-white/10 bg-neutral-900 inline-block" onerror="this.src='assets/mb_badge.jpg'">
+          <td style="padding:12px 10px; text-align:center;">
+            <img src="${l.logo_url || 'assets/mb_badge.jpg'}" style="width:36px; height:36px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.15); display:inline-block; vertical-align:middle;" onerror="this.src='assets/mb_badge.jpg'">
           </td>
-          <td class="py-3 px-4">
-            <div class="text-xs font-bold text-white tracking-tight">${l.name}</div>
-            <div class="text-[11px] text-neutral-400 font-medium">${l.category || 'General'}</div>
+          <td style="padding:12px 10px;">
+            <div style="font-weight:700; color:#fff; font-size:0.85rem;">${l.name}</div>
+            <div style="font-size:0.75rem; color:#94a3b8;">${l.category || 'General'}</div>
           </td>
-          <td class="py-3 px-4">
-            <div class="text-xs font-medium text-neutral-200">${ownerName}</div>
-            <div class="text-[10px] text-neutral-400 font-mono">${memberId}</div>
+          <td style="padding:12px 10px;">
+            <div style="font-weight:600; color:#e2e8f0; font-size:0.83rem;">${ownerName}</div>
+            <div style="font-size:0.72rem; color:#94a3b8; font-family:monospace;">${memberId}</div>
           </td>
-          <td class="py-3 px-4 text-center">
-            <span class="bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full inline-block">${durationMonths} Bulan</span>
-            <span class="text-[10px] text-neutral-400 font-mono block mt-1">${startStr} – ${endStr}</span>
+          <td style="padding:12px 10px; text-align:center;">
+            <span style="display:inline-block; padding:3px 10px; border-radius:20px; background:rgba(56,189,248,0.12); color:#38bdf8; border:1px solid rgba(56,189,248,0.25); font-weight:700; font-size:0.75rem;">
+              ${durationMonths} Bulan
+            </span>
+            <div style="font-size:0.7rem; color:#94a3b8; font-family:monospace; margin-top:4px;">${startStr} – ${endStr}</div>
           </td>
-          <td class="py-3 px-4 text-right">
-            <span class="font-mono text-xs font-semibold text-neutral-200 block">${totalFeeFormatted}</span>
-            <span class="text-[10px] text-neutral-400 font-mono block">${feeMonthlyFormatted}</span>
+          <td style="padding:12px 10px; text-align:right;">
+            <div style="font-family:monospace; font-weight:800; color:#fbbf24; font-size:0.88rem;">${totalFeeFormatted}</div>
+            <div style="font-family:monospace; font-size:0.72rem; color:#94a3b8;">${feeMonthlyFormatted}</div>
           </td>
-          <td class="py-3 px-4 text-center">${statusBadge}</td>
-          <td class="py-3 px-4 text-center">
-            <div class="flex gap-1.5 justify-center items-center flex-wrap">
-              <button type="button" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-sm" onclick="M7Engine.openReviewLapakModal('${l.id}')" title="Review Permohonan & Bukti Transfer">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <td style="padding:12px 10px; text-align:center;">${statusBadge}</td>
+          <td style="padding:12px 10px; text-align:center;">
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:nowrap;">
+              <button type="button" class="btn-primary" style="padding:5px 12px; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:8px; cursor:pointer;" onclick="M7Engine.openReviewLapakModal('${l.id}')" title="Review Permohonan & Bukti Transfer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <span>Review</span>
               </button>
-              <button type="button" class="p-1.5 rounded-lg text-neutral-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all cursor-pointer" onclick="M7Engine.viewLapakProducts('${l.id}')" title="Lihat Produk">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#cbd5e1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.viewLapakProducts('${l.id}')" title="Lihat Produk Lapak">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
-              <button type="button" class="p-1.5 rounded-lg text-neutral-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-all cursor-pointer" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Edit & Perpanjang Sewa">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Edit & Perpanjang Sewa">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               </button>
-              <button type="button" class="p-1.5 rounded-lg text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 border border-white/10 transition-all cursor-pointer" onclick="M7Engine.deleteLapak('${l.id}')" title="Hapus Lapak">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#f87171; border-color:rgba(239,68,68,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.deleteLapak('${l.id}')" title="Hapus Lapak">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               </button>
             </div>
           </td>
