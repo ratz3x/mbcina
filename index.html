@@ -5170,21 +5170,20 @@
 
         <form id="form-tambah-produk" onsubmit="M7Engine.submitProdukForm(event)">
 
-          <!-- SECTION 0: PILIH TOKO / LAPAK PENJUAL -->
+          <!-- SECTION 0: LOKASI PENJUAL / LAPAK PRIBADI -->
           <div style="font-size:0.8rem; font-weight:800; color:var(--accent-gold); letter-spacing:1px; margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:4px;">
-            ─── LOKASI PENJUAL & TOKO (OFFICIAL STORE / LAPAK BAZAAR) ───
+            ─── LOKASI PENJUAL & LAPAK ────────────────────────────────
           </div>
 
           <div class="form-group" style="margin-bottom:16px;">
             <label style="font-size:0.82rem; font-weight:700; color:#fff; display:block; margin-bottom:4px;">
-              🏢 Toko / Lapak Penjual <span style="color:red;">*</span>
+              🏢 Toko / Lapak Penjual
             </label>
-            <select id="produk-form-lapak" class="form-input" style="width:100%; font-weight:700; background:#0b1120; border-color:var(--accent-gold); padding:10px;">
-              <option value="SPONSOR_STORE">🏢 Official Store Sponsor MB INA</option>
+            <select id="produk-form-lapak" class="form-input" style="width:100%; font-weight:700; background:#0b1120; border-color:var(--accent-gold); padding:10px; pointer-events:none;">
               <option value="MEMBER_MARKETPLACE">👤 Bursa Jual Beli Member MB INA (Lapak Komunitas)</option>
             </select>
-            <span style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
-              Pilih etalase tempat produk/iklan ini dipublikasikan (Official Store Sponsor, Lapak Komunitas Member, atau Booth Bazaar Event).
+            <span id="produk-form-lapak-note" style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:block;">
+              Produk otomatis diterbitkan pada Lapak Pribadi Anda.
             </span>
           </div>
 

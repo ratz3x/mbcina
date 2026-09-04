@@ -22360,44 +22360,76 @@ window.M7Engine = {
     const isSponsor = (user.role === 'SPONSOR') || (user.member_id && user.member_id.startsWith('SPN-'));
     const sponsorName = user.name || 'FDR Tyre Indonesia';
 
-    // Populate lapak / store dropdown
+    // Check if user has their own registered lapak
+    let userLapak = null;
+    if (this.data && Array.isArray(this.data.lapak)) {
+      userLapak = this.data.lapak.find(l => 
+        (user.id && (l.user_id === user.id || l.created_by === user.id)) || 
+        (user.username && (l.user_id === user.username || l.created_by === user.username)) || 
+        (user.member_id && (l.user_id === user.member_id || l.created_by === user.member_id))
+      );
+    }
+
+    // If lapakIdParam was passed (e.g. from Lapak Detail "+ Tambah Produk"), lock to that lapak
+    if (lapakIdParam && this.data && Array.isArray(this.data.lapak)) {
+      const matchLapak = this.data.lapak.find(l => l.id === lapakIdParam || l.lapak_code === lapakIdParam);
+      if (matchLapak) {
+        userLapak = matchLapak;
+      }
+    }
+
+    // Populate lapak / store selector - strictly locked to user's own store (no titip barang / cross-store)
     const lapakSel = document.getElementById('produk-form-lapak');
+    const lapakNote = document.getElementById('produk-form-lapak-note');
     if (lapakSel) {
       lapakSel.innerHTML = '';
 
-      if (isSponsor) {
+      if (userLapak) {
+        // User has a registered personal lapak -> Strictly lock to their own lapak
+        const opt = document.createElement('option');
+        opt.value = userLapak.id;
+        opt.textContent = `🏬 ${userLapak.lapak_code} — ${userLapak.name} (Lapak Pribadi Anda)`;
+        opt.selected = true;
+        lapakSel.appendChild(opt);
+        lapakSel.style.pointerEvents = 'none';
+        lapakSel.style.background = 'rgba(15, 23, 42, 0.9)';
+        lapakSel.style.color = '#38bdf8';
+        lapakSel.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+        if (lapakNote) {
+          lapakNote.innerHTML = `✅ Produk ini otomatis diterbitkan ke Lapak Pribadi Anda: <strong>${userLapak.name}</strong> (${userLapak.lapak_code}).`;
+          lapakNote.style.color = '#4ade80';
+        }
+      } else if (isSponsor) {
+        // Sponsor official store -> Strictly lock to their own official sponsor store
         const optSponsor = document.createElement('option');
         optSponsor.value = user.member_id || user.id || 'SPONSOR_STORE';
         optSponsor.textContent = `🏢 ${sponsorName} — Official Store Sponsor MB INA`;
         optSponsor.selected = true;
         lapakSel.appendChild(optSponsor);
+        lapakSel.style.pointerEvents = 'none';
+        lapakSel.style.background = 'rgba(15, 23, 42, 0.9)';
+        lapakSel.style.color = 'var(--accent-gold)';
+        lapakSel.style.borderColor = 'var(--accent-gold)';
+        if (lapakNote) {
+          lapakNote.innerHTML = `✅ Produk ini otomatis diterbitkan ke katalog resmi <strong>${sponsorName}</strong>.`;
+          lapakNote.style.color = 'var(--accent-gold)';
+        }
       } else {
+        // Regular member without personal lapak -> Bursa Jual Beli Komunitas Member
         const optMember = document.createElement('option');
         optMember.value = 'MEMBER_MARKETPLACE';
         optMember.textContent = `👤 Bursa Jual Beli Member MB INA (Lapak Komunitas Anggota)`;
         optMember.selected = true;
         lapakSel.appendChild(optMember);
-      }
-
-      // Add database lapak or fallback event booths
-      const eventLapaks = (this.data && Array.isArray(this.data.lapak) && this.data.lapak.length > 0) ? this.data.lapak : [
-        { id: 'LPK-SPN-2026-002', lapak_code: 'LPK-SPN-2026-002', name: 'FDR Tyre Indonesia Official Store', event_name: 'Booth A-01 Jamnas' },
-        { id: 'LPK-MEM-2026-001', lapak_code: 'LPK-MEM-2026-001', name: 'Bintang Mercy Autoparts & Spares', event_name: 'Booth B-05 Jamnas' },
-        { id: 'LPK-MEM-2026-002', lapak_code: 'LPK-MEM-2026-002', name: 'Retro Benz Classic Restoration', event_name: 'Booth C-12 Jamnas' },
-        { id: 'LPK-SPN-2026-001', lapak_code: 'LPK-SPN-2026-001', name: 'Shell Helix & Advance Official Booth', event_name: 'Booth A-02 Jamnas' }
-      ];
-
-      eventLapaks.forEach(l => {
-        // Skip duplicate of current sponsor
-        if (isSponsor && l.name && l.name.toLowerCase().includes(sponsorName.toLowerCase())) return;
-        const opt = document.createElement('option');
-        opt.value = l.id;
-        opt.textContent = `🎪 ${l.lapak_code} — ${l.name} (${l.event_name || 'Bazaar Event MB INA'})`;
-        if (lapakIdParam && (l.id === lapakIdParam || l.lapak_code === lapakIdParam)) {
-          opt.selected = true;
+        lapakSel.style.pointerEvents = 'none';
+        lapakSel.style.background = 'rgba(15, 23, 42, 0.9)';
+        lapakSel.style.color = '#cbd5e1';
+        lapakSel.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        if (lapakNote) {
+          lapakNote.innerHTML = `ℹ️ Anda belum menyewa lapak pribadi. Produk akan masuk ke Bursa Iklan Komunitas Anggota.`;
+          lapakNote.style.color = '#94a3b8';
         }
-        lapakSel.appendChild(opt);
-      });
+      }
     }
 
     // Auto-fill user defaults (WhatsApp & Location)
@@ -22433,6 +22465,22 @@ window.M7Engine = {
       this._editingProductId = editProduct.id;
       if (modalTitle) modalTitle.innerHTML = '✏️ EDIT PRODUK / IKLAN MARKETPLACE';
       if (submitBtn) submitBtn.innerHTML = '💾 SIMPAN PERUBAHAN PRODUK';
+
+      if (editProduct.lapak_id && lapakSel) {
+        const matchLpk = (this.data && Array.isArray(this.data.lapak)) ? this.data.lapak.find(l => l.id === editProduct.lapak_id) : null;
+        if (matchLpk) {
+          lapakSel.innerHTML = '';
+          const opt = document.createElement('option');
+          opt.value = matchLpk.id;
+          opt.textContent = `🏬 ${matchLpk.lapak_code} — ${matchLpk.name} (Lapak Pribadi Anda)`;
+          opt.selected = true;
+          lapakSel.appendChild(opt);
+          if (lapakNote) {
+            lapakNote.innerHTML = `✅ Produk ini milik Lapak: <strong>${matchLpk.name}</strong> (${matchLpk.lapak_code}).`;
+            lapakNote.style.color = '#4ade80';
+          }
+        }
+      }
 
       const nameEl = document.getElementById('produk-form-name');
       if (nameEl) nameEl.value = editProduct.name || '';
