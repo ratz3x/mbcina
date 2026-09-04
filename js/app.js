@@ -2432,6 +2432,12 @@ const AppEngine = {
             </div>
           </div>
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            ${myLapakFirst ? `
+            <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 14px; border-color:rgba(56,189,248,0.4); color:#38bdf8; background:rgba(56,189,248,0.08); font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${myLapakFirst.id}')" title="Perpanjang Masa Sewa Lapak">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span>Perpanjang Sewa</span>
+            </button>
+            ` : ''}
             <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 14px; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:700; border-radius:8px; display:flex; align-items:center; gap:4px; cursor:pointer;" onclick="AppEngine.openMemberLapakModal('ALL', 'reviews')">
               ⭐ Lihat Semua Ulasan (${myLapakReviews.length})
             </button>
