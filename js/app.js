@@ -20889,7 +20889,10 @@ window.M7Engine = {
       this.renderLapakTable();
       if (window.showToast) window.showToast(`🏪 Menampilkan lapak Anda: ${myLapak.name} (${myLapak.lapak_code})`, 'success');
     } else {
-      alert("Anda belum memiliki Lapak terdaftar.");
+      const confirmOpen = confirm("Anda belum memiliki Lapak terdaftar.\n\nApakah Anda ingin membuka Form Sewa Lapak Baru sekarang?");
+      if (confirmOpen) {
+        this.openSewaLapakModal();
+      }
     }
   },
 
@@ -21899,9 +21902,17 @@ window.M7Engine = {
       return;
     }
 
-    // Explicitly open modal with class active and important flex display
-    modal.classList.add('active');
+    // Explicitly clear all closing styles and show modal
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('opacity');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('visibility');
     modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '100005', 'important');
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
     const userNameInput = document.getElementById('sewa-user-name');
@@ -21910,7 +21921,7 @@ window.M7Engine = {
     const userPhoneInput = document.getElementById('sewa-form-phone');
 
     const memberName = user.name || 'Member MB INA';
-    const memberId = user.member_id || user.memberId || window.AppEngine?.getOfficialMemberId?.(user) || 'MBINA-JKT-2026-000005';
+    const memberId = user.member_id || user.memberId || window.AppEngine?.getOfficialMemberId?.(user) || 'MBINA-HQ-2026-000001';
     const tierStr = (user.tier || 'BRONZE').toUpperCase();
 
     if (userNameInput) userNameInput.value = memberName;
@@ -21932,6 +21943,9 @@ window.M7Engine = {
     if (modal) {
       modal.classList.remove('active');
       modal.style.setProperty('display', 'none', 'important');
+      modal.style.setProperty('opacity', '0', 'important');
+      modal.style.setProperty('pointer-events', 'none', 'important');
+      modal.style.setProperty('visibility', 'hidden', 'important');
     }
     document.body.style.overflow = '';
   },
@@ -21941,7 +21955,7 @@ window.M7Engine = {
     if (!monthsSelect) return;
     const months = parseInt(monthsSelect.value || 6);
 
-    const user = AppEngine.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const user = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
     const userTier = (user.tier || 'BRONZE').toUpperCase();
     const discMap = { 'PLATINUM': 20, 'GOLD': 15, 'SILVER': 10, 'BRONZE': 5 };
     const discPercent = discMap[userTier] !== undefined ? discMap[userTier] : 5;
@@ -21983,7 +21997,7 @@ window.M7Engine = {
     const bannerUrl = document.getElementById('sewa-form-banner')?.value || '';
     const proofUrl = document.getElementById('sewa-form-proof')?.value || '';
 
-    const user = AppEngine.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const user = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
     const userId = user.id || user.username || 'usr_superadmin';
 
     try {
@@ -22028,7 +22042,17 @@ window.M7Engine = {
     const modal = document.getElementById('modal-edit-lapak');
     if (!modal) return;
 
-    modal.style.display = 'flex';
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('opacity');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('visibility');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '100005', 'important');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
 
     // Set hidden ID and fields
     document.getElementById('edit-lapak-id').value = lapak.id;
@@ -22064,7 +22088,14 @@ window.M7Engine = {
 
   closeEditModal: function() {
     const modal = document.getElementById('modal-edit-lapak');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.setProperty('display', 'none', 'important');
+      modal.style.setProperty('opacity', '0', 'important');
+      modal.style.setProperty('pointer-events', 'none', 'important');
+      modal.style.setProperty('visibility', 'hidden', 'important');
+    }
+    document.body.style.overflow = '';
   },
 
   recalculateEditSewaFee: function() {
@@ -22301,8 +22332,16 @@ window.M7Engine = {
       if (submitBtn) submitBtn.innerHTML = '📝 TAMBAHKAN PRODUK';
     }
 
-    modal.classList.add('active');
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('opacity');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('visibility');
     modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('z-index', '100005', 'important');
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
   },
 
@@ -22363,6 +22402,9 @@ window.M7Engine = {
     if (modal) {
       modal.classList.remove('active');
       modal.style.setProperty('display', 'none', 'important');
+      modal.style.setProperty('opacity', '0', 'important');
+      modal.style.setProperty('pointer-events', 'none', 'important');
+      modal.style.setProperty('visibility', 'hidden', 'important');
     }
     document.body.style.overflow = '';
 
