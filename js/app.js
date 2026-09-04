@@ -20853,9 +20853,43 @@ window.M7Engine = {
 
   filterMyLapak: function() {
     const searchInput = document.getElementById('m7-search-lapak');
-    if (searchInput) {
-      searchInput.value = 'Andi';
+    if (!searchInput) return;
+
+    const user = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    if (!user || user.role === 'GUEST') {
+      if (window.showToast) window.showToast('Silakan login terlebih dahulu untuk melihat Lapak Anda.', 'warning');
+      else alert('Silakan login terlebih dahulu untuk melihat Lapak Anda.');
+      return;
+    }
+
+    // Cari lapak milik user di data lapak
+    const myLapak = (this.data && Array.isArray(this.data.lapak)) 
+      ? this.data.lapak.find(l => 
+          (l.user_id && (l.user_id === user.id || l.user_id === user.userId)) ||
+          (l.member_id && user.member_id && l.member_id.trim().toUpperCase() === user.member_id.trim().toUpperCase()) ||
+          (l.pemilik && user.name && l.pemilik.trim().toLowerCase() === user.name.trim().toLowerCase())
+        )
+      : null;
+
+    // Toggle: Jika saat ini sudah dalam keadaan difilter ke lapak user, klik lagi untuk reset
+    const isCurrentlyFiltered = searchInput.value && (
+      (myLapak && (searchInput.value === myLapak.lapak_code || searchInput.value === myLapak.name)) ||
+      (user.name && searchInput.value.toLowerCase() === user.name.toLowerCase())
+    );
+
+    if (isCurrentlyFiltered) {
+      searchInput.value = '';
       this.renderLapakTable();
+      if (window.showToast) window.showToast('Menampilkan seluruh lapak.', 'info');
+      return;
+    }
+
+    if (myLapak) {
+      searchInput.value = myLapak.lapak_code;
+      this.renderLapakTable();
+      if (window.showToast) window.showToast(`🏪 Menampilkan lapak Anda: ${myLapak.name} (${myLapak.lapak_code})`, 'success');
+    } else {
+      alert("Anda belum memiliki Lapak terdaftar.");
     }
   },
 
@@ -21854,10 +21888,7 @@ window.M7Engine = {
         : null;
 
       if (myLapak) {
-        const bukaProduk = confirm(`ℹ️ Anda sudah memiliki lapak resmi: "${myLapak.name}" (${myLapak.lapak_code}).\n\nSesuai regulasi MB Club INA, 1 member hanya boleh memiliki 1 lapak resmi untuk memasang banyak produk.\n\nApakah Anda ingin membuka form Tambah Produk ke lapak Anda sekarang?`);
-        if (bukaProduk) {
-          this.openProductModal(myLapak.id);
-        }
+        alert("Anda sudah memiliki Lapak");
         return;
       }
     }

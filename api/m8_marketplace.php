@@ -84,7 +84,7 @@ switch ($action) {
                 if ($existingLapak) {
                     echo json_encode([
                         'success' => false, 
-                        'message' => "Anda sudah memiliki lapak resmi terdaftar: '{$existingLapak['name']}' ({$existingLapak['lapak_code']}). Sesuai regulasi MB Club INA, 1 member hanya diperbolehkan memiliki 1 lapak resmi untuk memasang banyak produk."
+                        'message' => 'Anda sudah memiliki Lapak'
                     ]);
                     exit;
                 }
