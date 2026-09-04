@@ -1994,6 +1994,7 @@ const AppEngine = {
   },
 
   _switchMemberLapakSubtab(sub, btn) {
+    if (!btn) btn = document.getElementById('btn-ml-subtab-' + sub);
     document.querySelectorAll('.member-lapak-subtab').forEach(b => {
       b.style.background = 'rgba(255,255,255,0.03)';
       b.style.borderColor = 'var(--chrome-border)';
@@ -2356,12 +2357,11 @@ const AppEngine = {
   },
 
   _renderMemberMyLapak() {
-    const container = document.getElementById('ml-my-lapak-container');
+    const container = document.getElementById('ml-my-ads-container');
     if (!container) return;
     const u = this.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
     const userId = (u.id || u.userId || '').toLowerCase();
     const userName = (u.name || u.username || '').toLowerCase();
-    const userPhone = (u.phone || '').replace(/[^0-9]/g, '');
 
     const prods = (window.M7Engine && Array.isArray(window.M7Engine.data?.products))
       ? window.M7Engine.data.products
@@ -2370,20 +2370,28 @@ const AppEngine = {
     const lapaks = (window.M7Engine && Array.isArray(window.M7Engine.data?.lapak))
       ? window.M7Engine.data.lapak
       : [];
-    const myLapakIds = lapaks
-      .filter(l => (userId && (String(l.user_id).toLowerCase() === userId || String(l.created_by).toLowerCase() === userId)) || (userName && l.name && l.name.toLowerCase().includes(userName)))
-      .map(l => l.id);
 
+    // Strictly match user's registered lapak by user_id or exact owner name
+    const myLapakList = lapaks.filter(l => {
+      const lUid = String(l.user_id || '').toLowerCase();
+      const lOwner = String(l.pemilik || '').toLowerCase();
+      return (userId && lUid === userId) || (userName && lOwner && lOwner === userName);
+    });
+    const myLapakIds = myLapakList.map(l => l.id);
+    const myLapakFirst = myLapakList[0] || null;
+
+    // Filter user's products:
+    // 1. Products in user's lapak (if user owns a lapak)
+    // 2. Direct ads created by this user in member marketplace
+    // Never include products belonging to other merchants' lapaks
     let myAds = prods.filter(p => {
       const pUid = String(p.user_id || '').toLowerCase();
-      const pSeller = (p.seller_name || p.seller || '').toLowerCase();
       const pLapak = p.lapak_id || '';
-      const pPhone = (p.contact_whatsapp || p.phone || '').replace(/[^0-9]/g, '');
 
-      return (userId && pUid && pUid === userId) ||
-             (myLapakIds.length && myLapakIds.includes(pLapak)) ||
-             (userName && pSeller && (pSeller === userName || pSeller.includes(userName) || userName.includes(pSeller))) ||
-             (userPhone && pPhone && userPhone === pPhone);
+      if (pLapak && pLapak !== 'MEMBER_MARKETPLACE') {
+        return myLapakIds.length > 0 && myLapakIds.includes(pLapak);
+      }
+      return userId && pUid && pUid === userId;
     });
 
     const fmtRp = v => 'Rp ' + Number(v).toLocaleString('id-ID');
@@ -2396,10 +2404,10 @@ const AppEngine = {
       return '#94a3b8';
     };
     const statusLabel = s => {
-      if (!s || s === 'PENDING')  return '⏳ MENUNGGU VERIFIKASI';
-      if (s === 'APPROVED' || s === 'DISETUJUI') return '✅ DISETUJUI';
-      if (s === 'REJECTED')       return '❌ DITOLAK';
-      if (s === 'REVISION')       return '📝 PERLU REVISI';
+      if (!s || s === 'PENDING')  return 'MENUNGGU VERIFIKASI';
+      if (s === 'APPROVED' || s === 'DISETUJUI') return 'DISETUJUI';
+      if (s === 'REJECTED')       return 'DITOLAK';
+      if (s === 'REVISION')       return 'PERLU REVISI';
       return s;
     };
 
@@ -2408,41 +2416,70 @@ const AppEngine = {
     const myLapakReviews = allReviews.filter(r => myLapakIds.includes(r.lapak_id));
     const avgRating = myLapakReviews.length 
       ? (myLapakReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0) / myLapakReviews.length).toFixed(1)
-      : (myLapakIds.length ? '5.0' : '-');
-    const starsIcon = myLapakReviews.length ? '⭐'.repeat(Math.min(5, Math.round(Number(avgRating)))) : '⭐ Belum Ada Ulasan';
+      : '5.0';
+    const starsIcon = myLapakReviews.length ? '⭐'.repeat(Math.min(5, Math.round(Number(avgRating)))) : 'Belum Ada Ulasan';
 
-    const myLapakFirst = lapaks.find(l => myLapakIds.includes(l.id));
-    const storeName = myLapakFirst ? myLapakFirst.name : (userName ? ('Lapak ' + u.name) : 'Lapak Saya');
-    const storeCode = myLapakFirst ? myLapakFirst.lapak_code : 'MERCHANT';
-
-    let reputationBanner = '';
-    if (myLapakIds.length > 0 || myAds.length > 0) {
-      reputationBanner = `
-        <div style="background:linear-gradient(135deg, rgba(245,158,11,0.09) 0%, rgba(15,23,42,0.9) 100%); border:1px solid rgba(245,158,11,0.3); border-radius:14px; padding:18px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+    let topBanner = '';
+    if (myLapakFirst) {
+      const storeName = myLapakFirst.name;
+      const storeCode = myLapakFirst.lapak_code || 'LPK';
+      const isExpired = (myLapakFirst.sewa_status || '').toUpperCase() === 'EXPIRED';
+      topBanner = `
+        <div style="background:linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(15,23,42,0.92) 100%); border:1px solid rgba(212,175,55,0.3); border-radius:14px; padding:18px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
           <div style="display:flex; align-items:center; gap:14px; min-width:240px;">
-            <div style="width:48px; height:48px; border-radius:12px; background:rgba(245,158,11,0.15); border:1px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; font-size:1.6rem;">🏪</div>
+            <div style="width:48px; height:48px; border-radius:12px; background:rgba(212,175,55,0.15); border:1px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" color="var(--accent-gold)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
             <div>
-              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Reputasi & Skor Lapak Saya</div>
-              <div style="font-size:1.05rem; font-weight:800; color:#fff;">${storeName} <span style="font-size:0.75rem; color:var(--accent-gold); font-family:monospace;">(${storeCode})</span></div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Lapak Resmi Member</span>
+                <span class="badge ${isExpired ? 'badge-danger' : 'badge-success'}" style="font-size:0.65rem; padding:2px 8px;">${myLapakFirst.sewa_status || 'AKTIF'}</span>
+              </div>
+              <div style="font-size:1.1rem; font-weight:800; color:#fff; margin-top:2px;">${storeName} <span style="font-size:0.75rem; color:var(--accent-gold); font-family:monospace;">(${storeCode})</span></div>
               <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-                <span style="font-size:1.2rem; font-weight:900; color:var(--accent-gold); font-family:monospace;">${avgRating}</span>
-                <span style="font-size:0.95rem;">${starsIcon}</span>
+                <span style="font-size:1.1rem; font-weight:900; color:var(--accent-gold); font-family:monospace;">${avgRating}</span>
+                <span style="font-size:0.8rem; color:#f59e0b;">${starsIcon}</span>
                 <span style="font-size:0.78rem; color:#cbd5e1; font-weight:600;">(${myLapakReviews.length} Ulasan Masuk)</span>
               </div>
             </div>
           </div>
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            ${myLapakFirst ? `
-            <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 14px; border-color:rgba(56,189,248,0.4); color:#38bdf8; background:rgba(56,189,248,0.08); font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${myLapakFirst.id}')" title="Perpanjang Masa Sewa Lapak">
+            <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 14px; border-color:rgba(56,189,248,0.4); color:#38bdf8; background:rgba(56,189,248,0.08); font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${myLapakFirst.id}')" title="Perpanjang Masa Sewa Lapak">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               <span>Perpanjang Sewa</span>
             </button>
-            ` : ''}
-            <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 14px; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:700; border-radius:8px; display:flex; align-items:center; gap:4px; cursor:pointer;" onclick="AppEngine.openMemberLapakModal('ALL', 'reviews')">
-              ⭐ Lihat Semua Ulasan (${myLapakReviews.length})
+            <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 14px; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine.openMemberLapakModal('ALL', 'reviews')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Ulasan Lapak (${myLapakReviews.length})</span>
             </button>
-            <button type="button" class="btn-primary" style="font-size:0.78rem; padding:8px 16px; font-weight:800; border-radius:8px; cursor:pointer;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan', document.querySelectorAll('.member-lapak-subtab')[2])">
-              + Pasang Iklan Baru
+            <button type="button" class="btn-primary" style="font-size:0.78rem; padding:8px 16px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>+ Pasang Iklan Baru</span>
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      topBanner = `
+        <div style="background:linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(15,23,42,0.95) 100%); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div style="display:flex; align-items:center; gap:14px; min-width:240px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.25); display:flex; align-items:center; justify-content:center; color:var(--accent-gold);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div>
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Status Toko & Kemitraan</div>
+              <div style="font-size:1.05rem; font-weight:800; color:#fff;">Belum Memiliki Lapak Resmi</div>
+              <div style="font-size:0.78rem; color:#94a3b8; margin-top:2px;">Sewa lapak resmi untuk mendapatkan profil merchant eksklusif, emblem verifikasi, & fitur ulasan pelanggan.</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 14px; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine.openMemberLapakModal ? AppEngine.openMemberLapakModal('ALL', 'katalog') : null">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              <span>Katalog Publik</span>
+            </button>
+            <button type="button" class="btn-primary" style="font-size:0.78rem; padding:8px 16px; font-weight:800; border-radius:8px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.openSewaModal ? M7Engine.openSewaModal() : (M7Engine.openSewaLapakModal ? M7Engine.openSewaLapakModal() : AppEngine._switchMemberLapakSubtab('pasangiklan'))">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Sewa Lapak Baru</span>
             </button>
           </div>
         </div>
@@ -2450,10 +2487,13 @@ const AppEngine = {
     }
 
     container.innerHTML = `
-      ${reputationBanner}
+      ${topBanner}
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <span style="font-size:0.85rem; font-weight:800; color:#fff;">Daftar Iklan Saya (${myAds.length})</span>
-        <button class="btn-primary" style="font-size:0.75rem; padding:6px 12px; font-weight:800;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan', document.querySelectorAll('.member-lapak-subtab')[2])">+ Pasang Iklan Baru</button>
+        <button class="btn-primary" style="font-size:0.75rem; padding:6px 14px; font-weight:800; display:inline-flex; align-items:center; gap:5px;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Pasang Iklan Baru</span>
+        </button>
       </div>
       ${myAds.length ? myAds.map(a => {
         let imgs = [];
@@ -2468,21 +2508,32 @@ const AppEngine = {
             <div style="flex:1; min-width:0;">
               <div style="font-size:0.88rem; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${a.name || a.title || 'Produk'}</div>
               <div style="font-size:0.8rem; color:var(--accent-gold); font-weight:800; margin:2px 0;">${fmtRp(a.price)}</div>
-              <span style="font-size:0.7rem; color:${sc}; font-weight:800;">● ${sl}</span>
+              <span style="font-size:0.7rem; color:${sc}; font-weight:800; display:inline-flex; align-items:center; gap:4px;">
+                <span style="width:6px; height:6px; border-radius:50%; background:${sc}; display:inline-block;"></span>
+                <span>${sl}</span>
+              </span>
             </div>
           </div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn-outline" style="font-size:0.78rem; padding:6px 14px; font-weight:800; border-color:var(--accent-gold); color:var(--accent-gold); display:flex; align-items:center; gap:4px; cursor:pointer;" onclick="AppEngine.openEditMemberAdModal('${a.id}')">
-              ✏️ Edit Iklan & Foto
+            <button class="btn-outline" style="font-size:0.75rem; padding:6px 14px; font-weight:700; border-color:var(--accent-gold); color:var(--accent-gold); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine.openEditMemberAdModal('${a.id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              <span>Edit Iklan & Foto</span>
             </button>
-            <button class="btn-outline" style="font-size:0.78rem; padding:6px 12px; font-weight:800; border-color:rgba(239,68,68,0.5); color:#f87171; cursor:pointer;" onclick="AppEngine.deleteMemberAd('${a.id}')">
-              🗑️ Hapus
+            <button class="btn-outline" style="font-size:0.75rem; padding:6px 12px; font-weight:700; border-color:rgba(239,68,68,0.5); color:#f87171; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="AppEngine.deleteMemberAd('${a.id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Hapus</span>
             </button>
           </div>
         </div>`;
       }).join('') : `
-        <div style="text-align:center; padding:30px; background:rgba(255,255,255,0.02); border:1.5px dashed var(--chrome-border); border-radius:12px; color:var(--text-muted); font-size:0.82rem;">
-          Anda belum memiliki iklan terdaftar.<br>Klik tombol <strong>"➕ Pasang Iklan"</strong> untuk mendaftarkan barang atau jualan Anda.
+        <div style="text-align:center; padding:36px 20px; background:rgba(255,255,255,0.02); border:1.5px dashed rgba(255,255,255,0.1); border-radius:12px; color:var(--text-muted); font-size:0.82rem;">
+          <div style="font-size:1.8rem; margin-bottom:8px; opacity:0.6;">📦</div>
+          <div style="color:#e2e8f0; font-weight:700; margin-bottom:4px;">Belum Ada Iklan Terdaftar</div>
+          <div style="color:#94a3b8; font-size:0.78rem; margin-bottom:14px;">Anda belum memiliki iklan terdaftar pada akun ini. Klik tombol di bawah untuk mulai mempublikasikan jualan Anda.</div>
+          <button class="btn-primary" style="font-size:0.75rem; padding:7px 16px; font-weight:800; display:inline-flex; align-items:center; gap:5px;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Pasang Iklan Baru</span>
+          </button>
         </div>`}`;
   },
 

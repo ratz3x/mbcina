@@ -20,7 +20,7 @@ switch ($action) {
                     COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id 
                 FROM lapak_products p 
                 LEFT JOIN lapak l ON p.lapak_id = l.id 
-                LEFT JOIN users u ON (p.user_id = u.id OR l.user_id = u.id) 
+                LEFT JOIN users u ON COALESCE(NULLIF(p.user_id, ''), l.user_id) = u.id 
                 ORDER BY p.created_at DESC
             ")->fetchAll() ?: [];
             $reviews = $sPdo->query("SELECT r.*, COALESCE(u.name, u.username, 'Member MB INA') AS user_name, COALESCE(u.member_id, 'MBINA-HQ-2026-000001') AS member_id FROM lapak_reviews r LEFT JOIN users u ON r.user_id = u.id ORDER BY r.created_at DESC")->fetchAll() ?: [];

@@ -117,7 +117,7 @@ switch ($action) {
             try {
                 ensureM7Tables($sPdo);
                 ensureM8Tables($sPdo);
-                $lapakList = $sPdo->query("SELECT l.*, COALESCE(u.username, u.name, 'Member MB INA') AS pemilik, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id, COALESCE(u.tier, 'GOLD') AS tier FROM lapak l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC")->fetchAll() ?: [];
+                $lapakList = $sPdo->query("SELECT l.*, COALESCE(u.name, u.username, 'Member MB INA') AS pemilik, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id, COALESCE(u.tier, 'GOLD') AS tier FROM lapak l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC")->fetchAll() ?: [];
                 $lapakProductsList = $sPdo->query("SELECT * FROM lapak_products ORDER BY created_at DESC")->fetchAll() ?: [];
                 $lapakReviewsList = $sPdo->query("SELECT * FROM lapak_reviews ORDER BY created_at DESC")->fetchAll() ?: [];
                 $lapakSewaLogsList = $sPdo->query("SELECT * FROM lapak_sewa_logs ORDER BY created_at DESC")->fetchAll() ?: [];
