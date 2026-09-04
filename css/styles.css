@@ -2347,6 +2347,27 @@ body.light-mode #notification-center-list::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.22);
 }
 
+/* FIX: Chrome / Edge / Safari Browser Autofill White Rectangle Glitch */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #0b0f19 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #ffffff !important;
+  border-radius: inherit !important;
+}
+
+body.light-mode input:-webkit-autofill,
+body.light-mode input:-webkit-autofill:hover, 
+body.light-mode input:-webkit-autofill:focus, 
+body.light-mode input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+  caret-color: #0f172a !important;
+}
+
 
 
 
