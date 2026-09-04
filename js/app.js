@@ -20742,83 +20742,74 @@ window.M7Engine = {
 
     tbody.innerHTML = filtered.map((l, idx) => {
       const isExpired = l.sewa_status === 'EXPIRED' || (l.sewa_end_date && new Date(l.sewa_end_date) < new Date());
-      let statusBadge = `<span class="tier-badge badge-status-active font-bold">🟢 AKTIF</span>`;
+      let statusBadge = `<span class="tier-badge font-bold" style="background:rgba(16,185,129,0.2); color:#34d399; font-weight:800; padding:4px 8px; border-radius:6px;">🟢 AKTIF</span>`;
 
       if (l.sewa_status === 'ACTIVE' || l.sewa_status === 'APPROVED' || l.status === 'APPROVED' || l.is_active === true || l.is_active === 'true') {
         if (isExpired) {
-          statusBadge = `<span class="tier-badge badge-status-danger font-bold">🔴 EXPIRED</span>`;
+          statusBadge = `<span class="tier-badge font-bold" style="background:rgba(239,68,68,0.2); color:#f87171; font-weight:800; padding:4px 8px; border-radius:6px;">🔴 EXPIRED</span>`;
         } else {
-          statusBadge = `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); font-weight:800;">🟢 AKTIF</span>`;
+          statusBadge = `<span class="tier-badge font-bold" style="background:rgba(16,185,129,0.2); color:#34d399; font-weight:800; padding:4px 8px; border-radius:6px;">🟢 AKTIF</span>`;
         }
       } else if (l.sewa_status === 'REJECTED' || l.status === 'REJECTED') {
-        statusBadge = `<span class="tier-badge badge-status-danger font-bold">🔴 DITOLAK</span>`;
+        statusBadge = `<span class="tier-badge font-bold" style="background:rgba(239,68,68,0.2); color:#f87171; font-weight:800; padding:4px 8px; border-radius:6px;">🔴 DITOLAK</span>`;
       } else if (l.sewa_status === 'REVISION' || l.status === 'REVISION') {
-        statusBadge = `<span class="tier-badge badge-tier-platinum font-bold">📝 REVISI</span>`;
+        statusBadge = `<span class="tier-badge font-bold" style="background:rgba(59,130,246,0.2); color:#60a5fa; font-weight:800; padding:4px 8px; border-radius:6px;">📝 REVISI</span>`;
       } else {
-        statusBadge = `<span class="tier-badge badge-status-pending font-bold">⏳ PENDING VERIFIKASI</span>`;
+        statusBadge = `<span class="tier-badge font-bold" style="background:rgba(245,158,11,0.2); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-weight:800; padding:4px 8px; border-radius:6px;">⏳ PENDING</span>`;
       }
 
       // Owner & Member ID
-      const ownerName = l.pemilik || (l.user_id === 'usr_m3_001' ? 'Andi Pratama' : (l.user_id === 'usr_m3_002' ? 'Siti Rahayu' : (l.user_id === 'usr_m3_003' ? 'Budi Santoso' : 'Denny Kurniawan')));
-      const memberId = l.member_id || (l.user_id === 'usr_m3_001' ? 'MBINA-JKT-2026-000005' : (l.user_id === 'usr_m3_002' ? 'MBINA-SBY-2026-000007' : (l.user_id === 'usr_m3_003' ? 'MBINA-BDG-2026-000006' : 'MBINA-JKT-2026-000009')));
+      const ownerName = l.pemilik || (l.user_id === 'usr_m3_001' ? 'Andi Pratama' : (l.user_id === 'usr_m3_002' ? 'Siti Rahayu' : (l.user_id === 'usr_m3_003' ? 'Budi Santoso' : (l.created_by || 'Member MB INA'))));
+      const memberId = l.member_id || (l.user_id === 'usr_m3_001' ? 'MBINA-JKT-2026-000005' : (l.user_id === 'usr_m3_002' ? 'MBINA-SBY-2026-000007' : (l.user_id === 'usr_m3_003' ? 'MBINA-BDG-2026-000006' : 'MBINA-HQ-2026-000001')));
 
-      // Tier & Discount mapping
-      const tier = (l.tier || (l.user_id === 'usr_m3_001' ? 'GOLD' : (l.user_id === 'usr_m3_002' ? 'SILVER' : (l.user_id === 'usr_m3_003' ? 'BRONZE' : 'PLATINUM')))).toUpperCase();
-      let tierBadge = `<span class="tier-badge badge-tier-gold">🥇 GOLD</span>`;
-      let discountStr = '15%';
-      let feeMonthly = 4250;
-
-      if (tier === 'PLATINUM') {
-        tierBadge = `<span class="tier-badge badge-tier-platinum">💎 PLATINUM</span>`;
-        discountStr = '20%';
-        feeMonthly = 4000;
-      } else if (tier === 'GOLD') {
-        tierBadge = `<span class="tier-badge badge-tier-gold">🥇 GOLD</span>`;
-        discountStr = '15%';
-        feeMonthly = 4250;
-      } else if (tier === 'SILVER') {
-        tierBadge = `<span class="tier-badge badge-tier-silver">🥈 SILVER</span>`;
-        discountStr = '10%';
-        feeMonthly = 4500;
-      } else if (tier === 'BRONZE') {
-        tierBadge = `<span class="tier-badge badge-tier-bronze">🥉 BRONZE</span>`;
-        discountStr = '5%';
-        feeMonthly = 4750;
+      // Calculate duration in months & date range
+      let durationMonths = 6;
+      if (l.sewa_start_date && l.sewa_end_date) {
+        const d1 = new Date(l.sewa_start_date);
+        const d2 = new Date(l.sewa_end_date);
+        durationMonths = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24 * 30.44)));
       }
+      const startStr = l.sewa_start_date ? new Date(l.sewa_start_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+      const endStr = l.sewa_end_date ? new Date(l.sewa_end_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
 
-      // Final calculated monthly fee
-      if (l.final_fee && l.sewa_start_date && l.sewa_end_date) {
-        const start = new Date(l.sewa_start_date);
-        const end = new Date(l.sewa_end_date);
-        const months = Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24 * 30)));
-        feeMonthly = Math.round(l.final_fee / months);
-      }
-
-      const feeFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(feeMonthly) + '/bln';
+      // Biaya Sewa (Total Fee & Monthly Rate)
+      const totalFee = l.final_fee || l.sewa_fee || (durationMonths * 5000);
+      const totalFeeFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalFee);
+      const feeMonthly = Math.round(totalFee / durationMonths);
+      const feeMonthlyFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(feeMonthly) + '/bln';
 
       return `
         <tr style="border-bottom:1px solid var(--chrome-border);">
-          <td style="padding:10px 8px; font-weight:700;">${idx + 1}</td>
-          <td style="padding:10px 8px; font-weight:800; color:var(--accent-gold);">${l.lapak_code}</td>
+          <td style="padding:10px 8px; font-weight:700; text-align:center;">${idx + 1}</td>
+          <td style="padding:10px 8px; font-weight:800; color:var(--accent-gold); font-family:monospace;">${l.lapak_code}</td>
+          <td style="padding:10px 8px; text-align:center;">
+            <img src="${l.logo_url || 'assets/mb_badge.jpg'}" style="width:32px; height:32px; border-radius:6px; object-fit:cover; border:1px solid rgba(255,255,255,0.15); display:inline-block;" onerror="this.src='assets/mb_badge.jpg'">
+          </td>
           <td style="padding:10px 8px; font-weight:700; color:#fff;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <img src="${l.logo_url || 'assets/mb_badge.jpg'}" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
-              <span>${l.name}</span>
-            </div>
+            <div>${l.name}</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">${l.category || 'General'}</div>
           </td>
           <td style="padding:10px 8px; color:var(--text-main);">
             <div style="font-weight:700; color:#fff;">${ownerName}</div>
             <div style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${memberId}</div>
           </td>
-          <td style="padding:10px 8px; text-align:center;">${tierBadge}</td>
-          <td style="padding:10px 8px; text-align:center; font-weight:800; color:var(--primary-emerald);">${discountStr}</td>
-          <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--accent-gold);">${feeFormatted}</td>
+          <td style="padding:10px 8px; text-align:center;">
+            <span style="display:inline-block; padding:3px 8px; border-radius:6px; background:rgba(59,130,246,0.15); color:#60a5fa; font-weight:700; font-size:0.8rem;">
+              ⏱️ ${durationMonths} Bulan
+            </span>
+            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:3px;">${startStr} s/d ${endStr}</div>
+          </td>
+          <td style="padding:10px 8px; text-align:right;">
+            <div style="font-weight:800; color:var(--accent-gold); font-size:0.88rem;">${totalFeeFormatted}</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">${feeMonthlyFormatted}</div>
+          </td>
           <td style="padding:10px 8px; text-align:center;">${statusBadge}</td>
           <td style="padding:10px 8px; text-align:center;">
-            <div style="display:flex; gap:4px; justify-content:center;">
-              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem;" onclick="M7Engine.viewLapakProducts('${l.id}')" title="Lihat Produk Lapak">👁️</button>
-              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-gold); border-color:var(--accent-gold);" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Perpanjang Sewa">✏️</button>
-              <button class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M7Engine.deleteLapak('${l.id}')" title="Hapus Lapak">🗑️</button>
+            <div style="display:flex; gap:5px; justify-content:center; align-items:center; flex-wrap:wrap;">
+              <button type="button" class="btn-primary" style="padding:4px 9px; font-size:0.75rem; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; border:none; border-radius:6px; cursor:pointer;" onclick="M7Engine.openReviewLapakModal('${l.id}')" title="Review Permohonan & Bukti Transfer">🔍 Review</button>
+              <button type="button" class="btn-outline" style="padding:4px 8px; font-size:0.75rem;" onclick="M7Engine.viewLapakProducts('${l.id}')" title="Lihat Produk Lapak">👁️</button>
+              <button type="button" class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-gold); border-color:var(--accent-gold);" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Perpanjang Sewa">✏️</button>
+              <button type="button" class="btn-outline" style="padding:4px 8px; font-size:0.75rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M7Engine.deleteLapak('${l.id}')" title="Hapus Lapak">🗑️</button>
             </div>
           </td>
         </tr>
@@ -21708,6 +21699,155 @@ window.M7Engine = {
     } catch (e) {
       alert(`❌ Connection error: ${e.message}`);
     }
+  },
+
+  openReviewLapakModal: function(lapakId) {
+    const lapak = (this.data && Array.isArray(this.data.lapak)) ? this.data.lapak.find(l => l.id === lapakId) : null;
+    if (!lapak) {
+      alert('Data lapak tidak ditemukan!');
+      return;
+    }
+
+    const modal = document.getElementById('modal-review-lapak');
+    if (!modal) return;
+
+    const idInput = document.getElementById('review-lapak-id');
+    if (idInput) idInput.value = lapak.id;
+
+    // Header info
+    const logoImg = document.getElementById('review-lapak-logo-img');
+    if (logoImg) logoImg.src = lapak.logo_url || 'assets/mb_badge.jpg';
+
+    const codeBadge = document.getElementById('review-lapak-code-badge');
+    if (codeBadge) codeBadge.textContent = lapak.lapak_code || '-';
+
+    const nameTxt = document.getElementById('review-lapak-name-txt');
+    if (nameTxt) nameTxt.textContent = lapak.name || '-';
+
+    const catTxt = document.getElementById('review-lapak-category-txt');
+    if (catTxt) catTxt.textContent = lapak.category || 'General';
+
+    // Status container
+    const statusContainer = document.getElementById('review-lapak-status-container');
+    if (statusContainer) {
+      const isExpired = lapak.sewa_status === 'EXPIRED' || (lapak.sewa_end_date && new Date(lapak.sewa_end_date) < new Date());
+      let badge = `<span class="tier-badge font-bold" style="background:rgba(245,158,11,0.2); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); padding:4px 10px; border-radius:6px; font-weight:800;">⏳ PENDING</span>`;
+      if (lapak.sewa_status === 'ACTIVE' || lapak.sewa_status === 'APPROVED' || lapak.status === 'APPROVED' || lapak.is_active === true || lapak.is_active === 'true') {
+        badge = isExpired 
+          ? `<span class="tier-badge font-bold" style="background:rgba(239,68,68,0.2); color:#f87171; padding:4px 10px; border-radius:6px; font-weight:800;">🔴 EXPIRED</span>`
+          : `<span class="tier-badge font-bold" style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:6px; font-weight:800;">🟢 AKTIF</span>`;
+      } else if (lapak.sewa_status === 'REJECTED' || lapak.status === 'REJECTED') {
+        badge = `<span class="tier-badge font-bold" style="background:rgba(239,68,68,0.2); color:#f87171; padding:4px 10px; border-radius:6px; font-weight:800;">🔴 DITOLAK</span>`;
+      }
+      statusContainer.innerHTML = badge;
+    }
+
+    // Owner info
+    const ownerName = lapak.pemilik || lapak.created_by || lapak.user_id || 'Member MB INA';
+    const memberId = lapak.member_id || 'MBINA-HQ-2026-000001';
+    const ownerEl = document.getElementById('review-lapak-owner-txt');
+    if (ownerEl) ownerEl.textContent = ownerName;
+
+    const midEl = document.getElementById('review-lapak-memberid-txt');
+    if (midEl) midEl.textContent = memberId;
+
+    const wa = lapak.contact_whatsapp || lapak.contact_phone || '-';
+    const waEl = document.getElementById('review-lapak-wa-txt');
+    if (waEl) {
+      if (wa && wa !== '-') {
+        const cleanWa = wa.replace(/[^0-9]/g, '');
+        waEl.innerHTML = `<a href="https://wa.me/${cleanWa}" target="_blank" style="color:#38bdf8; text-decoration:underline; display:inline-flex; align-items:center; gap:4px;">📱 ${wa} <span style="font-size:0.75rem; color:#94a3b8;">(Klik untuk chat WA)</span></a>`;
+      } else {
+        waEl.textContent = '-';
+      }
+    }
+
+    // Duration & Period
+    let durationMonths = 6;
+    if (lapak.sewa_start_date && lapak.sewa_end_date) {
+      const d1 = new Date(lapak.sewa_start_date);
+      const d2 = new Date(lapak.sewa_end_date);
+      durationMonths = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24 * 30.44)));
+    }
+    const durEl = document.getElementById('review-lapak-duration-txt');
+    if (durEl) durEl.textContent = `${durationMonths} Bulan`;
+
+    const startStr = lapak.sewa_start_date ? new Date(lapak.sewa_start_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
+    const endStr = lapak.sewa_end_date ? new Date(lapak.sewa_end_date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-';
+    const periodEl = document.getElementById('review-lapak-period-txt');
+    if (periodEl) periodEl.textContent = `${startStr} s/d ${endStr}`;
+
+    // Payment Status & Total Fee
+    const totalFee = lapak.final_fee || lapak.sewa_fee || (durationMonths * 5000);
+    const totalFeeStr = 'Rp ' + new Intl.NumberFormat('id-ID').format(totalFee);
+    const feeEl = document.getElementById('review-lapak-total-fee-txt');
+    if (feeEl) feeEl.textContent = totalFeeStr;
+
+    const paidEl = document.getElementById('review-lapak-paid-status');
+    if (paidEl) {
+      const isPaid = lapak.sewa_paid_status === 'PAID';
+      paidEl.textContent = isPaid ? '✅ LUNAS (PAID)' : '⏳ MENUNGGU VERIFIKASI (UNPAID)';
+      paidEl.style.color = isPaid ? '#34d399' : '#fbbf24';
+    }
+
+    // Payment proof image / PDF handling
+    const proofUrl = lapak.payment_proof_url || '';
+    const emptyContainer = document.getElementById('review-lapak-proof-empty');
+    const imgContainer = document.getElementById('review-lapak-proof-image-container');
+    const pdfContainer = document.getElementById('review-lapak-proof-pdf-container');
+    const proofImg = document.getElementById('review-lapak-proof-img');
+    const proofLink = document.getElementById('review-lapak-proof-link');
+    const pdfLink = document.getElementById('review-lapak-proof-pdf-link');
+
+    if (emptyContainer) emptyContainer.style.display = 'none';
+    if (imgContainer) imgContainer.style.display = 'none';
+    if (pdfContainer) pdfContainer.style.display = 'none';
+
+    if (!proofUrl || proofUrl.trim() === '') {
+      if (emptyContainer) emptyContainer.style.display = 'block';
+    } else {
+      const isPdf = proofUrl.includes('application/pdf') || proofUrl.toLowerCase().endsWith('.pdf');
+      if (isPdf) {
+        if (pdfContainer) pdfContainer.style.display = 'block';
+        if (pdfLink) pdfLink.href = proofUrl;
+      } else {
+        if (imgContainer) imgContainer.style.display = 'block';
+        if (proofImg) proofImg.src = proofUrl;
+        if (proofLink) proofLink.href = proofUrl;
+      }
+    }
+
+    modal.style.removeProperty('display');
+    modal.style.removeProperty('opacity');
+    modal.style.removeProperty('pointer-events');
+    modal.style.removeProperty('visibility');
+    modal.style.setProperty('display', 'flex', 'important');
+  },
+
+  closeReviewLapakModal: function() {
+    const modal = document.getElementById('modal-review-lapak');
+    if (modal) modal.style.display = 'none';
+  },
+
+  approveCurrentReviewLapak: async function() {
+    const lapakId = document.getElementById('review-lapak-id')?.value;
+    if (!lapakId) return;
+
+    if (!confirm('Apakah Anda yakin ingin MENYETUJUI (Approve) sewa lapak ini?\n\nStatus lapak akan langsung menjadi AKTIF dan terverifikasi di sistem.')) return;
+
+    this.closeReviewLapakModal();
+    await this.verifyLapak(lapakId, 'APPROVED');
+  },
+
+  rejectCurrentReviewLapak: async function() {
+    const lapakId = document.getElementById('review-lapak-id')?.value;
+    if (!lapakId) return;
+
+    const reason = prompt('Masukkan alasan penolakan sewa lapak (misal: Bukti transfer tidak valid/kurang jelas):', 'Bukti transfer tidak sesuai atau dana belum masuk rekening resmi');
+    if (reason === null) return; // cancel clicked
+
+    this.closeReviewLapakModal();
+    await this.verifyLapak(lapakId, 'REJECTED', reason);
   },
 
   promptRejectProduct: function(productId) {
