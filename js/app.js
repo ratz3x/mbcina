@@ -22038,9 +22038,9 @@ window.M7Engine = {
           <td style="padding:12px 10px; text-align:right; font-family:monospace; font-weight:800; color:#fbbf24; font-size:0.88rem;">${feeFormatted}</td>
           <td style="padding:12px 10px; text-align:center;">${statusBadge}</td>
           <td style="padding:12px 10px; text-align:center;">
-            <button type="button" class="btn-outline" style="padding:5px 12px; font-size:0.75rem; font-weight:600; border-radius:8px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Perpanjang Sewa Lapak">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              <span>Perpanjang</span>
+            <button type="button" class="btn-primary" style="padding:5px 12px; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:8px; cursor:pointer;" onclick="M7Engine.openReviewLapakModal('${l.id}')" title="Review Rincian & Bukti Transfer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>Review Bukti</span>
             </button>
           </td>
         </tr>
