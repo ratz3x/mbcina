@@ -21935,6 +21935,20 @@ window.M7Engine = {
     else tierBadgeStr = '🥉 BRONZE';
     if (userTierInput) userTierInput.value = tierBadgeStr;
 
+    // Reset file input & previews
+    ['proof', 'logo', 'banner'].forEach(f => {
+      const pCont = document.getElementById(`sewa-preview-container-${f}`);
+      const pImg = document.getElementById(`sewa-preview-img-${f}`);
+      const pPdf = document.getElementById(`sewa-preview-pdf-${f}`);
+      const fInp = document.getElementById(`sewa-file-input-${f}`);
+      const tInp = document.getElementById(`sewa-form-${f}`);
+      if (pCont) pCont.style.display = 'none';
+      if (pImg) pImg.src = '';
+      if (pPdf) { pPdf.innerHTML = ''; pPdf.style.display = 'none'; }
+      if (fInp) fInp.value = '';
+      if (tInp) tInp.value = '';
+    });
+
     this.recalculateSewaFee();
   },
 
@@ -22032,6 +22046,96 @@ window.M7Engine = {
     }
   },
 
+  handleSewaFileUpload: async function(inputEl, fieldType, mode = 'sewa') {
+    if (!inputEl.files || !inputEl.files[0]) return;
+    const file = inputEl.files[0];
+    const prefix = mode === 'edit' ? 'edit' : 'sewa';
+    const textInput = document.getElementById(`${prefix}-form-${fieldType}`);
+    const previewContainer = document.getElementById(`${prefix}-preview-container-${fieldType}`);
+    const previewImg = document.getElementById(`${prefix}-preview-img-${fieldType}`);
+    const previewPdf = document.getElementById(`${prefix}-preview-pdf-${fieldType}`);
+
+    // Check file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('⚠️ Ukuran file melebihi batas 2MB! Silakan pilih file yang lebih kecil.');
+      inputEl.value = '';
+      return;
+    }
+
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const dataUrl = e.target.result;
+      if (textInput) textInput.value = dataUrl;
+
+      if (previewContainer) previewContainer.style.display = 'block';
+      if (isPdf) {
+        if (previewImg) previewImg.style.display = 'none';
+        if (previewPdf) {
+          previewPdf.style.display = 'flex';
+          previewPdf.innerHTML = `📄 <strong>${file.name}</strong> (${(file.size/1024).toFixed(1)} KB)`;
+        }
+      } else {
+        if (previewPdf) previewPdf.style.display = 'none';
+        if (previewImg) {
+          previewImg.style.display = 'block';
+          previewImg.src = dataUrl;
+        }
+      }
+
+      // Try upload to backend API
+      try {
+        const formData = new FormData();
+        formData.append('photo_file', file);
+        formData.append('type', fieldType);
+
+        const res = await fetch('api.php?action=upload_image', {
+          method: 'POST',
+          body: formData
+        }).then(r => r.json());
+
+        if (res && res.success && res.url) {
+          if (textInput) textInput.value = res.url;
+          if (window.showToast) window.showToast(`✅ File ${fieldType} berhasil diunggah!`, 'success');
+        }
+      } catch (err) {
+        console.warn('Upload file error (Base64 fallback active):', err);
+      }
+    };
+    reader.readAsDataURL(file);
+  },
+
+  updateSewaPreviewFromUrl: function(fieldType, mode = 'sewa') {
+    const prefix = mode === 'edit' ? 'edit' : 'sewa';
+    const textInput = document.getElementById(`${prefix}-form-${fieldType}`);
+    const previewContainer = document.getElementById(`${prefix}-preview-container-${fieldType}`);
+    const previewImg = document.getElementById(`${prefix}-preview-img-${fieldType}`);
+    const previewPdf = document.getElementById(`${prefix}-preview-pdf-${fieldType}`);
+
+    if (!textInput || !previewContainer) return;
+    const val = textInput.value.trim();
+    if (!val) {
+      previewContainer.style.display = 'none';
+      return;
+    }
+
+    previewContainer.style.display = 'block';
+    if (val.toLowerCase().endsWith('.pdf') || val.includes('application/pdf')) {
+      if (previewImg) previewImg.style.display = 'none';
+      if (previewPdf) {
+        previewPdf.style.display = 'flex';
+        previewPdf.innerHTML = `📄 <strong>Dokumen PDF</strong> (<a href="${val}" target="_blank" style="color:var(--accent-gold); text-decoration:underline;">Lihat Dokumen</a>)`;
+      }
+    } else {
+      if (previewPdf) previewPdf.style.display = 'none';
+      if (previewImg) {
+        previewImg.style.display = 'block';
+        previewImg.src = val;
+      }
+    }
+  },
+
   openRenewLapakModal: function(lapakId) {
     const lapak = this.data.lapak.find(l => l.id === lapakId);
     if (!lapak) {
@@ -22082,6 +22186,22 @@ window.M7Engine = {
     else if (tier === 'SILVER') tierBadgeStr = '🥈 SILVER';
     else if (tier === 'BRONZE') tierBadgeStr = '🥉 BRONZE';
     document.getElementById('edit-user-tier').value = tierBadgeStr;
+
+    // Reset file inputs & initialize previews
+    ['logo', 'banner', 'proof'].forEach(f => {
+      const pCont = document.getElementById(`edit-preview-container-${f}`);
+      const pImg = document.getElementById(`edit-preview-img-${f}`);
+      const pPdf = document.getElementById(`edit-preview-pdf-${f}`);
+      const fInp = document.getElementById(`edit-file-input-${f}`);
+      if (pCont) pCont.style.display = 'none';
+      if (pImg) pImg.src = '';
+      if (pPdf) { pPdf.innerHTML = ''; pPdf.style.display = 'none'; }
+      if (fInp) fInp.value = '';
+    });
+
+    if (lapak.logo_url) this.updateSewaPreviewFromUrl('logo', 'edit');
+    if (lapak.banner_url) this.updateSewaPreviewFromUrl('banner', 'edit');
+    if (lapak.payment_proof_url) this.updateSewaPreviewFromUrl('proof', 'edit');
 
     this.recalculateEditSewaFee();
   },

@@ -5459,10 +5459,28 @@
             ─── UPLOAD BUKTI TRANSFER ─────────────────────────────
           </div>
 
-          <div class="form-group" style="margin-bottom:16px;">
-            <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Pilih & Upload Bukti Transfer (JPG/PNG/PDF)</label>
-            <input type="text" id="sewa-form-proof" class="form-input" placeholder="https://... atau URL Bukti Transfer" style="width:100%; font-size:0.8rem;">
-            <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:2px;">📁 File Bukti Transfer lunas ke rekening Bank Mandiri MB Club Indonesia (Max 2MB)</span>
+          <div class="form-group" style="margin-bottom:16px; background:rgba(15,23,42,0.4); border:1px dashed rgba(245,158,11,0.3); padding:14px; border-radius:12px;">
+            <label style="font-size:0.82rem; font-weight:700; color:#fff; display:block; margin-bottom:6px;">
+              🧾 Pilih & Upload Bukti Transfer (JPG/PNG/PDF) <span style="color:red;">*</span>
+            </label>
+
+            <!-- Preview Container Bukti Transfer -->
+            <div id="sewa-preview-container-proof" style="display:none; margin-bottom:10px; text-align:center;">
+              <img id="sewa-preview-img-proof" src="" alt="Preview Bukti Transfer" style="max-height:160px; max-width:100%; border-radius:8px; border:1px solid rgba(255,255,255,0.2); object-fit:contain; margin:0 auto; display:none; background:#000;">
+              <div id="sewa-preview-pdf-proof" style="display:none; align-items:center; justify-content:center; gap:8px; padding:10px; background:rgba(245,158,11,0.1); border-radius:8px; border:1px solid var(--accent-gold); color:#fef08a; font-size:0.85rem;"></div>
+            </div>
+
+            <!-- Upload Action Toolbar Bukti Transfer -->
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+              <button type="button" class="btn-primary" style="font-size:0.82rem; padding:8px 18px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="document.getElementById('sewa-file-input-proof').click()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Upload Bukti Transfer</span>
+              </button>
+              <input type="file" id="sewa-file-input-proof" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;" onchange="M7Engine.handleSewaFileUpload(this, 'proof', 'sewa')">
+              <span style="font-size:0.75rem; color:var(--text-muted);">Format: JPG, PNG, atau PDF (Maks. 2MB)</span>
+            </div>
+
+            <input type="text" id="sewa-form-proof" class="form-input" placeholder="Atau masukkan URL Bukti Transfer (https://...)" style="width:100%; font-size:0.8rem;" oninput="M7Engine.updateSewaPreviewFromUrl('proof', 'sewa')">
           </div>
 
           <!-- SECTION 6: DOKUMEN LOGO & BANNER -->
@@ -5471,15 +5489,48 @@
           </div>
 
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
-            <div class="form-group" style="margin:0;">
-              <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Logo Lapak (URL/File)</label>
-              <input type="text" id="sewa-form-logo" class="form-input" placeholder="https://..." style="width:100%; font-size:0.8rem;">
-              <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:2px;">(JPG/PNG/SVG, max 2MB)</span>
+            <!-- Upload Logo -->
+            <div class="form-group" style="margin:0; background:rgba(15,23,42,0.4); border:1px dashed rgba(255,255,255,0.18); padding:12px; border-radius:12px;">
+              <label style="font-size:0.8rem; font-weight:700; color:#fff; display:block; margin-bottom:6px;">
+                🖼️ Upload Logo Lapak
+              </label>
+
+              <!-- Preview Logo -->
+              <div id="sewa-preview-container-logo" style="display:none; margin-bottom:8px; text-align:center;">
+                <img id="sewa-preview-img-logo" src="" alt="Preview Logo" style="max-height:80px; max-width:80px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); object-fit:contain; margin:0 auto; display:block; background:#000;">
+              </div>
+
+              <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                <button type="button" class="btn-outline" style="font-size:0.75rem; padding:6px 14px; font-weight:700; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('sewa-file-input-logo').click()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span>Upload Logo</span>
+                </button>
+                <input type="file" id="sewa-file-input-logo" accept="image/jpeg,image/png,image/svg+xml,image/webp" style="display:none;" onchange="M7Engine.handleSewaFileUpload(this, 'logo', 'sewa')">
+                <span style="font-size:0.7rem; color:var(--text-muted);">(JPG/PNG/SVG, max 2MB)</span>
+              </div>
+              <input type="text" id="sewa-form-logo" class="form-input" placeholder="atau URL Logo (https://...)" style="width:100%; font-size:0.78rem;" oninput="M7Engine.updateSewaPreviewFromUrl('logo', 'sewa')">
             </div>
-            <div class="form-group" style="margin:0;">
-              <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Banner Lapak (URL/File)</label>
-              <input type="text" id="sewa-form-banner" class="form-input" placeholder="https://..." style="width:100%; font-size:0.8rem;">
-              <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:2px;">(JPG/PNG, max 2MB)</span>
+
+            <!-- Upload Banner -->
+            <div class="form-group" style="margin:0; background:rgba(15,23,42,0.4); border:1px dashed rgba(255,255,255,0.18); padding:12px; border-radius:12px;">
+              <label style="font-size:0.8rem; font-weight:700; color:#fff; display:block; margin-bottom:6px;">
+                🎨 Upload Banner Lapak
+              </label>
+
+              <!-- Preview Banner -->
+              <div id="sewa-preview-container-banner" style="display:none; margin-bottom:8px; text-align:center;">
+                <img id="sewa-preview-img-banner" src="" alt="Preview Banner" style="max-height:80px; width:100%; border-radius:8px; border:1px solid rgba(255,255,255,0.2); object-fit:cover; margin:0 auto; display:block; background:#000;">
+              </div>
+
+              <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                <button type="button" class="btn-outline" style="font-size:0.75rem; padding:6px 14px; font-weight:700; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('sewa-file-input-banner').click()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span>Upload Banner</span>
+                </button>
+                <input type="file" id="sewa-file-input-banner" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="M7Engine.handleSewaFileUpload(this, 'banner', 'sewa')">
+                <span style="font-size:0.7rem; color:var(--text-muted);">(JPG/PNG, max 2MB)</span>
+              </div>
+              <input type="text" id="sewa-form-banner" class="form-input" placeholder="atau URL Banner (https://...)" style="width:100%; font-size:0.78rem;" oninput="M7Engine.updateSewaPreviewFromUrl('banner', 'sewa')">
             </div>
           </div>
 
@@ -5658,10 +5709,28 @@
             ─── UPLOAD BUKTI TRANSFER ─────────────────────────────
           </div>
 
-          <div class="form-group" style="margin-bottom:16px;">
-            <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Pilih & Upload Bukti Transfer (JPG/PNG/PDF)</label>
-            <input type="text" id="edit-form-proof" class="form-input" placeholder="https://... atau URL Bukti Transfer" style="width:100%; font-size:0.8rem;">
-            <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:2px;">📁 File Bukti Transfer lunas ke rekening Bank Mandiri MB Club Indonesia (Max 2MB)</span>
+          <div class="form-group" style="margin-bottom:16px; background:rgba(15,23,42,0.4); border:1px dashed rgba(245,158,11,0.3); padding:14px; border-radius:12px;">
+            <label style="font-size:0.82rem; font-weight:700; color:#fff; display:block; margin-bottom:6px;">
+              🧾 Pilih & Upload Bukti Transfer (JPG/PNG/PDF)
+            </label>
+
+            <!-- Preview Container Bukti Transfer -->
+            <div id="edit-preview-container-proof" style="display:none; margin-bottom:10px; text-align:center;">
+              <img id="edit-preview-img-proof" src="" alt="Preview Bukti Transfer" style="max-height:160px; max-width:100%; border-radius:8px; border:1px solid rgba(255,255,255,0.2); object-fit:contain; margin:0 auto; display:none; background:#000;">
+              <div id="edit-preview-pdf-proof" style="display:none; align-items:center; justify-content:center; gap:8px; padding:10px; background:rgba(245,158,11,0.1); border-radius:8px; border:1px solid var(--accent-gold); color:#fef08a; font-size:0.85rem;"></div>
+            </div>
+
+            <!-- Upload Action Toolbar Bukti Transfer -->
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+              <button type="button" class="btn-primary" style="font-size:0.82rem; padding:8px 18px; font-weight:800; background:linear-gradient(135deg,#f59e0b,#d97706); color:#000; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="document.getElementById('edit-file-input-proof').click()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Upload Bukti Transfer</span>
+              </button>
+              <input type="file" id="edit-file-input-proof" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;" onchange="M7Engine.handleSewaFileUpload(this, 'proof', 'edit')">
+              <span style="font-size:0.75rem; color:var(--text-muted);">Format: JPG, PNG, atau PDF (Maks. 2MB)</span>
+            </div>
+
+            <input type="text" id="edit-form-proof" class="form-input" placeholder="Atau masukkan URL Bukti Transfer (https://...)" style="width:100%; font-size:0.8rem;" oninput="M7Engine.updateSewaPreviewFromUrl('proof', 'edit')">
           </div>
 
           <!-- SECTION 6: DOKUMEN LOGO & BANNER -->
@@ -5670,15 +5739,48 @@
           </div>
 
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
-            <div class="form-group" style="margin:0;">
-              <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Logo Lapak (URL/File)</label>
-              <input type="text" id="edit-form-logo" class="form-input" placeholder="https://..." style="width:100%; font-size:0.8rem;">
-              <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:2px;">(JPG/PNG/SVG, max 2MB)</span>
+            <!-- Upload Logo -->
+            <div class="form-group" style="margin:0; background:rgba(15,23,42,0.4); border:1px dashed rgba(255,255,255,0.18); padding:12px; border-radius:12px;">
+              <label style="font-size:0.8rem; font-weight:700; color:#fff; display:block; margin-bottom:6px;">
+                🖼️ Upload Logo Lapak
+              </label>
+
+              <!-- Preview Logo -->
+              <div id="edit-preview-container-logo" style="display:none; margin-bottom:8px; text-align:center;">
+                <img id="edit-preview-img-logo" src="" alt="Preview Logo" style="max-height:80px; max-width:80px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); object-fit:contain; margin:0 auto; display:block; background:#000;">
+              </div>
+
+              <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                <button type="button" class="btn-outline" style="font-size:0.75rem; padding:6px 14px; font-weight:700; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('edit-file-input-logo').click()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span>Upload Logo</span>
+                </button>
+                <input type="file" id="edit-file-input-logo" accept="image/jpeg,image/png,image/svg+xml,image/webp" style="display:none;" onchange="M7Engine.handleSewaFileUpload(this, 'logo', 'edit')">
+                <span style="font-size:0.7rem; color:var(--text-muted);">(JPG/PNG/SVG, max 2MB)</span>
+              </div>
+              <input type="text" id="edit-form-logo" class="form-input" placeholder="atau URL Logo (https://...)" style="width:100%; font-size:0.78rem;" oninput="M7Engine.updateSewaPreviewFromUrl('logo', 'edit')">
             </div>
-            <div class="form-group" style="margin:0;">
-              <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Banner Lapak (URL/File)</label>
-              <input type="text" id="edit-form-banner" class="form-input" placeholder="https://..." style="width:100%; font-size:0.8rem;">
-              <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:2px;">(JPG/PNG, max 2MB)</span>
+
+            <!-- Upload Banner -->
+            <div class="form-group" style="margin:0; background:rgba(15,23,42,0.4); border:1px dashed rgba(255,255,255,0.18); padding:12px; border-radius:12px;">
+              <label style="font-size:0.8rem; font-weight:700; color:#fff; display:block; margin-bottom:6px;">
+                🎨 Upload Banner Lapak
+              </label>
+
+              <!-- Preview Banner -->
+              <div id="edit-preview-container-banner" style="display:none; margin-bottom:8px; text-align:center;">
+                <img id="edit-preview-img-banner" src="" alt="Preview Banner" style="max-height:80px; width:100%; border-radius:8px; border:1px solid rgba(255,255,255,0.2); object-fit:cover; margin:0 auto; display:block; background:#000;">
+              </div>
+
+              <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                <button type="button" class="btn-outline" style="font-size:0.75rem; padding:6px 14px; font-weight:700; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('edit-file-input-banner').click()">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span>Upload Banner</span>
+                </button>
+                <input type="file" id="edit-file-input-banner" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="M7Engine.handleSewaFileUpload(this, 'banner', 'edit')">
+                <span style="font-size:0.7rem; color:var(--text-muted);">(JPG/PNG, max 2MB)</span>
+              </div>
+              <input type="text" id="edit-form-banner" class="form-input" placeholder="atau URL Banner (https://...)" style="width:100%; font-size:0.78rem;" oninput="M7Engine.updateSewaPreviewFromUrl('banner', 'edit')">
             </div>
           </div>
 
