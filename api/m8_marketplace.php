@@ -165,14 +165,23 @@ switch ($action) {
                     $stmt->execute([$lapakId, $userId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $userId]);
                     $inserted = true;
                 } catch (Throwable $tErr) {
+                    if (strpos($tErr->getMessage(), '22001') !== false || strpos($tErr->getMessage(), 'too long') !== false) {
+                        try {
+                            $sPdo->exec("ALTER TABLE lapak ALTER COLUMN logo_url TYPE TEXT");
+                            $sPdo->exec("ALTER TABLE lapak ALTER COLUMN banner_url TYPE TEXT");
+                            $sPdo->exec("ALTER TABLE lapak ALTER COLUMN payment_proof_url TYPE TEXT");
+                            $stmt->execute([$lapakId, $userId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $userId]);
+                            $inserted = true;
+                            break;
+                        } catch (Throwable $altErr) {
+                            throw $tErr;
+                        }
+                    }
                     $seq++;
                     $lapakCode = 'LAPAK-' . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
                     $retry++;
                     if ($retry >= 20) {
-                        $lapakCode = 'LAPAK-' . $year . '-' . strtoupper(substr(md5(uniqid()), 0, 6));
-                        $stmt = $sPdo->prepare("INSERT INTO lapak (id, user_id, lapak_code, name, description, category, contact_phone, contact_whatsapp, logo_url, banner_url, payment_proof_url, sewa_start_date, sewa_end_date, sewa_status, sewa_fee, original_fee, tier_discount, final_fee, sewa_paid_status, is_active, is_verified, created_by, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, 'UNPAID', FALSE, FALSE, ?, 'PENDING')");
-                        $stmt->execute([$lapakId, $userId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $userId]);
-                        $inserted = true;
+                        throw $tErr;
                     }
                 }
             }
@@ -388,7 +397,22 @@ switch ($action) {
                                  logo_url = ?, banner_url = ?, payment_proof_url = COALESCE(NULLIF(?, ''), payment_proof_url), 
                                  sewa_status = ?, sewa_paid_status = ?, is_active = ?, is_verified = ?, status = ?, sewa_end_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
             ");
-            $stmtUpdate->execute([$name, $description, $category, $contactWhatsapp, $contactPhone, $logoUrl, $bannerUrl, $paymentProofUrl, $sewaStatus, $sewaPaid, $isActBool, $isVerBool, $mainStatus, $newEnd, $lapakId]);
+            try {
+                $stmtUpdate->execute([$name, $description, $category, $contactWhatsapp, $contactPhone, $logoUrl, $bannerUrl, $paymentProofUrl, $sewaStatus, $sewaPaid, $isActBool, $isVerBool, $mainStatus, $newEnd, $lapakId]);
+            } catch (Throwable $upErr) {
+                if (strpos($upErr->getMessage(), '22001') !== false || strpos($upErr->getMessage(), 'too long') !== false) {
+                    try {
+                        $sPdo->exec("ALTER TABLE lapak ALTER COLUMN logo_url TYPE TEXT");
+                        $sPdo->exec("ALTER TABLE lapak ALTER COLUMN banner_url TYPE TEXT");
+                        $sPdo->exec("ALTER TABLE lapak ALTER COLUMN payment_proof_url TYPE TEXT");
+                        $stmtUpdate->execute([$name, $description, $category, $contactWhatsapp, $contactPhone, $logoUrl, $bannerUrl, $paymentProofUrl, $sewaStatus, $sewaPaid, $isActBool, $isVerBool, $mainStatus, $newEnd, $lapakId]);
+                    } catch (Throwable $altErr) {
+                        throw $upErr;
+                    }
+                } else {
+                    throw $upErr;
+                }
+            }
 
             logAudit($userId, 'UPDATE', 'E_COMMERCE', ['lapak_id' => $lapakId, 'name' => $name, 'add_months' => $addMonths]);
 

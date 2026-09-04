@@ -22055,53 +22055,73 @@ window.M7Engine = {
     const previewImg = document.getElementById(`${prefix}-preview-img-${fieldType}`);
     const previewPdf = document.getElementById(`${prefix}-preview-pdf-${fieldType}`);
 
-    // Check file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      alert('⚠️ Ukuran file melebihi batas 2MB! Silakan pilih file yang lebih kecil.');
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('⚠️ Ukuran file melebihi batas 5MB! Silakan pilih file yang lebih kecil.');
       inputEl.value = '';
       return;
     }
 
     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const dataUrl = e.target.result;
-      if (textInput) textInput.value = dataUrl;
-
-      if (previewContainer) previewContainer.style.display = 'block';
-      if (isPdf) {
+    if (isPdf) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const dataUrl = e.target.result;
+        if (textInput) textInput.value = dataUrl;
+        if (previewContainer) previewContainer.style.display = 'block';
         if (previewImg) previewImg.style.display = 'none';
         if (previewPdf) {
           previewPdf.style.display = 'flex';
           previewPdf.innerHTML = `📄 <strong>${file.name}</strong> (${(file.size/1024).toFixed(1)} KB)`;
         }
-      } else {
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    // For images: optimize via Canvas to keep payload light and crisp
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const rawDataUrl = e.target.result;
+      const img = new Image();
+      img.onload = function() {
+        const maxDim = 1280;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+        if (textInput) textInput.value = compressedDataUrl;
+        if (previewContainer) previewContainer.style.display = 'block';
         if (previewPdf) previewPdf.style.display = 'none';
         if (previewImg) {
           previewImg.style.display = 'block';
-          previewImg.src = dataUrl;
+          previewImg.src = compressedDataUrl;
         }
-      }
-
-      // Try upload to backend API
-      try {
-        const formData = new FormData();
-        formData.append('photo_file', file);
-        formData.append('type', fieldType);
-
-        const res = await fetch('api.php?action=upload_image', {
-          method: 'POST',
-          body: formData
-        }).then(r => r.json());
-
-        if (res && res.success && res.url) {
-          if (textInput) textInput.value = res.url;
-          if (window.showToast) window.showToast(`✅ File ${fieldType} berhasil diunggah!`, 'success');
+      };
+      img.onerror = function() {
+        if (textInput) textInput.value = rawDataUrl;
+        if (previewContainer) previewContainer.style.display = 'block';
+        if (previewImg) {
+          previewImg.style.display = 'block';
+          previewImg.src = rawDataUrl;
         }
-      } catch (err) {
-        console.warn('Upload file error (Base64 fallback active):', err);
-      }
+      };
+      img.src = rawDataUrl;
     };
     reader.readAsDataURL(file);
   },

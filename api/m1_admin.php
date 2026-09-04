@@ -150,11 +150,20 @@ switch ($action) {
             }
 
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'pdf'];
             if (!in_array($ext, $allowed)) {
                 $ext = 'jpg';
             }
-            $mimeType = ($ext === 'png') ? 'image/png' : (($ext === 'webp') ? 'image/webp' : 'image/jpeg');
+            $mimeMap = [
+                'png'  => 'image/png',
+                'webp' => 'image/webp',
+                'gif'  => 'image/gif',
+                'svg'  => 'image/svg+xml',
+                'pdf'  => 'application/pdf',
+                'jpg'  => 'image/jpeg',
+                'jpeg' => 'image/jpeg'
+            ];
+            $mimeType = $mimeMap[$ext] ?? 'image/jpeg';
 
             $rawBytes = @file_get_contents($file['tmp_name']);
             if ($rawBytes === false) {
