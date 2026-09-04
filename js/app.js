@@ -1780,7 +1780,8 @@ const AppEngine = {
             <button class="member-lapak-subtab active" id="btn-ml-subtab-katalog" data-sub="katalog" style="font-size:0.88rem; padding:8px 18px; border-radius:8px; border:1px solid var(--accent-blue); background:rgba(59,130,246,0.15); color:var(--accent-blue); font-weight:800; cursor:pointer;" onclick="AppEngine._switchMemberLapakSubtab('katalog', this)">🛍️ Katalog Produk & Iklan</button>
             <button class="member-lapak-subtab" id="btn-ml-subtab-lapaksaya" data-sub="lapaksaya" style="font-size:0.88rem; padding:8px 18px; border-radius:8px; border:1px solid var(--chrome-border); background:rgba(255,255,255,0.03); color:var(--text-muted); font-weight:700; cursor:pointer;" onclick="AppEngine._switchMemberLapakSubtab('lapaksaya', this)">🏪 Lapak Saya</button>
             <button class="member-lapak-subtab" id="btn-ml-subtab-pasangiklan" data-sub="pasangiklan" style="font-size:0.88rem; padding:8px 18px; border-radius:8px; border:1px solid var(--chrome-border); background:rgba(255,255,255,0.03); color:var(--text-muted); font-weight:700; cursor:pointer;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan', this)">➕ Pasang Iklan Produk Baru</button>
-            <button class="member-lapak-subtab" id="btn-ml-subtab-sewa" style="font-size:0.88rem; padding:8px 18px; border-radius:8px; border:1px solid var(--accent-gold); background:rgba(245,158,11,0.15); color:var(--accent-gold); font-weight:800; cursor:pointer;" onclick="document.getElementById('modal-member-lapak').style.display='none'; M7Engine.openSewaLapakModal();">🏪 Form Sewa Lapak Sponsor</button>
+            <button class="member-lapak-subtab" id="btn-ml-subtab-reviews" data-sub="reviews" style="font-size:0.88rem; padding:8px 18px; border-radius:8px; border:1px solid var(--accent-gold); background:rgba(245,158,11,0.08); color:var(--accent-gold); font-weight:800; cursor:pointer;" onclick="AppEngine._switchMemberLapakSubtab('reviews', this)">⭐ Ulasan & Rating Lapak</button>
+            <button class="member-lapak-subtab" id="btn-ml-subtab-sewa" style="font-size:0.88rem; padding:8px 18px; border-radius:8px; border:1px solid var(--chrome-border); background:rgba(255,255,255,0.03); color:var(--text-muted); font-weight:700; cursor:pointer;" onclick="document.getElementById('modal-member-lapak').style.display='none'; M7Engine.openSewaLapakModal();">🏪 Form Sewa Lapak Sponsor</button>
           </div>
 
           <!-- HALAMAN BODY -->
@@ -1873,6 +1874,60 @@ const AppEngine = {
                 </div>
               </form>
             </div>
+            <!-- Subtab 4: Ulasan & Rating Lapak -->
+            <div id="ml-subtab-reviews" style="display:none;">
+              <div style="display:grid; grid-template-columns:1fr 1.4fr; gap:24px; margin-top:4px;" class="member-review-grid-responsive">
+                <!-- Form Beri Rating -->
+                <div class="glass-card" style="padding:22px 24px; border:1px solid var(--accent-gold); border-radius:16px; background:rgba(15,23,42,0.85); box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+                  <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
+                    <div style="font-size:1.5rem; background:rgba(245,158,11,0.15); border:1px solid var(--accent-gold); width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center;">⭐</div>
+                    <div>
+                      <h4 style="color:var(--accent-gold); font-size:1.1rem; margin:0; font-weight:800; letter-spacing:0.3px;">BERI RATING & REVIEW LAPAK</h4>
+                      <p style="font-size:0.75rem; color:var(--text-muted); margin:3px 0 0 0;">Testimoni transaksi jujur member untuk membangun reputasi lapak MB INA</p>
+                    </div>
+                  </div>
+                  <form id="member-review-form" onsubmit="event.preventDefault(); AppEngine._submitMemberReviewForm();">
+                    <div class="form-group" style="margin-bottom:14px;">
+                      <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Pilih Lapak / Merchant Penjual *</label>
+                      <select id="member-review-lapak-sel" class="form-input" style="font-size:0.85rem; font-weight:700; padding:10px 14px; background:rgba(0,0,0,0.4); border-color:var(--chrome-border); color:#fff;" required>
+                        <!-- Populated dynamically -->
+                      </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:14px;">
+                      <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Rating (Bintang) *</label>
+                      <div style="display:flex; gap:8px; margin-top:4px;" id="member-star-rating-picker">
+                        <button type="button" class="btn-outline member-star-btn" data-star="1" onclick="AppEngine.setMemberStarRating(1)" style="padding:8px 12px; font-size:1.05rem; border-radius:8px;">⭐ 1</button>
+                        <button type="button" class="btn-outline member-star-btn" data-star="2" onclick="AppEngine.setMemberStarRating(2)" style="padding:8px 12px; font-size:1.05rem; border-radius:8px;">⭐ 2</button>
+                        <button type="button" class="btn-outline member-star-btn" data-star="3" onclick="AppEngine.setMemberStarRating(3)" style="padding:8px 12px; font-size:1.05rem; border-radius:8px;">⭐ 3</button>
+                        <button type="button" class="btn-outline member-star-btn" data-star="4" onclick="AppEngine.setMemberStarRating(4)" style="padding:8px 12px; font-size:1.05rem; border-radius:8px;">⭐ 4</button>
+                        <button type="button" class="btn-primary member-star-btn active" data-star="5" onclick="AppEngine.setMemberStarRating(5)" style="padding:8px 12px; font-size:1.05rem; border-radius:8px; background:var(--accent-gold); color:#000; font-weight:800;">⭐ 5</button>
+                      </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:16px;">
+                      <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Ulasan Pengalaman Transaksi *</label>
+                      <textarea id="member-review-content" class="form-input" rows="4" placeholder="Tuliskan kepuasan Anda mengenai produk, packing rapi, respon cepat penjual via WhatsApp, atau kondisi unit yang dibeli..." required style="font-size:0.85rem; padding:10px 14px; resize:vertical; background:rgba(0,0,0,0.4); border-color:var(--chrome-border); color:#fff;"></textarea>
+                    </div>
+                    <button type="submit" id="btn-submit-member-review" class="btn-primary" style="width:100%; font-weight:800; background:linear-gradient(135deg,var(--accent-gold),#d97706); color:#000; padding:12px; font-size:0.88rem; border-radius:10px; cursor:pointer; border:none; box-shadow:0 4px 16px rgba(212,175,55,0.3);">
+                      💾 KIRIM ULASAN & PENILAIAN
+                    </button>
+                  </form>
+                </div>
+
+                <!-- List Reviews -->
+                <div class="glass-card" style="padding:22px 24px; border:1px solid var(--chrome-border); border-radius:16px; background:rgba(15,23,42,0.65);">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px; flex-wrap:wrap; gap:8px;">
+                    <div>
+                      <h4 style="color:var(--accent-gold); font-size:1.05rem; margin:0; font-weight:800;">💬 TESTIMONI RESMI SESAMA ANGGOTA</h4>
+                      <p style="font-size:0.72rem; color:var(--text-muted); margin:2px 0 0 0;">Seluruh review terikat ke nomor E-KTA resmi anggota MB Club INA</p>
+                    </div>
+                    <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 12px; border-radius:8px; color:var(--accent-gold); border-color:rgba(245,158,11,0.3);" onclick="AppEngine._renderMemberReviewsSection()">🔄 Segarkan</button>
+                  </div>
+                  <div id="member-reviews-list-container" style="display:flex; flex-direction:column; gap:12px; max-height:500px; overflow-y:auto; padding-right:6px;">
+                    <!-- Filled dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>`;
       document.body.appendChild(modal);
@@ -1914,16 +1969,160 @@ const AppEngine = {
       b.style.color = 'var(--text-muted)';
       b.classList.remove('active');
     });
-    btn.style.background = sub === 'pasangiklan' ? 'rgba(245,158,11,0.1)' : 'rgba(59,130,246,0.15)';
-    btn.style.borderColor = sub === 'pasangiklan' ? 'var(--accent-gold)' : 'var(--accent-blue)';
-    btn.style.color = sub === 'pasangiklan' ? 'var(--accent-gold)' : 'var(--accent-blue)';
-    btn.classList.add('active');
+    if (btn) {
+      btn.style.background = (sub === 'pasangiklan' || sub === 'reviews') ? 'rgba(245,158,11,0.1)' : 'rgba(59,130,246,0.15)';
+      btn.style.borderColor = (sub === 'pasangiklan' || sub === 'reviews') ? 'var(--accent-gold)' : 'var(--accent-blue)';
+      btn.style.color = (sub === 'pasangiklan' || sub === 'reviews') ? 'var(--accent-gold)' : 'var(--accent-blue)';
+      btn.classList.add('active');
+    }
 
-    document.getElementById('ml-subtab-katalog').style.display = sub === 'katalog' ? 'block' : 'none';
-    document.getElementById('ml-subtab-lapaksaya').style.display = sub === 'lapaksaya' ? 'block' : 'none';
-    document.getElementById('ml-subtab-pasangiklan').style.display = sub === 'pasangiklan' ? 'block' : 'none';
+    const katalogEl = document.getElementById('ml-subtab-katalog');
+    const lapaksayaEl = document.getElementById('ml-subtab-lapaksaya');
+    const pasangiklanEl = document.getElementById('ml-subtab-pasangiklan');
+    const reviewsEl = document.getElementById('ml-subtab-reviews');
+
+    if (katalogEl) katalogEl.style.display = sub === 'katalog' ? 'block' : 'none';
+    if (lapaksayaEl) lapaksayaEl.style.display = sub === 'lapaksaya' ? 'block' : 'none';
+    if (pasangiklanEl) pasangiklanEl.style.display = sub === 'pasangiklan' ? 'block' : 'none';
+    if (reviewsEl) reviewsEl.style.display = sub === 'reviews' ? 'block' : 'none';
 
     if (sub === 'lapaksaya') this._renderMemberMyLapak();
+    if (sub === 'reviews') this._renderMemberReviewsSection();
+  },
+
+  _memberSelectedStarRating: 5,
+
+  setMemberStarRating(star) {
+    this._memberSelectedStarRating = star;
+    document.querySelectorAll('.member-star-btn').forEach(btn => {
+      if (parseInt(btn.getAttribute('data-star')) === star) {
+        btn.className = 'btn-primary member-star-btn active';
+        btn.style.background = 'var(--accent-gold)';
+        btn.style.color = '#000';
+        btn.style.fontWeight = '800';
+      } else {
+        btn.className = 'btn-outline member-star-btn';
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-main)';
+        btn.style.fontWeight = 'normal';
+      }
+    });
+  },
+
+  openMemberReviewForLapak(lapakId) {
+    const btn = document.getElementById('btn-ml-subtab-reviews');
+    if (btn) this._switchMemberLapakSubtab('reviews', btn);
+    setTimeout(() => {
+      const sel = document.getElementById('member-review-lapak-sel');
+      if (sel && lapakId) {
+        sel.value = lapakId;
+      }
+      const form = document.getElementById('member-review-form');
+      if (form) form.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  },
+
+  async _renderMemberReviewsSection() {
+    const sel = document.getElementById('member-review-lapak-sel');
+    const container = document.getElementById('member-reviews-list-container');
+
+    if (window.M7Engine && (!window.M7Engine.data?.lapak || window.M7Engine.data.lapak.length === 0)) {
+      await window.M7Engine.fetchData();
+    }
+
+    const lapakList = (window.M7Engine && Array.isArray(window.M7Engine.data?.lapak)) ? window.M7Engine.data.lapak : [];
+    const reviewsList = (window.M7Engine && Array.isArray(window.M7Engine.data?.reviews)) ? window.M7Engine.data.reviews : [];
+
+    if (sel) {
+      if (lapakList.length) {
+        sel.innerHTML = lapakList.map(l => `<option value="${l.id}">🏪 ${l.name} (${l.lapak_code || 'MB INA'})</option>`).join('');
+      } else {
+        sel.innerHTML = `<option value="">-- Belum ada lapak terdaftar --</option>`;
+      }
+    }
+
+    if (container) {
+      if (!reviewsList.length) {
+        container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:0.85rem;">Belum ada ulasan untuk lapak MB INA. Jadilah anggota pertama yang memberikan testimoni!</div>`;
+        return;
+      }
+
+      container.innerHTML = reviewsList.map(r => {
+        const lapak = lapakList.find(l => l.id === r.lapak_id) || { name: 'Lapak MB INA' };
+        const stars = '⭐'.repeat(r.rating || 5);
+        const memberKta = r.member_id || 'MBINA-HQ-2026-000001';
+        const memberName = r.user_name || 'Member MB INA';
+        const dateStr = (r.created_at || '').substring(0, 10) || 'Terbaru';
+
+        return `
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--chrome-border); padding:14px 16px; border-radius:12px; transition:border-color 0.2s;" onmouseover="this.style.borderColor='rgba(245,158,11,0.4)';" onmouseout="this.style.borderColor='var(--chrome-border)';">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <div style="font-size:0.88rem; font-weight:800; color:var(--accent-gold);">🏪 ${lapak.name}</div>
+              <div style="font-size:0.95rem; letter-spacing:1px;">${stars}</div>
+            </div>
+            <div style="font-size:0.85rem; color:#f8fafc; margin-bottom:8px; line-height:1.4;">"${r.content}"</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px; border-top:1px solid rgba(255,255,255,0.05); padding-top:6px;">
+              <span style="display:flex; align-items:center; gap:5px; color:#e2e8f0;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <strong>${memberName}</strong> <span style="color:var(--text-muted); font-family:monospace;">(${memberKta})</span>
+              </span>
+              <span style="color:#64748b; font-size:0.72rem;">📅 ${dateStr}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  },
+
+  async _submitMemberReviewForm() {
+    const lapakId = document.getElementById('member-review-lapak-sel')?.value;
+    const content = document.getElementById('member-review-content')?.value?.trim();
+    const btn = document.getElementById('btn-submit-member-review');
+
+    if (!lapakId) {
+      alert("❌ Silakan pilih lapak/toko yang ingin dinilai!");
+      return;
+    }
+    if (!content) {
+      alert("❌ Tuliskan ulasan Anda mengenai pengalaman bertransaksi!");
+      return;
+    }
+
+    const u = this.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const userId = u.id || 'usr_member';
+    const rating = this._memberSelectedStarRating || 5;
+
+    try {
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Mengirim Ulasan...'; }
+
+      const res = await fetch('api.php?action=create_lapak_review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lapak_id: lapakId,
+          user_id: userId,
+          rating: rating,
+          content: content
+        })
+      }).then(r => r.json());
+
+      if (res && res.success) {
+        alert("⭐ Terima kasih! Ulasan & Penilaian Anda berhasil dikirim dan tayang secara resmi.");
+        const txtArea = document.getElementById('member-review-content');
+        if (txtArea) txtArea.value = '';
+
+        if (window.M7Engine && typeof window.M7Engine.fetchData === 'function') {
+          await window.M7Engine.fetchData();
+        }
+        this._renderMemberReviewsSection();
+      } else {
+        alert("❌ Gagal mengirim ulasan: " + (res?.message || 'Error server'));
+      }
+    } catch (err) {
+      alert("❌ Terjadi kesalahan koneksi: " + err.message);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '💾 KIRIM ULASAN & PENILAIAN'; }
+    }
   },
 
   async _renderMemberLapakProducts() {
@@ -2005,6 +2204,9 @@ const AppEngine = {
               💬 Hubungi via WA
             </button>
           </a>
+          <button type="button" onclick="AppEngine.openMemberReviewForLapak('${p.lapak_id || ''}')" style="margin-top:6px; width:100%; padding:6px; font-size:0.75rem; font-weight:700; background:rgba(255,255,255,0.04); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); border-radius:7px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; transition:background 0.2s;" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+            ⭐ Beri Rating Lapak Ini
+          </button>
         </div>
       </div>`;
     }).join('') : `<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted);">Tidak ada produk atau iklan yang cocok.</div>`;

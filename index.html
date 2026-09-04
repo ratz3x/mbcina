@@ -518,10 +518,11 @@
             </div>
             <!-- Body: Chips Kategori & 1 Produk Unggulan -->
             <div>
-              <div style="display:flex; gap:6px; margin-bottom:10px;">
+              <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
                 <span style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:3px 10px; border-radius:20px; font-size:0.7rem; color:#cbd5e1; cursor:pointer;" onclick="AppEngine.openMemberLapakModal('KENDARAAN')">Mobil</span>
                 <span style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:3px 10px; border-radius:20px; font-size:0.7rem; color:#cbd5e1; cursor:pointer;" onclick="AppEngine.openMemberLapakModal('SPAREPART')">Sparepart</span>
                 <span style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:3px 10px; border-radius:20px; font-size:0.7rem; color:#cbd5e1; cursor:pointer;" onclick="AppEngine.openMemberLapakModal('MERCHANDISE')">Merchandise</span>
+                <span style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:3px 10px; border-radius:20px; font-size:0.7rem; color:#fbbf24; font-weight:700; cursor:pointer;" onclick="AppEngine.openMemberLapakModal('ALL', 'reviews')">⭐ Review Lapak</span>
               </div>
               <div style="padding:10px 12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="AppEngine.openMemberLapakModal()">
                 <div>
@@ -535,9 +536,12 @@
             </div>
           </div>
           <!-- Action Footer -->
-          <div style="margin-top:14px;">
-            <button type="button" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#ffffff; font-size:0.75rem; padding:8px 16px; border-radius:12px; width:100%; text-align:center; cursor:pointer; transition:all 0.2s; font-weight:600;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';" onclick="AppEngine.openMemberLapakModal()">
+          <div style="margin-top:14px; display:flex; gap:8px;">
+            <button type="button" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#ffffff; font-size:0.75rem; padding:8px 12px; border-radius:12px; text-align:center; cursor:pointer; transition:all 0.2s; font-weight:600;" onmouseover="this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.background='rgba(255,255,255,0.05)';" onclick="AppEngine.openMemberLapakModal()">
               Jelajahi Katalog
+            </button>
+            <button type="button" style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.35); color:var(--accent-gold); font-size:0.75rem; padding:8px 14px; border-radius:12px; text-align:center; cursor:pointer; transition:all 0.2s; font-weight:700; display:flex; align-items:center; gap:4px;" onmouseover="this.style.background='rgba(245,158,11,0.2)';" onmouseout="this.style.background='rgba(245,158,11,0.12)';" onclick="AppEngine.openMemberLapakModal('ALL', 'reviews')">
+              ⭐ Ulasan Lapak
             </button>
           </div>
         </div>
