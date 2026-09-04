@@ -24,7 +24,11 @@ switch ($action) {
                         WHEN d.notes LIKE 'Nama: %' THEN TRIM(SPLIT_PART(SPLIT_PART(d.notes, 'Nama: ', 2), ' | ', 1))
                         ELSE 'Hamba Allah'
                     END as donor_name,
-                    u.member_id
+                    CASE
+                        WHEN u.member_id IS NOT NULL AND u.member_id != '' THEN u.member_id
+                        WHEN d.notes LIKE '%Member ID: %' THEN TRIM(SPLIT_PART(SPLIT_PART(SPLIT_PART(d.notes, 'Member ID: ', 2), ' | ', 1), E'\n', 1))
+                        ELSE NULL
+                    END as member_id
                 FROM donations d
                 LEFT JOIN users u ON d.user_id = u.id
                 ORDER BY d.created_at DESC
@@ -36,7 +40,12 @@ switch ($action) {
                         WHEN u.name IS NOT NULL AND u.name != '' THEN u.name
                         WHEN d.notes LIKE 'Nama: %' THEN TRIM(SPLIT_PART(SPLIT_PART(d.notes, 'Nama: ', 2), ' | ', 1))
                         ELSE 'Hamba Allah'
-                    END as donor_name
+                    END as donor_name,
+                    CASE
+                        WHEN u.member_id IS NOT NULL AND u.member_id != '' THEN u.member_id
+                        WHEN d.notes LIKE '%Member ID: %' THEN TRIM(SPLIT_PART(SPLIT_PART(SPLIT_PART(d.notes, 'Member ID: ', 2), ' | ', 1), E'\n', 1))
+                        ELSE NULL
+                    END as member_id
                 FROM donation_receipts r
                 JOIN donations d ON r.donation_id = d.id
                 LEFT JOIN users u ON d.user_id = u.id
