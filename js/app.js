@@ -2546,17 +2546,11 @@ const AppEngine = {
       ? window.M7Engine.data.products
       : [];
     const list = this._memberAdsList || [];
-    const ad = prods.find(x => String(x.id) === String(adId)) || list.find(x => String(x.id) === String(adId)) || {
-      id: adId,
-      name: 'Iklan Member',
-      category: 'Parts',
-      price: 1000000,
-      condition: 'BEKAS',
-      location: 'Jakarta',
-      phone: '08545585568',
-      img: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400',
-      desc: ''
-    };
+    const ad = prods.find(x => String(x.id) === String(adId)) || list.find(x => String(x.id) === String(adId));
+    if (!ad) {
+      window.showToast('Data iklan tidak ditemukan.', 'warning');
+      return;
+    }
 
     let modal = document.getElementById('modal-edit-member-ad');
     if (!modal) {
@@ -2862,10 +2856,13 @@ const AppEngine = {
     this._memberAdsList.unshift(newAd);
 
     // Cari lapak milik user ini dari M7Engine
-    let lapakId = 'lapak_001';
+    let lapakId = 'MEMBER_MARKETPLACE';
     if (window.M7Engine && Array.isArray(window.M7Engine.data?.lapak)) {
+      const uid = String(u.id || u.userId || '').toLowerCase();
+      const uname = String(u.name || u.username || '').toLowerCase();
       const myLapak = window.M7Engine.data.lapak.find(l =>
-        l.user_id === u.id || l.user_id === u.userId
+        (uid && String(l.user_id || '').toLowerCase() === uid) ||
+        (uname && String(l.pemilik || '').toLowerCase() === uname)
       );
       if (myLapak) lapakId = myLapak.id;
     }
@@ -9029,8 +9026,11 @@ const AppEngine = {
       });
     });
 
-    // M7: Lapak Saya & Sponsor Marketplace
-    const pendingAds = (this._memberAdsList || []).filter(a => a.status === 'PENDING');
+    const dbPendingAds = (window.M7Engine && Array.isArray(window.M7Engine.data?.products))
+      ? window.M7Engine.data.products.filter(a => a.status === 'PENDING')
+      : [];
+    const localPendingAds = (this._memberAdsList || []).filter(a => a.status === 'PENDING' && !dbPendingAds.some(x => x.id === a.id));
+    const pendingAds = [...dbPendingAds, ...localPendingAds];
     pendingAds.forEach(a => {
       items.push({
         id: a.id,
