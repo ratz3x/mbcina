@@ -194,6 +194,7 @@ $moduleMap = [
     'verify_lapak_product' => 'm8_marketplace',
     'delete_lapak_product' => 'm8_marketplace',
     'create_lapak_review' => 'm8_marketplace',
+    'migrate_lapak_codes' => 'm8_marketplace',
     'get_sponsorship_inventory_status' => 'm9_monetisasi',
     'create_endorse_contract_with_queue' => 'm9_monetisasi',
     'get_m8_data' => 'm9_monetisasi',

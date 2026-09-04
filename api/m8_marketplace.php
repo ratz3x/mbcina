@@ -76,26 +76,42 @@ switch ($action) {
                 exit;
             }
 
-            $year = date('Y');
-            $maxSeq = 0;
+            // Determine whether the creator is a SPONSOR or a regular MEMBER
+            $isSponsor = false;
             try {
-                $maxStmt = $sPdo->query("SELECT lapak_code FROM lapak WHERE lapak_code LIKE 'LAPAK-%'");
-                if ($maxStmt) {
-                    while ($r = $maxStmt->fetch()) {
-                        if (preg_match('/LAPAK-\d+-(\d+)/i', $r['lapak_code'], $m)) {
-                            $val = intval($m[1]);
-                            if ($val > $maxSeq) $maxSeq = $val;
-                        }
+                $stmtUser = $sPdo->prepare("SELECT role, member_id FROM users WHERE id = ? OR username = ? OR member_id = ?");
+                $stmtUser->execute([$userId, $userId, $userId]);
+                $uRow = $stmtUser->fetch();
+                if ($uRow) {
+                    $uRole = strtoupper($uRow['role'] ?? '');
+                    $uMid  = strtoupper($uRow['member_id'] ?? '');
+                    if ($uRole === 'SPONSOR' || strpos($uMid, 'SPN-') !== false) {
+                        $isSponsor = true;
                     }
                 }
             } catch (Exception $ex) {}
 
-            $stmtCount = $sPdo->query("SELECT COUNT(*) FROM lapak");
-            $countVal = intval($stmtCount ? $stmtCount->fetchColumn() : 0);
-            $seq = max($maxSeq, $countVal) + 1;
+            if (!empty($input['is_sponsor']) || (!empty($input['lapak_type']) && strtoupper($input['lapak_type']) === 'SPONSOR')) {
+                $isSponsor = true;
+            }
 
+            $prefix = $isSponsor ? 'LPK-SPN-' : 'LPK-MEM-';
+            $year   = date('Y');
+            $maxSeq = 0;
+            try {
+                $maxStmt = $sPdo->prepare("SELECT lapak_code FROM lapak WHERE lapak_code LIKE ?");
+                $maxStmt->execute([$prefix . $year . '-%']);
+                while ($r = $maxStmt->fetch()) {
+                    if (preg_match('/LPK-(?:MEM|SPN)-\d+-(\d+)/i', $r['lapak_code'], $m)) {
+                        $val = intval($m[1]);
+                        if ($val > $maxSeq) $maxSeq = $val;
+                    }
+                }
+            } catch (Exception $ex) {}
+
+            $seq = $maxSeq + 1;
             do {
-                $lapakCode = 'LAPAK-' . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
+                $lapakCode = $prefix . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
                 $check = $sPdo->prepare("SELECT COUNT(*) FROM lapak WHERE TRIM(lapak_code) = TRIM(?)");
                 $check->execute([$lapakCode]);
                 $exists = intval($check->fetchColumn());
@@ -543,6 +559,82 @@ switch ($action) {
     // ============================================
     // M8: GET SPONSORSHIP INVENTORY STATUS & WAITLIST QUEUE
     // ============================================
+
+    case 'migrate_lapak_codes':
+        try {
+            ensureM7Tables($sPdo);
+            $year = date('Y');
+
+            // 1. Bersihkan Duplikasi Shell (lapak_6a841104b8a01_577 vs lapak_shell)
+            $checkDupShell = $sPdo->query("SELECT id FROM lapak WHERE id = 'lapak_6a841104b8a01_577'")->fetch();
+            if ($checkDupShell) {
+                $sPdo->prepare("UPDATE lapak_products SET lapak_id = 'lapak_shell' WHERE lapak_id = 'lapak_6a841104b8a01_577'")->execute();
+                $sPdo->prepare("UPDATE lapak_reviews SET lapak_id = 'lapak_shell' WHERE lapak_id = 'lapak_6a841104b8a01_577'")->execute();
+                $sPdo->prepare("DELETE FROM lapak WHERE id = 'lapak_6a841104b8a01_577'")->execute();
+            }
+
+            // 2. Bersihkan Duplikasi Garasi FayFay (lapak_004 dummy vs lapak_6a80f3422be6b real)
+            $checkDupFay = $sPdo->query("SELECT id FROM lapak WHERE id = 'lapak_004'")->fetch();
+            if ($checkDupFay) {
+                $sPdo->prepare("UPDATE lapak_products SET lapak_id = 'lapak_6a80f3422be6b' WHERE lapak_id = 'lapak_004'")->execute();
+                $sPdo->prepare("UPDATE lapak_reviews SET lapak_id = 'lapak_6a80f3422be6b' WHERE lapak_id = 'lapak_004'")->execute();
+                $sPdo->prepare("DELETE FROM lapak WHERE id = 'lapak_004'")->execute();
+            }
+
+            // 3. Ambil semua lapak yang tersisa
+            $lapaks = $sPdo->query("
+                SELECT l.*, u.role as user_role, u.member_id as user_mid 
+                FROM lapak l 
+                LEFT JOIN users u ON l.user_id = u.id 
+                ORDER BY l.created_at ASC
+            ")->fetchAll() ?: [];
+
+            $spnSeq = 1;
+            $memSeq = 1;
+            $updatedList = [];
+
+            foreach ($lapaks as $l) {
+                $isSponsor = false;
+                $role = strtoupper($l['user_role'] ?? '');
+                $mid  = strtoupper($l['user_mid'] ?? '');
+                $name = strtolower($l['name'] ?? '');
+
+                if ($l['id'] === 'lapak_shell' || $l['id'] === 'lapak_fdr' || $role === 'SPONSOR' || strpos($mid, 'SPN-') !== false) {
+                    if ($l['id'] === 'lapak_6a8410db861b4_344') {
+                        $isSponsor = false;
+                    } else {
+                        $isSponsor = true;
+                    }
+                }
+
+                if ($isSponsor) {
+                    $newCode = 'LPK-SPN-' . $year . '-' . str_pad($spnSeq, 3, '0', STR_PAD_LEFT);
+                    $spnSeq++;
+                } else {
+                    $newCode = 'LPK-MEM-' . $year . '-' . str_pad($memSeq, 3, '0', STR_PAD_LEFT);
+                    $memSeq++;
+                }
+
+                $sPdo->prepare("UPDATE lapak SET lapak_code = ? WHERE id = ?")->execute([$newCode, $l['id']]);
+                $updatedList[] = [
+                    'id' => $l['id'],
+                    'old_code' => $l['lapak_code'],
+                    'new_code' => $newCode,
+                    'name' => $l['name'],
+                    'type' => $isSponsor ? 'SPONSOR' : 'MEMBER'
+                ];
+            }
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Migrasi kode lapak berhasil!',
+                'total_migrated' => count($updatedList),
+                'details' => $updatedList
+            ]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
 
     default:
         echo json_encode(['success' => false, 'message' => 'Unknown action in m8_marketplace: ' . $action]);

@@ -22147,10 +22147,10 @@ window.M7Engine = {
 
       // Add database lapak or fallback event booths
       const eventLapaks = (this.data && Array.isArray(this.data.lapak) && this.data.lapak.length > 0) ? this.data.lapak : [
-        { id: 'LPK-001', lapak_code: 'LPK-001', name: 'FDR Tyre Indonesia Official Store', event_name: 'Booth A-01 Jamnas' },
-        { id: 'LPK-002', lapak_code: 'LPK-002', name: 'Bintang Mercy Autoparts & Spares', event_name: 'Booth B-05 Jamnas' },
-        { id: 'LPK-003', lapak_code: 'LPK-003', name: 'Retro Benz Classic Restoration', event_name: 'Booth C-12 Jamnas' },
-        { id: 'LPK-004', lapak_code: 'LPK-004', name: 'Shell Helix & Advance Official Booth', event_name: 'Booth A-02 Jamnas' }
+        { id: 'LPK-SPN-2026-002', lapak_code: 'LPK-SPN-2026-002', name: 'FDR Tyre Indonesia Official Store', event_name: 'Booth A-01 Jamnas' },
+        { id: 'LPK-MEM-2026-001', lapak_code: 'LPK-MEM-2026-001', name: 'Bintang Mercy Autoparts & Spares', event_name: 'Booth B-05 Jamnas' },
+        { id: 'LPK-MEM-2026-002', lapak_code: 'LPK-MEM-2026-002', name: 'Retro Benz Classic Restoration', event_name: 'Booth C-12 Jamnas' },
+        { id: 'LPK-SPN-2026-001', lapak_code: 'LPK-SPN-2026-001', name: 'Shell Helix & Advance Official Booth', event_name: 'Booth A-02 Jamnas' }
       ];
 
       eventLapaks.forEach(l => {
