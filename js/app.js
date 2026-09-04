@@ -2437,9 +2437,13 @@ const AppEngine = {
               </div>
               <div style="font-size:1.1rem; font-weight:800; color:#fff; margin-top:2px;">${storeName} <span style="font-size:0.75rem; color:var(--accent-gold); font-family:monospace;">(${storeCode})</span></div>
               <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-                <span style="font-size:1.1rem; font-weight:900; color:var(--accent-gold); font-family:monospace;">${avgRating}</span>
-                <span style="font-size:0.8rem; color:#f59e0b;">${starsIcon}</span>
-                <span style="font-size:0.78rem; color:#cbd5e1; font-weight:600;">(${myLapakReviews.length} Ulasan Masuk)</span>
+                ${myLapakReviews.length ? `
+                  <span style="font-size:1.1rem; font-weight:900; color:var(--accent-gold); font-family:monospace;">${avgRating}</span>
+                  <span style="font-size:0.8rem; color:#f59e0b;">${starsIcon}</span>
+                  <span style="font-size:0.78rem; color:#cbd5e1; font-weight:600;">(${myLapakReviews.length} Ulasan Masuk)</span>
+                ` : `
+                  <span style="font-size:0.78rem; color:var(--text-muted); font-style:italic;">⭐ Belum ada ulasan masuk</span>
+                `}
               </div>
             </div>
           </div>
