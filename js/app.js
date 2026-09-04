@@ -1887,11 +1887,38 @@ const AppEngine = {
                     </div>
                   </div>
                   <form id="member-review-form" onsubmit="event.preventDefault(); AppEngine._submitMemberReviewForm();">
-                    <div class="form-group" style="margin-bottom:14px;">
-                      <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Pilih Lapak / Merchant Penjual *</label>
-                      <select id="member-review-lapak-sel" class="form-input" style="font-size:0.85rem; font-weight:700; padding:10px 14px; background:rgba(0,0,0,0.4); border-color:var(--chrome-border); color:#fff;" required>
-                        <!-- Populated dynamically -->
-                      </select>
+                    <!-- Searchable & Scalable Lapak Selector -->
+                    <div class="form-group" style="margin-bottom:14px; position:relative;">
+                      <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                        <span>Pilih Lapak / Merchant Penjual *</span>
+                        <span id="member-review-lapak-badge-status" style="font-size:0.7rem; color:var(--text-muted);">Cari nama lapak atau kota</span>
+                      </label>
+
+                      <!-- Card Lapak yang Dipilih -->
+                      <div id="member-review-selected-card" style="display:none; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.35); border-radius:12px; padding:10px 14px; margin-bottom:8px; align-items:center; justify-content:space-between; gap:10px;">
+                        <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                          <img id="member-review-selected-logo" src="assets/mb_badge.jpg" style="width:34px; height:34px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.2);">
+                          <div style="min-width:0;">
+                            <div id="member-review-selected-name" style="font-size:0.88rem; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Nama Lapak</div>
+                            <div id="member-review-selected-sub" style="font-size:0.72rem; color:var(--accent-gold);">Pemilik • Kode Lapak</div>
+                          </div>
+                        </div>
+                        <button type="button" class="btn-outline" style="font-size:0.72rem; padding:4px 10px; border-radius:8px; color:#cbd5e1; white-space:nowrap;" onclick="AppEngine.clearSelectedReviewLapak()">✕ Ganti</button>
+                      </div>
+
+                      <!-- Search Input & Live Suggestion Dropdown -->
+                      <div id="member-review-search-wrap" style="position:relative;">
+                        <input type="text" id="member-review-search-input" class="form-input" placeholder="🔍 Ketik nama toko, pemilik, atau kota (cth: Shell, Andi, Bandung)..." style="font-size:0.85rem; padding:10px 14px; background:rgba(0,0,0,0.4); border-color:var(--chrome-border); color:#fff; width:100%;" oninput="AppEngine.onSearchReviewLapak(this.value)" onfocus="AppEngine.onFocusReviewLapakSearch()" autocomplete="off">
+                        <input type="hidden" id="member-review-lapak-sel" value="">
+                        
+                        <!-- Autocomplete Suggestions Popover -->
+                        <div id="member-review-suggestions" style="display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; max-height:220px; overflow-y:auto; background:#0f172a; border:1px solid var(--accent-gold); border-radius:12px; z-index:99999; box-shadow:0 12px 36px rgba(0,0,0,0.85); padding:6px;"></div>
+                      </div>
+
+                      <!-- Quick Shortcut Chips for Top Stores -->
+                      <div id="member-review-quick-chips" style="display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; align-items:center;">
+                        <span style="font-size:0.7rem; color:var(--text-muted);">Pilihan Cepat:</span>
+                      </div>
                     </div>
                     <div class="form-group" style="margin-bottom:14px;">
                       <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Rating (Bintang) *</label>
@@ -2009,22 +2036,102 @@ const AppEngine = {
     });
   },
 
+  selectReviewLapak(lapakId) {
+    const lapakList = (window.M7Engine && Array.isArray(window.M7Engine.data?.lapak)) ? window.M7Engine.data.lapak : [];
+    const lapak = lapakList.find(l => String(l.id) === String(lapakId));
+    if (!lapak) return;
+
+    const hiddenInp = document.getElementById('member-review-lapak-sel');
+    if (hiddenInp) hiddenInp.value = lapak.id;
+
+    const card = document.getElementById('member-review-selected-card');
+    const searchWrap = document.getElementById('member-review-search-wrap');
+    const chipsWrap = document.getElementById('member-review-quick-chips');
+    const nameEl = document.getElementById('member-review-selected-name');
+    const subEl = document.getElementById('member-review-selected-sub');
+    const logoEl = document.getElementById('member-review-selected-logo');
+    const suggEl = document.getElementById('member-review-suggestions');
+
+    if (nameEl) nameEl.textContent = lapak.name;
+    if (subEl) subEl.textContent = `👤 ${lapak.pemilik || 'Member MB INA'} · 🏷️ ${lapak.lapak_code || 'MB INA'}`;
+    if (logoEl) logoEl.src = lapak.logo_url || 'assets/mb_badge.jpg';
+
+    if (card) card.style.display = 'flex';
+    if (searchWrap) searchWrap.style.display = 'none';
+    if (chipsWrap) chipsWrap.style.display = 'none';
+    if (suggEl) suggEl.style.display = 'none';
+  },
+
+  clearSelectedReviewLapak() {
+    const hiddenInp = document.getElementById('member-review-lapak-sel');
+    if (hiddenInp) hiddenInp.value = '';
+
+    const card = document.getElementById('member-review-selected-card');
+    const searchWrap = document.getElementById('member-review-search-wrap');
+    const chipsWrap = document.getElementById('member-review-quick-chips');
+    const searchInp = document.getElementById('member-review-search-input');
+
+    if (card) card.style.display = 'none';
+    if (searchWrap) searchWrap.style.display = 'block';
+    if (chipsWrap) chipsWrap.style.display = 'flex';
+    if (searchInp) {
+      searchInp.value = '';
+      searchInp.focus();
+    }
+  },
+
+  onSearchReviewLapak(query) {
+    const q = (query || '').toLowerCase().trim();
+    const suggEl = document.getElementById('member-review-suggestions');
+    if (!suggEl) return;
+
+    const lapakList = (window.M7Engine && Array.isArray(window.M7Engine.data?.lapak)) ? window.M7Engine.data.lapak : [];
+    const filtered = lapakList.filter(l => {
+      if (!q) return true;
+      const n = (l.name || '').toLowerCase();
+      const p = (l.pemilik || '').toLowerCase();
+      const c = (l.lapak_code || '').toLowerCase();
+      const cat = (l.category || '').toLowerCase();
+      return n.includes(q) || p.includes(q) || c.includes(q) || cat.includes(q);
+    });
+
+    if (filtered.length === 0) {
+      suggEl.innerHTML = `<div style="padding:10px 12px; font-size:0.78rem; color:var(--text-muted); text-align:center;">Tidak ada lapak yang cocok dengan pencarian "${query}".</div>`;
+      suggEl.style.display = 'block';
+      return;
+    }
+
+    suggEl.innerHTML = filtered.slice(0, 10).map(l => `
+      <div onclick="AppEngine.selectReviewLapak('${l.id}')" style="display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:8px; cursor:pointer; transition:background 0.15s; border-bottom:1px solid rgba(255,255,255,0.04);" onmouseover="this.style.background='rgba(245,158,11,0.1)';" onmouseout="this.style.background='transparent';">
+        <img src="${l.logo_url || 'assets/mb_badge.jpg'}" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:0.84rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${l.name}</div>
+          <div style="font-size:0.72rem; color:var(--accent-gold);">${l.lapak_code || ''} · ${l.pemilik || 'Member'}</div>
+        </div>
+        <button type="button" class="btn-primary" style="padding:3px 8px; font-size:0.7rem; font-weight:700; border-radius:6px; background:var(--accent-gold); color:#000;">Pilih</button>
+      </div>
+    `).join('');
+    suggEl.style.display = 'block';
+  },
+
+  onFocusReviewLapakSearch() {
+    const searchInp = document.getElementById('member-review-search-input');
+    this.onSearchReviewLapak(searchInp ? searchInp.value : '');
+  },
+
   openMemberReviewForLapak(lapakId) {
     const btn = document.getElementById('btn-ml-subtab-reviews');
     if (btn) this._switchMemberLapakSubtab('reviews', btn);
     setTimeout(() => {
-      const sel = document.getElementById('member-review-lapak-sel');
-      if (sel && lapakId) {
-        sel.value = lapakId;
-      }
+      this.selectReviewLapak(lapakId);
       const form = document.getElementById('member-review-form');
       if (form) form.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   },
 
   async _renderMemberReviewsSection() {
-    const sel = document.getElementById('member-review-lapak-sel');
     const container = document.getElementById('member-reviews-list-container');
+    const chipsWrap = document.getElementById('member-review-quick-chips');
 
     if (window.M7Engine && (!window.M7Engine.data?.lapak || window.M7Engine.data.lapak.length === 0)) {
       await window.M7Engine.fetchData();
@@ -2033,12 +2140,14 @@ const AppEngine = {
     const lapakList = (window.M7Engine && Array.isArray(window.M7Engine.data?.lapak)) ? window.M7Engine.data.lapak : [];
     const reviewsList = (window.M7Engine && Array.isArray(window.M7Engine.data?.reviews)) ? window.M7Engine.data.reviews : [];
 
-    if (sel) {
-      if (lapakList.length) {
-        sel.innerHTML = lapakList.map(l => `<option value="${l.id}">🏪 ${l.name} (${l.lapak_code || 'MB INA'})</option>`).join('');
-      } else {
-        sel.innerHTML = `<option value="">-- Belum ada lapak terdaftar --</option>`;
-      }
+    // Render Quick Choice Chips for Popular Stores
+    if (chipsWrap && lapakList.length) {
+      chipsWrap.innerHTML = `<span style="font-size:0.7rem; color:var(--text-muted);">Pilihan Cepat:</span>` +
+        lapakList.slice(0, 4).map(l => `
+          <span onclick="AppEngine.selectReviewLapak('${l.id}')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(245,158,11,0.25); color:#fde68a; font-size:0.7rem; padding:2px 8px; border-radius:12px; cursor:pointer; font-weight:600; transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent-gold)'; this.style.background='rgba(245,158,11,0.15)';" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)'; this.style.background='rgba(255,255,255,0.05)';">
+            🏪 ${l.name}
+          </span>
+        `).join('');
     }
 
     if (container) {
@@ -2080,7 +2189,7 @@ const AppEngine = {
     const btn = document.getElementById('btn-submit-member-review');
 
     if (!lapakId) {
-      alert("❌ Silakan pilih lapak/toko yang ingin dinilai!");
+      alert("❌ Silakan cari dan pilih lapak/toko yang ingin dinilai!");
       return;
     }
     if (!content) {
@@ -2107,9 +2216,35 @@ const AppEngine = {
       }).then(r => r.json());
 
       if (res && res.success) {
-        alert("⭐ Terima kasih! Ulasan & Penilaian Anda berhasil dikirim dan tayang secara resmi.");
+        alert("⭐ Terima kasih! Ulasan & Penilaian Anda berhasil dikirim dan tersinkronisasi ke pemilik lapak.");
         const txtArea = document.getElementById('member-review-content');
         if (txtArea) txtArea.value = '';
+        this.clearSelectedReviewLapak();
+
+        // Push real-time notification to the store owner
+        try {
+          const newNotif = {
+            id: 'notif_rev_' + Date.now(),
+            category: 'TRANSACTION',
+            title: `⭐ Ulasan Baru: ${res.lapak_name || 'Lapak Anda'} (${rating}/5 Bintang)`,
+            description: `${res.reviewer_name || 'Member'} (${res.reviewer_kta || 'KTA MB INA'}): "${content.substring(0, 75)}..."`,
+            timestamp: 'Baru saja',
+            timeISO: new Date().toISOString(),
+            isRead: false,
+            iconType: 'check-circle',
+            targetRole: ['MEMBER', 'SPONSOR', 'SUPER_ADMIN'],
+            targetUserId: res.owner_id || null,
+            actionText: 'Lihat Ulasan',
+            actionHandler: "AppEngine.openMemberLapakModal('ALL', 'reviews');"
+          };
+          const customNotifs = JSON.parse(localStorage.getItem('mbcina_notifications_custom') || '[]');
+          customNotifs.unshift(newNotif);
+          localStorage.setItem('mbcina_notifications_custom', JSON.stringify(customNotifs));
+
+          if (window.NotificationEngine && typeof window.NotificationEngine.updateBadgeCounters === 'function') {
+            window.NotificationEngine.updateBadgeCounters();
+          }
+        } catch(eNotif) {}
 
         if (window.M7Engine && typeof window.M7Engine.fetchData === 'function') {
           await window.M7Engine.fetchData();
@@ -2264,7 +2399,48 @@ const AppEngine = {
       return s;
     };
 
+    // Calculate merchant reputation and received reviews
+    const allReviews = (window.M7Engine && Array.isArray(window.M7Engine.data?.reviews)) ? window.M7Engine.data.reviews : [];
+    const myLapakReviews = allReviews.filter(r => myLapakIds.includes(r.lapak_id));
+    const avgRating = myLapakReviews.length 
+      ? (myLapakReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0) / myLapakReviews.length).toFixed(1)
+      : (myLapakIds.length ? '5.0' : '-');
+    const starsIcon = myLapakReviews.length ? '⭐'.repeat(Math.min(5, Math.round(Number(avgRating)))) : '⭐ Belum Ada Ulasan';
+
+    const myLapakFirst = lapaks.find(l => myLapakIds.includes(l.id));
+    const storeName = myLapakFirst ? myLapakFirst.name : (userName ? ('Lapak ' + u.name) : 'Lapak Saya');
+    const storeCode = myLapakFirst ? myLapakFirst.lapak_code : 'MERCHANT';
+
+    let reputationBanner = '';
+    if (myLapakIds.length > 0 || myAds.length > 0) {
+      reputationBanner = `
+        <div style="background:linear-gradient(135deg, rgba(245,158,11,0.09) 0%, rgba(15,23,42,0.9) 100%); border:1px solid rgba(245,158,11,0.3); border-radius:14px; padding:18px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div style="display:flex; align-items:center; gap:14px; min-width:240px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:rgba(245,158,11,0.15); border:1px solid var(--accent-gold); display:flex; align-items:center; justify-content:center; font-size:1.6rem;">🏪</div>
+            <div>
+              <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Reputasi & Skor Lapak Saya</div>
+              <div style="font-size:1.05rem; font-weight:800; color:#fff;">${storeName} <span style="font-size:0.75rem; color:var(--accent-gold); font-family:monospace;">(${storeCode})</span></div>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+                <span style="font-size:1.2rem; font-weight:900; color:var(--accent-gold); font-family:monospace;">${avgRating}</span>
+                <span style="font-size:0.95rem;">${starsIcon}</span>
+                <span style="font-size:0.78rem; color:#cbd5e1; font-weight:600;">(${myLapakReviews.length} Ulasan Masuk)</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 14px; border-color:var(--accent-gold); color:var(--accent-gold); font-weight:700; border-radius:8px; display:flex; align-items:center; gap:4px; cursor:pointer;" onclick="AppEngine.openMemberLapakModal('ALL', 'reviews')">
+              ⭐ Lihat Semua Ulasan (${myLapakReviews.length})
+            </button>
+            <button type="button" class="btn-primary" style="font-size:0.78rem; padding:8px 16px; font-weight:800; border-radius:8px; cursor:pointer;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan', document.querySelectorAll('.member-lapak-subtab')[2])">
+              + Pasang Iklan Baru
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
     container.innerHTML = `
+      ${reputationBanner}
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <span style="font-size:0.85rem; font-weight:800; color:#fff;">Daftar Iklan Saya (${myAds.length})</span>
         <button class="btn-primary" style="font-size:0.75rem; padding:6px 12px; font-weight:800;" onclick="AppEngine._switchMemberLapakSubtab('pasangiklan', document.querySelectorAll('.member-lapak-subtab')[2])">+ Pasang Iklan Baru</button>

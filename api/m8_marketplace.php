@@ -500,9 +500,41 @@ switch ($action) {
             $sPdo->prepare("INSERT INTO lapak_reviews (id, lapak_id, user_id, rating, content) VALUES (?, ?, ?, ?, ?)")
                  ->execute([$revId, $lapakId, $userId, $rating, $content]);
 
-            logAudit($userId, 'CREATE', 'E_COMMERCE_REVIEW', ['review_id' => $revId, 'rating' => $rating]);
+            // Get Lapak Info and Owner User ID
+            $stmtLapak = $sPdo->prepare("SELECT name, user_id, contact_whatsapp FROM lapak WHERE id = ?");
+            $stmtLapak->execute([$lapakId]);
+            $lapakInfo = $stmtLapak->fetch();
+            $ownerId = $lapakInfo['user_id'] ?? null;
+            $lapakName = $lapakInfo['name'] ?? 'Lapak MB INA';
 
-            echo json_encode(['success' => true, 'message' => 'Review & Rating berhasil dikirim!']);
+            // Get Reviewer Info
+            $stmtRev = $sPdo->prepare("SELECT name, username, member_id FROM users WHERE id = ?");
+            $stmtRev->execute([$userId]);
+            $revUser = $stmtRev->fetch();
+            $reviewerName = $revUser['name'] ?? $revUser['username'] ?? 'Member MB INA';
+            $reviewerKta = $revUser['member_id'] ?? 'E-KTA MB INA';
+
+            // Log activity / notification for the store owner
+            if ($ownerId) {
+                try {
+                    $actId = 'act_' . uniqid();
+                    $stars = str_repeat('⭐', $rating);
+                    $detail = "Lapak Anda '$lapakName' menerima penilaian $stars ($rating/5) dari $reviewerName ($reviewerKta): \"$content\"";
+                    $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (?, ?, 'MARKETPLACE_REVIEW', 'Ulasan Baru Diterima', ?)")
+                         ->execute([$actId, $ownerId, $detail]);
+                } catch (Exception $eAct) {}
+            }
+
+            logAudit($userId, 'CREATE', 'E_COMMERCE_REVIEW', ['review_id' => $revId, 'lapak_id' => $lapakId, 'rating' => $rating, 'owner_id' => $ownerId]);
+
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Review & Rating berhasil dikirim!',
+                'lapak_name' => $lapakName,
+                'owner_id' => $ownerId,
+                'reviewer_name' => $reviewerName,
+                'reviewer_kta' => $reviewerKta
+            ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
