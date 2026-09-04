@@ -1559,7 +1559,11 @@ const AppEngine = {
       window.M7Engine.openSewaLapakModal();
     } else {
       let modal = document.getElementById('modal-sewa-lapak-baru');
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.setProperty('display', 'flex', 'important');
+        document.body.style.overflow = 'hidden';
+      }
     }
   },
 
@@ -21839,50 +21843,66 @@ window.M7Engine = {
   },
 
   openSewaLapakModal: function() {
-    const user = AppEngine.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
-    const myLapak = (this.data && Array.isArray(this.data.lapak)) 
-      ? this.data.lapak.find(l => (l.user_id && (l.user_id === user.id || l.user_id === user.userId)) || (l.member_id && l.member_id === user.member_id))
-      : null;
+    const user = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+    const adminRoles = ['SUPER_ADMIN', 'ADMIN_ORGANISASI', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'PENGURUS_KLUB'];
+    const isAdmin = adminRoles.includes(user.role);
 
-    if (myLapak && user.role !== 'SUPER_ADMIN') {
-      if (confirm(`ℹ️ Anda sudah memiliki lapak resmi: "${myLapak.name}" (${myLapak.lapak_code}).\n\nSesuai regulasi MB Club INA, 1 member hanya diperbolehkan memiliki 1 lapak resmi untuk memasang banyak produk.\n\nApakah Anda ingin membuka form Tambah Produk untuk lapak Anda sekarang?`)) {
-        this.openProductModal(myLapak.id);
+    // Cek jika member biasa (non-admin) sudah memiliki lapak resmi terdaftar
+    if (!isAdmin && user.role !== 'GUEST' && user.id) {
+      const myLapak = (this.data && Array.isArray(this.data.lapak)) 
+        ? this.data.lapak.find(l => (l.user_id && (l.user_id === user.id || l.user_id === user.userId)) || (l.member_id && l.member_id === user.member_id))
+        : null;
+
+      if (myLapak) {
+        const bukaProduk = confirm(`ℹ️ Anda sudah memiliki lapak resmi: "${myLapak.name}" (${myLapak.lapak_code}).\n\nSesuai regulasi MB Club INA, 1 member hanya boleh memiliki 1 lapak resmi untuk memasang banyak produk.\n\nApakah Anda ingin membuka form Tambah Produk ke lapak Anda sekarang?`);
+        if (bukaProduk) {
+          this.openProductModal(myLapak.id);
+        }
+        return;
       }
-      return;
     }
 
     const modal = document.getElementById('modal-sewa-lapak-baru');
-    if (modal) {
-      modal.style.display = 'flex';
-
-      const userNameInput = document.getElementById('sewa-user-name');
-      const userMemberIdInput = document.getElementById('sewa-user-memberid');
-      const userTierInput = document.getElementById('sewa-user-tier');
-      const userPhoneInput = document.getElementById('sewa-form-phone');
-
-      const user = AppEngine.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
-      const memberName = user.name || 'Member MB INA';
-      const memberId = user.member_id || user.memberId || AppEngine.getOfficialMemberId(user) || 'MBINA-JAM-2026-000011';
-      const tierStr = (user.tier || 'BRONZE').toUpperCase();
-
-      if (userNameInput) userNameInput.value = memberName;
-      if (userMemberIdInput) userMemberIdInput.value = memberId;
-      if (userPhoneInput && user.phone) userPhoneInput.value = user.phone;
-
-      let tierBadgeStr = '🥉 BRONZE';
-      if (tierStr === 'PLATINUM') tierBadgeStr = '💎 PLATINUM';
-      else if (tierStr === 'GOLD') tierBadgeStr = '🥇 GOLD';
-      else if (tierStr === 'SILVER') tierBadgeStr = '🥈 SILVER';
-      else tierBadgeStr = '🥉 BRONZE';
-      if (userTierInput) userTierInput.value = tierBadgeStr;
-
-      this.recalculateSewaFee();
+    if (!modal) {
+      alert('Modal Sewa Lapak Baru tidak ditemukan di halaman.');
+      return;
     }
+
+    // Explicitly open modal with class active and important flex display
+    modal.classList.add('active');
+    modal.style.setProperty('display', 'flex', 'important');
+    document.body.style.overflow = 'hidden';
+
+    const userNameInput = document.getElementById('sewa-user-name');
+    const userMemberIdInput = document.getElementById('sewa-user-memberid');
+    const userTierInput = document.getElementById('sewa-user-tier');
+    const userPhoneInput = document.getElementById('sewa-form-phone');
+
+    const memberName = user.name || 'Member MB INA';
+    const memberId = user.member_id || user.memberId || window.AppEngine?.getOfficialMemberId?.(user) || 'MBINA-JKT-2026-000005';
+    const tierStr = (user.tier || 'BRONZE').toUpperCase();
+
+    if (userNameInput) userNameInput.value = memberName;
+    if (userMemberIdInput) userMemberIdInput.value = memberId;
+    if (userPhoneInput && user.phone) userPhoneInput.value = user.phone;
+
+    let tierBadgeStr = '🥉 BRONZE';
+    if (tierStr === 'PLATINUM') tierBadgeStr = '💎 PLATINUM';
+    else if (tierStr === 'GOLD') tierBadgeStr = '🥇 GOLD';
+    else if (tierStr === 'SILVER') tierBadgeStr = '🥈 SILVER';
+    else tierBadgeStr = '🥉 BRONZE';
+    if (userTierInput) userTierInput.value = tierBadgeStr;
+
+    this.recalculateSewaFee();
   },
 
   closeSewaModal: function() {
     const modal = document.getElementById('modal-sewa-lapak-baru');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.setProperty('display', 'none', 'important');
+    }
+    document.body.style.overflow = '';
   },
 
   recalculateSewaFee: function() {
