@@ -17716,19 +17716,19 @@ const M6Engine = {
       let actionBtnHtml = '';
 
       if (sp.status === 'WAITING_BENDAHARA') {
-        pipelineHtml = `<span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold);">⏳ Level 1: Menunggu Bendahara</span>`;
+        pipelineHtml = `<span class="tier-badge badge-status-pending">⏳ Level 1: Menunggu Bendahara</span>`;
         actionBtnHtml = `<button class="btn-primary" style="font-size:0.75rem; padding:4px 12px; font-weight:800; background:var(--accent-gold); color:#000;" onclick="M6Engine.openSponsorApprovalReviewModal('${sp.id}')">💰 Review Bendahara</button>`;
       } else if (sp.status === 'WAITING_PRESIDEN') {
-        pipelineHtml = `<span class="tier-badge" style="background:rgba(139,92,246,0.15); color:#8b5cf6; border:1px solid #8b5cf6;">⏳ Level 2: Menunggu Sekjen/Presiden</span>`;
+        pipelineHtml = `<span class="tier-badge badge-tier-platinum">⏳ Level 2: Menunggu Sekjen/Presiden</span>`;
         actionBtnHtml = `<button class="btn-primary" style="font-size:0.75rem; padding:4px 12px; font-weight:800; background:#8b5cf6; color:#fff;" onclick="M6Engine.openSponsorApprovalReviewModal('${sp.id}')">📋 Review Presiden</button>`;
       } else if (sp.status === 'WAITING_ADMIN') {
-        pipelineHtml = `<span class="tier-badge" style="background:rgba(59,130,246,0.15); color:var(--accent-blue); border:1px solid var(--accent-blue);">⏳ Level 3: Menunggu Admin Final</span>`;
+        pipelineHtml = `<span class="tier-badge badge-status-info">⏳ Level 3: Menunggu Admin Final</span>`;
         actionBtnHtml = `<button class="btn-primary" style="font-size:0.75rem; padding:4px 12px; font-weight:800; background:var(--accent-blue); color:#fff;" onclick="M6Engine.openSponsorApprovalReviewModal('${sp.id}')">🖥️ Review Admin</button>`;
       } else if (sp.status === 'CONFIRMED') {
-        pipelineHtml = `<span class="tier-badge" style="background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid var(--primary-emerald);">✅ CONFIRMED (AKTIF)</span>`;
+        pipelineHtml = `<span class="tier-badge badge-status-confirmed">✅ CONFIRMED (AKTIF)</span>`;
         actionBtnHtml = `<button class="btn-outline" style="font-size:0.75rem; padding:4px 12px;" onclick="M6Engine.openSponsorApprovalReviewModal('${sp.id}')">👁️ Lihat Detail</button>`;
       } else {
-        pipelineHtml = `<span class="tier-badge" style="background:rgba(239,68,68,0.15); color:var(--accent-red); border:1px solid var(--accent-red);">❌ DITOLAK</span>`;
+        pipelineHtml = `<span class="tier-badge badge-status-danger">❌ DITOLAK</span>`;
         actionBtnHtml = `<button class="btn-outline" style="font-size:0.75rem; padding:4px 12px; color:var(--accent-red);" onclick="M6Engine.openSponsorApprovalReviewModal('${sp.id}')">👁️ Lihat Alasan</button>`;
       }
 
@@ -20360,20 +20360,20 @@ window.M7Engine = {
 
     tbody.innerHTML = filtered.map((l, idx) => {
       const isExpired = l.sewa_status === 'EXPIRED' || (l.sewa_end_date && new Date(l.sewa_end_date) < new Date());
-      let statusBadge = `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); font-weight:800;">🟢 AKTIF</span>`;
+      let statusBadge = `<span class="tier-badge badge-status-active font-bold">🟢 AKTIF</span>`;
 
       if (l.sewa_status === 'ACTIVE' || l.sewa_status === 'APPROVED' || l.status === 'APPROVED' || l.is_active === true || l.is_active === 'true') {
         if (isExpired) {
-          statusBadge = `<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); font-weight:800;">🔴 EXPIRED</span>`;
+          statusBadge = `<span class="tier-badge badge-status-danger font-bold">🔴 EXPIRED</span>`;
         } else {
           statusBadge = `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); font-weight:800;">🟢 AKTIF</span>`;
         }
       } else if (l.sewa_status === 'REJECTED' || l.status === 'REJECTED') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); font-weight:800;">🔴 DITOLAK</span>`;
+        statusBadge = `<span class="tier-badge badge-status-danger font-bold">🔴 DITOLAK</span>`;
       } else if (l.sewa_status === 'REVISION' || l.status === 'REVISION') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(168,85,247,0.2); color:#a855f7; font-weight:800;">📝 REVISI</span>`;
+        statusBadge = `<span class="tier-badge badge-tier-platinum font-bold">📝 REVISI</span>`;
       } else {
-        statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-weight:800;">⏳ PENDING VERIFIKASI</span>`;
+        statusBadge = `<span class="tier-badge badge-status-pending font-bold">⏳ PENDING VERIFIKASI</span>`;
       }
 
       // Owner & Member ID
@@ -20382,24 +20382,24 @@ window.M7Engine = {
 
       // Tier & Discount mapping
       const tier = (l.tier || (l.user_id === 'usr_m3_001' ? 'GOLD' : (l.user_id === 'usr_m3_002' ? 'SILVER' : (l.user_id === 'usr_m3_003' ? 'BRONZE' : 'PLATINUM')))).toUpperCase();
-      let tierBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold);">🥇 GOLD</span>`;
+      let tierBadge = `<span class="tier-badge badge-tier-gold">🥇 GOLD</span>`;
       let discountStr = '15%';
       let feeMonthly = 4250;
 
       if (tier === 'PLATINUM') {
-        tierBadge = `<span class="tier-badge" style="background:rgba(59,130,246,0.2); color:var(--accent-blue);">💎 PLATINUM</span>`;
+        tierBadge = `<span class="tier-badge badge-tier-platinum">💎 PLATINUM</span>`;
         discountStr = '20%';
         feeMonthly = 4000;
       } else if (tier === 'GOLD') {
-        tierBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold);">🥇 GOLD</span>`;
+        tierBadge = `<span class="tier-badge badge-tier-gold">🥇 GOLD</span>`;
         discountStr = '15%';
         feeMonthly = 4250;
       } else if (tier === 'SILVER') {
-        tierBadge = `<span class="tier-badge" style="background:rgba(148,163,184,0.2); color:#c0c0c0;">🥈 SILVER</span>`;
+        tierBadge = `<span class="tier-badge badge-tier-silver">🥈 SILVER</span>`;
         discountStr = '10%';
         feeMonthly = 4500;
       } else if (tier === 'BRONZE') {
-        tierBadge = `<span class="tier-badge" style="background:rgba(217,119,6,0.2); color:#cd7f32;">🥉 BRONZE</span>`;
+        tierBadge = `<span class="tier-badge badge-tier-bronze">🥉 BRONZE</span>`;
         discountStr = '5%';
         feeMonthly = 4750;
       }
@@ -20694,11 +20694,11 @@ window.M7Engine = {
 
     tbody.innerHTML = myProducts.map((p, idx) => {
       const statusStr = (p.status || 'PENDING').toUpperCase();
-      let statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.2); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.75rem; font-weight:800;">● ⏳ MENUNGGU VERIFIKASI</span>`;
+      let statusBadge = `<span class="tier-badge badge-status-pending font-bold text-xs">● ⏳ MENUNGGU VERIFIKASI</span>`;
       if (statusStr === 'APPROVED') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(16,185,129,0.2); color:var(--primary-emerald); border:1px solid var(--primary-emerald); font-size:0.75rem; font-weight:800;">● ✅ DISETUJUI</span>`;
+        statusBadge = `<span class="tier-badge badge-status-confirmed font-bold text-xs">● ✅ DISETUJUI</span>`;
       } else if (statusStr === 'REJECTED') {
-        statusBadge = `<span class="tier-badge" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); font-size:0.75rem; font-weight:800;">● ❌ DITOLAK</span>`;
+        statusBadge = `<span class="tier-badge badge-status-danger font-bold text-xs">● ❌ DITOLAK</span>`;
       } else if (statusStr === 'REVISION') {
         statusBadge = `<span class="tier-badge" style="background:rgba(245,158,11,0.25); color:#3b82f6; border:1px solid #3b82f6; font-size:0.75rem; font-weight:800;">● 📝 REVISI</span>`;
       }

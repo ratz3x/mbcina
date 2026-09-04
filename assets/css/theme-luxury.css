@@ -1,0 +1,584 @@
+/* ==========================================================================
+   MERCEDES-BENZ CLUB INDONESIA (MB CLUB INA)
+   GLOBAL LUXURY DESIGN SYSTEM & UTILITY STYLESHEET
+   File: assets/css/theme-luxury.css
+   Version: 1.0 (Executive Automotive Luxury Specification)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. DESIGN TOKENS & CSS VARIABLES
+   -------------------------------------------------------------------------- */
+:root {
+  /* Obsidian & Chrome Surface Colors */
+  --lx-bg-deep: #07090e;
+  --lx-bg-surface: #0b0f19;
+  --lx-bg-card: rgba(14, 19, 31, 0.75);
+  --lx-bg-glass: rgba(11, 15, 25, 0.72);
+  --lx-bg-glass-heavy: rgba(10, 14, 23, 0.92);
+  --lx-bg-glass-subtle: rgba(255, 255, 255, 0.03);
+  --lx-bg-glass-hover: rgba(255, 255, 255, 0.06);
+
+  /* Mercedes Luxury Champagne Gold & Amber */
+  --lx-gold-primary: #d4af37;
+  --lx-gold-light: #f59e0b;
+  --lx-gold-bright: #fbbf24;
+  --lx-gold-dark: #b89628;
+  --lx-gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --lx-gold-gradient-hover: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  --lx-gold-glow: rgba(245, 158, 11, 0.28);
+  --lx-gold-subtle: rgba(245, 158, 11, 0.12);
+  --lx-gold-border: rgba(245, 158, 11, 0.35);
+
+  /* Automotive Silver & Chrome Accents */
+  --lx-silver-primary: #cbd5e1;
+  --lx-silver-light: #e2e8f0;
+  --lx-silver-dark: #64748b;
+  --lx-silver-gradient: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  --lx-silver-gradient-hover: linear-gradient(135deg, #475569 0%, #334155 100%);
+  --lx-silver-glow: rgba(203, 213, 225, 0.15);
+  --lx-silver-border: rgba(226, 232, 240, 0.2);
+
+  /* Electric Cyan & Royal Blue */
+  --lx-blue-primary: #38bdf8;
+  --lx-blue-accent: #60a5fa;
+  --lx-blue-subtle: rgba(56, 189, 248, 0.12);
+  --lx-blue-border: rgba(56, 189, 248, 0.3);
+
+  /* Status Tokens */
+  --lx-emerald-primary: #10b981;
+  --lx-emerald-accent: #34d399;
+  --lx-emerald-subtle: rgba(16, 185, 129, 0.14);
+  --lx-emerald-border: rgba(16, 185, 129, 0.3);
+
+  --lx-ruby-primary: #f43f5e;
+  --lx-ruby-accent: #fb7185;
+  --lx-ruby-subtle: rgba(244, 63, 94, 0.14);
+  --lx-ruby-border: rgba(244, 63, 94, 0.3);
+
+  --lx-platinum-purple: #a855f7;
+  --lx-platinum-subtle: rgba(168, 85, 247, 0.15);
+  --lx-platinum-border: rgba(168, 85, 247, 0.35);
+
+  /* Typography & Layout */
+  --lx-text-heading: #ffffff;
+  --lx-text-main: #f8fafc;
+  --lx-text-muted: #94a3b8;
+  --lx-text-dim: #64748b;
+
+  --lx-border-subtle: rgba(255, 255, 255, 0.08);
+  --lx-border-bright: rgba(255, 255, 255, 0.18);
+  --lx-shadow-card: 0 12px 36px rgba(0, 0, 0, 0.45);
+  --lx-shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --lx-shadow-modal: 0 25px 70px rgba(0, 0, 0, 0.85);
+
+  --lx-blur-panel: blur(20px);
+  --lx-blur-card: blur(14px);
+  --lx-radius-card: 16px;
+  --lx-radius-panel: 20px;
+  --lx-radius-badge: 20px;
+  --lx-radius-btn: 12px;
+}
+
+/* Light Mode Overrides */
+body.light-mode {
+  --lx-bg-deep: #f8fafc;
+  --lx-bg-surface: #ffffff;
+  --lx-bg-card: rgba(255, 255, 255, 0.92);
+  --lx-bg-glass: rgba(255, 255, 255, 0.88);
+  --lx-bg-glass-heavy: rgba(255, 255, 255, 0.95);
+  --lx-bg-glass-subtle: rgba(0, 0, 0, 0.02);
+  --lx-bg-glass-hover: rgba(0, 0, 0, 0.05);
+
+  --lx-gold-primary: #b45309;
+  --lx-gold-light: #d97706;
+  --lx-gold-bright: #d97706;
+  --lx-gold-dark: #92400e;
+  --lx-gold-gradient: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  --lx-gold-gradient-hover: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --lx-gold-glow: rgba(217, 119, 6, 0.18);
+  --lx-gold-subtle: rgba(217, 119, 6, 0.08);
+  --lx-gold-border: rgba(217, 119, 6, 0.3);
+
+  --lx-silver-primary: #475569;
+  --lx-silver-light: #1e293b;
+  --lx-silver-dark: #94a3b8;
+  --lx-silver-gradient: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  --lx-silver-gradient-hover: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  --lx-silver-border: rgba(100, 116, 139, 0.25);
+
+  --lx-text-heading: #0f172a;
+  --lx-text-main: #1e293b;
+  --lx-text-muted: #64748b;
+  --lx-text-dim: #94a3b8;
+
+  --lx-border-subtle: rgba(0, 0, 0, 0.08);
+  --lx-border-bright: rgba(0, 0, 0, 0.16);
+  --lx-shadow-card: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --lx-shadow-panel: 0 16px 40px rgba(0, 0, 0, 0.08);
+  --lx-shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   2. GLASSMORPHISM COMPONENT SYSTEM
+   -------------------------------------------------------------------------- */
+.glass-panel,
+.lx-panel {
+  background: var(--lx-bg-glass-heavy);
+  backdrop-filter: var(--lx-blur-panel);
+  -webkit-backdrop-filter: var(--lx-blur-panel);
+  border: 1px solid var(--lx-border-subtle);
+  border-radius: var(--lx-radius-panel);
+  box-shadow: var(--lx-shadow-panel);
+  color: var(--lx-text-main);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.glass-card,
+.lx-card {
+  background: var(--lx-bg-card);
+  backdrop-filter: var(--lx-blur-card);
+  -webkit-backdrop-filter: var(--lx-blur-card);
+  border: 1px solid var(--lx-border-subtle);
+  border-radius: var(--lx-radius-card);
+  box-shadow: var(--lx-shadow-card);
+  color: var(--lx-text-main);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+/* Card Accent Variations */
+.glass-card-gold,
+.lx-card-gold {
+  background: var(--lx-bg-card);
+  backdrop-filter: var(--lx-blur-card);
+  border: 1px solid var(--lx-gold-border);
+  border-radius: var(--lx-radius-card);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(245, 158, 11, 0.08);
+}
+
+.glass-card-gold:hover,
+.lx-card-gold:hover {
+  border-color: var(--lx-gold-primary);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--lx-gold-glow);
+  transform: translateY(-2px);
+}
+
+.glass-card-blue,
+.lx-card-blue {
+  background: var(--lx-bg-card);
+  backdrop-filter: var(--lx-blur-card);
+  border: 1px solid var(--lx-blue-border);
+  border-radius: var(--lx-radius-card);
+}
+
+.glass-card-interactive,
+.lx-card-interactive {
+  cursor: pointer;
+}
+
+.glass-card-interactive:hover,
+.lx-card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: var(--lx-border-bright);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* --------------------------------------------------------------------------
+   3. TIER & STATUS BADGES SYSTEM
+   -------------------------------------------------------------------------- */
+.tier-badge,
+.lx-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 3px 12px;
+  border-radius: var(--lx-radius-badge);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+}
+
+/* Specific Membership Tiers */
+.tier-badge.tier-platinum,
+.badge-tier-platinum {
+  background: var(--lx-platinum-subtle);
+  color: var(--lx-platinum-purple);
+  border: 1px solid var(--lx-platinum-border);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.15);
+}
+
+.tier-badge.tier-gold,
+.badge-tier-gold {
+  background: var(--lx-gold-subtle);
+  color: var(--lx-gold-bright);
+  border: 1px solid var(--lx-gold-border);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+}
+
+.tier-badge.tier-silver,
+.badge-tier-silver {
+  background: rgba(203, 213, 225, 0.12);
+  color: var(--lx-silver-primary);
+  border: 1px solid var(--lx-silver-border);
+}
+
+.tier-badge.tier-bronze,
+.badge-tier-bronze {
+  background: rgba(217, 119, 6, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+/* Status Indicators */
+.badge-status-confirmed,
+.badge-status-active,
+.badge-status-success {
+  background: var(--lx-emerald-subtle);
+  color: var(--lx-emerald-accent);
+  border: 1px solid var(--lx-emerald-border);
+}
+
+.badge-status-pending,
+.badge-status-waiting,
+.badge-status-warning {
+  background: var(--lx-gold-subtle);
+  color: var(--lx-gold-bright);
+  border: 1px solid var(--lx-gold-border);
+}
+
+.badge-status-rejected,
+.badge-status-danger,
+.badge-status-suspended {
+  background: var(--lx-ruby-subtle);
+  color: var(--lx-ruby-accent);
+  border: 1px solid var(--lx-ruby-border);
+}
+
+.badge-status-neutral,
+.badge-status-info {
+  background: var(--lx-blue-subtle);
+  color: var(--lx-blue-primary);
+  border: 1px solid var(--lx-blue-border);
+}
+
+/* --------------------------------------------------------------------------
+   4. BUTTON SYSTEM (PRIMARY, SECONDARY, OUTLINE)
+   -------------------------------------------------------------------------- */
+.btn-primary,
+.lx-btn-primary {
+  background: var(--lx-gold-gradient);
+  color: #000000 !important;
+  border: 1px solid var(--lx-gold-primary);
+  padding: 10px 22px;
+  border-radius: var(--lx-radius-btn);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px var(--lx-gold-glow);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.btn-primary:hover,
+.lx-btn-primary:hover {
+  background: var(--lx-gold-gradient-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+  color: #000000 !important;
+}
+
+.btn-primary:active,
+.lx-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary Button (Automotive Neutral Chrome / Silver) */
+.btn-secondary,
+.lx-btn-secondary {
+  background: var(--lx-silver-gradient);
+  color: #ffffff !important;
+  border: 1px solid var(--lx-silver-border);
+  padding: 10px 22px;
+  border-radius: var(--lx-radius-btn);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+body.light-mode .btn-secondary,
+body.light-mode .lx-btn-secondary {
+  background: var(--lx-silver-gradient);
+  color: #0f172a !important;
+}
+
+.btn-secondary:hover,
+.lx-btn-secondary:hover {
+  background: var(--lx-silver-gradient-hover);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* Outline Button */
+.btn-outline,
+.lx-btn-outline {
+  background: var(--lx-bg-glass-subtle);
+  border: 1px solid var(--lx-border-subtle);
+  color: var(--lx-text-main);
+  padding: 10px 20px;
+  border-radius: var(--lx-radius-btn);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.btn-outline:hover,
+.lx-btn-outline:hover {
+  border-color: var(--lx-gold-primary);
+  color: var(--lx-gold-bright);
+  background: var(--lx-gold-subtle);
+  transform: translateY(-1px);
+}
+
+/* Danger Subtle Button */
+.btn-danger-subtle,
+.lx-btn-danger-subtle {
+  background: var(--lx-ruby-subtle);
+  border: 1px solid var(--lx-ruby-border);
+  color: var(--lx-ruby-accent);
+  padding: 8px 16px;
+  border-radius: var(--lx-radius-btn);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-danger-subtle:hover,
+.lx-btn-danger-subtle:hover {
+  background: rgba(244, 63, 94, 0.25);
+  border-color: var(--lx-ruby-primary);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   5. MODAL SYSTEM (BACKDROP, CONTAINER, HEADER, BODY, CLOSE BUTTON)
+   -------------------------------------------------------------------------- */
+.modal-backdrop,
+.modal-overlay,
+.lx-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(7, 9, 14, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.modal-container,
+.lx-modal-container {
+  background: rgba(10, 14, 23, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--lx-border-bright);
+  border-radius: 22px;
+  box-shadow: var(--lx-shadow-modal);
+  width: 100%;
+  max-width: 720px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  color: var(--lx-text-main);
+  animation: lxModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes lxModalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+body.light-mode .modal-container,
+body.light-mode .lx-modal-container {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.18);
+}
+
+.modal-header,
+.lx-modal-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--lx-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.modal-title,
+.lx-modal-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--lx-text-heading);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-close-btn,
+.lx-modal-close-btn {
+  background: var(--lx-bg-glass-subtle);
+  border: 1px solid var(--lx-border-subtle);
+  color: var(--lx-text-muted);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1;
+}
+
+.modal-close-btn:hover,
+.lx-modal-close-btn:hover {
+  background: var(--lx-ruby-subtle);
+  border-color: var(--lx-ruby-border);
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.modal-body,
+.lx-modal-body {
+  padding: 24px;
+  overflow-y: auto !important;
+  flex: 1 1 auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-footer,
+.lx-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--lx-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode .modal-footer,
+body.light-mode .lx-modal-footer {
+  background: #f8fafc;
+}
+
+/* --------------------------------------------------------------------------
+   6. LUXURY FORM UTILITIES
+   -------------------------------------------------------------------------- */
+.form-input,
+.lx-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--lx-border-subtle);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--lx-text-main);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.form-input:focus,
+.lx-input:focus {
+  border-color: var(--lx-gold-primary);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 2px var(--lx-gold-subtle);
+}
+
+body.light-mode .form-input,
+body.light-mode .lx-input {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+body.light-mode .form-input:focus,
+body.light-mode .lx-input:focus {
+  border-color: var(--lx-gold-primary);
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+/* --------------------------------------------------------------------------
+   7. SCROLLBARS & ACCESSIBILITY
+   -------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.35);
+}
+
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(180, 83, 9, 0.4);
+}
