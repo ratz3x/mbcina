@@ -5963,28 +5963,35 @@
 
           <!-- 1. HERO SECTION -->
           <section class="v2-hero-wrap">
-            <img src="assets/gwagon_hero.jpg" alt="Mercedes-Benz G-Wagon G-Class" class="v2-hero-bg">
-            <div class="v2-hero-overlay"></div>
-            <div class="v2-hero-content">
-              <div class="v2-gold-pill">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>OFFICIAL PORTAL MB CLUB INDONESIA</span>
+            <div class="v2-hero-grid">
+              <div class="v2-hero-content">
+                <div class="v2-gold-pill">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span>OFFICIAL PORTAL MB CLUB INDONESIA</span>
+                </div>
+                <h1 class="font-v2-serif v2-hero-title">
+                  <span style="display:block; font-weight:400; letter-spacing:0.02em;">The Home of</span>
+                  <span class="font-v2-italic" style="display:block; font-weight:700; background:linear-gradient(135deg,#FFF5D6 0%,#DFBA73 50%,#9E7518 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Star Enthusiasts</span>
+                </h1>
+                <p style="font-size:1.02rem; color:#cbd5e1; line-height:1.7; margin-bottom:28px; max-width:540px;">
+                  Wadah resmi pemersatu seluruh klub dan komunitas Mercedes-Benz di seluruh nusantara. Membangun solidaritas, menjaga nilai persaudaraan, dan merawat passion otomotif legendaris.
+                </p>
+                <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
+                  <button type="button" class="btn-primary" data-open-modal="modal-register" style="padding:12px 26px; font-size:0.9rem; font-weight:800; border-radius:12px; background:linear-gradient(135deg, #dfba73 0%, #b8860b 100%); color:#000; box-shadow:0 8px 25px rgba(223,186,115,0.4); display:inline-flex; align-items:center; gap:8px;">
+                    <span>Gabung Sekarang</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </button>
+                  <button type="button" onclick="document.getElementById('v2-tentang-section').scrollIntoView({behavior:'smooth'})" style="padding:12px 24px; font-size:0.9rem; font-weight:600; border-radius:12px; background:rgba(255,255,255,0.04); color:#e2e8f0; border:1px solid rgba(255,255,255,0.18); backdrop-filter:blur(8px); cursor:pointer; transition:all 0.2s;" onmouseenter="this.style.borderColor='rgba(223,186,115,0.5)'; this.style.color='#fff';" onmouseleave="this.style.borderColor='rgba(255,255,255,0.18)'; this.style.color='#e2e8f0';">
+                    Jelajahi Portal
+                  </button>
+                </div>
               </div>
-              <h1 class="font-v2-serif v2-hero-title">
-                <span style="display:block; font-weight:400; letter-spacing:0.02em;">The Home of</span>
-                <span class="font-v2-italic" style="display:block; font-weight:700; background:linear-gradient(135deg,#FFF5D6 0%,#D4AF37 50%,#9E7518 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Star Enthusiasts</span>
-              </h1>
-              <p style="font-size:1.05rem; color:#cbd5e1; line-height:1.7; margin-bottom:28px; max-width:580px;">
-                Wadah resmi pemersatu seluruh klub dan komunitas Mercedes-Benz di seluruh nusantara. Membangun solidaritas, menjaga nilai persaudaraan, dan merawat passion otomotif legendaris.
-              </p>
-              <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
-                <button type="button" class="btn-primary" data-open-modal="modal-register" style="padding:12px 26px; font-size:0.9rem; font-weight:800; border-radius:12px; background:linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color:#000; box-shadow:0 8px 25px rgba(212,175,55,0.4); display:inline-flex; align-items:center; gap:8px;">
-                  <span>Gabung Sekarang</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                </button>
-                <button type="button" onclick="document.getElementById('v2-tentang-section').scrollIntoView({behavior:'smooth'})" style="padding:12px 24px; font-size:0.9rem; font-weight:600; border-radius:12px; background:rgba(255,255,255,0.04); color:#e2e8f0; border:1px solid rgba(255,255,255,0.18); backdrop-filter:blur(8px); cursor:pointer; transition:all 0.2s;" onmouseenter="this.style.borderColor='rgba(212,175,55,0.5)'; this.style.color='#fff';" onmouseleave="this.style.borderColor='rgba(255,255,255,0.18)'; this.style.color='#e2e8f0';">
-                  Jelajahi Portal
-                </button>
+
+              <!-- Dedicated Horizontal G-Wagon Image Stage -->
+              <div class="v2-hero-car-col">
+                <div class="v2-hero-car-card">
+                  <img src="assets/gwagon_hero.jpg" alt="Mercedes-Benz G-Wagon G-Class AMG">
+                </div>
               </div>
             </div>
           </section>
