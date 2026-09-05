@@ -5002,11 +5002,10 @@ const AppEngine = {
 
     const wallHtml = displayItems.map(s => `
       <div style="background:rgba(15,23,42,0.8); border:1px solid ${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.35)' : 'rgba(245,158,11,0.35)'}; border-radius:14px; padding:16px; position:relative; overflow:hidden;">
-        <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:800; background:${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.15)' : 'rgba(245,158,11,0.15)'}; color:${s.tier.includes('SILVER') ? '#cbd5e1' : '#fbbf24'}; padding:2px 8px; border-radius:10px; border:1px solid ${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.3)' : 'rgba(245,158,11,0.3)'};">${s.tier}</div>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-          <img src="${s.logo || 'assets/mb_badge.jpg'}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
-          <div style="padding-right:80px;">
-            <div style="font-weight:900; font-size:0.92rem; color:#fff;">${s.name || 'PT Sponsor'}</div>
+          <img src="${s.logo || 'assets/mb_badge.jpg'}" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:900; font-size:0.92rem; color:#fff; word-break:break-word;">${s.name || 'PT Sponsor'}</div>
             <div style="font-size:0.72rem; color:${s.tier.includes('SILVER') ? '#cbd5e1' : 'var(--accent-gold)'}; font-weight:700;">${s.partner_name || s.category || 'Official Partner'}</div>
           </div>
         </div>
