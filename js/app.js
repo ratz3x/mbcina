@@ -134,6 +134,7 @@ const AppEngine = {
       this.fetchDonationData();
       this.renderTestimonials();
       this.updateLandingCounters();
+      this.initLandingVersion();
     }, 20);
   },
 
@@ -265,6 +266,9 @@ const AppEngine = {
     document.body.classList.remove('yt-has-sidebar');
 
     this.updateHeaderNavPillsActive('nav-btn-home');
+    if (typeof this.initLandingVersion === 'function') this.initLandingVersion();
+    if (typeof this.renderLandingSponsors === 'function') this.renderLandingSponsors();
+    if (typeof this.updateLandingCounters === 'function') this.updateLandingCounters();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
@@ -4317,6 +4321,14 @@ const AppEngine = {
     if (elClubs) elClubs.innerText = new Intl.NumberFormat('id-ID').format(totalClubs);
     if (elClubsSub) elClubsSub.innerText = `${totalRegions} Regional Wilayah`;
     if (elEvents) elEvents.innerText = new Intl.NumberFormat('id-ID').format(totalEvents);
+
+    // Also update Landing Page Versi 2 metrics
+    const v2Members = document.getElementById('v2-stat-members');
+    const v2Clubs = document.getElementById('v2-stat-clubs');
+    const v2Events = document.getElementById('v2-stat-events');
+    if (v2Members) v2Members.innerText = new Intl.NumberFormat('id-ID').format(totalMembers);
+    if (v2Clubs) v2Clubs.innerText = new Intl.NumberFormat('id-ID').format(totalClubs);
+    if (v2Events) v2Events.innerText = '5.000+';
   },
 
   showLoader(message = 'Memuat Data (Supabase Cloud)...') {
@@ -4972,9 +4984,9 @@ const AppEngine = {
   },
 
   renderSponsorGridWall() {
-    const container = document.getElementById('sponsor-grid-wall-container');
+    const containers = document.querySelectorAll('#sponsor-grid-wall-container, [id="sponsor-grid-wall-container"]');
     const badgeEl = document.getElementById('sponsor-wall-inventory-badge');
-    if (!container) return;
+    if (!containers.length) return;
 
     // RULE: SPONSOR GRID CARDS WALL KHUSUS UNTUK GOLD & SILVER SPONSORS
     const displayItems = this.sponsorGridWallItems || [];
@@ -4984,11 +4996,11 @@ const AppEngine = {
     }
 
     if (!displayItems.length) {
-      container.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Gold & Silver Sponsor aktif.</div>`;
+      containers.forEach(c => c.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Gold & Silver Sponsor aktif.</div>`);
       return;
     }
 
-    container.innerHTML = displayItems.map(s => `
+    const wallHtml = displayItems.map(s => `
       <div style="background:rgba(15,23,42,0.8); border:1px solid ${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.35)' : 'rgba(245,158,11,0.35)'}; border-radius:14px; padding:16px; position:relative; overflow:hidden;">
         <div style="position:absolute; top:10px; right:10px; font-size:0.65rem; font-weight:800; background:${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.15)' : 'rgba(245,158,11,0.15)'}; color:${s.tier.includes('SILVER') ? '#cbd5e1' : '#fbbf24'}; padding:2px 8px; border-radius:10px; border:1px solid ${s.tier.includes('SILVER') ? 'rgba(203,213,225,0.3)' : 'rgba(245,158,11,0.3)'};">${s.tier}</div>
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
@@ -5005,15 +5017,17 @@ const AppEngine = {
         </div>
       </div>
     `).join('');
+
+    containers.forEach(c => c.innerHTML = wallHtml);
   },
 
   renderSponsorCarouselFrame() {
-    const container = document.getElementById('landing-sponsors-grid-container');
-    if (!container || !this.sponsorCarouselItems || !this.sponsorCarouselItems.length) return;
+    const containers = document.querySelectorAll('#landing-sponsors-grid-container, [id="landing-sponsors-grid-container"]');
+    if (!containers.length || !this.sponsorCarouselItems || !this.sponsorCarouselItems.length) return;
 
     const items = this.sponsorCarouselItems;
     if (!items.length) {
-      container.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Banner Rotator aktif terdaftar.</div>`;
+      containers.forEach(c => c.innerHTML = `<div style="grid-column:1/-1; padding:20px; text-align:center; color:var(--text-muted);">Belum ada Banner Rotator aktif terdaftar.</div>`);
       return;
     }
 
@@ -5021,7 +5035,7 @@ const AppEngine = {
     const current = items[this.sponsorCarouselIndex];
     const total = items.length;
 
-    container.innerHTML = `
+    const frameHtml = `
       <div class="glass-card" style="grid-column:1/-1; position:relative; width:100%; border-radius:20px; overflow:hidden; border:1.5px solid var(--accent-gold); background:#000; box-shadow:0 12px 35px rgba(0,0,0,0.6);" onmouseenter="AppEngine.stopSponsorCarouselTimer()" onmouseleave="AppEngine.startSponsorCarouselTimer()">
         
         <!-- MAIN SLIDE BANNER HERO STAGE (FULL-BLEED CLICKABLE BANNER) -->
@@ -5046,6 +5060,69 @@ const AppEngine = {
 
       </div>
     `;
+
+    containers.forEach(c => c.innerHTML = frameHtml);
+  },
+
+  // ============================================================
+  // 🌟 LANDING PAGE VERSION SWITCHER & V2 ENGINE
+  // ============================================================
+  currentLandingVersion: 'v2',
+
+  initLandingVersion() {
+    const savedVer = localStorage.getItem('mbina_landing_version') || 'v2';
+    this.toggleLandingVersion(savedVer, false);
+  },
+
+  toggleLandingVersion(version, save = true) {
+    this.currentLandingVersion = version || 'v2';
+    if (save) localStorage.setItem('mbina_landing_version', this.currentLandingVersion);
+
+    const v2Container = document.getElementById('landing-v2-container');
+    const v1Container = document.getElementById('landing-v1-container');
+    const btnV2 = document.getElementById('btn-toggle-v2');
+    const btnV1 = document.getElementById('btn-toggle-v1');
+
+    if (this.currentLandingVersion === 'v1') {
+      if (v2Container) v2Container.style.display = 'none';
+      if (v1Container) v1Container.style.display = 'block';
+
+      if (btnV1) {
+        btnV1.style.background = 'linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)';
+        btnV1.style.color = '#000';
+        btnV1.style.fontWeight = '800';
+        btnV1.style.boxShadow = '0 2px 10px rgba(212,175,55,0.35)';
+        btnV1.style.border = 'none';
+      }
+      if (btnV2) {
+        btnV2.style.background = 'rgba(255,255,255,0.05)';
+        btnV2.style.color = '#94a3b8';
+        btnV2.style.fontWeight = '600';
+        btnV2.style.boxShadow = 'none';
+        btnV2.style.border = '1px solid rgba(255,255,255,0.1)';
+      }
+    } else {
+      if (v1Container) v1Container.style.display = 'none';
+      if (v2Container) v2Container.style.display = 'block';
+
+      if (btnV2) {
+        btnV2.style.background = 'linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)';
+        btnV2.style.color = '#000';
+        btnV2.style.fontWeight = '800';
+        btnV2.style.boxShadow = '0 2px 10px rgba(212,175,55,0.35)';
+        btnV2.style.border = 'none';
+      }
+      if (btnV1) {
+        btnV1.style.background = 'rgba(255,255,255,0.05)';
+        btnV1.style.color = '#94a3b8';
+        btnV1.style.fontWeight = '600';
+        btnV1.style.boxShadow = 'none';
+        btnV1.style.border = '1px solid rgba(255,255,255,0.1)';
+      }
+    }
+
+    if (typeof this.updateLandingCounters === 'function') this.updateLandingCounters();
+    if (typeof this.renderLandingSponsors === 'function') this.renderLandingSponsors();
   },
 
   startSponsorCarouselTimer() {

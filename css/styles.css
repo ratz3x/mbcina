@@ -1,5 +1,5 @@
 /* Mercedes-Benz Club Indonesia (MB INA) Design System - HIGH-END EXECUTIVE REFINEMENTS */
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Outfit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Outfit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,600;1,700;1,800;1,900&family=Cinzel:wght@400;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap');
 
 :root {
   /* Obsidian Deep Matte Dark Mode Variables */
@@ -2462,6 +2462,223 @@ body.light-mode input:-webkit-autofill:active {
 .modal-footer {
   flex-shrink: 0 !important;
 }
+
+/* ============================================================ */
+/* 🌟 LANDING PAGE VERSI 2 - LUXURY DARK AUTOMOTIVE DESIGN SYSTEM */
+/* ============================================================ */
+.font-v2-serif {
+  font-family: 'Cinzel', Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+.font-v2-italic {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+.v2-gold-gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F5DEB3 25%, #D4AF37 60%, #AA7C11 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.v2-gold-gradient-subtle {
+  background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.v2-hero-wrap {
+  position: relative;
+  min-height: 82vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 80px 48px;
+  border-radius: 28px;
+  overflow: hidden;
+  margin-bottom: 48px;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  background: radial-gradient(circle at 75% 35%, rgba(212, 175, 55, 0.08) 0%, rgba(7, 9, 14, 0.95) 70%), #07090e;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85);
+}
+
+@media (max-width: 768px) {
+  .v2-hero-wrap {
+    padding: 48px 24px;
+    min-height: auto;
+  }
+}
+
+.v2-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  opacity: 0.42;
+  filter: contrast(1.15) brightness(0.85);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.v2-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.92) 45%, rgba(7, 9, 14, 0.4) 100%),
+              linear-gradient(180deg, rgba(7, 9, 14, 0.2) 0%, #07090e 100%);
+  z-index: 2;
+}
+
+.v2-hero-content {
+  position: relative;
+  z-index: 3;
+  max-width: 680px;
+}
+
+.v2-gold-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: #F5DEB3;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  backdrop-filter: blur(8px);
+}
+
+.v2-hero-title {
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 1.08;
+  margin-bottom: 22px;
+  color: #FFFFFF;
+}
+
+.v2-card-luxury {
+  background: rgba(14, 19, 31, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 32px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.v2-card-luxury:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(212, 175, 55, 0.1);
+  transform: translateY(-3px);
+}
+
+/* 💳 3D DIGITAL E-KTA MEMBERSHIP CARD (OBSIDIAN TITANIUM & GOLD) */
+.v2-ekta-card {
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 1.586 / 1;
+  background: linear-gradient(135deg, #1c1f26 0%, #0c0e14 50%, #151821 100%);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 18px;
+  padding: 24px 26px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.v2-ekta-card:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(-4px);
+  box-shadow: 0 35px 80px rgba(0, 0, 0, 0.9), 0 0 45px rgba(212, 175, 55, 0.3);
+}
+
+.v2-ekta-chip {
+  width: 44px;
+  height: 32px;
+  background: linear-gradient(135deg, #fce08a 0%, #dfb33b 50%, #9e7518 100%);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.v2-ekta-chip::after {
+  content: '';
+  position: absolute;
+  inset: 4px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 3px;
+}
+
+/* 🏎️ V2 EVENT CARD */
+.v2-event-card {
+  background: rgba(14, 19, 31, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.v2-event-card:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.12);
+}
+
+.v2-event-img-wrap {
+  width: 100%;
+  height: 180px;
+  position: relative;
+  overflow: hidden;
+  background: #0b0d14;
+}
+
+.v2-event-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.v2-event-card:hover .v2-event-img {
+  transform: scale(1.05);
+}
+
+/* 💬 V2 TESTIMONIAL CARD */
+.v2-quote-card {
+  background: rgba(14, 19, 31, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+
+.v2-quote-card:hover {
+  border-color: rgba(212, 175, 55, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
 
 
 

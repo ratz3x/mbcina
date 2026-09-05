@@ -5936,8 +5936,600 @@
     </div>
 
     <!-- VIEW A: LANDING PAGE -->
+        <!-- VIEW A: LANDING PAGE (DUAL VERSION: V2 LUXURY DARK + V1 CLASSIC) -->
     <div id="view-landing-page" class="view-container" style="display:none;">
-      <div style="max-width:1440px; margin:0 auto; padding:24px;">
+      <div style="max-width:1440px; margin:0 auto; padding:20px 24px;">
+
+        <!-- 🔄 TOP VERSION SWITCHER BAR -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding:10px 20px; background:rgba(14,19,31,0.7); border:1px solid rgba(212,175,55,0.25); border-radius:14px; backdrop-filter:blur(12px);">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="display:inline-flex; width:8px; height:8px; border-radius:50%; background:#d4af37; box-shadow:0 0 10px #d4af37;"></span>
+            <span style="font-size:0.8rem; font-weight:700; color:#e2e8f0; letter-spacing:0.06em; text-transform:uppercase;">Pilihan Tampilan Landing Page:</span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button id="btn-toggle-v2" type="button" onclick="AppEngine.toggleLandingVersion('v2')" style="font-size:0.75rem; font-weight:800; padding:6px 14px; border-radius:10px; cursor:pointer; background:linear-gradient(135deg, #d4af37 0%, #aa7c11 100%); color:#000; border:none; box-shadow:0 2px 10px rgba(212,175,55,0.35); transition:all 0.2s;">
+              ✨ Versi 2 (Modern Luxury)
+            </button>
+            <button id="btn-toggle-v1" type="button" onclick="AppEngine.toggleLandingVersion('v1')" style="font-size:0.75rem; font-weight:600; padding:6px 14px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,0.05); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); transition:all 0.2s;">
+              🏛️ Versi 1 (Classic)
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 🌟 LANDING PAGE VERSI 2 - LUXURY DARK AUTOMOTIVE (DEFAULT) -->
+        <!-- ============================================================ -->
+        <div id="landing-v2-container" style="display:block;">
+
+          <!-- 1. HERO SECTION -->
+          <section class="v2-hero-wrap">
+            <img src="assets/mb_hero.jpg" alt="Mercedes-Benz Club Indonesia" class="v2-hero-bg">
+            <div class="v2-hero-overlay"></div>
+            <div class="v2-hero-content">
+              <div class="v2-gold-pill">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>OFFICIAL PORTAL MB CLUB INDONESIA</span>
+              </div>
+              <h1 class="font-v2-serif v2-hero-title">
+                <span style="display:block; font-weight:400; letter-spacing:0.02em;">The Home of</span>
+                <span class="font-v2-italic" style="display:block; font-weight:700; background:linear-gradient(135deg,#FFF5D6 0%,#D4AF37 50%,#9E7518 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Star Enthusiasts</span>
+              </h1>
+              <p style="font-size:1.05rem; color:#cbd5e1; line-height:1.7; margin-bottom:28px; max-width:580px;">
+                Wadah resmi pemersatu seluruh klub dan komunitas Mercedes-Benz di seluruh nusantara. Membangun solidaritas, menjaga nilai persaudaraan, dan merawat passion otomotif legendaris.
+              </p>
+              <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center;">
+                <button type="button" class="btn-primary" data-open-modal="modal-register" style="padding:12px 26px; font-size:0.9rem; font-weight:800; border-radius:12px; background:linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color:#000; box-shadow:0 8px 25px rgba(212,175,55,0.4); display:inline-flex; align-items:center; gap:8px;">
+                  <span>Gabung Sekarang</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </button>
+                <button type="button" onclick="document.getElementById('v2-tentang-section').scrollIntoView({behavior:'smooth'})" style="padding:12px 24px; font-size:0.9rem; font-weight:600; border-radius:12px; background:rgba(255,255,255,0.04); color:#e2e8f0; border:1px solid rgba(255,255,255,0.18); backdrop-filter:blur(8px); cursor:pointer; transition:all 0.2s;" onmouseenter="this.style.borderColor='rgba(212,175,55,0.5)'; this.style.color='#fff';" onmouseleave="this.style.borderColor='rgba(255,255,255,0.18)'; this.style.color='#e2e8f0';">
+                  Jelajahi Portal
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. STATS & METRICS BAR -->
+          <section style="margin-bottom:60px; padding:32px 24px; background:rgba(14,19,31,0.5); border:1px solid rgba(255,255,255,0.06); border-radius:20px; backdrop-filter:blur(16px);">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:24px; text-align:center;">
+              <!-- Stat 1 -->
+              <div style="padding:12px 20px; border-right:1px solid rgba(255,255,255,0.08);">
+                <div id="v2-stat-members" class="font-v2-serif" style="font-size:3rem; font-weight:900; color:#d4af37; line-height:1;">18</div>
+                <div style="font-size:0.75rem; font-weight:800; color:#cbd5e1; letter-spacing:0.12em; text-transform:uppercase; margin-top:8px;">Regional Chapter</div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">Di 38 Provinsi Indonesia</div>
+              </div>
+              <!-- Stat 2 -->
+              <div style="padding:12px 20px; border-right:1px solid rgba(255,255,255,0.08);">
+                <div id="v2-stat-clubs" class="font-v2-serif" style="font-size:3rem; font-weight:900; color:#38bdf8; line-height:1;">111</div>
+                <div style="font-size:0.75rem; font-weight:800; color:#cbd5e1; letter-spacing:0.12em; text-transform:uppercase; margin-top:8px;">Klub Terdaftar Resmi</div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">Komunitas Terverifikasi</div>
+              </div>
+              <!-- Stat 3 -->
+              <div style="padding:12px 20px;">
+                <div id="v2-stat-events" class="font-v2-serif" style="font-size:3rem; font-weight:900; color:#10b981; line-height:1;">5.000+</div>
+                <div style="font-size:0.75rem; font-weight:800; color:#cbd5e1; letter-spacing:0.12em; text-transform:uppercase; margin-top:8px;">Anggota Aktif Terdaftar</div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">Pemilik Mercedes-Benz</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. VISI & MISI SECTION -->
+          <section id="v2-tentang-section" style="margin-bottom:64px;">
+            <div style="text-align:center; max-width:760px; margin:0 auto 36px auto;">
+              <span class="v2-gold-pill">TENTANG KAMI</span>
+              <h2 class="font-v2-serif" style="font-size:2.4rem; color:#ffffff; margin:0 0 6px 0;">Visi & Misi</h2>
+              <div class="font-v2-italic" style="font-size:1.6rem; color:#d4af37; margin-bottom:14px;">Mercedes-Benz Club Indonesia</div>
+              <p style="font-size:0.95rem; color:#94a3b8; line-height:1.7;">
+                Sebagai induk organisasi klub Mercedes-Benz resmi dan tertua di Indonesia yang diakui secara internasional, kami berkomitmen menjaga integritas, merawat warisan bintang tiga sudut, dan memajukan dunia otomotif nasional.
+              </p>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:24px;">
+              <!-- Card 1: Visi Utama -->
+              <div class="v2-card-luxury">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+                  <div style="width:44px; height:44px; border-radius:12px; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); display:flex; align-items:center; justify-content:center; color:#d4af37;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="font-v2-serif" style="font-size:1.3rem; color:#fff; margin:0;">Visi Utama</h3>
+                    <span style="font-size:0.75rem; color:#d4af37; font-weight:600;">Landasan Organisasi</span>
+                  </div>
+                </div>
+                <p style="font-size:0.95rem; color:#e2e8f0; line-height:1.8; font-style:italic; border-left:2px solid #d4af37; padding-left:16px; margin:0;">
+                  "Menjadi wadah komunitas otomotif Mercedes-Benz terbesar, terdepan, dan paling solid di Indonesia yang menjunjung tinggi persaudaraan, integritas, keselamatan berkendara, serta memberikan kontribusi nyata bagi bangsa."
+                </p>
+              </div>
+
+              <!-- Card 2: Misi Strategis -->
+              <div class="v2-card-luxury">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+                  <div style="width:44px; height:44px; border-radius:12px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); display:flex; align-items:center; justify-content:center; color:#34d399;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="font-v2-serif" style="font-size:1.3rem; color:#fff; margin:0;">Misi Strategis</h3>
+                    <span style="font-size:0.75rem; color:#34d399; font-weight:600;">Program Kerja Utama</span>
+                  </div>
+                </div>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
+                  <li style="display:flex; align-items:flex-start; gap:10px; font-size:0.88rem; color:#cbd5e1; line-height:1.5;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Mempererat persaudaraan dan solidaritas antar klub anggota di seluruh Indonesia.</span>
+                  </li>
+                  <li style="display:flex; align-items:flex-start; gap:10px; font-size:0.88rem; color:#cbd5e1; line-height:1.5;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Menjadi wadah aspirasi, informasi teknis, dan advokasi resmi bagi pecinta Mercedes-Benz.</span>
+                  </li>
+                  <li style="display:flex; align-items:flex-start; gap:10px; font-size:0.88rem; color:#cbd5e1; line-height:1.5;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Menginisiasi kegiatan sosial, keselamatan jalan raya (*road safety*), dan pelestarian mobil klasik.</span>
+                  </li>
+                  <li style="display:flex; align-items:flex-start; gap:10px; font-size:0.88rem; color:#cbd5e1; line-height:1.5;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Menjalin kemitraan strategis dengan Mercedes-Benz Indonesia, sponsor resmi, dan pemangku kepentingan.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. SPONSOR UTAMA & PLATINUM + ROTATOR IKLAN CAROUSEL + E-KTA PRIVILEGE -->
+          <section id="v2-sponsor-section" style="margin-bottom:64px;">
+            <div style="text-align:center; max-width:760px; margin:0 auto 36px auto;">
+              <span class="v2-gold-pill">PARTNERSHIP RESMI</span>
+              <h2 class="font-v2-serif" style="font-size:2.4rem; color:#ffffff; margin:0 0 6px 0;">Sponsor Utama &</h2>
+              <div class="font-v2-italic" style="font-size:1.6rem; color:#d4af37; margin-bottom:14px;">Platinum MB INA</div>
+              <p style="font-size:0.95rem; color:#94a3b8; line-height:1.7;">
+                Bekerja sama dengan brand terkemuka dalam memberikan benefit, diskon khusus, program perbankan prioritas, dan dukungan terbaik bagi seluruh anggota.
+              </p>
+            </div>
+
+            <!-- 📢 ACTIVE SPONSOR ROTATOR CAROUSEL STAGE (SLIDESHOW PLATINUM) -->
+            <div style="margin-bottom:32px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                <div style="font-size:0.75rem; font-weight:800; color:#d4af37; letter-spacing:0.1em; display:flex; align-items:center; gap:6px;">
+                  <span style="width:6px; height:6px; border-radius:50%; background:#d4af37; box-shadow:0 0 6px #d4af37;"></span>
+                  <span>ROTATOR IKLAN SPONSOR PLATINUM RESMI</span>
+                </div>
+                <div style="font-size:0.72rem; color:#64748b;">
+                  Otomatis berganti slide & interaktif
+                </div>
+              </div>
+              <div id="landing-sponsors-grid-container">
+                <!-- Rendered dynamically by AppEngine.renderLandingSponsors() -->
+              </div>
+            </div>
+
+            <!-- 💳 EXCLUSIVE MEMBER BENEFIT SPLIT-CARD WITH 3D E-KTA MEMBERSHIP CARD -->
+            <div class="v2-card-luxury" style="padding:40px; margin-bottom:32px; background:radial-gradient(circle at 80% 50%, rgba(212,175,55,0.08) 0%, rgba(14,19,31,0.7) 100%);">
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:36px; align-items:center;">
+                <!-- Left Details -->
+                <div>
+                  <div style="display:inline-flex; align-items:center; gap:8px; font-size:0.72rem; font-weight:800; color:#d4af37; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); padding:4px 12px; border-radius:9999px; margin-bottom:16px;">
+                    <span>BENEFIT MEMBER</span>
+                    <span>•</span>
+                    <span>CO-BRANDING RESMI</span>
+                  </div>
+                  <h3 class="font-v2-serif" style="font-size:1.8rem; color:#fff; line-height:1.25; margin:0 0 14px 0;">
+                    Eksklusif untuk<br>
+                    <span class="font-v2-italic" style="color:#d4af37;">Anggota MB Club INA</span>
+                  </h3>
+                  <p style="font-size:0.92rem; color:#cbd5e1; line-height:1.7; margin-bottom:20px;">
+                    Nikmati berbagai privilege istimewa bagi pemegang KTA Digital resmi: diskon suku cadang & servis resmi Mercedes-Benz, cashback pengisian BBM di SPBU rekanan, akses airport lounge, hingga tarif khusus akomodasi hotel di seluruh Indonesia.
+                  </p>
+
+                  <!-- 3 Feature Badges -->
+                  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px;">
+                    <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:6px 12px; font-size:0.78rem; color:#e2e8f0; display:inline-flex; align-items:center; gap:6px;">
+                      <span>🏷️</span>
+                      <span>Diskon Part 15-20%</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:6px 12px; font-size:0.78rem; color:#e2e8f0; display:inline-flex; align-items:center; gap:6px;">
+                      <span>⛽</span>
+                      <span>Cashback BBM 10%</span>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:6px 12px; font-size:0.78rem; color:#e2e8f0; display:inline-flex; align-items:center; gap:6px;">
+                      <span>✈️</span>
+                      <span>Lounge Bandara</span>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button type="button" class="btn-primary" data-open-modal="modal-register" style="padding:10px 20px; font-size:0.85rem; font-weight:700; border-radius:10px; background:var(--accent-gold); color:#000;">
+                      Aktivasi Benefit E-KTA →
+                    </button>
+                    <button type="button" onclick="AppEngine.switchNavTab('member')" class="btn-outline" style="padding:10px 18px; font-size:0.85rem; font-weight:600; border-radius:10px; border-color:rgba(255,255,255,0.2); color:#e2e8f0;">
+                      Daftar KTA Digital
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Right 3D Digital Membership Card -->
+                <div style="display:flex; justify-content:center; align-items:center;">
+                  <div class="v2-ekta-card">
+                    <!-- Top row: Brand & Star -->
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                      <div>
+                        <div style="font-size:0.68rem; letter-spacing:0.15em; font-weight:800; color:#d4af37; text-transform:uppercase;">Mercedes-Benz Club Indonesia</div>
+                        <div style="font-size:0.58rem; color:#94a3b8; letter-spacing:0.05em;">OFFICIAL FEDERATION E-KTA</div>
+                      </div>
+                      <!-- Star Logo Watermark -->
+                      <div style="width:36px; height:36px; border-radius:50%; border:1px solid rgba(212,175,55,0.5); display:flex; align-items:center; justify-content:center; background:rgba(212,175,55,0.1); color:#d4af37;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      </div>
+                    </div>
+
+                    <!-- Middle: Chip & Contactless -->
+                    <div style="display:flex; align-items:center; gap:14px; margin:16px 0;">
+                      <div class="v2-ekta-chip"></div>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.8" stroke-linecap="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                    </div>
+
+                    <!-- Bottom: Cardholder Info -->
+                    <div>
+                      <div style="font-family:monospace; font-size:0.95rem; font-weight:700; color:#fff; letter-spacing:0.12em; margin-bottom:8px;">
+                        MBINA-HQ-2026-000001
+                      </div>
+                      <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                        <div>
+                          <div style="font-size:0.58rem; color:#64748b; text-transform:uppercase; letter-spacing:0.08em;">CARDHOLDER</div>
+                          <div style="font-size:0.85rem; font-weight:800; color:#f8fafc; letter-spacing:0.05em;">DERIST TOURIANO</div>
+                        </div>
+                        <div style="text-align:right;">
+                          <div style="font-size:0.58rem; color:#64748b; text-transform:uppercase; letter-spacing:0.08em;">TIER</div>
+                          <div style="font-size:0.75rem; font-weight:800; color:#d4af37; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); padding:2px 8px; border-radius:4px;">PLATINUM</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 🤝 GOLD & SILVER SPONSORS WALL GRID -->
+            <div>
+              <div style="font-size:0.75rem; font-weight:800; color:#cbd5e1; letter-spacing:0.1em; margin-bottom:14px; text-transform:uppercase;">
+                Mitra Resmi Gold & Silver MB INA:
+              </div>
+              <div id="sponsor-grid-wall-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px;">
+                <!-- Rendered dynamically by AppEngine.renderSponsorGridWall() -->
+              </div>
+            </div>
+          </section>
+
+          <!-- 5. EVENT TERBARU SECTION -->
+          <section id="v2-event-section" style="margin-bottom:64px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; flex-wrap:wrap; gap:14px;">
+              <div>
+                <span class="v2-gold-pill">AGENDA RESMI</span>
+                <h2 class="font-v2-serif" style="font-size:2.4rem; color:#ffffff; margin:0 0 6px 0;">Event Terbaru</h2>
+                <div class="font-v2-italic" style="font-size:1.6rem; color:#d4af37;">MB INA</div>
+                <p style="font-size:0.92rem; color:#94a3b8; margin:6px 0 0 0;">
+                  Jadwal agenda touring, bakti sosial, dan jambore nasional mendatang di seluruh nusantara.
+                </p>
+              </div>
+              <button type="button" onclick="AppEngine.openMemberUpcomingEventsModal()" style="background:none; border:none; color:#d4af37; font-size:0.85rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseenter="this.style.textDecoration='underline';" onmouseleave="this.style.textDecoration='none';">
+                <span>Lihat Semua Agenda</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <!-- 5-CARD AUTOMOTIVE BENTO GRID -->
+            <div style="display:flex; flex-direction:column; gap:20px;">
+              <!-- Top Row: 3 Event Cards -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:20px;">
+                <!-- Event 1: Anniversary & Rakernas (Completed) -->
+                <div class="v2-event-card">
+                  <div class="v2-event-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800&q=80" alt="Rakernas MB INA" class="v2-event-img">
+                    <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); backdrop-filter:blur(8px); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">
+                      EVT-2026-012
+                    </div>
+                    <div style="position:absolute; top:12px; right:12px; background:rgba(148,163,184,0.25); border:1px solid rgba(148,163,184,0.4); backdrop-filter:blur(8px); padding:3px 10px; border-radius:9999px; font-size:0.68rem; font-weight:800; color:#cbd5e1;">
+                      SELESAI
+                    </div>
+                  </div>
+                  <div style="padding:20px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+                    <div>
+                      <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                        <span>📅 05 Sep 2026</span>
+                        <span>•</span>
+                        <span>📍 TOPGOLF Jakarta</span>
+                      </div>
+                      <h4 style="font-size:1.05rem; font-weight:800; color:#fff; margin:0 0 8px 0; line-height:1.4;">
+                        Mercedes-Benz Club 22nd Anniversary & Rakernas 2026
+                      </h4>
+                      <p style="font-size:0.8rem; color:#94a3b8; line-height:1.5; margin:0 0 16px 0;">
+                        Press Conference Jamnas XXI, Pelantikan Pengurus MB Club Indonesia 2025-2027, & HUT ke-22.
+                      </p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px;">
+                      <span style="font-size:0.72rem; color:#94a3b8;">150 Peserta Hadir</span>
+                      <button type="button" class="btn-outline" style="font-size:0.72rem; padding:4px 10px; border-radius:8px;" onclick="AppEngine.openMemberEventDetailModal('EVT-2026-012')">
+                        Arsip Event
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Event 2: Touring Yogyakarta (🔥 Event Terdekat) -->
+                <div class="v2-event-card" style="border-color:rgba(212,175,55,0.4); background:rgba(212,175,55,0.03);">
+                  <div class="v2-event-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80" alt="Touring Yogyakarta" class="v2-event-img">
+                    <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(212,175,55,0.4); backdrop-filter:blur(8px); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fbbf24; font-family:monospace;">
+                      EVT-2026-001
+                    </div>
+                    <div style="position:absolute; top:12px; right:12px; background:rgba(245,158,11,0.2); border:1px solid rgba(245,158,11,0.5); backdrop-filter:blur(8px); padding:3px 10px; border-radius:9999px; font-size:0.68rem; font-weight:800; color:#fbbf24;">
+                      🔥 EVENT TERDEKAT
+                    </div>
+                  </div>
+                  <div style="padding:20px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+                    <div>
+                      <div style="font-size:0.75rem; color:#fbbf24; font-weight:600; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                        <span>📅 13 - 14 Sep 2026</span>
+                        <span>•</span>
+                        <span>📍 Yogyakarta</span>
+                      </div>
+                      <h4 style="font-size:1.05rem; font-weight:800; color:#fff; margin:0 0 8px 0; line-height:1.4;">
+                        Touring & Bakti Sosial MB INA - Yogyakarta 2026
+                      </h4>
+                      <p style="font-size:0.8rem; color:#cbd5e1; line-height:1.5; margin:0 0 16px 0;">
+                        Touring tahunan menyusuri rute budaya, Gala Dinner chapter, dan penyerahan donasi panti asuhan.
+                      </p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px;">
+                      <span style="font-size:0.72rem; color:#fbbf24; font-weight:600;">HTM: Rp 350.000</span>
+                      <button type="button" class="btn-primary" style="font-size:0.72rem; padding:5px 12px; font-weight:800; border-radius:8px; background:var(--accent-gold); color:#000;" onclick="AppEngine.openMemberEventRegisterModal('EVT-2026-001','ONLINE')">
+                        Daftar Event
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Event 3: Grand Touring Sumatra -->
+                <div class="v2-event-card">
+                  <div class="v2-event-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80" alt="Trans Sumatra Rally" class="v2-event-img">
+                    <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); backdrop-filter:blur(8px); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">
+                      EVT-2026-003
+                    </div>
+                    <div style="position:absolute; top:12px; right:12px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); backdrop-filter:blur(8px); padding:3px 10px; border-radius:9999px; font-size:0.68rem; font-weight:700; color:#34d399;">
+                      PUBLISHED
+                    </div>
+                  </div>
+                  <div style="padding:20px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+                    <div>
+                      <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                        <span>📅 01 - 07 Okt 2026</span>
+                        <span>•</span>
+                        <span>📍 Medan - Padang</span>
+                      </div>
+                      <h4 style="font-size:1.05rem; font-weight:800; color:#fff; margin:0 0 8px 0; line-height:1.4;">
+                        Grand Touring Trans Sumatra & Celebes Rally 2026
+                      </h4>
+                      <p style="font-size:0.8rem; color:#94a3b8; line-height:1.5; margin:0 0 16px 0;">
+                        Petualangan lintas pulau menyusuri rute spektakuler Sumatra & Sulawesi, bakti sosial antar chapter.
+                      </p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px;">
+                      <span style="font-size:0.72rem; color:#34d399; font-weight:600;">HTM: Rp 1.500.000</span>
+                      <button type="button" class="btn-primary" style="font-size:0.72rem; padding:5px 12px; font-weight:700; border-radius:8px; background:rgba(255,255,255,0.1); color:#fff;" onclick="AppEngine.openMemberEventRegisterModal('EVT-2026-003','ONLINE')">
+                        Daftar Event
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bottom Row: 2 Wider Featured Cards -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:20px;">
+                <!-- Event 4: Jamnas XXI Surakarta -->
+                <div class="v2-event-card" style="flex-direction:row; flex-wrap:wrap;">
+                  <div style="flex:1; min-width:260px; height:200px; position:relative; overflow:hidden;">
+                    <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&q=80" alt="Jamnas XXI" style="width:100%; height:100%; object-fit:cover;">
+                    <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">EVT-2026-004</div>
+                  </div>
+                  <div style="flex:1.4; min-width:280px; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                      <span style="font-size:0.72rem; color:#38bdf8; font-weight:700;">JAMBORE NASIONAL • 20 - 22 NOV 2026</span>
+                      <h4 style="font-size:1.15rem; font-weight:800; color:#fff; margin:4px 0 8px 0;">Jambore Nasional MB INA XXI 2026</h4>
+                      <p style="font-size:0.8rem; color:#94a3b8; line-height:1.5; margin:0 0 14px 0;">
+                        Perhelatan akbar Jamnas XXI Surakarta menghadirkan 2.500+ anggota, kontes mobil klasik, dan festival otomotif budaya di Stadion Manahan Surakarta.
+                      </p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+                      <span style="font-size:0.72rem; color:#38bdf8; font-weight:700;">📍 Surakarta • Kuota 2.500</span>
+                      <button type="button" class="btn-primary" style="font-size:0.72rem; padding:5px 12px; font-weight:700; border-radius:8px; background:var(--accent-gold); color:#000;" onclick="AppEngine.openMemberEventDetailModal('EVT-2026-004')">Detail Jamnas</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Event 5: Jamnas XXV & Munas ICE BSD -->
+                <div class="v2-event-card" style="flex-direction:row; flex-wrap:wrap;">
+                  <div style="flex:1; min-width:260px; height:200px; position:relative; overflow:hidden;">
+                    <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800&q=80" alt="Jamnas XXV ICE BSD" style="width:100%; height:100%; object-fit:cover;">
+                    <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">EVT-2026-002</div>
+                  </div>
+                  <div style="flex:1.4; min-width:280px; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                      <span style="font-size:0.72rem; color:#a78bfa; font-weight:700;">MUNAS & JAMBORE • 20 - 22 NOV 2026</span>
+                      <h4 style="font-size:1.15rem; font-weight:800; color:#fff; margin:4px 0 8px 0;">Jamnas MB INA XXV & Musyawarah Nasional 2026</h4>
+                      <p style="font-size:0.8rem; color:#94a3b8; line-height:1.5; margin:0 0 14px 0;">
+                        Musyawarah Nasional akbar 110+ klub Mercedes-Benz se-Indonesia serta pameran mobil klasik legendaris di Hall ICE BSD City.
+                      </p>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+                      <span style="font-size:0.72rem; color:#a78bfa; font-weight:700;">📍 ICE BSD City • Kuota 500</span>
+                      <button type="button" class="btn-primary" style="font-size:0.72rem; padding:5px 12px; font-weight:700; border-radius:8px; background:var(--accent-gold); color:#000;" onclick="AppEngine.openMemberEventDetailModal('EVT-2026-002')">Detail Agenda</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 6. TESTIMONI MEMBER & PENGURUS SECTION -->
+          <section id="v2-testimoni-section" style="margin-bottom:64px;">
+            <div style="text-align:center; max-width:760px; margin:0 auto 36px auto;">
+              <span class="v2-gold-pill">TESTIMONIAL</span>
+              <h2 class="font-v2-serif" style="font-size:2.4rem; color:#ffffff; margin:0 0 6px 0;">Testimoni Member</h2>
+              <div class="font-v2-italic" style="font-size:1.6rem; color:#d4af37; margin-bottom:14px;">& Pengurus</div>
+              <p style="font-size:0.95rem; color:#94a3b8; line-height:1.7;">
+                Kisah dan pengalaman nyata dari para pembina, pengurus pusat, dan member mengenai kebanggaan menjadi bagian dari keluarga besar MB INA.
+              </p>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
+              <!-- Quote 1 -->
+              <div class="v2-quote-card">
+                <div>
+                  <div style="color:#d4af37; font-size:2.2rem; line-height:1; font-family:Georgia, serif; margin-bottom:12px;">“</div>
+                  <p style="font-size:0.92rem; color:#e2e8f0; line-height:1.7; margin:0 0 20px 0; font-style:italic;">
+                    Bergabung dengan MB INA membuka jejaring luar biasa di seluruh Indonesia. Semangat kekeluargaan dan gairah merawat bintang tiga sudut sangat terasa di setiap touring dan bakti sosial.
+                  </p>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; border-top:1px solid rgba(255,255,255,0.07); padding-top:16px;">
+                  <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg, #d4af37 0%, #aa7c11 100%); color:#000; font-weight:800; font-size:0.95rem; display:flex; align-items:center; justify-content:center;">
+                    BS
+                  </div>
+                  <div>
+                    <div style="font-size:0.92rem; font-weight:800; color:#fff;">Bambang Soesatyo</div>
+                    <div style="font-size:0.75rem; color:#d4af37;">Pembina MB Club Indonesia</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quote 2 -->
+              <div class="v2-quote-card">
+                <div>
+                  <div style="color:#d4af37; font-size:2.2rem; line-height:1; font-family:Georgia, serif; margin-bottom:12px;">“</div>
+                  <p style="font-size:0.92rem; color:#e2e8f0; line-height:1.7; margin:0 0 20px 0; font-style:italic;">
+                    Platform digital MB INA sangat memudahkan koordinasi antar 110+ klub dan pengurusan KTA secara real-time. Transparan, modern, dan sangat representatif untuk komunitas sebesar ini.
+                  </p>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; border-top:1px solid rgba(255,255,255,0.07); padding-top:16px;">
+                  <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); color:#fff; font-weight:800; font-size:0.95rem; display:flex; align-items:center; justify-content:center;">
+                    RH
+                  </div>
+                  <div>
+                    <div style="font-size:0.92rem; font-weight:800; color:#fff;">Dr. Rochady Hendra S.W.</div>
+                    <div style="font-size:0.75rem; color:#38bdf8;">Presiden MB Club Indonesia (2025-2027)</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quote 3 -->
+              <div class="v2-quote-card">
+                <div>
+                  <div style="color:#d4af37; font-size:2.2rem; line-height:1; font-family:Georgia, serif; margin-bottom:12px;">“</div>
+                  <p style="font-size:0.92rem; color:#e2e8f0; line-height:1.7; margin:0 0 20px 0; font-style:italic;">
+                    Banyak benefit nyata yang dirasakan anggota: mulai dari diskon servis resmi, kemudahan suku cadang, hingga event Jambore Nasional yang selalu berkesan seumur hidup.
+                  </p>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; border-top:1px solid rgba(255,255,255,0.07); padding-top:16px;">
+                  <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg, #10b981 0%, #047857 100%); color:#fff; font-weight:800; font-size:0.95rem; display:flex; align-items:center; justify-content:center;">
+                    DT
+                  </div>
+                  <div>
+                    <div style="font-size:0.92rem; font-weight:800; color:#fff;">Derist Touriano</div>
+                    <div style="font-size:0.75rem; color:#10b981;">Sekretaris Jenderal MB Club Indonesia</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 7. CTA: BERGABUNG BERSAMA KAMI -->
+          <section style="margin-bottom:64px; padding:64px 24px; text-align:center; background:radial-gradient(circle at center, rgba(212,175,55,0.12) 0%, rgba(14,19,31,0.85) 75%); border:1px solid rgba(212,175,55,0.3); border-radius:24px; box-shadow:0 20px 60px rgba(0,0,0,0.8);">
+            <!-- Star Icon Ring -->
+            <div style="width:56px; height:56px; margin:0 auto 20px auto; border-radius:50%; border:1px solid #d4af37; background:rgba(212,175,55,0.1); display:flex; align-items:center; justify-content:center; color:#d4af37; box-shadow:0 0 20px rgba(212,175,55,0.3);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <h2 class="font-v2-serif" style="font-size:2.4rem; color:#fff; margin:0 0 10px 0;">Bergabung Bersama Kami</h2>
+            <p style="font-size:1rem; color:#cbd5e1; max-width:600px; margin:0 auto 28px auto; line-height:1.6;">
+              Jadilah bagian dari keluarga besar pemilik dan pecinta Mercedes-Benz terbesar dan paling terhormat di nusantara.
+            </p>
+            <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap;">
+              <button type="button" class="btn-primary" data-open-modal="modal-register" style="padding:12px 28px; font-size:0.9rem; font-weight:800; border-radius:12px; background:linear-gradient(135deg, #d4af37 0%, #aa7c11 100%); color:#000; box-shadow:0 8px 25px rgba(212,175,55,0.4);">
+                Daftar Member Baru →
+              </button>
+              <button type="button" onclick="window.open('https://wa.me/6282129709595', '_blank')" class="btn-outline" style="padding:12px 24px; font-size:0.9rem; font-weight:600; border-radius:12px; border-color:rgba(255,255,255,0.25); color:#fff;">
+                Hubungi Sekretariat
+              </button>
+            </div>
+          </section>
+
+          <!-- 8. FOOTER V2 -->
+          <footer style="border-top:1px solid rgba(255,255,255,0.08); padding-top:48px; margin-top:40px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:36px; margin-bottom:36px;">
+              <div>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+                  <img src="assets/mb_badge.jpg" alt="MB INA Logo" style="width:38px; height:38px; border-radius:50%; border:1px solid #d4af37;">
+                  <div>
+                    <div class="font-v2-serif" style="font-size:1.15rem; font-weight:900; color:#fff;">MB Club INA</div>
+                    <div style="font-size:0.72rem; color:#d4af37; font-weight:700;">Mercedes-Benz Club Indonesia</div>
+                  </div>
+                </div>
+                <p style="font-size:0.85rem; color:#94a3b8; line-height:1.6; margin-bottom:14px;">
+                  Platform resmi manajemen keanggotaan dan klub Mercedes-Benz se-Indonesia dengan sistem RBAC & Supabase Cloud Live Database.
+                </p>
+                <div style="font-size:0.72rem; color:#64748b;">
+                  Created by Derist Touriano (Super Admin & System Architect)
+                </div>
+              </div>
+
+              <div>
+                <h4 class="font-v2-serif" style="font-size:0.95rem; color:#d4af37; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.08em;">Navigasi Cepat</h4>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; font-size:0.85rem;">
+                  <li><a href="#v2-tentang-section" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Tentang Kami & Visi Misi</a></li>
+                  <li><a href="#v2-sponsor-section" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Sponsor & Rotator Iklan</a></li>
+                  <li><a href="#v2-event-section" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Agenda Event & Jamnas</a></li>
+                  <li><a href="#v2-testimoni-section" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Testimoni Pengurus & Member</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="font-v2-serif" style="font-size:0.95rem; color:#d4af37; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.08em;">Modul & Layanan</h4>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; font-size:0.85rem;">
+                  <li><a href="javascript:void(0)" onclick="AppEngine.switchNavTab('member')" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">KTA Digital & Keanggotaan</a></li>
+                  <li><a href="javascript:void(0)" onclick="AppEngine.switchNavTab('lapak')" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Marketplace Lapak Member</a></li>
+                  <li><a href="javascript:void(0)" onclick="AppEngine.switchAdminTab('m5_media')" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Galeri Media & Dokumentasi</a></li>
+                  <li><a href="javascript:void(0)" onclick="AppEngine.switchNavTab('sponsor')" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Portal Kemitraan Sponsor</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 class="font-v2-serif" style="font-size:0.95rem; color:#d4af37; margin-bottom:14px; text-transform:uppercase; letter-spacing:0.08em;">Sekretariat Pusat</h4>
+                <p style="font-size:0.85rem; color:#94a3b8; line-height:1.7; margin:0;">
+                  📍 Gedung Sekretariat MB INA, Jakarta Selatan<br>
+                  📞 WhatsApp: +62 821-2970-9595<br>
+                  ✉️ Email: info@mbina.or.id
+                </p>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.06); padding-top:24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:0.8rem; color:#64748b;">
+              <div>
+                © 2026 Mercedes-Benz Club Indonesia (MB INA). All rights reserved.
+              </div>
+              <div style="display:flex; gap:14px;">
+                <a href="javascript:void(0)" style="color:#94a3b8; text-decoration:none;" title="Instagram">Instagram</a>
+                <span>•</span>
+                <a href="javascript:void(0)" style="color:#94a3b8; text-decoration:none;" title="YouTube">YouTube</a>
+                <span>•</span>
+                <a href="javascript:void(0)" style="color:#94a3b8; text-decoration:none;" title="Facebook">Facebook</a>
+              </div>
+            </div>
+          </footer>
+
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- 🏛️ LANDING PAGE VERSI 1 - KLASIK (TOGGLEABLE) -->
+        <!-- ============================================================ -->
+        <div id="landing-v1-container" style="display:none;">
+          <div style="max-width:1440px; margin:0 auto; padding:24px;">
 
         <!-- HERO SECTION -->
         <section class="hero-section">
@@ -6090,10 +6682,12 @@
         </footer>
 
       </div>
+    
+        </div>
+
+      </div>
     </div>
 
-  
-  <!-- ============================================================ -->
   <!-- MODAL M3: DETAIL PROFIL MEMBER (MERCEDES-BENZ LUXURY DARK MODE) -->
   <!-- ============================================================ -->
   <div id="modal-m3-member-detail" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(4,5,8,0.88); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
