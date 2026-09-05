@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260906_v156_mbenz_nowrap">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v156_mbenz_nowrap">
+  <link rel="stylesheet" href="css/styles.css?v=20260906_v157_event_banner_upload">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v157_event_banner_upload">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -2419,14 +2419,31 @@
                       <input type="datetime-local" id="m6-evt-end" class="form-input" value="2026-09-14T18:00" required>
                     </div>
                   </div>
-                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                    <div class="form-group">
-                      <label class="form-label">Kapasitas Peserta *</label>
-                      <input type="number" id="m6-evt-capacity" class="form-input" value="150" min="1" required onchange="M6Engine.calculateRabTotals()">
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label">Banner Image URL (Opsional)</label>
-                      <input type="text" id="m6-evt-banner" class="form-input" value="assets/mb_hero.jpg">
+                  <div class="form-group">
+                    <label class="form-label">Kapasitas Peserta *</label>
+                    <input type="number" id="m6-evt-capacity" class="form-input" value="150" min="1" required onchange="M6Engine.calculateRabTotals()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                      <span>Banner Image Event (Opsional)</span>
+                      <span id="m6-evt-banner-status" style="font-size:0.75rem; color:#94a3b8;">Format: JPG, PNG, WEBP</span>
+                    </label>
+                    <div style="border:1.5px dashed rgba(212,175,55,0.4); border-radius:12px; padding:12px; background:rgba(0,0,0,0.4); display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+                      <div style="position:relative; width:110px; height:68px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); background:#111; flex-shrink:0;">
+                        <img id="m6-evt-banner-thumb" src="assets/mb_hero.jpg" alt="Preview Banner" style="width:100%; height:100%; object-fit:cover; display:block;">
+                      </div>
+                      <div style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:8px;">
+                        <input type="text" id="m6-evt-banner" class="form-input" value="assets/mb_hero.jpg" placeholder="URL Gambar atau path" style="font-size:0.8rem; padding:6px 10px;" oninput="document.getElementById('m6-evt-banner-thumb').src = this.value || 'assets/mb_hero.jpg'">
+                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                          <input type="file" id="m6-evt-banner-file" accept="image/*" style="display:none;" onchange="M6Engine.uploadBannerImage(event)">
+                          <button type="button" class="btn-primary" onclick="document.getElementById('m6-evt-banner-file').click()" style="padding:5px 14px; font-size:0.75rem; font-weight:700; border-radius:6px; background:var(--accent-gold); color:#000; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+                            <span>📁 Upload Gambar</span>
+                          </button>
+                          <button type="button" class="btn-outline" onclick="M6Engine.resetBannerImage()" style="padding:5px 12px; font-size:0.75rem; border-radius:6px; color:#cbd5e1; border-color:rgba(255,255,255,0.2); cursor:pointer;">
+                            🔄 Reset Default
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </form>
@@ -6134,7 +6151,7 @@
                 <!-- Event 1: Anniversary & Rakernas (Completed) -->
                 <div class="v2-event-card">
                   <div class="v2-event-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800&q=80" alt="Rakernas MB INA" class="v2-event-img">
+                    <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=80" alt="Mercedes-Benz Anniversary & Rakernas" class="v2-event-img">
                     <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); backdrop-filter:blur(8px); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">
                       EVT-2026-012
                     </div>
@@ -6168,7 +6185,7 @@
                 <!-- Event 2: Touring Yogyakarta (🔥 Event Terdekat) -->
                 <div class="v2-event-card" style="border-color:rgba(212,175,55,0.4); background:rgba(212,175,55,0.03);">
                   <div class="v2-event-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80" alt="Touring Yogyakarta" class="v2-event-img">
+                    <img src="assets/gwagon_hero.jpg" alt="Touring Mercedes-Benz Yogyakarta" class="v2-event-img">
                     <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(212,175,55,0.4); backdrop-filter:blur(8px); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fbbf24; font-family:monospace;">
                       EVT-2026-001
                     </div>
@@ -6202,7 +6219,7 @@
                 <!-- Event 3: Grand Touring Sumatra -->
                 <div class="v2-event-card">
                   <div class="v2-event-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80" alt="Trans Sumatra Rally" class="v2-event-img">
+                    <img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&q=80" alt="Mercedes-AMG Grand Touring" class="v2-event-img">
                     <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); backdrop-filter:blur(8px); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">
                       EVT-2026-003
                     </div>
@@ -6239,7 +6256,7 @@
                 <!-- Event 4: Jamnas XXI Surakarta -->
                 <div class="v2-event-card" style="flex-direction:row; flex-wrap:wrap;">
                   <div style="flex:1; min-width:260px; height:200px; position:relative; overflow:hidden;">
-                    <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&q=80" alt="Jamnas XXI" style="width:100%; height:100%; object-fit:cover;">
+                    <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&q=80" alt="Mercedes-AMG Jamnas XXI" style="width:100%; height:100%; object-fit:cover;">
                     <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">EVT-2026-004</div>
                   </div>
                   <div style="flex:1.4; min-width:280px; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
@@ -6260,7 +6277,7 @@
                 <!-- Event 5: Jamnas XXV & Munas ICE BSD -->
                 <div class="v2-event-card" style="flex-direction:row; flex-wrap:wrap;">
                   <div style="flex:1; min-width:260px; height:200px; position:relative; overflow:hidden;">
-                    <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800&q=80" alt="Jamnas XXV ICE BSD" style="width:100%; height:100%; object-fit:cover;">
+                    <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&q=80" alt="Mercedes-Benz Munas ICE BSD" style="width:100%; height:100%; object-fit:cover;">
                     <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">EVT-2026-002</div>
                   </div>
                   <div style="flex:1.4; min-width:280px; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
@@ -10638,6 +10655,29 @@
             <label class="form-label" style="font-size:0.8rem; font-weight:700;">Lokasi / Venue *</label>
             <input type="text" id="m6-edit-pub-location" class="form-input" required>
           </div>
+          <div class="form-group" style="margin-top:12px;">
+            <label class="form-label" style="font-size:0.8rem; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
+              <span>Banner Image Event (Opsional)</span>
+              <span id="m6-edit-pub-banner-status" style="font-size:0.72rem; color:var(--accent-gold);">Preview Siap</span>
+            </label>
+            <div style="border:1.5px dashed rgba(212,175,55,0.35); border-radius:10px; padding:12px; background:rgba(0,0,0,0.35); display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+              <div style="position:relative; width:110px; height:68px; border-radius:6px; overflow:hidden; border:1px solid rgba(255,255,255,0.15); background:#111; flex-shrink:0;">
+                <img id="m6-edit-pub-banner-thumb" src="assets/mb_hero.jpg" alt="Preview Banner" style="width:100%; height:100%; object-fit:cover; display:block;">
+              </div>
+              <div style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:6px;">
+                <input type="text" id="m6-edit-pub-banner" class="form-input" placeholder="URL Gambar Banner" style="font-size:0.78rem; padding:6px 10px;" oninput="document.getElementById('m6-edit-pub-banner-thumb').src = this.value || 'assets/mb_hero.jpg'">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                  <input type="file" id="m6-edit-pub-banner-file" accept="image/*" style="display:none;" onchange="M6Engine.uploadEditPubBanner(event)">
+                  <button type="button" class="btn-primary" onclick="document.getElementById('m6-edit-pub-banner-file').click()" style="padding:5px 12px; font-size:0.72rem; font-weight:700; border-radius:6px; background:var(--accent-gold); color:#000; cursor:pointer;">
+                    📁 Ganti / Upload Gambar
+                  </button>
+                  <button type="button" class="btn-outline" onclick="M6Engine.clearEditPubBanner()" style="padding:5px 10px; font-size:0.72rem; border-radius:6px; color:#cbd5e1; border-color:rgba(255,255,255,0.2); cursor:pointer;">
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px; border-top:1px solid var(--chrome-border); padding-top:14px;">
             <button type="button" class="btn-outline" onclick="AuthEngine.closeModal('modal-m6-edit-event-published')">Batal</button>
             <button type="submit" class="btn-primary" style="background:var(--accent-gold); color:#000; font-weight:800; border-color:var(--accent-gold);">💾 Simpan Perubahan</button>
@@ -11128,8 +11168,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260906_v156_mbenz_nowrap"></script>
-  <script src="js/app.js?v=20260906_v156_mbenz_nowrap"></script>
+  <script src="js/auth.js?v=20260906_v157_event_banner_upload"></script>
+  <script src="js/app.js?v=20260906_v157_event_banner_upload"></script>
   <script>
     lucide.createIcons();
     try {

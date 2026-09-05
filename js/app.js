@@ -13996,14 +13996,69 @@ const M6Engine = {
     const st = document.getElementById('m6-edit-pub-start');
     const en = document.getElementById('m6-edit-pub-end');
     const lo = document.getElementById('m6-edit-pub-location');
+    const ba = document.getElementById('m6-edit-pub-banner');
+    const th = document.getElementById('m6-edit-pub-banner-thumb');
+    const sl = document.getElementById('m6-edit-pub-banner-status');
 
     if (ti) ti.value = ev.title;
     if (de) de.value = ev.description;
     if (st) st.value = ev.start_date || '2026-09-12T08:00';
     if (en) en.value = ev.end_date || '2026-09-14T18:00';
     if (lo) lo.value = ev.location;
+    const bannerVal = ev.banner_url || ev.image_url || 'assets/mb_hero.jpg';
+    if (ba) ba.value = bannerVal;
+    if (th) th.src = bannerVal;
+    if (sl) {
+      sl.innerText = 'Preview Siap';
+      sl.style.color = 'var(--accent-gold)';
+    }
 
     AuthEngine.openModal('modal-m6-edit-event-published');
+  },
+
+  uploadEditPubBanner(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('⚠️ Harap pilih file gambar yang valid (JPG, PNG, WEBP).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const bannerInput = document.getElementById('m6-edit-pub-banner');
+      const thumb = document.getElementById('m6-edit-pub-banner-thumb');
+      const statusLabel = document.getElementById('m6-edit-pub-banner-status');
+
+      if (bannerInput) bannerInput.value = dataUrl;
+      if (thumb) {
+        thumb.src = dataUrl;
+        thumb.style.display = 'inline-block';
+      }
+      if (statusLabel) {
+        statusLabel.innerText = `✓ '${file.name}' Siap`;
+        statusLabel.style.color = 'var(--primary-emerald)';
+      }
+      if (window.showToast) window.showToast(`🖼️ Banner event '${file.name}' berhasil dimuat!`, 'success');
+    };
+    reader.readAsDataURL(file);
+  },
+
+  clearEditPubBanner() {
+    const bannerInput = document.getElementById('m6-edit-pub-banner');
+    const thumb = document.getElementById('m6-edit-pub-banner-thumb');
+    const statusLabel = document.getElementById('m6-edit-pub-banner-status');
+    const fileInput = document.getElementById('m6-edit-pub-banner-file');
+
+    if (bannerInput) bannerInput.value = 'assets/mb_hero.jpg';
+    if (thumb) thumb.src = 'assets/mb_hero.jpg';
+    if (statusLabel) {
+      statusLabel.innerText = 'Preview Siap';
+      statusLabel.style.color = 'var(--accent-gold)';
+    }
+    if (fileInput) fileInput.value = '';
   },
 
   savePublishedEventChanges(e) {
@@ -14016,6 +14071,7 @@ const M6Engine = {
     const start = document.getElementById('m6-edit-pub-start')?.value;
     const end   = document.getElementById('m6-edit-pub-end')?.value;
     const loc   = document.getElementById('m6-edit-pub-location')?.value.trim();
+    const banner = document.getElementById('m6-edit-pub-banner')?.value.trim() || 'assets/mb_hero.jpg';
 
     if (!title || !desc) { alert('⚠️ Judul & Deskripsi wajib diisi!'); return; }
 
@@ -14024,6 +14080,8 @@ const M6Engine = {
     ev.start_date = start;
     ev.end_date = end;
     ev.location = loc;
+    ev.banner_url = banner;
+    ev.image_url = banner;
 
     const formatDt = (str) => {
       if (!str) return '';
@@ -14047,11 +14105,19 @@ const M6Engine = {
     if (elEnd)   elEnd.textContent   = ev.end_formatted;
     if (elLoc)   elLoc.textContent   = ev.location;
 
+    // Update any banner image in DOM
+    const cardImg = document.querySelector(`[data-event-code="${ev.code}"] img, [data-event-id="${ev.id}"] img, #m6-pub-evt-banner-img`);
+    if (cardImg) cardImg.src = banner;
+
     // Sync to M1 Dashboard Calendar
     if (window.AppEngine) window.AppEngine.renderAdminCalendarEvents();
 
+    try {
+      localStorage.setItem('mbcina_m6_published_events', JSON.stringify(this.publishedEvents));
+    } catch(err) {}
+
     AuthEngine.closeModal('modal-m6-edit-event-published');
-    alert('✅ Deskripsi dan waktu event published berhasil diperbarui & disinkronkan ke Kalender Dashboard (Modul M1)!');
+    alert('✅ Event published berhasil diperbarui (termasuk banner gambar) & disinkronkan ke Kalender Dashboard (Modul M1)!');
   },
 
   sampleMembersDb: [
@@ -16343,6 +16409,22 @@ const M6Engine = {
       else alert(`🖼️ File banner '${file.name}' berhasil dipilih dan siap disimpan ke proposal!`);
     };
     reader.readAsDataURL(file);
+  },
+
+  resetBannerImage() {
+    const bannerInput = document.getElementById('m6-evt-banner');
+    const thumb = document.getElementById('m6-evt-banner-thumb');
+    const statusLabel = document.getElementById('m6-evt-banner-status');
+    const fileInput = document.getElementById('m6-evt-banner-file');
+
+    if (bannerInput) bannerInput.value = 'assets/mb_hero.jpg';
+    if (thumb) thumb.src = 'assets/mb_hero.jpg';
+    if (statusLabel) {
+      statusLabel.innerText = 'Format: JPG, PNG, WEBP';
+      statusLabel.style.color = '#94a3b8';
+    }
+    if (fileInput) fileInput.value = '';
+    if (window.showToast) window.showToast('🔄 Banner direset ke default', 'info');
   },
 
   async saveRabAndCalculate() {
