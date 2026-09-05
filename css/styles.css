@@ -2517,9 +2517,9 @@ body.light-mode input:-webkit-autofill:active {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: right center;
-  opacity: 0.42;
-  filter: contrast(1.15) brightness(0.85);
+  object-position: 72% center;
+  opacity: 0.88;
+  filter: contrast(1.12) brightness(0.95);
   pointer-events: none;
   z-index: 1;
 }
@@ -2527,8 +2527,8 @@ body.light-mode input:-webkit-autofill:active {
 .v2-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.92) 45%, rgba(7, 9, 14, 0.4) 100%),
-              linear-gradient(180deg, rgba(7, 9, 14, 0.2) 0%, #07090e 100%);
+  background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.94) 40%, rgba(7, 9, 14, 0.5) 65%, rgba(7, 9, 14, 0.1) 100%),
+              linear-gradient(180deg, rgba(7, 9, 14, 0.35) 0%, transparent 45%, rgba(7, 9, 14, 0.85) 100%);
   z-index: 2;
 }
 
