@@ -739,10 +739,18 @@ const AppEngine = {
       ];
     }
 
-    // Sort by start_date ascending (closest upcoming first)
+    const now = new Date();
+
+    // Sort: upcoming & ongoing first, completed later
     events.sort((a, b) => {
       const da = new Date(a.start_date || a.date_start || 0);
       const db = new Date(b.start_date || b.date_start || 0);
+      const ea = new Date(a.end_date || a.date_end || a.start_date || 0);
+      const eb = new Date(b.end_date || b.date_end || b.start_date || 0);
+      const aPast = now > ea;
+      const bPast = now > eb;
+      if (aPast && !bPast) return 1;
+      if (!aPast && bPast) return -1;
       return da - db;
     });
 
@@ -765,29 +773,32 @@ const AppEngine = {
       const loc = e.city || e.location || 'Jakarta';
       const rawPrice = e.ticket_online_price ?? e.ticket_price ?? e.htm_nett ?? 0;
       const dateStr = e.start_date || e.date_start || '';
+      const isPast = now > new Date(e.end_date || e.date_end || e.start_date || 0);
       return `
       <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:12px; margin-bottom:8px; display:flex; flex-direction:column; justify-content:space-between; transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.1)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px; gap:8px;">
             <span style="font-size:0.78rem; font-weight:700; color:#ffffff; line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical;" title="${e.title}">${e.title}</span>
-            <span style="font-size:0.68rem; color:#fbbf24; font-weight:600; flex-shrink:0; background:rgba(245,158,11,0.08); padding:2px 6px; border-radius:4px; border:1px solid rgba(245,158,11,0.2); font-family:monospace;">${fmtDate(dateStr)}</span>
+            <span style="font-size:0.68rem; color:${isPast ? '#94a3b8' : '#fbbf24'}; font-weight:600; flex-shrink:0; background:${isPast ? 'rgba(148,163,184,0.08)' : 'rgba(245,158,11,0.08)'}; padding:2px 6px; border-radius:4px; border:1px solid ${isPast ? 'rgba(148,163,184,0.2)' : 'rgba(245,158,11,0.2)'}; font-family:monospace;">${fmtDate(dateStr)}</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:#94a3b8; margin-bottom:8px;">
             <span style="display:flex; align-items:center; gap:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px;">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               <span>${loc}</span>
             </span>
-            <span style="color:${rawPrice === 0 ? '#34d399' : '#fbbf24'}; font-weight:600; font-family:monospace;">${fmtRp(rawPrice)}</span>
+            <span style="color:${isPast ? '#94a3b8' : (rawPrice === 0 ? '#34d399' : '#fbbf24')}; font-weight:600; font-family:monospace;">${isPast ? 'Selesai' : fmtRp(rawPrice)}</span>
           </div>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; pt-1;">
           <button type="button" style="padding:4px 10px; font-size:0.7rem; font-weight:500; background:rgba(255,255,255,0.04); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); border-radius:8px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'" onclick="AppEngine.openMemberEventDetailModal('${e.id}')">
             Detail Agenda
           </button>
-          ${!isFull ? `
+          ${isPast ? `
+          <span style="font-size:0.68rem; color:#94a3b8; font-weight:600; background:rgba(148,163,184,0.1); padding:2px 8px; border-radius:6px; border:1px solid rgba(148,163,184,0.2);">Selesai</span>
+          ` : (!isFull ? `
           <button type="button" style="padding:4px 10px; font-size:0.7rem; font-weight:600; background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); border-radius:8px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(245,158,11,0.2)'" onmouseout="this.style.background='rgba(245,158,11,0.12)'" onclick="AppEngine.openMemberEventRegisterModal('${e.id}','ONLINE')">
             Daftar Event
-          </button>` : `<span style="font-size:0.68rem; color:#f87171; font-weight:600; background:rgba(239,68,68,0.1); padding:2px 8px; border-radius:6px; border:1px solid rgba(239,68,68,0.2);">Kuota Penuh</span>`}
+          </button>` : `<span style="font-size:0.68rem; color:#f87171; font-weight:600; background:rgba(239,68,68,0.1); padding:2px 8px; border-radius:6px; border:1px solid rgba(239,68,68,0.2);">Kuota Penuh</span>`)}
         </div>
       </div>`;
     }).join('');
@@ -1621,10 +1632,18 @@ const AppEngine = {
       ];
     }
 
-    // Sort by start_date ascending (closest upcoming first)
+    const now = new Date();
+
+    // Sort: upcoming & ongoing first, completed later
     events.sort((a, b) => {
       const da = new Date(a.start_date || a.date_start || 0);
       const db = new Date(b.start_date || b.date_start || 0);
+      const ea = new Date(a.end_date || a.date_end || a.start_date || 0);
+      const eb = new Date(b.end_date || b.date_end || b.start_date || 0);
+      const aPast = now > ea;
+      const bPast = now > eb;
+      if (aPast && !bPast) return 1;
+      if (!aPast && bPast) return -1;
       return da - db;
     });
 
@@ -1633,19 +1652,30 @@ const AppEngine = {
       body.innerHTML = events.map(e => {
         const dateDisplay = e.start_formatted || e.start_date || '5 September 2026';
         const locDisplay = e.location || e.address || e.city || 'Jakarta';
+        const isPast = now > new Date(e.end_date || e.date_end || e.start_date || 0);
         return `
-        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; margin-bottom:14px;">
+        <div style="background:rgba(255,255,255,0.03); border:1px solid ${isPast ? 'rgba(255,255,255,0.06)' : 'var(--chrome-border)'}; border-radius:12px; padding:16px; margin-bottom:14px;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
             <div>
-              <span style="font-size:0.68rem; background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); padding:2px 8px; border-radius:4px; font-weight:800;">${e.code || e.id || 'EVT'}</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:0.68rem; background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); padding:2px 8px; border-radius:4px; font-weight:800;">${e.code || e.id || 'EVT'}</span>
+                ${isPast ? `
+                  <span style="font-size:0.68rem; background:rgba(148,163,184,0.12); color:#94a3b8; border:1px solid rgba(148,163,184,0.25); padding:2px 8px; border-radius:4px; font-weight:700;">SELESAI</span>
+                ` : ''}
+              </div>
               <h4 style="font-size:1.05rem; font-weight:800; color:#fff; margin:6px 0 2px 0;">${e.title}</h4>
               <div style="font-size:0.78rem; color:var(--text-muted);">📍 ${locDisplay} &nbsp;·&nbsp; 📅 ${dateDisplay} &nbsp;·&nbsp; 👥 Kuota ${e.capacity || 150} Orang</div>
             </div>
           </div>
           <p style="font-size:0.8rem; color:#cbd5e1; margin:0 0 12px 0; line-height:1.5;">${e.description || 'Kegiatan resmi Mercedes-Benz Club Indonesia.'}</p>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn-primary" style="background:var(--accent-blue); color:#fff; font-weight:800; font-size:0.75rem; padding:6px 12px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.openMemberEventRegisterModal('${e.id}','ONLINE')">🎟️ Daftar Online Event</button>
-            <button class="btn-primary" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-weight:800; font-size:0.75rem; padding:6px 12px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.openMemberEventRegisterModal('${e.id}','OFFLINE')">📝 Daftar Offline</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            ${isPast ? `
+              <span style="background:rgba(148,163,184,0.1); color:#94a3b8; font-size:0.75rem; padding:6px 14px; border-radius:8px; border:1px solid rgba(148,163,184,0.2); font-weight:600;">Pendaftaran Ditutup (Event Telah Selesai)</span>
+              <button class="btn-outline" style="font-size:0.75rem; padding:6px 12px; font-weight:700; border-radius:8px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.switchTab('m5_media');">📸 Dokumentasi & Galeri</button>
+            ` : `
+              <button class="btn-primary" style="background:var(--accent-blue); color:#fff; font-weight:800; font-size:0.75rem; padding:6px 12px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.openMemberEventRegisterModal('${e.id}','ONLINE')">🎟️ Daftar Online Event</button>
+              <button class="btn-primary" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-weight:800; font-size:0.75rem; padding:6px 12px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.openMemberEventRegisterModal('${e.id}','OFFLINE')">📝 Daftar Offline</button>
+            `}
           </div>
         </div>`;
       }).join('');
@@ -5719,37 +5749,107 @@ const AppEngine = {
       }
     ];
 
-    // Sort chronologically (closest upcoming event is #1)
-    masterEvents.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+    const now = new Date();
+
+    // 1. Calculate dynamic lifecycle state (COMPLETED, ONGOING, UPCOMING)
+    masterEvents.forEach(ev => {
+      const s = new Date(ev.start_date);
+      const e = new Date(ev.end_date || ev.start_date);
+      if (now > e) {
+        ev.lifecycle = 'COMPLETED';
+        ev.is_nearest = false;
+      } else if (now >= s && now <= e) {
+        ev.lifecycle = 'ONGOING';
+        ev.is_nearest = false;
+      } else {
+        ev.lifecycle = 'UPCOMING';
+        ev.is_nearest = false;
+      }
+    });
+
+    // 2. Sort upcoming/ongoing by start_date asc, completed by start_date desc
+    const upcomingList = masterEvents
+      .filter(ev => ev.lifecycle !== 'COMPLETED')
+      .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+    const completedList = masterEvents
+      .filter(ev => ev.lifecycle === 'COMPLETED')
+      .sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
+
+    // Mark the earliest upcoming/ongoing event as nearest
+    if (upcomingList.length > 0) {
+      upcomingList[0].is_nearest = true;
+    }
+
+    const activeFilter = this._calendarEventsFilter || 'ALL';
+    let displayList = [];
+    if (activeFilter === 'UPCOMING') {
+      displayList = upcomingList;
+    } else if (activeFilter === 'COMPLETED') {
+      displayList = completedList;
+    } else {
+      displayList = [...upcomingList, ...completedList];
+    }
 
     container.innerHTML = `
+      <!-- SUB-FILTER TAB STATUS & INFO WAKTU -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${activeFilter === 'ALL' ? 'var(--accent-gold)' : 'rgba(255,255,255,0.08)'}; background:${activeFilter === 'ALL' ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.03)'}; color:${activeFilter === 'ALL' ? 'var(--accent-gold)' : '#94a3b8'}; font-weight:${activeFilter === 'ALL' ? '800' : '600'};" onclick="AppEngine.setCalendarEventsFilter('ALL')">
+            Semua Agenda (${masterEvents.length})
+          </button>
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${activeFilter === 'UPCOMING' ? '#34d399' : 'rgba(255,255,255,0.08)'}; background:${activeFilter === 'UPCOMING' ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)'}; color:${activeFilter === 'UPCOMING' ? '#34d399' : '#94a3b8'}; font-weight:${activeFilter === 'UPCOMING' ? '800' : '600'};" onclick="AppEngine.setCalendarEventsFilter('UPCOMING')">
+            Akan Datang (${upcomingList.length})
+          </button>
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${activeFilter === 'COMPLETED' ? '#94a3b8' : 'rgba(255,255,255,0.08)'}; background:${activeFilter === 'COMPLETED' ? 'rgba(148,163,184,0.15)' : 'rgba(255,255,255,0.03)'}; color:${activeFilter === 'COMPLETED' ? '#e2e8f0' : '#94a3b8'}; font-weight:${activeFilter === 'COMPLETED' ? '800' : '600'};" onclick="AppEngine.setCalendarEventsFilter('COMPLETED')">
+            Selesai / Terlaksana (${completedList.length})
+          </button>
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-muted); display:inline-flex; align-items:center; gap:6px;">
+          <span>Waktu Sistem:</span>
+          <span style="color:#ffffff; font-family:monospace; font-weight:700; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">${now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        </div>
+      </div>
+
       <div style="display:flex; flex-direction:column; gap:16px;">
-        ${masterEvents.map(ev => `
-          <div class="group" style="padding:20px; border:1px solid ${ev.is_nearest ? 'rgba(245,158,11,0.35)' : 'rgba(255,255,255,0.08)'}; border-radius:16px; background:${ev.is_nearest ? 'rgba(245,158,11,0.04)' : 'rgba(255,255,255,0.03)'}; backdrop-filter:blur(12px); transition:all 0.3s ease; position:relative;" onmouseover="this.style.borderColor='rgba(245,158,11,0.5)'; this.style.background='rgba(255,255,255,0.06)';" onmouseout="this.style.borderColor='${ev.is_nearest ? 'rgba(245,158,11,0.35)' : 'rgba(255,255,255,0.08)'}'; this.style.background='${ev.is_nearest ? 'rgba(245,158,11,0.04)' : 'rgba(255,255,255,0.03)'}';">
+        ${displayList.map(ev => `
+          <div class="group" style="padding:20px; border:1px solid ${ev.is_nearest ? 'rgba(245,158,11,0.35)' : (ev.lifecycle === 'COMPLETED' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.08)')}; border-radius:16px; background:${ev.is_nearest ? 'rgba(245,158,11,0.04)' : (ev.lifecycle === 'COMPLETED' ? 'rgba(255,255,255,0.015)' : 'rgba(255,255,255,0.03)')}; backdrop-filter:blur(12px); transition:all 0.3s ease; position:relative;" onmouseover="this.style.borderColor='${ev.is_nearest ? 'rgba(245,158,11,0.6)' : 'rgba(255,255,255,0.2)'}';" onmouseout="this.style.borderColor='${ev.is_nearest ? 'rgba(245,158,11,0.35)' : (ev.lifecycle === 'COMPLETED' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.08)')}';">
             
             <!-- HEADER EVENT ROW -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
               <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                 <span style="font-family:monospace; font-size:0.75rem; color:#94a3b8; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:4px 10px; border-radius:8px;">${ev.code || ev.id}</span>
                 <h4 style="color:#ffffff; font-size:1rem; font-weight:700; margin:0;">${ev.title}</h4>
-                ${ev.is_nearest ? `
-                  <span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); font-size:0.7rem; font-weight:800; padding:3px 10px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
-                    <span>🔥 EVENT TERDEKAT</span>
+                ${ev.lifecycle === 'COMPLETED' ? `
+                  <span style="background:rgba(148,163,184,0.12); color:#94a3b8; border:1px solid rgba(148,163,184,0.25); font-size:0.7rem; font-weight:700; padding:3px 10px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>SELESAI / TELAH BERLALU</span>
                   </span>
-                ` : ''}
-                <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.75rem; font-weight:500; padding:3px 10px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
-                  <span style="width:6px; height:6px; border-radius:50%; background:#34d399;"></span>
-                  <span>PUBLISHED</span>
-                </span>
+                ` : (ev.lifecycle === 'ONGOING' ? `
+                  <span style="background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); font-size:0.7rem; font-weight:800; padding:3px 10px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
+                    <span style="width:6px; height:6px; border-radius:50%; background:#ef4444;" class="animate-pulse"></span>
+                    <span>SEDANG BERLANGSUNG</span>
+                  </span>
+                ` : `
+                  ${ev.is_nearest ? `
+                    <span style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.35); font-size:0.7rem; font-weight:800; padding:3px 10px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
+                      <span>🔥 EVENT TERDEKAT</span>
+                    </span>
+                  ` : ''}
+                  <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.2); font-size:0.75rem; font-weight:500; padding:3px 10px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px;">
+                    <span style="width:6px; height:6px; border-radius:50%; background:#34d399;"></span>
+                    <span>PUBLISHED</span>
+                  </span>
+                `)}
               </div>
-              <button type="button" style="background:rgba(255,255,255,0.05); color:#e2e8f0; border:1px solid rgba(255,255,255,0.1); font-size:0.75rem; font-weight:500; padding:6px 14px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#e2e8f0';" onclick="AppEngine.switchAdminTab('m6_event'); if(window.M6Engine){ M6Engine.switchSubtab('6_3_publish'); M6Engine.selectEventToPublish('${ev.code || ev.id}'); }">
-                <span>Buka Detail Event</span>
+              <button type="button" style="background:rgba(255,255,255,0.05); color:#e2e8f0; border:1px solid rgba(255,255,255,0.1); font-size:0.75rem; font-weight:600; padding:6px 14px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#e2e8f0';" onclick="AppEngine.switchAdminTab('m6_event'); if(window.M6Engine){ M6Engine.switchSubtab('6_3_publish'); M6Engine.selectEventToPublish('${ev.code || ev.id}'); }">
+                <span>${ev.lifecycle === 'COMPLETED' ? 'Buka Arsip & LPJ Event' : 'Buka Detail Event'}</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </button>
             </div>
 
             <!-- DESKRIPSI EVENT -->
-            <p style="font-size:0.8125rem; color:#cbd5e1; line-height:1.6; margin:0 0 16px 0; background:rgba(255,255,255,0.02); padding:12px 16px; border-radius:12px; border-left:3px solid ${ev.is_nearest ? '#ef4444' : '#fbbf24'}; white-space:pre-line;">
+            <p style="font-size:0.8125rem; color:#cbd5e1; line-height:1.6; margin:0 0 16px 0; background:rgba(255,255,255,0.02); padding:12px 16px; border-radius:12px; border-left:3px solid ${ev.lifecycle === 'COMPLETED' ? '#64748b' : (ev.is_nearest ? '#fbbf24' : '#38bdf8')}; white-space:pre-line;">
               ${ev.description}
             </p>
 
@@ -5769,9 +5869,9 @@ const AppEngine = {
               </div>
               <div>
                 <!-- Kuota Peserta -->
-                <span style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); color:#fbbf24; font-size:0.75rem; font-weight:500; padding:4px 12px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;">
+                <span style="background:${ev.lifecycle === 'COMPLETED' ? 'rgba(148,163,184,0.1)' : 'rgba(245,158,11,0.1)'}; border:1px solid ${ev.lifecycle === 'COMPLETED' ? 'rgba(148,163,184,0.2)' : 'rgba(245,158,11,0.2)'}; color:${ev.lifecycle === 'COMPLETED' ? '#94a3b8' : '#fbbf24'}; font-size:0.75rem; font-weight:500; padding:4px 12px; border-radius:9999px; display:inline-flex; align-items:center; gap:6px;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  <span>${ev.registered_count} / ${ev.capacity} Peserta Terdaftar</span>
+                  <span>${ev.registered_count} / ${ev.capacity} Peserta ${ev.lifecycle === 'COMPLETED' ? 'Hadir' : 'Terdaftar'}</span>
                 </span>
               </div>
             </div>
@@ -5779,6 +5879,11 @@ const AppEngine = {
         `).join('')}
       </div>
     `;
+  },
+
+  setCalendarEventsFilter(filter) {
+    this._calendarEventsFilter = filter;
+    this.renderAdminCalendarEvents();
   },
 
   showMapTooltip(evt, text) {
