@@ -493,20 +493,28 @@ const AppEngine = {
 
   openMemberDonations() {
     this._switchToMemberAdminTab('admin-tab-m7_donation', 'member_donations');
-    // Sembunyikan tab "Buat Program Donasi" untuk member
-    const donTabs = document.querySelectorAll('[data-m73-subtab]');
+    // Pastikan subtab progress yang aktif
+    this.switchDonationSubtab('7_3_1_progress');
+
+    // Sembunyikan tab "Buat Program Donasi" dan "Log Digital Receipt" untuk member
+    const donTabs = document.querySelectorAll('#admin-tab-m7_donation [data-m73-subtab]');
     donTabs.forEach(btn => {
       const t = btn.getAttribute('data-m73-subtab');
-      // Member hanya boleh: 7_3_1_progress dan 7_3_4_receipts
-      btn.style.display = (t === '7_3_2_form') ? 'none' : '';
+      // Member hanya pada Progress & Monitoring (7_3_1_progress)
+      btn.style.display = (t === '7_3_1_progress') ? '' : 'none';
     });
-    if (window.DonationManager) {
-      window.DonationManager.init();
-    } else if (typeof this.renderDonationModule === 'function') {
+
+    // Sembunyikan konten subtab non-progress
+    const rTab = document.getElementById('m73-subtab-7_3_4_receipts');
+    if (rTab) rTab.style.display = 'none';
+    const fTab = document.getElementById('m73-subtab-7_3_2_form');
+    if (fTab) fTab.style.display = 'none';
+
+    if (typeof this.renderDonationModule === 'function') {
       this.renderDonationModule();
+    } else if (typeof this.renderDonationDonorTable === 'function') {
+      this.renderDonationDonorTable();
     }
-    // Filter receipt hanya untuk member sendiri
-    this._filterDonationReceiptsForMember();
   },
 
   _filterDonationReceiptsForMember() {
@@ -4969,6 +4977,10 @@ const AppEngine = {
         M6Engine.switchSubtab('6_4_sponsorship');
       }
     } else if (tab === 'm7_donation') {
+      if (!this.isMemberUser()) {
+        const donTabs = document.querySelectorAll('#admin-tab-m7_donation [data-m73-subtab]');
+        donTabs.forEach(btn => btn.style.display = '');
+      }
       if (window.DonationManager) {
         window.DonationManager.init();
       } else if (typeof this.renderDonationModule === 'function') {
@@ -20656,6 +20668,24 @@ const M6Engine = {
       ];
     }
 
+    const activeApp = window.AppEngine || this;
+    const isMember = document.body.classList.contains('member-mode') || (activeApp && typeof activeApp.isMemberUser === 'function' && activeApp.isMemberUser());
+
+    // Update section title & description depending on role
+    const titleEl = document.getElementById('m73-donor-list-header-title');
+    const descEl = document.getElementById('m73-donor-list-header-desc');
+    const u = (activeApp && activeApp.currentUser) || (window.AuthEngine && window.AuthEngine.currentUser) || {};
+    const uName = u.name || u.username || 'Member MB INA';
+    const uMid = u.member_id || '';
+
+    if (isMember) {
+      if (titleEl) titleEl.innerHTML = '📜 LOG DONASI SAYA (MEMBER AKTIF)';
+      if (descEl) descEl.innerHTML = `Riwayat transaksi donasi akun aktif Anda (<strong>${uName}</strong>${uMid ? ' • ' + uMid : ''}) beserta bukti transfer dan kwitansi resmi`;
+    } else {
+      if (titleEl) titleEl.innerHTML = '👥 DAFTAR DONATUR & VERIFIKASI';
+      if (descEl) descEl.innerHTML = 'Semua transaksi donasi pada seluruh campaign aktif';
+    }
+
     const sel = document.getElementById('m73-donor-campaign-filter');
     const activeVal = filterCampaignId || (sel ? sel.value : 'ALL');
 
@@ -20674,9 +20704,48 @@ const M6Engine = {
     if (activeVal && activeVal !== 'ALL') {
       list = list.filter(d => d.campaign_id === activeVal);
     }
-    
+
+    // Filter donasi hanya milik akun member yang sedang aktif
+    if (isMember) {
+      const curUid = (u.id || u.user_id || '').toLowerCase().trim();
+      const curMid = (u.member_id || '').toLowerCase().trim();
+      const curName = (u.name || u.username || '').toLowerCase().trim();
+      const curEmail = (u.email || '').toLowerCase().trim();
+
+      list = list.filter(d => {
+        const dUid = (d.user_id || '').toLowerCase().trim();
+        const dMid = (d.member_id || '').toLowerCase().trim();
+        const dName = (d.donor_name || '').toLowerCase().trim();
+        const dEmail = (d.donor_email || d.email || '').toLowerCase().trim();
+
+        if (curUid && dUid && curUid === dUid) return true;
+        if (curMid && dMid && (curMid === dMid || curMid.includes(dMid) || dMid.includes(curMid))) return true;
+        if (curEmail && dEmail && curEmail === dEmail) return true;
+        if (curName && dName && (curName === dName || curName.includes(dName) || dName.includes(curName))) return true;
+        return false;
+      });
+    }
+
     if (list.length === 0) {
-      container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#94a3b8; font-size:0.875rem;">Belum ada transaksi donasi terdaftar untuk campaign ini.</div>`;
+      if (isMember) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:36px 20px; background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1); border-radius:14px;">
+            <div style="width:48px; height:48px; border-radius:50%; background:rgba(245,158,11,0.12); color:#fbbf24; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:1.3rem;">
+              ❤️
+            </div>
+            <h4 style="color:#ffffff; font-size:0.95rem; margin:0 0 6px 0; font-weight:600;">Belum Ada Riwayat Donasi Pada Akun Anda</h4>
+            <p style="color:#94a3b8; font-size:0.8rem; margin:0 auto 16px; max-width:440px; line-height:1.5;">
+              Anda belum memiliki transaksi donasi yang tercatat untuk campaign ini. Salurkan kepedulian Anda dengan berpartisipasi dalam program donasi MB INA.
+            </p>
+            <button type="button" class="btn-primary" style="font-size:0.78rem; padding:8px 18px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; background:#f59e0b; color:#0a0a0a; font-weight:700; border:none; cursor:pointer;" onclick="AppEngine.openMemberDonasiModal()">
+              <span>Donasi Sekarang</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `<div style="text-align:center; padding:40px 20px; color:#94a3b8; font-size:0.875rem;">Belum ada transaksi donasi terdaftar untuk campaign ini.</div>`;
+      }
       return;
     }
 
@@ -20700,36 +20769,60 @@ const M6Engine = {
           ? `<span style="background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.2); font-size:0.75rem; padding:2px 8px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px; font-weight:500;"><span style="width:6px; height:6px; border-radius:50%; background:#fb7185;"></span><span>Rejected</span></span>`
           : `<span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); font-size:0.75rem; padding:2px 8px; border-radius:9999px; display:inline-flex; align-items:center; gap:5px; font-weight:500;"><span style="width:6px; height:6px; border-radius:50%; background:#fbbf24;"></span><span>Pending</span></span>`);
 
-      // Action button based on precise status (No checkmark on rejected!)
+      // Action button based on precise status & role
       let actionBtn = '';
-      if (isSuccess) {
-        actionBtn = `
-          <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
-            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#d4d4d4; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(245,158,11,0.1)';" onmouseout="this.style.color='#d4d4d4'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.03)';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span>Bukti</span>
-            </button>
-            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(52,211,153,0.3); background:rgba(16,185,129,0.08); color:#34d399; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(16,185,129,0.18)';" onmouseout="this.style.background='rgba(16,185,129,0.08)';" onclick="AppEngine.openDigitalReceiptModalByDonationId('${d.id}')" title="Kwitansi Digital Resmi">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
-              <span>Kwitansi</span>
-            </button>
-          </div>`;
-      } else if (d.status === 'REJECTED') {
-        actionBtn = `
-          <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
-            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(244,63,94,0.3); background:rgba(244,63,94,0.06); color:#fb7185; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(244,63,94,0.15)';" onmouseout="this.style.background='rgba(244,63,94,0.06)';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer (Ditolak)">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span>Lihat Bukti</span>
-            </button>
-          </div>`;
+      if (isMember) {
+        if (isSuccess) {
+          actionBtn = `
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(52,211,153,0.3); background:rgba(16,185,129,0.08); color:#34d399; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(16,185,129,0.18)';" onmouseout="this.style.background='rgba(16,185,129,0.08)';" onclick="AppEngine.openDigitalReceiptModalByDonationId('${d.id}')" title="Kwitansi Digital Resmi">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+                <span>Kwitansi</span>
+              </button>
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#d4d4d4; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(245,158,11,0.1)';" onmouseout="this.style.color='#d4d4d4'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.03)';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Bukti</span>
+              </button>
+            </div>`;
+        } else {
+          actionBtn = `
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#d4d4d4; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(245,158,11,0.1)';" onmouseout="this.style.color='#d4d4d4'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.03)';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Lihat Bukti</span>
+              </button>
+            </div>`;
+        }
       } else {
-        actionBtn = `
-          <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
-            <button type="button" style="font-size:0.75rem; padding:6px 14px; background:#f59e0b; color:#0a0a0a; font-weight:700; border-radius:8px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s; box-shadow:0 2px 8px rgba(245,158,11,0.25);" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Periksa Bukti Transfer & Verifikasi">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span>Periksa Bukti</span>
-            </button>
-          </div>`;
+        if (isSuccess) {
+          actionBtn = `
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#d4d4d4; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.color='#fbbf24'; this.style.borderColor='rgba(245,158,11,0.3)'; this.style.background='rgba(245,158,11,0.1)';" onmouseout="this.style.color='#d4d4d4'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.03)';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Bukti</span>
+              </button>
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(52,211,153,0.3); background:rgba(16,185,129,0.08); color:#34d399; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(16,185,129,0.18)';" onmouseout="this.style.background='rgba(16,185,129,0.08)';" onclick="AppEngine.openDigitalReceiptModalByDonationId('${d.id}')" title="Kwitansi Digital Resmi">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+                <span>Kwitansi</span>
+              </button>
+            </div>`;
+        } else if (d.status === 'REJECTED') {
+          actionBtn = `
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:5px 10px; border-radius:8px; border:1px solid rgba(244,63,94,0.3); background:rgba(244,63,94,0.06); color:#fb7185; display:inline-flex; align-items:center; gap:5px; cursor:pointer; transition:all 0.15s;" onmouseover="this.style.background='rgba(244,63,94,0.15)';" onmouseout="this.style.background='rgba(244,63,94,0.06)';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Lihat Bukti Transfer (Ditolak)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Lihat Bukti</span>
+              </button>
+            </div>`;
+        } else {
+          actionBtn = `
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+              <button type="button" style="font-size:0.75rem; padding:6px 14px; background:#f59e0b; color:#0a0a0a; font-weight:700; border-radius:8px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s; box-shadow:0 2px 8px rgba(245,158,11,0.25);" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';" onclick="AppEngine.openDonationVerifyModal('${d.id}')" title="Periksa Bukti Transfer & Verifikasi">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Periksa Bukti</span>
+              </button>
+            </div>`;
+        }
       }
 
       const campObj = (this.donationData.campaigns || []).find(c => c.id === d.campaign_id);
@@ -20739,8 +20832,12 @@ const M6Engine = {
         <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.02)';" onmouseout="this.style.background='transparent';">
           <td style="padding:12px; text-align:center; font-family:monospace; color:#94a3b8; font-size:0.8125rem;">${idx + 1}</td>
           <td style="padding:12px; font-family:monospace; font-size:0.75rem; color:#94a3b8;">${d.id}</td>
-          <td style="padding:12px; font-family:monospace; color:#fbbf24; font-size:0.75rem; font-weight:600;">${d.member_id || '-'}</td>
-          <td style="padding:12px; font-weight:600; color:#ffffff; font-size:0.875rem;">${d.donor_name || 'Hamba Allah'}</td>
+          ${isMember ? `
+            <td style="padding:12px; font-size:0.75rem; color:#94a3b8; font-family:monospace;">${d.created_at || '-'}</td>
+          ` : `
+            <td style="padding:12px; font-family:monospace; color:#fbbf24; font-size:0.75rem; font-weight:600;">${d.member_id || '-'}</td>
+            <td style="padding:12px; font-weight:600; color:#ffffff; font-size:0.875rem;">${d.donor_name || 'Hamba Allah'}</td>
+          `}
           <td style="padding:12px; font-size:0.8125rem; color:#cbd5e1;">${campTitle}</td>
           <td style="padding:12px; text-align:right; font-family:monospace; font-weight:600; color:rgba(52,211,153,0.9); font-size:0.875rem;">Rp ${parseFloat(d.amount || 0).toLocaleString('id-ID')}</td>
           <td style="padding:12px; text-align:center; font-weight:500; color:#38bdf8; font-size:0.75rem; text-transform:uppercase;">${d.payment_method || 'TRANSFER'}</td>
@@ -20753,12 +20850,12 @@ const M6Engine = {
     container.innerHTML = `
       <div style="margin-bottom:14px; font-size:0.8125rem; color:#94a3b8; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div>
-          <span style="color:#ffffff; font-weight:600;">Total Transaksi:</span> <span style="font-family:monospace; color:#ffffff; font-weight:700;">${list.length}</span> &nbsp;•&nbsp;
+          <span style="color:#ffffff; font-weight:600;">${isMember ? 'Donasi Akun Saya:' : 'Total Transaksi:'}</span> <span style="font-family:monospace; color:#ffffff; font-weight:700;">${list.length}</span> &nbsp;•&nbsp;
           <span style="color:#34d399; font-weight:600;">Terverifikasi:</span> <span style="font-family:monospace; color:#34d399; font-weight:700;">${verifiedCount}</span> &nbsp;•&nbsp;
           <span style="color:#fbbf24; font-weight:600;">Pending:</span> <span style="font-family:monospace; color:#fbbf24; font-weight:700;">${pendingCount}</span>
         </div>
         <div style="font-size:0.8125rem; color:#94a3b8;">
-          Total Terkumpul: <strong style="font-family:monospace; color:#34d399; font-size:1rem; margin-left:4px;">Rp ${totalSuccessAmount.toLocaleString('id-ID')}</strong>
+          ${isMember ? 'Total Donasi Anda:' : 'Total Terkumpul:'} <strong style="font-family:monospace; color:#34d399; font-size:1rem; margin-left:4px;">Rp ${totalSuccessAmount.toLocaleString('id-ID')}</strong>
         </div>
       </div>
       <div style="overflow-x:auto;">
@@ -20767,13 +20864,17 @@ const M6Engine = {
             <tr>
               <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); width:35px; text-align:center;">No</th>
               <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:left;">Kode Donasi</th>
-              <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:left;">Member ID</th>
-              <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:left;">Nama Donatur</th>
+              ${isMember ? `
+                <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:left;">Tanggal</th>
+              ` : `
+                <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:left;">Member ID</th>
+                <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:left;">Nama Donatur</th>
+              `}
               <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:left;">Campaign</th>
               <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:right;">Jumlah Donasi</th>
               <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:center;">Metode</th>
               <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:center;">Status</th>
-              <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:center;">Aksi</th>
+              <th style="padding:14px 12px; color:#94a3b8; font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); text-align:center;">${isMember ? 'Kwitansi & Bukti' : 'Aksi'}</th>
             </tr>
           </thead>
           <tbody>
@@ -21110,17 +21211,28 @@ const M6Engine = {
     }
 
     if (actionsEl) {
+      const activeApp = window.AppEngine || this;
+      const isMember = document.body.classList.contains('member-mode') || (activeApp && typeof activeApp.isMemberUser === 'function' && activeApp.isMemberUser());
       if (status === 'PENDING') {
-        actionsEl.innerHTML = `
-          <button type="button" class="btn-outline" style="border-color:rgba(244,63,94,0.4); color:#fb7185; padding:9px 20px; border-radius:12px; font-weight:600; font-size:0.8125rem; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine.confirmVerifyDonation(false)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            <span>Tolak Donasi</span>
-          </button>
-          <button type="button" class="btn-primary" style="background:#10b981; color:#042f2e; font-weight:700; padding:9px 24px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 10px rgba(16,185,129,0.3);" onclick="AppEngine.confirmVerifyDonation(true)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Setujui & Terbitkan Kwitansi</span>
-          </button>
-        `;
+        if (isMember) {
+          actionsEl.innerHTML = `
+            <button type="button" class="btn-outline" style="padding:9px 20px; border-radius:12px; font-size:0.8125rem; color:#94a3b8; border-color:rgba(255,255,255,0.1);" onclick="AuthEngine.closeAllModals()">Tutup</button>
+            <span style="background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); font-size:0.75rem; padding:8px 16px; border-radius:10px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+              <span>⏳ Menunggu Peninjauan Admin MB INA</span>
+            </span>
+          `;
+        } else {
+          actionsEl.innerHTML = `
+            <button type="button" class="btn-outline" style="border-color:rgba(244,63,94,0.4); color:#fb7185; padding:9px 20px; border-radius:12px; font-weight:600; font-size:0.8125rem; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine.confirmVerifyDonation(false)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <span>Tolak Donasi</span>
+            </button>
+            <button type="button" class="btn-primary" style="background:#10b981; color:#042f2e; font-weight:700; padding:9px 24px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 10px rgba(16,185,129,0.3);" onclick="AppEngine.confirmVerifyDonation(true)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Setujui & Terbitkan Kwitansi</span>
+            </button>
+          `;
+        }
       } else if (status === 'SUCCESS' || status === 'CONFIRMED') {
         actionsEl.innerHTML = `
           <button type="button" class="btn-outline" style="padding:9px 20px; border-radius:12px; font-size:0.8125rem; color:#94a3b8; border-color:rgba(255,255,255,0.1);" onclick="AuthEngine.closeAllModals()">Tutup</button>

@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260907_v175_restore_member_sidebar">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v175_restore_member_sidebar">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v176_member_donation_log">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v176_member_donation_log">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -2935,16 +2935,17 @@
           <!-- ─── DONOR LIST & VERIFIKASI — langsung di bawah campaign ─── -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin:28px 0 14px; flex-wrap:wrap; gap:12px;">
             <div>
-              <h4 style="color:var(--accent-gold); font-size:1.1rem; margin:0;">👥 DAFTAR DONATUR & VERIFIKASI</h4>
+              <h4 style="color:var(--accent-gold); font-size:1.1rem; margin:0;" id="m73-donor-list-header-title">👥 DAFTAR DONATUR & VERIFIKASI</h4>
               <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0;" id="m73-donor-list-header-desc">Semua transaksi donasi pada seluruh campaign aktif</p>
             </div>
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
               <select id="m73-donor-campaign-filter" class="form-input" style="font-size:0.78rem; padding:6px 12px; max-width:260px; background:rgba(15,23,42,0.9); color:var(--accent-gold); border:1px solid var(--accent-gold);" onchange="window.filterDonorsByCampaign(this.value)">
                 <option value="ALL">🔍 Semua Campaign (All)</option>
               </select>
-              <button class="btn-outline" style="font-size:0.78rem; padding:6px 12px;" onclick="exportDonationsExcel()">📤 Export Excel</button>
-              <button class="btn-outline" style="font-size:0.78rem; padding:6px 12px;" onclick="exportDonationsPdf()">📤 Export PDF</button>
-              <button class="btn-primary" style="font-size:0.78rem; padding:6px 12px;" onclick="sendThankYouToAllDonors()">📧 Kirim Terima Kasih</button>
+              <button class="btn-outline m73-admin-only-btn" style="font-size:0.78rem; padding:6px 12px;" onclick="exportDonationsExcel()">📤 Export Excel</button>
+              <button class="btn-outline m73-admin-only-btn" style="font-size:0.78rem; padding:6px 12px;" onclick="exportDonationsPdf()">📤 Export PDF</button>
+              <button class="btn-primary m73-admin-only-btn" style="font-size:0.78rem; padding:6px 12px;" onclick="sendThankYouToAllDonors()">📧 Kirim Terima Kasih</button>
+              <button id="btn-m73-member-donate" class="btn-primary" style="display:none; font-size:0.78rem; padding:6px 14px; background:#f59e0b; color:#0a0a0a; font-weight:700; border-radius:10px; border:none; cursor:pointer;" onclick="AppEngine.openMemberDonasiModal()">❤️ Donasi Sekarang</button>
             </div>
           </div>
           <div id="m73-donor-table-container" class="glass-card" style="padding:16px; margin-bottom:20px; border:1px solid var(--chrome-border); border-radius:14px;">
@@ -11355,8 +11356,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v175_restore_member_sidebar"></script>
-  <script src="js/app.js?v=20260907_v175_restore_member_sidebar"></script>
+  <script src="js/auth.js?v=20260907_v176_member_donation_log"></script>
+  <script src="js/app.js?v=20260907_v176_member_donation_log"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11433,7 +11434,6 @@
   </script>
 
 
-  
-  <script src="js/donation_manager.js?v=20260907_v174_remove_member_sidebar_and_m2_actions"></script>
+  <script src="js/donation_manager.js?v=20260907_v176_member_donation_log"></script>
 </body>
 </html>

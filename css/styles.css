@@ -2692,6 +2692,8 @@ body.light-mode input:-webkit-autofill:active {
   border-color: rgba(212, 175, 55, 0.3);
   transform: translateY(-3px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
 /* ==========================================================================
    🔒 MEMBER MODE STYLES (READ-ONLY FOR REGULAR MEMBERS)
    ========================================================================== */
@@ -2764,12 +2766,27 @@ body.member-mode #admin-tab-m5_forum button[onclick*="openM5CreateBroadcastModal
   display: none !important;
 }
 
-/* Donation restrictions for member (hide Create Program tab & hide global donor list section) */
+/* Donation restrictions for member:
+   - Hide "Buat Program Donasi" (7_3_2_form)
+   - Hide "Log Digital Receipt" tab (7_3_4_receipts) and content
+   - Hide Admin-only export and thank-you buttons
+*/
 body.member-mode #admin-tab-m7_donation button[data-m73-subtab="7_3_2_form"],
+body.member-mode #admin-tab-m7_donation button[data-m73-subtab="7_3_4_receipts"],
+body.member-mode #admin-tab-m7_donation #m73-subtab-7_3_2_form,
+body.member-mode #admin-tab-m7_donation #m73-subtab-7_3_4_receipts,
+body.member-mode #admin-tab-m7_donation .m73-admin-only-btn,
+body.member-mode #admin-tab-m7_donation button[onclick*="exportDonations"],
+body.member-mode #admin-tab-m7_donation button[onclick*="sendThankYouToAllDonors"],
 body.member-mode #admin-tab-m7_donation .mbux-tab-link:nth-child(2),
+body.member-mode #admin-tab-m7_donation .mbux-tab-link:nth-child(3),
 body.member-mode #admin-tab-m7_donation .mbux-tab-link:nth-child(4),
 body.member-mode #admin-tab-m7_donation .member-hide-donor-transactions {
   display: none !important;
+}
+
+body.member-mode #btn-m73-member-donate {
+  display: inline-flex !important;
 }
 
 
