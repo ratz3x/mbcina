@@ -611,7 +611,12 @@ photo_url: sbUser.user_metadata?.picture || '',
           } else if (res.message) {
             const idLower = email.toLowerCase();
             const passLower = password.toLowerCase();
-            if (['dtouriano@gmail.com', 'usr_superadmin', 'superadmin', 'admin', 'derist', 'mbina-hq-2026-000001'].includes(idLower) && 
+            // Daftar akun demo yang harus selalu bisa fallback ke Step 3
+            const demoAccounts = ['andi@email.com', 'member@mbcina.or.id', 'demo.member@mbcina.or.id', 'member', 'andi_wijaya', 'mbina-dki-2026-000012'];
+            if (demoAccounts.includes(idLower)) {
+              // Biarkan jatuh ke Step 3 — jangan return di sini
+              console.log('Demo member account detected, skipping API error, falling to Step 3...');
+            } else if (['dtouriano@gmail.com', 'usr_superadmin', 'superadmin', 'admin', 'derist', 'mbina-hq-2026-000001'].includes(idLower) && 
                 (passLower.includes('superadmin') || passLower.includes('admin') || passLower.includes('mbcina') || passLower === '123456')) {
               loginSuccess = true;
               loggedUser = {
@@ -722,7 +727,13 @@ photo_url: sbUser.user_metadata?.picture || '',
           tier: 'GOLD'
         };
         loginMessage = `Login Berhasil! Selamat Datang kembali, ${loggedUser.name} (Portal Sponsor MB INA).`;
-      } else if (['andi@email.com', 'member', 'member@mbina.or.id', 'andi_wijaya', 'mbina-dki-2026-000012'].includes(idLower)) {
+      } else if (['andi@email.com', 'member', 'member@mbcina.or.id', 'demo.member@mbcina.or.id', 'andi_wijaya', 'mbina-dki-2026-000012'].includes(idLower)) {
+        const passLower = password.toLowerCase();
+        const validPasses = ['member123', 'mbcina2026', '123456', 'member'];
+        if (!validPasses.includes(passLower) && password !== '') {
+          alert('❌ Password salah! Gunakan password: member123');
+          return;
+        }
         loginSuccess = true;
         loggedUser = {
           id: 'usr_member_andi',
