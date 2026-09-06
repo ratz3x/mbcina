@@ -23205,14 +23205,37 @@ window.M7Engine = {
     const adminRoles = ['SUPER_ADMIN', 'ADMIN_ORGANISASI', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'PENGURUS_KLUB'];
     const isAdmin = adminRoles.includes(user.role);
 
-    // Cek jika member biasa (non-admin) sudah memiliki lapak resmi terdaftar
-    if (!isAdmin && user.role !== 'GUEST' && user.id) {
+    // ATURAN 1: PEMILIK LAPAK WAJIB MENJADI MEMBER DAN MEMILIKI NOMOR KTA RESMI
+    const memberId = (user.member_id || user.memberId || '').trim();
+    if (!isAdmin && user.role !== 'GUEST') {
+      if (!memberId || (!memberId.startsWith('MBINA-') && !memberId.startsWith('SPN-'))) {
+        alert("⚠️ Pengajuan sewa lapak hanya diperuntukkan bagi Anggota resmi MB INA yang telah memiliki Nomor KTA aktif.");
+        return;
+      }
+    }
+
+    // ATURAN 2: 1 MEMBER_ID = 1 LAPAK DENGAN BANYAK PRODUK
+    if (!isAdmin && user.role !== 'GUEST' && (user.id || memberId)) {
+      const uMid = memberId.toLowerCase();
+      const uUid = (user.id || user.userId || '').trim().toLowerCase();
+      const uName = (user.name || user.username || '').trim().toLowerCase();
+
       const myLapak = (this.data && Array.isArray(this.data.lapak)) 
-        ? this.data.lapak.find(l => (l.user_id && (l.user_id === user.id || l.user_id === user.userId)) || (l.member_id && l.member_id === user.member_id))
+        ? this.data.lapak.find(l => {
+            const lMid = (l.member_id || '').trim().toLowerCase();
+            const lUid = (l.user_id || '').trim().toLowerCase();
+            const lOwner = (l.pemilik || '').trim().toLowerCase();
+            return (uMid && (lMid === uMid || lUid === uMid)) ||
+                   (uUid && (lUid === uUid || lMid === uUid)) ||
+                   (uName && lOwner === uName);
+          })
         : null;
 
       if (myLapak) {
-        alert("Anda sudah memiliki Lapak");
+        alert(`ℹ️ Anda sudah memiliki 1 Lapak Resmi terdaftar: "${myLapak.name}" (${myLapak.lapak_code || myLapak.id}).\n\nSesuai aturan federasi MB INA, 1 Nomor Anggota (KTA) hanya berhak memiliki 1 Lapak Resmi dengan kapasitas banyak produk dagangan.\n\nSilakan klik OK untuk langsung menambahkan produk ke lapak Anda.`);
+        if (typeof this.openProductModal === 'function') {
+          this.openProductModal(myLapak.id);
+        }
         return;
       }
     }
@@ -23333,7 +23356,9 @@ window.M7Engine = {
     const proofUrl = document.getElementById('sewa-form-proof')?.value || '';
 
     const user = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
-    const userId = user.id || user.username || 'usr_superadmin';
+    const officialMemberId = (user.member_id || user.memberId || '').trim();
+    const userId = officialMemberId || user.id || user.username || 'usr_superadmin';
+    const pemilikName = user.name || user.nama_lengkap || user.username || 'Member MB INA';
 
     try {
       const res = await fetch('api.php?action=create_lapak', {
@@ -23341,6 +23366,8 @@ window.M7Engine = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userId,
+          member_id: officialMemberId,
+          pemilik: pemilikName,
           name: name,
           category: category,
           description: description,

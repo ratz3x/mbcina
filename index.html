@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260907_v180_member_id_and_moderation">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v180_member_id_and_moderation">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v181_standardized_lapak_id_kta">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v181_standardized_lapak_id_kta">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -11470,8 +11470,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v180_member_id_and_moderation"></script>
-  <script src="js/app.js?v=20260907_v180_member_id_and_moderation"></script>
+  <script src="js/auth.js?v=20260907_v181_standardized_lapak_id_kta"></script>
+  <script src="js/app.js?v=20260907_v181_standardized_lapak_id_kta"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11518,15 +11518,23 @@
               const res = await fetch('api.php?action=submit_donation', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ campaign_id, user_id: 'usr_superadmin', donor_name, member_id_input, amount, payment_method, payment_proof_url: 'assets/mb_hero.jpg' })
+                body: JSON.stringify({
+                  campaign_id: campaign_id,
+                  amount: amount,
+                  donor_name: donor_name,
+                  member_id: member_id_input,
+                  payment_method: payment_method
+                })
               }).then(r => r.json());
               if (res.success) {
-                window.showToast('💝 TERIMA KASIH ATAS DONASI ANDA!\n\nNominal: Rp ' + parseFloat(amount).toLocaleString('id-ID') + '\nDonasi Anda telah berhasil dikirim dan akan diverifikasi oleh Admin MB INA.', 'success');
-                document.getElementById('member-donation-form').reset();
-                if (window.AuthEngine) window.AuthEngine.closeModal('modal-member-donation');
-                if (window.loadDonationData) {
-                  await window.loadDonationData();
-                  // renderM73CampaignCards and renderM73DonorTable are called inside loadDonationData
+                window.showToast('🎉 ' + res.message, 'success');
+                const modal = document.getElementById('modal-member-donation');
+                if (modal) {
+                  modal.classList.remove('active');
+                  modal.style.setProperty('display', 'none', 'important');
+                }
+                if (typeof window.AppEngine.loadDonasiData === 'function') {
+                  window.AppEngine.loadDonasiData();
                 }
               } else {
                 window.showToast('⚠️ Error: ' + res.message, 'error');
@@ -11548,6 +11556,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v180_member_id_and_moderation"></script>
+  <script src="js/donation_manager.js?v=20260907_v181_standardized_lapak_id_kta"></script>
 </body>
 </html>
