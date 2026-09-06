@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260906_v159_transparent_gold_map">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v159_transparent_gold_map">
+  <link rel="stylesheet" href="css/styles.css?v=20260906_v160_luxury_dark_member_portal">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v160_luxury_dark_member_portal">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -626,69 +626,73 @@
         </div>
       </div>
 
-      <!-- 2-COLUMN LUXURY EXECUTIVE LAYOUT (PETA & FORM BIODATA) -->
+      <!-- 2-COLUMN LUXURY EXECUTIVE LAYOUT (PETA & FORM BIODATA - STRICT LUXURY DARK MODE) -->
       <div style="display:grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap:24px; margin-top:32px; margin-bottom:32px; align-items:start;" class="pov-grid-responsive">
         
         <!-- KOLOM KIRI (PETA SEBARAN 111 KLUB & REGIONAL MB INA) -->
-        <div class="glass-panel" style="padding:22px; border-radius:18px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:0 10px 30px rgba(0,0,0,0.35); display:flex; flex-direction:column; gap:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-xl flex flex-col gap-4" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px); border-radius:24px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.4); display:flex; flex-direction:column; gap:16px;">
+          <div class="flex justify-between items-center flex-wrap gap-2.5" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
-              <h3 style="font-size:1.15rem; color:var(--accent-gold); font-weight:800; margin:0;">
+              <h3 class="text-sm md:text-base font-bold text-white tracking-wide" style="font-size:1rem; font-weight:700; color:#ffffff; letter-spacing:0.025em; margin:0;">
                 Peta Persebaran 111 Klub MB INA
               </h3>
-              <p style="font-size:0.78rem; color:var(--text-muted); margin:3px 0 0 0;">Visualisasi geografis real-time sebaran klub & distribusi anggota se-Indonesia</p>
+              <p class="text-xs text-neutral-400 mt-1" style="font-size:0.75rem; color:#a3a3a3; margin:4px 0 0 0;">Visualisasi geografis real-time sebaran klub & distribusi anggota se-Indonesia</p>
             </div>
-            <button class="btn-outline" style="padding:6px 12px; font-size:0.75rem; color:var(--accent-gold); border-color:rgba(245,158,11,0.3);" onclick="AppEngine.openSelectClubModal()">
+            <button type="button" class="bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white border border-white/10 px-3.5 py-1.5 rounded-xl text-xs transition-all" style="background:rgba(255,255,255,0.05); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); padding:6px 14px; border-radius:12px; font-size:0.75rem; font-weight:500; cursor:pointer; transition:all 0.2s;" onclick="AppEngine.openSelectClubModal()">
               Katalog 111 Klub
             </button>
           </div>
 
           <!-- INTERACTIVE INDONESIA MAP POV CONTAINER -->
-          <div style="background:#090d16; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:6px; position:relative; overflow:hidden;">
+          <div style="background:#090d16; border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:6px; position:relative; overflow:hidden;">
             <div id="member-indonesia-map" style="width:100%; height:auto; overflow:hidden;"></div>
           </div>
 
-          <!-- REGIONAL DISTRIBUTION PROGRESS BARS (CLEAN DARK DESIGN) -->
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-size:0.82rem; font-weight:700; color:#fff;">Distribusi Wilayah Anggota</span>
-              <span style="font-size:0.72rem; color:var(--text-muted);">12.544 Member Terdaftar</span>
+          <!-- REGIONAL DISTRIBUTION PROGRESS BARS (STRICT MONOCHROME SLATE LUXURY) -->
+          <div class="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:16px;">
+            <div class="flex justify-between items-center mb-3" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span class="text-xs font-semibold text-neutral-200" style="font-size:0.75rem; font-weight:600; color:#e2e8f0;">Distribusi Wilayah Anggota</span>
+              <span class="text-xs font-mono text-neutral-400" style="font-size:0.75rem; font-family:ui-monospace, monospace; color:#a3a3a3;">12.544 Member Terdaftar</span>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; font-size:0.78rem;">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-3" style="display:grid; grid-template-columns:1fr 1fr; gap:12px 16px;">
               <div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                  <span style="color:var(--text-muted);">DKI & Banten</span><strong style="color:var(--accent-gold);">4.820 (38%)</strong>
+                <div class="flex justify-between items-center mb-1" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <span class="text-xs text-neutral-400" style="font-size:0.75rem; color:#a3a3a3;">DKI & Banten</span>
+                  <span class="font-mono text-xs font-semibold text-neutral-200" style="font-family:ui-monospace, monospace; font-size:0.75rem; font-weight:600; color:#e2e8f0;">4.820 (38%)</span>
                 </div>
-                <div style="height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;">
-                  <div style="width:38%; height:100%; background:var(--accent-gold);"></div>
+                <div class="h-1 rounded-full bg-white/10 overflow-hidden" style="height:4px; background:rgba(255,255,255,0.1); border-radius:9999px; overflow:hidden;">
+                  <div class="h-full rounded-full bg-slate-300" style="width:38%; height:100%; background:#cbd5e1; border-radius:9999px;"></div>
                 </div>
               </div>
 
               <div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                  <span style="color:var(--text-muted);">Jawa Barat</span><strong style="color:#60a5fa;">2.950 (24%)</strong>
+                <div class="flex justify-between items-center mb-1" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <span class="text-xs text-neutral-400" style="font-size:0.75rem; color:#a3a3a3;">Jawa Barat</span>
+                  <span class="font-mono text-xs font-semibold text-neutral-200" style="font-family:ui-monospace, monospace; font-size:0.75rem; font-weight:600; color:#e2e8f0;">2.950 (24%)</span>
                 </div>
-                <div style="height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;">
-                  <div style="width:24%; height:100%; background:#3b82f6;"></div>
-                </div>
-              </div>
-
-              <div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                  <span style="color:var(--text-muted);">Jateng & DIY</span><strong style="color:var(--primary-emerald);">1.840 (15%)</strong>
-                </div>
-                <div style="height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;">
-                  <div style="width:15%; height:100%; background:#10b981;"></div>
+                <div class="h-1 rounded-full bg-white/10 overflow-hidden" style="height:4px; background:rgba(255,255,255,0.1); border-radius:9999px; overflow:hidden;">
+                  <div class="h-full rounded-full bg-slate-300" style="width:24%; height:100%; background:#cbd5e1; border-radius:9999px;"></div>
                 </div>
               </div>
 
               <div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                  <span style="color:var(--text-muted);">Jatim & Bali</span><strong style="color:#ec4899;">1.650 (13%)</strong>
+                <div class="flex justify-between items-center mb-1" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <span class="text-xs text-neutral-400" style="font-size:0.75rem; color:#a3a3a3;">Jateng & DIY</span>
+                  <span class="font-mono text-xs font-semibold text-neutral-200" style="font-family:ui-monospace, monospace; font-size:0.75rem; font-weight:600; color:#e2e8f0;">1.840 (15%)</span>
                 </div>
-                <div style="height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden;">
-                  <div style="width:13%; height:100%; background:#ec4899;"></div>
+                <div class="h-1 rounded-full bg-white/10 overflow-hidden" style="height:4px; background:rgba(255,255,255,0.1); border-radius:9999px; overflow:hidden;">
+                  <div class="h-full rounded-full bg-slate-300" style="width:15%; height:100%; background:#cbd5e1; border-radius:9999px;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <span class="text-xs text-neutral-400" style="font-size:0.75rem; color:#a3a3a3;">Jatim & Bali</span>
+                  <span class="font-mono text-xs font-semibold text-neutral-200" style="font-family:ui-monospace, monospace; font-size:0.75rem; font-weight:600; color:#e2e8f0;">1.650 (13%)</span>
+                </div>
+                <div class="h-1 rounded-full bg-white/10 overflow-hidden" style="height:4px; background:rgba(255,255,255,0.1); border-radius:9999px; overflow:hidden;">
+                  <div class="h-full rounded-full bg-slate-300" style="width:13%; height:100%; background:#cbd5e1; border-radius:9999px;"></div>
                 </div>
               </div>
             </div>
@@ -696,19 +700,19 @@
         </div>
 
         <!-- KOLOM KANAN (FORM BIODATA RESMI MEMBER MB INA & SELEKSI KLUB) -->
-        <div class="glass-panel" style="padding:22px; border-radius:18px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); box-shadow:0 8px 30px rgba(0,0,0,0.35);">
+        <div class="bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-xl" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px); border-radius:24px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.4);">
           
           <!-- TOP BOX: FOTO RESMI MEMBER (KTA & PROFIL) -->
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:14px 16px; margin-bottom:18px; display:flex; align-items:center; gap:16px;">
-            <div style="width:58px; height:58px; border-radius:14px; border:1px solid rgba(255,255,255,0.12); overflow:hidden; background:rgba(0,0,0,0.4); flex-shrink:0; display:flex; align-items:center; justify-content:center;">
-              <img id="dash-member-photo" src="assets/mb_badge.jpg" style="width:100%; height:100%; object-fit:cover;">
+          <div class="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 mb-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:16px; margin-bottom:16px; display:flex; align-items:center; gap:16px;">
+            <div class="w-14 h-14 rounded-full border border-white/15 bg-neutral-900 p-1 shadow-md flex-shrink-0 flex items-center justify-center overflow-hidden" style="width:56px; height:56px; border-radius:9999px; border:1px solid rgba(255,255,255,0.15); background:#171717; padding:4px; box-shadow:0 4px 12px rgba(0,0,0,0.5); flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+              <img id="dash-member-photo" src="assets/mb_badge.jpg" alt="Foto Profil" class="w-full h-full rounded-full object-cover" style="width:100%; height:100%; border-radius:9999px; object-fit:cover;">
             </div>
             <div>
-              <div style="color:var(--accent-gold); font-size:0.84rem; font-weight:700; margin-bottom:6px;">
+              <div class="text-xs font-semibold text-white mb-1.5" style="color:#ffffff; font-size:0.75rem; font-weight:600; margin-bottom:6px;">
                 Foto Resmi Member (KTA & Profil)
               </div>
               <input type="file" id="dash-photo-input" accept="image/*" style="display:none;" onchange="AppEngine.handleDashboardPhotoUpload(event)">
-              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:4px 12px; border-radius:8px; color:#cbd5e1;" onclick="document.getElementById('dash-photo-input').click()">
+              <button type="button" class="bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white border border-white/10 text-xs px-3 py-1.5 rounded-xl transition-all" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#cbd5e1; font-size:0.75rem; padding:6px 12px; border-radius:12px; cursor:pointer; transition:all 0.2s;" onclick="document.getElementById('dash-photo-input').click()">
                 Pilih & Upload Foto...
               </button>
             </div>
@@ -718,15 +722,13 @@
             <!-- ROW 1: MEMBER ID & STATUS -->
             <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:12px; margin-bottom:12px;">
               <div>
-                <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Member ID</label>
-                <input type="text" id="dash-member-id" class="form-input" readonly style="font-family:monospace; color:var(--accent-gold); font-weight:700; font-size:0.85rem; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08); padding:8px 12px; cursor:not-allowed;" value="">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Member ID</label>
+                <input type="text" id="dash-member-id" class="w-full bg-white/[0.04] border border-white/[0.08] focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-neutral-600 outline-none transition-all" readonly style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:8px 14px; font-size:0.75rem; font-family:ui-monospace, monospace; color:#cbd5e1; font-weight:600; cursor:not-allowed; outline:none;" value="">
               </div>
               <div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                  <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin:0; text-transform:uppercase; letter-spacing:0.04em;">Status</label>
-                  <span id="dash-status-auth-badge" style="font-size:0.65rem; color:var(--accent-gold);">Sekjen/Admin</span>
-                </div>
-                <select id="dash-member-status" class="form-input" style="font-size:0.82rem; font-weight:600; padding:8px 10px; background:rgba(15,23,42,0.8); border-color:rgba(255,255,255,0.08); color:var(--primary-emerald);">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Status</label>
+                <span id="dash-status-auth-badge" style="display:none;"></span>
+                <select id="dash-member-status" class="w-full bg-slate-900 border border-white/10 focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-white outline-none transition-all" style="width:100%; background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; color:#e2e8f0; font-weight:500; outline:none;">
                   <option value="ACTIVE" selected>ACTIVE</option>
                   <option value="PENDING">PENDING</option>
                   <option value="HONORARY">HONORARY</option>
@@ -736,31 +738,31 @@
 
             <!-- ROW 2: NAMA LENGKAP -->
             <div style="margin-bottom:12px;">
-              <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Nama Lengkap</label>
-              <input type="text" id="dash-member-name" class="form-input" placeholder="Nama Lengkap Sesuai KTP / E-KTA" required style="font-size:0.88rem; padding:8px 12px; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08); color:#fff; font-weight:600;" value="">
+              <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Nama Lengkap</label>
+              <input type="text" id="dash-member-name" class="w-full bg-white/[0.04] border border-white/[0.08] focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-neutral-600 outline-none transition-all" placeholder="Nama Lengkap Sesuai KTP / E-KTA" required style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; color:#ffffff; font-weight:600; outline:none;" value="">
             </div>
 
             <!-- ROW 3: EMAIL & NO. WHATSAPP -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
               <div>
-                <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Email</label>
-                <input type="email" id="dash-member-email" class="form-input" required style="font-size:0.82rem; padding:8px 12px; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08);" value="">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Email</label>
+                <input type="email" id="dash-member-email" class="w-full bg-white/[0.04] border border-white/[0.08] focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-neutral-600 outline-none transition-all" required style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; color:#ffffff; outline:none;" value="">
               </div>
               <div>
-                <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">No. WhatsApp</label>
-                <input type="tel" id="dash-member-phone" class="form-input" required style="font-size:0.82rem; padding:8px 12px; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08);" value="">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">No. WhatsApp</label>
+                <input type="tel" id="dash-member-phone" class="w-full bg-white/[0.04] border border-white/[0.08] focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-neutral-600 outline-none transition-all" required style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; color:#ffffff; outline:none;" value="">
               </div>
             </div>
 
             <!-- ROW 4: KOTA & PROVINSI -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
               <div>
-                <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Kota</label>
-                <input type="text" id="dash-member-city" class="form-input" placeholder="Kota Domisili" style="font-size:0.82rem; padding:8px 12px; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08);" value="">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Kota</label>
+                <input type="text" id="dash-member-city" class="w-full bg-white/[0.04] border border-white/[0.08] focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-neutral-600 outline-none transition-all" placeholder="Kota Domisili" style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; color:#ffffff; outline:none;" value="">
               </div>
               <div>
-                <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Provinsi</label>
-                <input type="text" id="dash-member-province" class="form-input" placeholder="Provinsi" style="font-size:0.82rem; padding:8px 12px; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08);" value="">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Provinsi</label>
+                <input type="text" id="dash-member-province" class="w-full bg-white/[0.04] border border-white/[0.08] focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-neutral-600 outline-none transition-all" placeholder="Provinsi" style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; color:#ffffff; outline:none;" value="">
               </div>
             </div>
 
@@ -768,58 +770,61 @@
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
               <div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                  <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin:0; text-transform:uppercase; letter-spacing:0.04em;">Tier Keanggotaan</label>
-                  <span id="dash-tier-badge-auto" style="font-size:0.65rem; color:var(--accent-gold); font-weight:600; cursor:pointer;" onclick="AppEngine.openMyTierModal()">Level Otomatis</span>
+                  <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Tier Keanggotaan</label>
+                  <span id="dash-tier-badge-auto" class="text-[10px] text-neutral-400 hover:text-white cursor-pointer transition-colors" style="font-size:10px; color:#a3a3a3; cursor:pointer;" onclick="AppEngine.openMyTierModal()">Level Otomatis</span>
                 </div>
-                <div id="dash-member-tier-display" class="form-input" style="font-size:0.82rem; font-weight:700; padding:8px 12px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); color:var(--accent-gold); display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="AppEngine.openMyTierModal()">
-                  <span id="dash-member-tier-txt">BRONZE MEMBER</span>
-                  <span id="dash-member-donation-total" style="font-size:0.7rem; color:var(--text-muted); font-weight:500;">(Rp 0)</span>
+                <div id="dash-member-tier-display" class="bg-white/5 border border-white/10 text-amber-400 font-mono text-xs px-3 py-2 rounded-xl flex items-center justify-between cursor-pointer" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fbbf24; font-family:ui-monospace, monospace; font-size:0.75rem; padding:8px 12px; border-radius:12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;" onclick="AppEngine.openMyTierModal()">
+                  <span id="dash-member-tier-txt" class="font-semibold tracking-wide">BRONZE MEMBER</span>
+                  <span id="dash-member-donation-total" class="text-[10px] text-neutral-400 font-normal" style="font-size:10px; color:#a3a3a3; font-weight:400;">(Rp 0)</span>
                 </div>
                 <input type="hidden" id="dash-member-tier" value="BRONZE">
               </div>
               <div>
-                <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Klub / Chapter</label>
-                <select id="dash-member-club" class="form-input" style="font-size:0.82rem; font-weight:600; padding:8px 10px; background:rgba(15,23,42,0.8); border-color:rgba(255,255,255,0.08); color:#60a5fa;">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Klub / Chapter</label>
+                <select id="dash-member-club" class="w-full bg-slate-900 border border-white/10 focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-neutral-200 outline-none transition-all" style="width:100%; background:#0f172a; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; color:#e2e8f0; font-weight:500; outline:none;">
                   <option value="Belum Memilih Klub">Nama klub</option>
                 </select>
               </div>
             </div>
 
             <!-- ROW 6: MODEL KENDARAAN & PLAT NOMOR -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; background:rgba(255,255,255,0.02); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.06);">
+            <div class="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-3.5 mb-3.5 grid grid-cols-2 gap-3" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:14px; margin-bottom:14px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
               <div>
-                <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Model Kendaraan</label>
-                <input type="text" id="dash-member-vehicle" class="form-input" placeholder="contoh: W124 300E / W212" style="font-size:0.82rem; font-weight:600; padding:8px 12px; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08);" value="">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Model Kendaraan</label>
+                <input type="text" id="dash-member-vehicle" class="w-full bg-white/[0.04] border border-white/[0.08] focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-neutral-600 outline-none transition-all" placeholder="contoh: W124 300E / W212" style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; color:#ffffff; outline:none;" value="">
               </div>
               <div>
-                <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Plat Nomor Polisi</label>
-                <input type="text" id="dash-member-plate" class="form-input" placeholder="contoh: B 1234 MB" style="font-size:0.82rem; font-weight:700; padding:8px 12px; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08); font-family:monospace; text-transform:uppercase; color:var(--accent-gold);" value="">
+                <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Plat Nomor Polisi</label>
+                <input type="text" id="dash-member-plate" class="w-full bg-white/[0.04] border border-white/[0.08] focus:border-amber-500/40 rounded-xl px-3.5 py-2 text-xs text-amber-400 font-mono placeholder:text-neutral-600 outline-none transition-all uppercase" placeholder="contoh: B 1234 MB" style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.75rem; font-family:ui-monospace, monospace; color:#fbbf24; text-transform:uppercase; font-weight:600; outline:none;" value="">
               </div>
             </div>
 
             <!-- ROW 7: CATATAN ADMIN / PROFIL -->
-            <div style="margin-bottom:18px;">
-              <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;">Catatan Internal</label>
-              <textarea id="dash-member-notes" class="form-input" rows="2" placeholder="Catatan internal..." style="font-size:0.8rem; padding:8px 12px; background:rgba(0,0,0,0.3); border-color:rgba(255,255,255,0.08); resize:none;"></textarea>
+            <div style="margin-bottom:16px;">
+              <label class="text-[10px] font-semibold tracking-wider text-neutral-400 uppercase mb-1 block" style="font-family:'Inter', sans-serif; font-size:10px; font-weight:600; letter-spacing:0.05em; color:#a3a3a3; text-transform:uppercase; margin-bottom:4px; display:block;">Catatan Internal</label>
+              <textarea id="dash-member-notes" rows="2" class="w-full bg-white/[0.02] border border-white/[0.05] rounded-xl p-2.5 text-[11px] text-neutral-400 font-mono outline-none resize-none transition-all placeholder:text-neutral-600" placeholder="Catatan internal..." style="width:100%; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:10px; font-size:11px; font-family:ui-monospace, monospace; color:#a3a3a3; resize:none; outline:none;"></textarea>
             </div>
 
             <!-- ACTION BUTTONS -->
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.08); padding-top:14px;">
-              <button type="button" class="btn-primary" style="font-size:0.8rem; padding:8px 16px; font-weight:700;" onclick="AppEngine.openMemberKtaModal()">
-                Cetak KTA
+            <div class="flex justify-between items-center gap-2.5 flex-wrap pt-3.5 border-t border-white/[0.08]" style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.08); padding-top:14px;">
+              <!-- Cetak KTA: Tombol secondary outline di sisi kiri -->
+              <button type="button" class="bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white border border-white/10 px-4 py-2 rounded-xl text-xs font-medium inline-flex items-center gap-1.5 transition-all" style="background:rgba(255,255,255,0.05); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); padding:8px 16px; border-radius:12px; font-size:0.75rem; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s;" onclick="AppEngine.openMemberKtaModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                <span>Cetak KTA</span>
               </button>
               
-              <div style="display:flex; gap:8px;">
-                <button type="button" class="btn-outline" style="padding:8px 14px; font-size:0.8rem; color:#cbd5e1;" onclick="AppEngine.populateMemberPortalData()">
+              <div class="flex items-center gap-2" style="display:flex; align-items:center; gap:8px;">
+                <!-- Batal: Tombol teks netral -->
+                <button type="button" class="text-neutral-400 hover:text-white text-xs px-3 py-2 transition-colors" style="background:transparent; border:none; color:#a3a3a3; font-size:0.75rem; padding:8px 12px; cursor:pointer; transition:color 0.2s;" onclick="AppEngine.populateMemberPortalData()">
                   Batal
                 </button>
-                <button type="submit" class="btn-primary" style="font-size:0.8rem; padding:8px 18px; font-weight:700;">
+                <!-- Simpan Perubahan: Tombol primary amber luxury -->
+                <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold px-5 py-2 rounded-xl text-xs transition-all shadow-sm" style="background:#f59e0b; color:#0a0a0a; border:none; padding:8px 20px; border-radius:12px; font-size:0.75rem; font-weight:600; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 8px rgba(245,158,11,0.25);">
                   Simpan Perubahan
                 </button>
               </div>
             </div>
           </form>
-
         </div>
 
       </div>
@@ -11168,8 +11173,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260906_v159_transparent_gold_map"></script>
-  <script src="js/app.js?v=20260906_v159_transparent_gold_map"></script>
+  <script src="js/auth.js?v=20260906_v160_luxury_dark_member_portal"></script>
+  <script src="js/app.js?v=20260906_v160_luxury_dark_member_portal"></script>
   <script>
     lucide.createIcons();
     try {

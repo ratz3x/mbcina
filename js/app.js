@@ -588,25 +588,19 @@ const AppEngine = {
       dStatus.style.opacity = canManageStatus ? '1' : '0.85';
       dStatus.title = canManageStatus ? 'Ubah status keanggotaan' : 'Status hanya dapat ditentukan oleh Sekjen, Presiden, atau Super Admin MB INA';
 
-      // Warna Status yang Sinkron Sempurna
+      // Warna Status yang Bersih Monokromatik & Amber Halus
       if (realStatus === 'ACTIVE') {
-        dStatus.style.color = 'var(--primary-emerald)';
+        dStatus.style.color = '#e2e8f0';
       } else if (realStatus === 'PENDING') {
-        dStatus.style.color = 'var(--accent-gold)';
+        dStatus.style.color = '#fbbf24';
       } else if (realStatus === 'HONORARY') {
-        dStatus.style.color = '#8b5cf6';
+        dStatus.style.color = '#cbd5e1';
       } else {
-        dStatus.style.color = 'var(--accent-red)';
+        dStatus.style.color = '#94a3b8';
       }
     }
     if (dAuthBadge) {
-      if (canManageStatus) {
-        dAuthBadge.innerHTML = '🔓 Otoritas Sekjen/Presiden/Admin';
-        dAuthBadge.style.color = 'var(--primary-emerald)';
-      } else {
-        dAuthBadge.innerHTML = '🔒 Otoritas Sekjen/Presiden/Admin';
-        dAuthBadge.style.color = 'var(--accent-gold)';
-      }
+      dAuthBadge.style.display = 'none';
     }
     if (dName) dName.value = u.name || '';
     if (dEmail) dEmail.value = u.email || '';
@@ -620,18 +614,19 @@ const AppEngine = {
     if (dVehicle) dVehicle.value = userVehicle;
     if (dPlate) dPlate.value = userPlate;
     
-    // Set Visual Tier Otomatis
-    if (dTierTxt) dTierTxt.innerHTML = `${tierCalc.icon} ${tierCalc.tier} MEMBER`;
-    if (dTierDon) dTierDon.innerText = `(Donasi/Event: Rp ${totalContrib.toLocaleString('id-ID')})`;
+    // Set Visual Tier Otomatis (Minimalist Luxury Pill Badge)
+    if (dTierTxt) dTierTxt.innerHTML = `${tierCalc.tier || tierName} MEMBER`;
+    if (dTierDon) dTierDon.innerText = `(Donasi: Rp ${totalContrib.toLocaleString('id-ID')})`;
     if (dTierVal) dTierVal.value = tierName;
     if (dTierBox) {
-      dTierBox.style.color = tierCalc.color;
-      dTierBox.style.borderColor = tierCalc.color;
+      dTierBox.style.color = '#fbbf24';
+      dTierBox.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+      dTierBox.style.background = 'rgba(255, 255, 255, 0.05)';
     }
 
     if (dNotes) dNotes.value = u.admin_notes || u.notes || '';
 
-    // Populasikan Dropdown 111 Klub Resmi ke dClub
+    // Populasikan Dropdown 111 Klub Resmi ke dClub (Standar Monokrom Gelap Tanpa Emoji Mobil/Bendera)
     if (dClub) {
       if (!this.allClubsSelectionData || this.allClubsSelectionData.length === 0) {
         await this.fetchClubsForSelection();
@@ -660,15 +655,15 @@ const AppEngine = {
         if (isSel) {
           matchFound = true;
           matchedClubValue = cName;
-          opts += `<option value="${cName}" selected>🚗 ${cName} (${c.city || c.region || 'Indonesia'})</option>`;
+          opts += `<option value="${cName}" selected>${cName} (${c.city || c.region || 'Indonesia'})</option>`;
         } else {
-          opts += `<option value="${cName}">🚗 ${cName} (${c.city || c.region || 'Indonesia'})</option>`;
+          opts += `<option value="${cName}">${cName} (${c.city || c.region || 'Indonesia'})</option>`;
         }
       });
 
       if (hasClub && !matchFound) {
         matchedClubValue = clubName;
-        opts += `<option value="${clubName}" selected>🚗 ${clubName}</option>`;
+        opts += `<option value="${clubName}" selected>${clubName}</option>`;
       }
 
       dClub.innerHTML = opts;
@@ -6005,17 +6000,17 @@ const AppEngine = {
       'Regional Kalimantan & Sulawesi': clubs.filter(c => c.region === 'Regional Kalimantan & Sulawesi')
     };
 
-    // Hotspot Coordinates mapped over dark mode vector map (viewBox 0 0 1000 480)
+    // Hotspot Coordinates mapped over dark mode vector map (viewBox 0 0 1000 480) - Uniform Minimalist Amber Pins
     const pins = [
-      { key: 'Regional Sumatra', name: 'Sumatra', fullName: 'Regional Sumatra', x: 170, y: 182, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' },
-      { key: 'Regional Banten', name: 'Banten', fullName: 'Regional Banten', x: 260, y: 315, color: '#38bdf8', glow: 'rgba(56,189,248,0.8)' },
-      { key: 'Regional Metro DKI Jakarta', name: 'DKI Jakarta', fullName: 'Regional Metro DKI Jakarta', x: 288, y: 314, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' },
-      { key: 'Regional Jawa Barat', name: 'Jawa Barat', fullName: 'Regional Jawa Barat', x: 318, y: 322, color: '#38bdf8', glow: 'rgba(56,189,248,0.8)' },
-      { key: 'Regional Jawa Tengah', name: 'Jawa Tengah', fullName: 'Regional Jawa Tengah', x: 365, y: 326, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' },
-      { key: 'Regional Yogyakarta', name: 'DI Yogyakarta', fullName: 'Regional Yogyakarta', x: 385, y: 334, color: '#38bdf8', glow: 'rgba(56,189,248,0.8)' },
-      { key: 'Regional Jawa Timur & Bali', name: 'Jawa Timur & Bali', fullName: 'Regional Jawa Timur & Bali', x: 425, y: 335, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' },
-      { key: 'Regional Kalimantan & Sulawesi', name: 'Kalimantan', fullName: 'Regional Kalimantan', x: 395, y: 195, color: '#38bdf8', glow: 'rgba(56,189,248,0.8)' },
-      { key: 'Regional Kalimantan & Sulawesi', name: 'Sulawesi', fullName: 'Regional Sulawesi', x: 525, y: 225, color: '#f59e0b', glow: 'rgba(245,158,11,0.8)' }
+      { key: 'Regional Sumatra', name: 'Sumatra', fullName: 'Regional Sumatra', x: 170, y: 182, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' },
+      { key: 'Regional Banten', name: 'Banten', fullName: 'Regional Banten', x: 260, y: 315, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' },
+      { key: 'Regional Metro DKI Jakarta', name: 'DKI Jakarta', fullName: 'Regional Metro DKI Jakarta', x: 288, y: 314, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' },
+      { key: 'Regional Jawa Barat', name: 'Jawa Barat', fullName: 'Regional Jawa Barat', x: 318, y: 322, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' },
+      { key: 'Regional Jawa Tengah', name: 'Jawa Tengah', fullName: 'Regional Jawa Tengah', x: 365, y: 326, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' },
+      { key: 'Regional Yogyakarta', name: 'DI Yogyakarta', fullName: 'Regional Yogyakarta', x: 385, y: 334, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' },
+      { key: 'Regional Jawa Timur & Bali', name: 'Jawa Timur & Bali', fullName: 'Regional Jawa Timur & Bali', x: 425, y: 335, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' },
+      { key: 'Regional Kalimantan & Sulawesi', name: 'Kalimantan', fullName: 'Regional Kalimantan', x: 395, y: 195, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' },
+      { key: 'Regional Kalimantan & Sulawesi', name: 'Sulawesi', fullName: 'Regional Sulawesi', x: 525, y: 225, color: '#f59e0b', glow: 'rgba(245,158,11,0.45)' }
     ];
 
     const defaultCounts = {
@@ -6042,23 +6037,23 @@ const AppEngine = {
           <title>${tooltipText}</title>
 
           <!-- Outer Soft Ambient Glow Halo (Pulsing) -->
-          <circle cx="${p.x}" cy="${p.y}" r="8" fill="${p.color}" opacity="0.15">
-            <animate attributeName="r" values="8;24;8" dur="2.6s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.35;0.0;0.35" dur="2.6s" repeatCount="indefinite"/>
+          <circle cx="${p.x}" cy="${p.y}" r="6" fill="${p.color}" opacity="0.12">
+            <animate attributeName="r" values="6;20;6" dur="2.8s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.25;0.0;0.25" dur="2.8s" repeatCount="indefinite"/>
           </circle>
           
           <!-- Mid Pulse Wave Ring -->
-          <circle cx="${p.x}" cy="${p.y}" r="5" stroke="${p.color}" stroke-width="1.2" fill="none" opacity="0.7">
-            <animate attributeName="r" values="5;16;5" dur="2.6s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.8;0.05;0.8" dur="2.6s" repeatCount="indefinite"/>
+          <circle cx="${p.x}" cy="${p.y}" r="4" stroke="${p.color}" stroke-width="1" fill="none" opacity="0.6">
+            <animate attributeName="r" values="4;14;4" dur="2.8s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.65;0.05;0.65" dur="2.8s" repeatCount="indefinite"/>
           </circle>
 
           <!-- Outer Soft Blur -->
-          <circle cx="${p.x}" cy="${p.y - 7}" r="7" fill="${p.color}" opacity="0.25" style="filter:blur(3px);"/>
+          <circle cx="${p.x}" cy="${p.y - 7}" r="6" fill="${p.color}" opacity="0.2" style="filter:blur(3px);"/>
 
           <!-- Map Pin Icon Shape (Sleek Minimalist Outline + Central Dot) -->
-          <path d="M ${p.x} ${p.y} m 0 -14 c -4 0 -7 3 -7 7 c 0 5 7 11 7 11 s 7 -6 7 -11 c 0 -4 -3 -7 -7 -7 z" fill="#090d16" stroke="${p.color}" stroke-width="1.5" style="filter:drop-shadow(0 0 8px ${p.glow});"/>
-          <circle cx="${p.x}" cy="${p.y - 7}" r="2.5" fill="${p.color}" style="filter:drop-shadow(0 0 6px ${p.color});"/>
+          <path d="M ${p.x} ${p.y} m 0 -14 c -4 0 -7 3 -7 7 c 0 5 7 11 7 11 s 7 -6 7 -11 c 0 -4 -3 -7 -7 -7 z" fill="#090d16" stroke="${p.color}" stroke-width="1.3" style="filter:drop-shadow(0 0 6px ${p.glow});"/>
+          <circle cx="${p.x}" cy="${p.y - 7}" r="2.2" fill="${p.color}" style="filter:drop-shadow(0 0 5px ${p.color});"/>
         </g>
       `;
     }).join('');
@@ -6074,8 +6069,8 @@ const AppEngine = {
         <!-- Subtle Dot Grid Matrix Canvas -->
         <rect width="1000" height="480" fill="url(#darkMapGrid)"/>
 
-        <!-- REAL INDONESIA GEOGRAPHICAL MAP IMAGE (DARK LUXURY TRANSPARENT GOLD) -->
-        <image href="images/indonesia_gold.png" xlink:href="images/indonesia_gold.png" x="0" y="0" width="1000" height="480" preserveAspectRatio="xMidYMid meet" opacity="1" style="filter: drop-shadow(0 6px 20px rgba(0,0,0,0.9));"/>
+        <!-- REAL INDONESIA GEOGRAPHICAL MAP IMAGE (SILVER-SLATE MONOCHROME LUXURY) -->
+        <image href="images/indonesia_gold.png" xlink:href="images/indonesia_gold.png" x="0" y="0" width="1000" height="480" preserveAspectRatio="xMidYMid meet" opacity="0.9" style="filter: grayscale(1) brightness(0.92) contrast(1.1) drop-shadow(0 6px 20px rgba(0,0,0,0.95));"/>
 
         <!-- SLEEK GLOWING PULSE MAP PINS -->
         ${pinsSvg}
