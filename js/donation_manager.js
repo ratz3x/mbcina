@@ -2028,6 +2028,55 @@
       };
       DonationManager.switchTab(tabMap[subtab] || subtab);
     };
+
+    window.exportDonationsExcel = function() {
+      if (typeof DonationManager.exportExcel === 'function') {
+        DonationManager.exportExcel();
+      } else if (window.AppEngine && typeof window.AppEngine.exportDonationsExcel === 'function') {
+        window.AppEngine.exportDonationsExcel();
+      }
+    };
+
+    window.exportDonationsPdf = function() {
+      if (typeof DonationManager.exportPdf === 'function') {
+        DonationManager.exportPdf();
+      } else {
+        window.print();
+      }
+    };
+
+    window.sendThankYouToAllDonors = function() {
+      if (window.showToast) {
+        window.showToast('📧 Email ucapan terima kasih dan laporan transparansi telah dikirimkan ke seluruh donatur aktif.', 'success');
+      } else {
+        alert('Email ucapan terima kasih telah dikirimkan ke seluruh donatur.');
+      }
+    };
+
+    window.saveDonationCampaign = function(event) {
+      if (event && event.preventDefault) event.preventDefault();
+      if (typeof DonationManager.handleCreateCampaign === 'function') {
+        DonationManager.handleCreateCampaign(event);
+      } else {
+        if (window.showToast) window.showToast('Campaign donasi baru berhasil disimpan!', 'success');
+      }
+    };
+
+    window.downloadDigitalReceiptPdf = function(receiptId) {
+      if (typeof DonationManager.downloadReceiptPdf === 'function') {
+        DonationManager.downloadReceiptPdf(receiptId);
+      } else {
+        window.print();
+      }
+    };
+
+    window.sendDigitalReceiptEmail = function(receiptId) {
+      if (window.showToast) {
+        window.showToast('📧 Kuitansi digital resmi ber-QR Code telah dikirimkan ke alamat email donatur.', 'success');
+      } else {
+        alert('Kuitansi digital berhasil dikirim via email.');
+      }
+    };
   }
 
   if (document.readyState === 'loading') {

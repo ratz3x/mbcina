@@ -376,15 +376,25 @@ const AppEngine = {
   },
 
   openMemberClubs() {
-    this.openPortalMember();
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const adminView = document.getElementById('view-admin-dashboard');
+    if (adminView) adminView.style.display = 'block';
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const orgTab = document.getElementById('admin-tab-m2_org');
+    if (orgTab) orgTab.style.display = 'block';
+
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
+    this.updateSidebarRoleVisibility();
     this.setActiveSidebarItem('member_clubs');
+    this.switchM2Subtab('clubs');
     this.closeMobileSidebar();
-    setTimeout(() => {
-      const mapSection = document.getElementById('member-indonesia-map');
-      if (mapSection) {
-        mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 150);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   openMemberEvents() {
@@ -406,40 +416,114 @@ const AppEngine = {
     this.setActiveSidebarItem('member_events');
     if (window.M6Engine) {
       M6Engine.init();
-      M6Engine.switchSubtab('6_1_proposal');
+      M6Engine.switchSubtab('6_3_publish');
     }
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   openMemberForum() {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const adminView = document.getElementById('view-admin-dashboard');
+    if (adminView) adminView.style.display = 'block';
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const forumTab = document.getElementById('admin-tab-m5_forum');
+    if (forumTab) forumTab.style.display = 'block';
+
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
+    this.updateSidebarRoleVisibility();
     this.setActiveSidebarItem('member_forum');
+    this.renderM5Module();
     this.closeMobileSidebar();
-    if (typeof this.openMemberForumModal === 'function') {
-      this.openMemberForumModal();
-    } else {
-      this.switchAdminTab('m5_forum');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  openForumThreadModal(threadId) {
+    this.openMemberForum();
+    if (threadId && typeof this.openM5ThreadDetailModal === 'function') {
+      setTimeout(() => this.openM5ThreadDetailModal(threadId), 120);
     }
   },
 
   openMemberDonations() {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const adminView = document.getElementById('view-admin-dashboard');
+    if (adminView) adminView.style.display = 'block';
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const donTab = document.getElementById('admin-tab-m7_donation');
+    if (donTab) donTab.style.display = 'block';
+
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
+    this.updateSidebarRoleVisibility();
     this.setActiveSidebarItem('member_donations');
-    this.closeMobileSidebar();
-    if (typeof this.openMemberDonasiModal === 'function') {
-      this.openMemberDonasiModal();
-    } else {
-      this.switchAdminTab('m7_donation');
+
+    if (window.DonationManager) {
+      window.DonationManager.init();
+    } else if (typeof this.renderDonationModule === 'function') {
+      this.renderDonationModule();
     }
+    this.closeMobileSidebar();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  openMemberDonasiModal(campaignId = null) {
+    const modal = document.getElementById('modal-member-donation');
+    if (!modal) return;
+    const u = this.currentUser || {};
+    const nameInput = document.getElementById('member-don-name');
+    const idInput = document.getElementById('member-don-id');
+    if (nameInput && !nameInput.value && u.name) nameInput.value = u.name;
+    if (idInput && !idInput.value && u.member_id) idInput.value = u.member_id;
+
+    modal.classList.add('active');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.zIndex = '10001';
+    document.body.style.overflow = 'hidden';
   },
 
   openMemberShop() {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const adminView = document.getElementById('view-admin-dashboard');
+    if (adminView) adminView.style.display = 'block';
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const shopTab = document.getElementById('admin-tab-m7_shop');
+    if (shopTab) shopTab.style.display = 'block';
+
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
+    this.updateSidebarRoleVisibility();
     this.setActiveSidebarItem('member_shop');
-    this.closeMobileSidebar();
-    if (typeof this.openMemberLapakModal === 'function') {
-      this.openMemberLapakModal();
-    } else {
-      this.switchAdminTab('m7_shop');
+
+    if (window.M7Engine) {
+      M7Engine.init();
+      M7Engine.switchSubtab('7_2_products');
     }
+    this.closeMobileSidebar();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  openMemberUpcomingEventsModal() {
+    this.openMemberEvents();
   },
 
   openPortalSponsor(email = null) {
@@ -1879,7 +1963,11 @@ const AppEngine = {
 
   goToDashboardFromLapak() {
     const lapakModal = document.getElementById('modal-member-lapak');
-    if (lapakModal) lapakModal.style.display = 'none';
+    if (lapakModal) {
+      lapakModal.classList.remove('active');
+      lapakModal.style.setProperty('display', 'none', 'important');
+    }
+    document.body.style.overflow = '';
 
     const isSponsor = this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR') || this._lapakOpenedFromSponsor;
     if (isSponsor) {
@@ -2134,7 +2222,13 @@ const AppEngine = {
     }
 
     if (window.M8Engine) window.M8Engine.renderSingleRotatorSlot('ad-slot-rotator-lapak');
-    modal.style.display = 'block';
+    modal.classList.add('active');
+    modal.style.setProperty('display', 'block', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.zIndex = '99999';
+    document.body.style.overflow = 'hidden';
   },
 
   _switchMemberLapakSubtab(sub, btn) {
@@ -3163,12 +3257,21 @@ const AppEngine = {
 
   openMemberSettingsModal() {
     const modal = document.getElementById('modal-member-settings');
-    if (modal) modal.style.display = 'flex';
+    if (modal) {
+      modal.classList.add('active');
+      modal.style.setProperty('display', 'flex', 'important');
+      modal.style.zIndex = '10001';
+      document.body.style.overflow = 'hidden';
+    }
   },
 
   closeMemberSettingsModal() {
     const modal = document.getElementById('modal-member-settings');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.setProperty('display', 'none', 'important');
+    }
+    document.body.style.overflow = '';
   },
 
   saveMemberSettings() {
@@ -3197,7 +3300,13 @@ const AppEngine = {
   async openSelectClubModal() {
     const modal = document.getElementById('modal-select-club');
     if (!modal) return;
-    modal.style.display = 'flex';
+    modal.classList.add('active');
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
+    modal.style.setProperty('visibility', 'visible', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.zIndex = '10001';
+    document.body.style.overflow = 'hidden';
 
     const searchInput = document.getElementById('club-search-input');
     if (searchInput) searchInput.value = '';
@@ -3224,7 +3333,11 @@ const AppEngine = {
 
   closeSelectClubModal() {
     const modal = document.getElementById('modal-select-club');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.setProperty('display', 'none', 'important');
+    }
+    document.body.style.overflow = '';
   },
 
   async fetchClubsForSelection() {
@@ -3650,7 +3763,11 @@ const AppEngine = {
 
   goToDashboardFromForum() {
     const forumModal = document.getElementById('modal-member-forum');
-    if (forumModal) forumModal.style.display = 'none';
+    if (forumModal) {
+      forumModal.classList.remove('active');
+      forumModal.style.setProperty('display', 'none', 'important');
+    }
+    document.body.style.overflow = '';
 
     const isSponsor = this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR') || this._forumOpenedFromSponsor;
     if (isSponsor) {
@@ -3668,10 +3785,17 @@ const AppEngine = {
 
   goToMemberDashboard() {
     const forumModal = document.getElementById('modal-member-forum');
-    if (forumModal) forumModal.style.display = 'none';
+    if (forumModal) {
+      forumModal.classList.remove('active');
+      forumModal.style.setProperty('display', 'none', 'important');
+    }
 
     const lapakModal = document.getElementById('modal-member-lapak');
-    if (lapakModal) lapakModal.style.display = 'none';
+    if (lapakModal) {
+      lapakModal.classList.remove('active');
+      lapakModal.style.setProperty('display', 'none', 'important');
+    }
+    document.body.style.overflow = '';
 
     const isSponsor = this.currentRole === 'SPONSOR' || (this.currentUser && this.currentUser.role === 'SPONSOR');
     if (isSponsor) {
@@ -3685,12 +3809,7 @@ const AppEngine = {
       return;
     }
 
-    document.querySelectorAll('.view-container').forEach(v => v.style.display = 'none');
-    const memberView = document.getElementById('view-member-dashboard');
-    if (memberView) {
-      memberView.style.display = 'block';
-      window.scrollTo(0, 0);
-    }
+    this.openPortalMember();
   },
 
   openMemberForumModal(fromSponsor = false) {
@@ -3888,7 +4007,9 @@ const AppEngine = {
     if (returnBtn) {
       returnBtn.innerHTML = isSponsor ? '🏠 Dashboard Sponsor' : '🏠 Dashboard Member';
     }
-    modal.style.display = 'block';
+    modal.classList.add('active');
+    modal.style.setProperty('display', 'block', 'important');
+    document.body.style.overflow = 'hidden';
     this._renderFullForumThreads();
   },
 
@@ -6702,6 +6823,11 @@ const AppEngine = {
     document.getElementById('edit-vm-sort').value = item.sort_order || 1;
 
     AuthEngine.openModal('modal-edit-vm');
+  },
+
+  saveVMFromModal(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    return this.saveVM();
   },
 
   async saveVM() {
@@ -10666,8 +10792,12 @@ const AppEngine = {
     AuthEngine.openModal('modal-m3-verify-member');
   },
 
+  processM3Verification(event) {
+    return this.saveM3Verification(event || { preventDefault: () => {} });
+  },
+
   async saveM3Verification(event) {
-    event.preventDefault();
+    if (event && event.preventDefault) event.preventDefault();
     const id = document.getElementById('m3-verify-id').value;
     const radios = document.getElementsByName('verify_action');
     let type = 'APPROVE';
@@ -11319,6 +11449,34 @@ const AppEngine = {
     else if (subtab === 'detail') this.renderM4DetailReview(this.m4Data.selectedAppId);
     else if (subtab === 'evaluations') this.renderM4Evaluations();
     else if (subtab === 'active_clubs') this.renderM4ActiveClubs();
+  },
+
+  openM4CreateEvaluationModal() {
+    const clubName = prompt('Masukkan Nama Klub / Chapter yang dievaluasi:', 'W124MBCI Jakarta Chapter');
+    if (!clubName) return;
+    const scoreStr = prompt('Masukkan Nilai Evaluasi (0 - 100):', '92');
+    const score = parseInt(scoreStr) || 88;
+    const grade = score >= 90 ? 'GRADE A (SANGAT BAIK)' : (score >= 75 ? 'GRADE B (BAIK)' : 'GRADE C (CUKUP)');
+    const notes = prompt('Catatan evaluasi kinerja:', 'Klub sangat aktif, tertib administrasi, dan rutin bakti sosial.');
+    
+    if (!this.m4Data) this.m4Data = {};
+    if (!Array.isArray(this.m4Data.evaluations)) this.m4Data.evaluations = [];
+    this.m4Data.evaluations.unshift({
+      id: 'ev_' + Date.now(),
+      club_name: clubName,
+      club_code: 'MBINA-CLB',
+      period_type: '1_YEAR',
+      evaluation_period: 'Periode 2025/2026 (1 Tahun)',
+      evaluation_score: score,
+      performance_grade: grade,
+      active_members: 145,
+      touring_count: 10,
+      social_count: 6,
+      evaluator_name: this.currentUser?.name || 'Derist Touriano',
+      notes: notes || 'Evaluasi kinerja resmi tercatat.'
+    });
+    alert('🎉 Evaluasi Kinerja Klub berhasil disimpan!');
+    this.renderM4Evaluations();
   },
 
   renderM4Evaluations() {
