@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260906_v167_fix_view_containers">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v167_fix_view_containers">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v168_member_sidebar_and_layout">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v168_member_sidebar_and_layout">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -326,6 +326,84 @@
       </div>
     </div>
   </aside>
+
+  <!-- 🚗 LUXURY LEFT VERTICAL SIDEBAR NAVIGATION (PORTAL MEMBER) -->
+  <aside id="member-sidebar" class="yt-sidebar member-sidebar" style="display:none;">
+    <div class="yt-sidebar-content">
+      <!-- PORTAL ANGGOTA -->
+      <div class="yt-nav-category">PORTAL ANGGOTA</div>
+      <div class="yt-nav-item active" data-member-tab="member_dashboard" onclick="AppEngine.openMemberDashboardTab('member_dashboard')" title="Dashboard Utama Anggota">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        </div>
+        <span class="yt-nav-label">Dashboard</span>
+      </div>
+      <div class="yt-nav-item" data-member-tab="member_profile" onclick="AppEngine.openMemberDashboardTab('member_profile')" title="Data Profil & Cetak E-KTA">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span class="yt-nav-label">Profil & E-KTA</span>
+      </div>
+      <div class="yt-nav-item" data-member-tab="member_garage" onclick="AppEngine.openMemberDashboardTab('member_garage')" title="Garasi Kendaraan & Plat Nomor">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.1 11 2 11.5 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+        </div>
+        <span class="yt-nav-label">Garasi Mobil</span>
+      </div>
+
+      <!-- KOMUNITAS & KEGIATAN -->
+      <div class="yt-nav-category">KOMUNITAS & EVENT</div>
+      <div class="yt-nav-item" data-member-tab="member_events" onclick="AppEngine.openMemberEvents()" title="Event & Kegiatan Touring">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <span class="yt-nav-label">Event & Touring</span>
+      </div>
+      <div class="yt-nav-item" data-member-tab="member_forum" onclick="AppEngine.openMemberForum()" title="Forum Diskusi Komunitas">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <span class="yt-nav-label">Forum Diskusi</span>
+      </div>
+      <div class="yt-nav-item" data-member-tab="member_donations" onclick="AppEngine.openMemberDonations()" title="Donasi & Filantropi MB INA Peduli">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <span class="yt-nav-label">Donasi & Sosial</span>
+      </div>
+      <div class="yt-nav-item" data-member-tab="member_koperasi" onclick="AppEngine.openMemberKoperasi('member')" title="Koperasi Bersama Satu Bintang">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <span class="yt-nav-label">Koperasi BSB</span>
+      </div>
+
+      <!-- MERCHANDISE & MITRA -->
+      <div class="yt-nav-category">MERCHANDISE & MITRA</div>
+      <div class="yt-nav-item" data-member-tab="member_shop" onclick="AppEngine.openMemberShop()" title="Lapak & Aksesoris Resmi">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="yt-nav-label">Lapak Merchandise</span>
+      </div>
+      <div class="yt-nav-item" data-member-tab="member_sponsors" onclick="AppEngine.openMemberDashboardTab('member_sponsors')" title="Daftar Mitra & Sponsor Resmi">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <span class="yt-nav-label">Mitra & Sponsor</span>
+      </div>
+    </div>
+
+    <!-- FOOTER ACTION (Sign Out) -->
+    <div class="yt-sidebar-footer">
+      <div class="yt-nav-item yt-nav-logout" onclick="AuthEngine.logout()" title="Keluar (Sign Out)">
+        <div class="yt-nav-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        </div>
+        <span class="yt-nav-label">Sign Out</span>
+      </div>
+    </div>
+  </aside>
   <div id="sidebar-backdrop" class="yt-sidebar-backdrop" onclick="AppEngine.closeMobileSidebar()"></div>
 
   <!-- 2. Main Content Wrapper -->
@@ -335,7 +413,7 @@
     <div id="view-member-dashboard" class="view-container" style="max-width:1440px; margin:0 auto; padding:20px; display:none;">
 
       <!-- 1. EXECUTIVE MERCEDES-BENZ HERO WELCOME BANNER -->
-      <div class="member-hero-banner" style="margin-bottom:24px; border-radius:24px; border:1px solid rgba(255,255,255,0.08); background:linear-gradient(90deg, #07090e 0%, rgba(7,9,14,0.92) 42%, rgba(7,9,14,0.6) 75%, rgba(7,9,14,0.15) 100%), url('https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=1600&q=85') center right / cover no-repeat, url('assets/mb_hero.jpg') center right / cover no-repeat; box-shadow:0 20px 60px rgba(0,0,0,0.6); position:relative; overflow:hidden; padding:28px 32px; min-height:170px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
+      <div id="member-section-overview" class="member-hero-banner" style="margin-bottom:24px; border-radius:24px; border:1px solid rgba(255,255,255,0.08); background:linear-gradient(90deg, #07090e 0%, rgba(7,9,14,0.92) 42%, rgba(7,9,14,0.6) 75%, rgba(7,9,14,0.15) 100%), url('https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=1600&q=85') center right / cover no-repeat, url('assets/mb_hero.jpg') center right / cover no-repeat; box-shadow:0 20px 60px rgba(0,0,0,0.6); position:relative; overflow:hidden; padding:28px 32px; min-height:170px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;">
         
         <!-- Subtle Ambient Glow -->
         <div style="position:absolute; top:-30px; left:-30px; width:200px; height:200px; border-radius:50%; background:radial-gradient(circle, rgba(212,175,55,0.12) 0%, transparent 70%); pointer-events:none;"></div>
@@ -395,7 +473,7 @@
       <div id="ad-slot-rotator-member" style="width:100%; margin-bottom:20px;"></div>
 
       <!-- 5 LUXURY BENTO GRID CARDS BERTEMA DARK GLASSMORPHISM MERCEDES-BENZ -->
-      <div class="portal-bento-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:20px; margin-bottom:32px;">
+      <div id="member-section-activities" class="portal-bento-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:20px; margin-bottom:32px;">
 
         <!-- ── KARTU 1: AGENDA & EVENT RESMI ── -->
         <div class="glass-panel bento-card" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:20px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); display:flex; flex-direction:column; justify-content:space-between; transition:all 0.3s ease; box-shadow:0 10px 30px rgba(0,0,0,0.4);" onmouseover="this.style.borderColor='rgba(245,158,11,0.3)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.transform='none';">
@@ -565,7 +643,7 @@
               ⭐ Ulasan Lapak
             </button>
           </div>
-
+        </div>
 
         <!-- ── KARTU 5: KOPERASI BERSAMA SATU BINTANG ── -->
         <div class="glass-panel bento-card" style="background:rgba(255,255,255,0.03); border:1px solid rgba(245,158,11,0.25); border-radius:18px; padding:20px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); display:flex; flex-direction:column; justify-content:space-between; transition:all 0.3s ease; box-shadow:0 10px 30px rgba(0,0,0,0.4);" onmouseover="this.style.borderColor='rgba(245,158,11,0.45)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(245,158,11,0.25)'; this.style.transform='none';">
@@ -627,7 +705,7 @@
       </div>
 
       <!-- 2-COLUMN LUXURY EXECUTIVE LAYOUT (PETA & FORM BIODATA - STRICT LUXURY DARK MODE) -->
-      <div style="display:grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap:24px; margin-top:32px; margin-bottom:32px; align-items:start;" class="pov-grid-responsive">
+      <div id="member-section-profile" style="display:grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap:24px; margin-top:32px; margin-bottom:32px; align-items:start;" class="pov-grid-responsive">
         
         <!-- KOLOM KIRI (PETA SEBARAN 111 KLUB & REGIONAL MB INA) -->
         <div class="bg-white/[0.03] border border-white/[0.08] backdrop-blur-xl rounded-3xl p-6 shadow-xl flex flex-col gap-4" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px); border-radius:24px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.4); display:flex; flex-direction:column; gap:16px;">
@@ -830,7 +908,7 @@
       </div>
 
       <!-- OFFICIAL PARTNERS & SPONSOR WALL (MEMBER PORTAL) -->
-      <div class="glass-panel" style="padding:22px; border-radius:18px; margin-top:24px; margin-bottom:24px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03);">
+      <div id="member-section-sponsors" class="glass-panel" style="padding:22px; border-radius:18px; margin-top:24px; margin-bottom:24px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03);">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
           <div>
             <h3 style="font-size:1.15rem; color:var(--accent-gold); font-weight:800; margin:0;">
@@ -11265,8 +11343,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260906_v167_fix_view_containers"></script>
-  <script src="js/app.js?v=20260906_v167_fix_view_containers"></script>
+  <script src="js/auth.js?v=20260907_v168_member_sidebar_and_layout"></script>
+  <script src="js/app.js?v=20260907_v168_member_sidebar_and_layout"></script>
   <script>
     lucide.createIcons();
     try {

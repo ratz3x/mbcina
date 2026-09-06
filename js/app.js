@@ -259,9 +259,11 @@ const AppEngine = {
     const landingView = document.getElementById('view-landing-page');
     if (landingView) landingView.style.display = 'block';
 
-    const sidebar = document.getElementById('app-sidebar');
+    const adminSidebar = document.getElementById('app-sidebar');
+    const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'none';
+    if (adminSidebar) adminSidebar.style.display = 'none';
+    if (memberSidebar) memberSidebar.style.display = 'none';
     if (btnHamburger) btnHamburger.style.display = 'none';
     document.body.classList.remove('yt-has-sidebar');
 
@@ -323,15 +325,50 @@ const AppEngine = {
       this.populateMemberPortalData();
     }
 
-    const sidebar = document.getElementById('app-sidebar');
+    const adminSidebar = document.getElementById('app-sidebar');
+    const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'none';
-    if (btnHamburger) btnHamburger.style.display = 'none';
-    document.body.classList.remove('yt-has-sidebar');
+
+    if (adminSidebar) adminSidebar.style.display = 'none';
+    if (memberSidebar) memberSidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
 
     this.updateHeaderNavPillsActive('nav-btn-member-portal');
+    this.setActiveMemberSidebarItem('member_dashboard');
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  openMemberDashboardTab(tabKey) {
+    this.setActiveMemberSidebarItem(tabKey);
+    this.closeMobileSidebar();
+
+    if (tabKey === 'member_dashboard') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (tabKey === 'member_profile') {
+      const el = document.getElementById('dash-member-profile-form') || document.getElementById('member-section-profile');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (tabKey === 'member_garage') {
+      const el = document.getElementById('dash-member-vehicle');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.focus();
+      }
+    } else if (tabKey === 'member_sponsors') {
+      const el = document.getElementById('sponsor-grid-wall-container') || document.getElementById('member-section-sponsors');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  },
+
+  setActiveMemberSidebarItem(targetKey) {
+    document.querySelectorAll('#member-sidebar .yt-nav-item').forEach(btn => {
+      if (btn.getAttribute('data-member-tab') === targetKey) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
   },
 
   updateSidebarRoleVisibility() {
@@ -4804,19 +4841,23 @@ const AppEngine = {
   },
 
   toggleSidebar() {
-    const sidebar = document.getElementById('app-sidebar');
-    if (!sidebar) return;
+    const memberSidebar = document.getElementById('member-sidebar');
+    const adminSidebar = document.getElementById('app-sidebar');
+    const activeSidebar = (memberSidebar && memberSidebar.style.display === 'flex') ? memberSidebar : adminSidebar;
+    if (!activeSidebar) return;
     if (window.innerWidth <= 768) {
-      sidebar.classList.toggle('mobile-open');
+      activeSidebar.classList.toggle('mobile-open');
     } else {
-      sidebar.classList.toggle('expanded');
+      activeSidebar.classList.toggle('expanded');
       document.body.classList.toggle('yt-sidebar-expanded');
     }
   },
 
   closeMobileSidebar() {
-    const sidebar = document.getElementById('app-sidebar');
-    if (sidebar) sidebar.classList.remove('mobile-open');
+    const s1 = document.getElementById('app-sidebar');
+    const s2 = document.getElementById('member-sidebar');
+    if (s1) s1.classList.remove('mobile-open');
+    if (s2) s2.classList.remove('mobile-open');
   },
 
   switchAdminTab(tab) {
@@ -4824,6 +4865,7 @@ const AppEngine = {
     this.activeAdminTab = tab;
     
     const sidebar = document.getElementById('app-sidebar');
+    const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
     const adminView = document.getElementById('view-admin-dashboard');
 
@@ -4831,6 +4873,7 @@ const AppEngine = {
     // do not remain visible and cover or push down the admin dashboard
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
 
+    if (memberSidebar) memberSidebar.style.display = 'none';
     if (adminView) adminView.style.display = 'block';
     if (sidebar) sidebar.style.display = 'flex';
     if (btnHamburger) btnHamburger.style.display = 'inline-flex';
