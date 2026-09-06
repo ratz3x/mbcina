@@ -722,6 +722,28 @@ photo_url: sbUser.user_metadata?.picture || '',
           tier: 'GOLD'
         };
         loginMessage = `Login Berhasil! Selamat Datang kembali, ${loggedUser.name} (Portal Sponsor MB INA).`;
+      } else if (['andi@email.com', 'member', 'member@mbina.or.id', 'andi_wijaya', 'mbina-dki-2026-000012'].includes(idLower)) {
+        loginSuccess = true;
+        loggedUser = {
+          id: 'usr_member_andi',
+          name: 'Andi Wijaya, S.T.',
+          username: 'andi_wijaya',
+          email: 'andi@email.com',
+          phone: '081298765432',
+          role: 'MEMBER',
+          status: 'ACTIVE',
+          tier: 'PLATINUM',
+          member_id: 'MBINA-DKI-2026-000012',
+          club: 'W124 MBCI Jakarta Chapter',
+          city: 'Jakarta Selatan',
+          province: 'DKI Jakarta',
+          vehicle_model: 'Mercedes-Benz W124 300E (1991)',
+          license_plate: 'B 124 MB',
+          totalDonation: 9500000,
+          total_contribution: 9500000,
+          photo_url: 'assets/mb_hero.jpg'
+        };
+        loginMessage = 'Login Berhasil! Selamat Datang kembali, Andi Wijaya (Member Resmi MB INA).';
       }
     }
 

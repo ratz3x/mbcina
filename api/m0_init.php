@@ -231,6 +231,26 @@ switch ($action) {
                         'status' => 'ACTIVE',
                         'tier' => 'PLATINUM'
                     ];
+                } else if (in_array($idLower, ['andi@email.com', 'member', 'member@mbina.or.id', 'andi_wijaya', 'usr_member_andi', 'mbina-dki-2026-000012'])) {
+                    $user = [
+                        'id' => 'usr_member_andi',
+                        'name' => 'Andi Wijaya, S.T.',
+                        'username' => 'andi_wijaya',
+                        'email' => 'andi@email.com',
+                        'phone' => '081298765432',
+                        'role' => 'MEMBER',
+                        'status' => 'ACTIVE',
+                        'tier' => 'PLATINUM',
+                        'member_id' => 'MBINA-DKI-2026-000012',
+                        'club' => 'W124 MBCI Jakarta Chapter',
+                        'city' => 'Jakarta Selatan',
+                        'province' => 'DKI Jakarta',
+                        'vehicle_model' => 'Mercedes-Benz W124 300E (1991)',
+                        'license_plate' => 'B 124 MB',
+                        'total_donation' => 9500000,
+                        'total_events' => 8,
+                        'points' => 350
+                    ];
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Akun tidak ditemukan di Supabase Cloud Database!']);
                     exit;

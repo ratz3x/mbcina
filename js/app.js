@@ -5142,11 +5142,13 @@ const AppEngine = {
         // Standard Member or Pending Member: Show Member Portal Dashboard
         if (adminView) adminView.style.display = 'none';
         if (landingView) landingView.style.display = 'none';
-        if (sidebar) sidebar.style.display = 'flex';
+        
+        const memberSidebar = document.getElementById('member-sidebar');
+        if (sidebar) sidebar.style.display = 'none';
+        if (memberSidebar) memberSidebar.style.display = 'flex';
         if (btnHamburger) btnHamburger.style.display = 'inline-flex';
         document.body.classList.add('yt-has-sidebar');
-        this.updateSidebarRoleVisibility();
-        this.setActiveSidebarItem('member_profile');
+        this.setActiveMemberSidebarItem('member_dashboard');
 
         const memberView = document.getElementById('view-member-dashboard');
         if (memberView) {
