@@ -2790,6 +2790,22 @@ body.member-mode #btn-m73-member-donate {
   display: none !important;
 }
 
+/* Marketplace (Toko Resmi & Lapak) member mode adjustments:
+   - Hide "Verifikasi Iklan & Moderasi" subtab button & content
+   - Hide "Laporan Sewa & Penjualan" subtab button & content
+   - Hide header button "Laporan Sewa"
+   - Hide redundant filter-my-lapak button in Lapak Saya
+*/
+body.member-mode #m7-subtab-btn-73,
+body.member-mode #m7-subtab-btn-75,
+body.member-mode #m7-subtab-7_3_verify,
+body.member-mode #m7-subtab-7_5_reports,
+body.member-mode #m7-header-reports-btn,
+body.member-mode #admin-tab-m7_shop button[onclick*="7_5_reports"],
+body.member-mode #m7-btn-filter-my-lapak {
+  display: none !important;
+}
+
 
 
 

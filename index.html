@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260907_v177_clean_member_donation_log">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v177_clean_member_donation_log">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v178_member_shop_refinement">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v178_member_shop_refinement">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -3113,12 +3113,12 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             </div>
             <div>
-              <h3 style="font-size:1.25rem; margin:0; color:#fff; font-weight:700;">Toko Resmi & Marketplace</h3>
-              <p style="font-size:0.82rem; color:#94a3b8; margin:2px 0 0 0;">Pusat pengelolaan sewa lapak, direktori produk & iklan, verifikasi moderasi, dan laporan merchant MB INA</p>
+              <h3 id="m7-module-header-title" style="font-size:1.25rem; margin:0; color:#fff; font-weight:700;">Toko Resmi & Marketplace</h3>
+              <p id="m7-module-header-desc" style="font-size:0.82rem; color:#94a3b8; margin:2px 0 0 0;">Pusat pengelolaan sewa lapak, direktori produk & iklan, verifikasi moderasi, dan laporan merchant MB INA</p>
             </div>
           </div>
           <div style="display:flex; gap:8px;">
-            <button class="btn-outline" style="font-size:0.8rem; font-weight:600; padding:8px 16px; border-radius:12px; color:#cbd5e1; display:inline-flex; align-items:center; gap:6px;" onclick="M7Engine.switchSubtab('7_5_reports')">
+            <button id="m7-header-reports-btn" class="btn-outline" style="font-size:0.8rem; font-weight:600; padding:8px 16px; border-radius:12px; color:#cbd5e1; display:inline-flex; align-items:center; gap:6px;" onclick="M7Engine.switchSubtab('7_5_reports')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
               <span>Laporan Sewa</span>
             </button>
@@ -3201,7 +3201,7 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                 <span>Sewa Lapak Baru</span>
               </button>
-              <button type="button" class="btn-outline" style="font-size:0.8rem; padding:8px 16px; border-radius:12px; color:#cbd5e1; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.filterMyLapak()">
+              <button type="button" id="m7-btn-filter-my-lapak" class="btn-outline" style="font-size:0.8rem; padding:8px 16px; border-radius:12px; color:#cbd5e1; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.filterMyLapak()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
                 <span>Lapak Saya</span>
               </button>
@@ -11356,8 +11356,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v177_clean_member_donation_log"></script>
-  <script src="js/app.js?v=20260907_v177_clean_member_donation_log"></script>
+  <script src="js/auth.js?v=20260907_v178_member_shop_refinement"></script>
+  <script src="js/app.js?v=20260907_v178_member_shop_refinement"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11434,6 +11434,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v177_clean_member_donation_log"></script>
+  <script src="js/donation_manager.js?v=20260907_v178_member_shop_refinement"></script>
 </body>
 </html>

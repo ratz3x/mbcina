@@ -558,6 +558,7 @@ const AppEngine = {
   openMemberShop() {
     this._switchToMemberAdminTab('admin-tab-m7_shop', 'member_shop');
     if (window.M7Engine) {
+      if (typeof M7Engine.updateRoleView === 'function') M7Engine.updateRoleView();
       M7Engine.init();
       M7Engine.switchSubtab('7_2_products');
     }
@@ -4988,6 +4989,7 @@ const AppEngine = {
       }
     } else if (tab === 'm7_shop' || tab === 'm7_ecommerce') {
       if (window.M7Engine) {
+        if (typeof M7Engine.updateRoleView === 'function') M7Engine.updateRoleView();
         M7Engine.init();
         M7Engine.switchSubtab('7_1_lapak');
       }
@@ -21561,7 +21563,35 @@ window.M7Engine = {
     this.renderAll();
   },
 
+  updateRoleView: function() {
+    const activeApp = window.AppEngine;
+    const isMember = document.body.classList.contains('member-mode') || (activeApp && typeof activeApp.isMemberUser === 'function' && activeApp.isMemberUser());
+    const titleEl = document.getElementById('m7-module-header-title');
+    const descEl = document.getElementById('m7-module-header-desc');
+    const btnLapakTab = document.getElementById('m7-subtab-btn-71');
+    const reportsBtn = document.getElementById('m7-header-reports-btn');
+
+    if (isMember) {
+      if (titleEl) titleEl.innerHTML = '🛍️ Toko Resmi & Lapak Member MB INA';
+      if (descEl) descEl.innerHTML = 'Katalog merchandise resmi klub dan direktori jual-beli spare parts, aksesoris, serta unit Mercedes-Benz antar anggota federasi.';
+      if (btnLapakTab) {
+        const span = btnLapakTab.querySelector('span');
+        if (span) span.innerText = 'Lapak Saya';
+      }
+      if (reportsBtn) reportsBtn.style.display = 'none';
+    } else {
+      if (titleEl) titleEl.innerHTML = 'Toko Resmi & Marketplace';
+      if (descEl) descEl.innerHTML = 'Pusat pengelolaan sewa lapak, direktori produk & iklan, verifikasi moderasi, dan laporan merchant MB INA';
+      if (btnLapakTab) {
+        const span = btnLapakTab.querySelector('span');
+        if (span) span.innerText = 'Manajemen Lapak & Merchant';
+      }
+      if (reportsBtn) reportsBtn.style.display = 'inline-flex';
+    }
+  },
+
   renderAll: function() {
+    this.updateRoleView();
     this.renderLapakTable();
     this.renderStoreHeaderAndFilter();
     this.renderProductsGrid();
@@ -21575,6 +21605,10 @@ window.M7Engine = {
     const tbody = document.getElementById('m7-lapak-tbody');
     if (!tbody) return;
 
+    const activeApp = window.AppEngine;
+    const isMember = document.body.classList.contains('member-mode') || (activeApp && typeof activeApp.isMemberUser === 'function' && activeApp.isMemberUser());
+    const user = activeApp?.currentUser || (window.AuthEngine && window.AuthEngine.currentUser) || {};
+
     const catFilter = document.getElementById('m7-filter-lapak-category')?.value || 'ALL';
     const statusFilter = document.getElementById('m7-filter-lapak-status')?.value || 'ALL';
     const search = (document.getElementById('m7-search-lapak')?.value || '').toLowerCase();
@@ -21586,8 +21620,47 @@ window.M7Engine = {
       return true;
     });
 
+    if (isMember) {
+      const uMid = (user.member_id || '').trim().toLowerCase();
+      const uUid = (user.id || user.userId || user.user_id || '').trim().toLowerCase();
+      const uName = (user.name || user.username || '').trim().toLowerCase();
+
+      filtered = filtered.filter(l => {
+        const lMid = (l.member_id || '').trim().toLowerCase();
+        const lUid = (l.user_id || '').trim().toLowerCase();
+        const lOwner = (l.pemilik || l.created_by || '').trim().toLowerCase();
+
+        if (uUid && lUid && uUid === lUid) return true;
+        if (uMid && lMid && (uMid === lMid || uMid.includes(lMid) || lMid.includes(uMid))) return true;
+        if (uName && lOwner && (uName === lOwner || uName.includes(lOwner) || lOwner.includes(uName))) return true;
+        return false;
+      });
+    }
+
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--text-muted); font-size:0.82rem;">Belum ada data penyewa lapak sesuai filter.</td></tr>`;
+      if (isMember) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="padding:48px 20px; text-align:center;">
+              <div style="max-width:480px; margin:0 auto;">
+                <div style="width:54px; height:54px; border-radius:16px; background:rgba(245,158,11,0.12); color:#fbbf24; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:1.6rem;">
+                  🏪
+                </div>
+                <h4 style="color:#ffffff; font-size:1.05rem; margin:0 0 8px 0; font-weight:700;">Anda Belum Memiliki Lapak Jualan</h4>
+                <p style="color:#94a3b8; font-size:0.83rem; margin:0 0 18px 0; line-height:1.5;">
+                  Mulai promosikan spare parts, merchandise resmi, aksesoris, atau unit kendaraan Mercedes-Benz Anda kepada ribuan anggota MB Club INA di seluruh Indonesia.
+                </p>
+                <button type="button" class="btn-primary" style="font-size:0.82rem; padding:10px 22px; border-radius:12px; font-weight:700; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="M7Engine.openSewaLapakModal()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  <span>Buka / Sewa Lapak Sekarang</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--text-muted); font-size:0.82rem;">Belum ada data penyewa lapak sesuai filter.</td></tr>`;
+      }
       return;
     }
 
@@ -21629,6 +21702,42 @@ window.M7Engine = {
       const feeMonthly = Math.round(totalFee / durationMonths);
       const feeMonthlyFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(feeMonthly) + '/bln';
 
+      let actionBtns = '';
+      if (isMember) {
+        actionBtns = `
+          <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:nowrap;">
+            <button type="button" class="btn-primary" style="padding:5px 12px; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:8px; cursor:pointer;" onclick="M7Engine.openProductModal('${l.id}')" title="Tambah Produk di Lapak Saya">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              <span>+ Produk</span>
+            </button>
+            <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#cbd5e1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.viewLapakProducts('${l.id}')" title="Lihat Produk di Lapak Saya">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Perpanjang Sewa Lapak">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+          </div>
+        `;
+      } else {
+        actionBtns = `
+          <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:nowrap;">
+            <button type="button" class="btn-primary" style="padding:5px 12px; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:8px; cursor:pointer;" onclick="M7Engine.openReviewLapakModal('${l.id}')" title="Review Permohonan & Bukti Transfer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>Review</span>
+            </button>
+            <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#cbd5e1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.viewLapakProducts('${l.id}')" title="Lihat Produk Lapak">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Edit & Perpanjang Sewa">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+            <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#f87171; border-color:rgba(239,68,68,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.deleteLapak('${l.id}')" title="Hapus Lapak">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        `;
+      }
+
       return `
         <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
           <td style="padding:12px 10px; font-weight:600; text-align:center; color:#94a3b8; font-size:0.8rem;">${idx + 1}</td>
@@ -21657,23 +21766,7 @@ window.M7Engine = {
             <div style="font-family:monospace; font-size:0.72rem; color:#94a3b8;">${feeMonthlyFormatted}</div>
           </td>
           <td style="padding:12px 10px; text-align:center;">${statusBadge}</td>
-          <td style="padding:12px 10px; text-align:center;">
-            <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:nowrap;">
-              <button type="button" class="btn-primary" style="padding:5px 12px; font-size:0.75rem; font-weight:700; display:inline-flex; align-items:center; gap:5px; border-radius:8px; cursor:pointer;" onclick="M7Engine.openReviewLapakModal('${l.id}')" title="Review Permohonan & Bukti Transfer">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <span>Review</span>
-              </button>
-              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#cbd5e1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.viewLapakProducts('${l.id}')" title="Lihat Produk Lapak">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Edit & Perpanjang Sewa">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              </button>
-              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#f87171; border-color:rgba(239,68,68,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.deleteLapak('${l.id}')" title="Hapus Lapak">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              </button>
-            </div>
-          </td>
+          <td style="padding:12px 10px; text-align:center;">${actionBtns}</td>
         </tr>
       `;
     }).join('');
