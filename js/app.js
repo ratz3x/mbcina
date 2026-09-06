@@ -325,33 +325,22 @@ const AppEngine = {
 
     const sidebar = document.getElementById('app-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
+    if (sidebar) sidebar.style.display = 'none';
+    if (btnHamburger) btnHamburger.style.display = 'none';
+    document.body.classList.remove('yt-has-sidebar');
 
-    this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('member_profile');
     this.updateHeaderNavPillsActive('nav-btn-member-portal');
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   updateSidebarRoleVisibility() {
-    const adminSection = document.getElementById('sidebar-admin-section');
-    const sponsorSection = document.getElementById('sidebar-sponsor-section');
-    const memberSection = document.getElementById('sidebar-member-section');
-    
-    const isAdminRole = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB'].includes(this.currentRole);
-    const isSponsorRole = this.currentRole === 'SPONSOR';
-
-    if (adminSection) adminSection.style.display = isAdminRole ? 'block' : 'none';
-    if (sponsorSection) sponsorSection.style.display = (isAdminRole || isSponsorRole) ? 'block' : 'none';
-    if (memberSection) memberSection.style.display = 'block';
+    // Kept clean to preserve exact Admin executive sidebar layout
   },
 
   setActiveSidebarItem(targetKey) {
     document.querySelectorAll('#app-sidebar .yt-nav-item').forEach(btn => {
-      const navTarget = btn.getAttribute('data-nav-target') || btn.getAttribute('data-admin-tab');
+      const navTarget = btn.getAttribute('data-admin-tab') || btn.getAttribute('data-nav-target');
       if (navTarget === targetKey) {
         btn.classList.add('active');
       } else {
@@ -376,7 +365,7 @@ const AppEngine = {
     document.body.classList.add('yt-has-sidebar');
 
     this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('member_org');
+    this.setActiveSidebarItem('m2_org');
     this.renderM2Module();
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -398,7 +387,7 @@ const AppEngine = {
     document.body.classList.add('yt-has-sidebar');
 
     this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('member_clubs');
+    this.setActiveSidebarItem('m2_org');
     this.switchM2Subtab('clubs');
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -420,7 +409,7 @@ const AppEngine = {
     document.body.classList.add('yt-has-sidebar');
 
     this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('member_events');
+    this.setActiveSidebarItem('m6_event');
     if (window.M6Engine) {
       M6Engine.init();
       M6Engine.switchSubtab('6_3_publish');
@@ -445,7 +434,7 @@ const AppEngine = {
     document.body.classList.add('yt-has-sidebar');
 
     this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('member_forum');
+    this.setActiveSidebarItem('m5_forum');
     this.renderM5Module();
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -474,7 +463,7 @@ const AppEngine = {
     document.body.classList.add('yt-has-sidebar');
 
     this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('member_donations');
+    this.setActiveSidebarItem('m7_donation');
 
     if (window.DonationManager) {
       window.DonationManager.init();
@@ -519,7 +508,7 @@ const AppEngine = {
     document.body.classList.add('yt-has-sidebar');
 
     this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('member_shop');
+    this.setActiveSidebarItem('m7_shop');
 
     if (window.M7Engine) {
       M7Engine.init();
@@ -542,7 +531,7 @@ const AppEngine = {
     if (window.SponsorPortalEngine && typeof window.SponsorPortalEngine.switchMainTab === 'function') {
       window.SponsorPortalEngine.switchMainTab(subtab);
     }
-    this.setActiveSidebarItem('spnd_' + subtab);
+    this.setActiveSidebarItem('m6_sponsorship');
   },
 
   openMemberKoperasi(fromView = 'member') {
@@ -561,7 +550,7 @@ const AppEngine = {
     document.body.classList.add('yt-has-sidebar');
 
     this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('member_koperasi');
+    this.setActiveSidebarItem('m11_koperasi');
 
     const btnReturnAdmin = document.getElementById('btn-kop-return-admin');
     const btnReturnMember = document.getElementById('btn-kop-return-member');
