@@ -29,6 +29,9 @@
 
   --font-heading: 'Outfit', 'Plus Jakarta Sans', sans-serif;
   --font-body: 'Inter', sans-serif;
+
+  --sidebar-bg: rgba(7, 9, 14, 0.96);
+  --sidebar-border: rgba(255, 255, 255, 0.08);
 }
 
 /* ☀️ Light Mode Theme Variables - Automotive Silver-Chrome & Slate */
@@ -1364,6 +1367,8 @@ body.light-mode {
   bottom: 0;
   width: var(--sidebar-width);
   background: var(--sidebar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
@@ -1396,8 +1401,8 @@ body.light-mode {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: #737373;
+  letter-spacing: 0.18em;
+  color: rgba(197, 160, 89, 0.85);
   padding: 14px 12px 6px 12px;
   user-select: none;
 }
@@ -1429,11 +1434,15 @@ body.light-mode {
 }
 
 .yt-nav-item.active {
-  background: rgba(245, 158, 11, 0.1);
-  color: #fbbf24;
-  border-color: rgba(245, 158, 11, 0.3);
+  background: linear-gradient(90deg, rgba(197, 160, 89, 0.15) 0%, rgba(197, 160, 89, 0.03) 100%);
+  color: #ffffff;
+  border-color: rgba(197, 160, 89, 0.35);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.yt-nav-item.active .yt-nav-icon {
+  color: #fbbf24;
 }
 
 .yt-nav-icon {

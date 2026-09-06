@@ -324,12 +324,122 @@ const AppEngine = {
 
     const sidebar = document.getElementById('app-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'none';
-    if (btnHamburger) btnHamburger.style.display = 'none';
-    document.body.classList.remove('yt-has-sidebar');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
 
+    this.updateSidebarRoleVisibility();
+    this.setActiveSidebarItem('member_profile');
     this.updateHeaderNavPillsActive('nav-btn-member-portal');
+    this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  updateSidebarRoleVisibility() {
+    const adminSection = document.getElementById('sidebar-admin-section');
+    if (!adminSection) return;
+    const isAdminRole = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB'].includes(this.currentRole);
+    adminSection.style.display = isAdminRole ? 'block' : 'none';
+  },
+
+  setActiveSidebarItem(targetKey) {
+    document.querySelectorAll('#app-sidebar .yt-nav-item').forEach(btn => {
+      const navTarget = btn.getAttribute('data-nav-target') || btn.getAttribute('data-admin-tab');
+      if (navTarget === targetKey) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  },
+
+  openMemberOrganisasi() {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const adminView = document.getElementById('view-admin-dashboard');
+    if (adminView) adminView.style.display = 'block';
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const orgTab = document.getElementById('admin-tab-m2_org');
+    if (orgTab) orgTab.style.display = 'block';
+
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
+    this.updateSidebarRoleVisibility();
+    this.setActiveSidebarItem('member_org');
+    this.renderM2Module();
+    this.closeMobileSidebar();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  openMemberClubs() {
+    this.openPortalMember();
+    this.setActiveSidebarItem('member_clubs');
+    this.closeMobileSidebar();
+    setTimeout(() => {
+      const mapSection = document.getElementById('member-indonesia-map');
+      if (mapSection) {
+        mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 150);
+  },
+
+  openMemberEvents() {
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const adminView = document.getElementById('view-admin-dashboard');
+    if (adminView) adminView.style.display = 'block';
+
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    const evtTab = document.getElementById('admin-tab-m6_event');
+    if (evtTab) evtTab.style.display = 'block';
+
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
+    this.updateSidebarRoleVisibility();
+    this.setActiveSidebarItem('member_events');
+    if (window.M6Engine) {
+      M6Engine.init();
+      M6Engine.switchSubtab('6_1_proposal');
+    }
+    this.closeMobileSidebar();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  openMemberForum() {
+    this.setActiveSidebarItem('member_forum');
+    this.closeMobileSidebar();
+    if (typeof this.openMemberForumModal === 'function') {
+      this.openMemberForumModal();
+    } else {
+      this.switchAdminTab('m5_forum');
+    }
+  },
+
+  openMemberDonations() {
+    this.setActiveSidebarItem('member_donations');
+    this.closeMobileSidebar();
+    if (typeof this.openMemberDonasiModal === 'function') {
+      this.openMemberDonasiModal();
+    } else {
+      this.switchAdminTab('m7_donation');
+    }
+  },
+
+  openMemberShop() {
+    this.setActiveSidebarItem('member_shop');
+    this.closeMobileSidebar();
+    if (typeof this.openMemberLapakModal === 'function') {
+      this.openMemberLapakModal();
+    } else {
+      this.switchAdminTab('m7_shop');
+    }
   },
 
   openPortalSponsor(email = null) {
@@ -345,21 +455,26 @@ const AppEngine = {
     const kopTab = document.getElementById('admin-tab-m11_koperasi');
     if (kopTab) kopTab.style.display = 'block';
 
+    const sidebar = document.getElementById('app-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
+    this.updateSidebarRoleVisibility();
+    this.setActiveSidebarItem('member_koperasi');
+
     const btnReturnAdmin = document.getElementById('btn-kop-return-admin');
     const btnReturnMember = document.getElementById('btn-kop-return-member');
     if (fromView === 'member') {
       if (btnReturnAdmin) btnReturnAdmin.style.display = 'none';
       if (btnReturnMember) btnReturnMember.style.display = 'inline-flex';
-      const sidebar = document.getElementById('app-sidebar');
-      if (sidebar) sidebar.style.display = 'none';
-      const btnHamburger = document.getElementById('btn-hamburger-toggle');
-      if (btnHamburger) btnHamburger.style.display = 'none';
-      document.body.classList.remove('yt-has-sidebar');
     } else {
       if (btnReturnAdmin) btnReturnAdmin.style.display = 'inline-flex';
       if (btnReturnMember) btnReturnMember.style.display = 'none';
     }
 
+    this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
@@ -4591,15 +4706,9 @@ const AppEngine = {
     if (btnHamburger) btnHamburger.style.display = 'inline-flex';
     document.body.classList.add('yt-has-sidebar');
 
-    // Update active state on YouTube sidebar items
+    this.updateSidebarRoleVisibility();
     const activeKey = (tab === 'dashboard' || tab === 'users' || tab === 'audit' || tab === 'settings') ? 'm1_portal' : tab;
-    document.querySelectorAll('.yt-nav-item[data-admin-tab]').forEach(btn => {
-      if (btn.getAttribute('data-admin-tab') === activeKey) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
-    });
+    this.setActiveSidebarItem(activeKey);
 
     const spDash = document.getElementById('view-sponsor-dashboard');
 
@@ -4858,9 +4967,11 @@ const AppEngine = {
         // Standard Member or Pending Member: Show Member Portal Dashboard
         if (adminView) adminView.style.display = 'none';
         if (landingView) landingView.style.display = 'none';
-        if (sidebar) sidebar.style.display = 'none';
-        if (btnHamburger) btnHamburger.style.display = 'none';
-        document.body.classList.remove('yt-has-sidebar');
+        if (sidebar) sidebar.style.display = 'flex';
+        if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+        document.body.classList.add('yt-has-sidebar');
+        this.updateSidebarRoleVisibility();
+        this.setActiveSidebarItem('member_profile');
 
         const memberView = document.getElementById('view-member-dashboard');
         if (memberView) {
