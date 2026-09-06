@@ -330,12 +330,13 @@ const AppEngine = {
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
 
     if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'none';
-    if (btnHamburger) btnHamburger.style.display = 'none';
-    document.body.classList.remove('yt-has-sidebar');
+    if (memberSidebar) memberSidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
     document.body.classList.add('member-mode');
 
     this.updateHeaderNavPillsActive('nav-btn-member-portal');
+    this.setActiveMemberSidebarItem('member_dashboard');
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
@@ -351,15 +352,16 @@ const AppEngine = {
     document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
     document.body.classList.add('member-mode');
 
-    // Sembunyikan sidebar & hamburger untuk member
+    // Tampilkan member-sidebar & hamburger
     const adminSidebar = document.getElementById('app-sidebar');
     const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
     if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'none';
-    if (btnHamburger) btnHamburger.style.display = 'none';
-    document.body.classList.remove('yt-has-sidebar');
+    if (memberSidebar) memberSidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
 
+    this.setActiveMemberSidebarItem(tabKey);
     this.closeMobileSidebar();
 
     if (tabKey === 'member_dashboard') {
@@ -420,14 +422,14 @@ const AppEngine = {
     const tab = document.getElementById(tabId);
     if (tab) tab.style.display = 'block';
 
-    // Sembunyikan semua sidebar & hamburger untuk member mode (bebas YT sidebar)
+    // Tampilkan member-sidebar (bukan admin-sidebar) untuk member
     const adminSidebar = document.getElementById('app-sidebar');
     const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
     if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'none';
-    if (btnHamburger) btnHamburger.style.display = 'none';
-    document.body.classList.remove('yt-has-sidebar');
+    if (memberSidebar) memberSidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
     document.body.classList.add('member-mode'); // CSS & JS hook untuk sembunyikan tombol AKSI
 
     // Tampilkan tombol navigasi kembali ke dashboard member
@@ -436,6 +438,7 @@ const AppEngine = {
     const retM2 = document.getElementById('btn-m2-return-member');
     if (retM2) retM2.style.display = (tabId === 'admin-tab-m2_org') ? 'inline-flex' : 'none';
 
+    this.setActiveMemberSidebarItem(activeItemKey);
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
@@ -5160,10 +5163,11 @@ const AppEngine = {
         
         const memberSidebar = document.getElementById('member-sidebar');
         if (sidebar) sidebar.style.display = 'none';
-        if (memberSidebar) memberSidebar.style.display = 'none';
-        if (btnHamburger) btnHamburger.style.display = 'none';
-        document.body.classList.remove('yt-has-sidebar');
+        if (memberSidebar) memberSidebar.style.display = 'flex';
+        if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+        document.body.classList.add('yt-has-sidebar');
         document.body.classList.add('member-mode');
+        this.setActiveMemberSidebarItem('member_dashboard');
 
         const memberView = document.getElementById('view-member-dashboard');
         if (memberView) {

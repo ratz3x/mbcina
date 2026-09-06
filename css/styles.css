@@ -2695,29 +2695,17 @@ body.light-mode input:-webkit-autofill:active {
 /* ==========================================================================
    🔒 MEMBER MODE STYLES (READ-ONLY FOR REGULAR MEMBERS)
    ========================================================================== */
-/* Hide left vertical sidebar and hamburger button for member */
-body.member-mode #member-sidebar,
-body.member-mode #app-sidebar,
-body.member-mode #btn-hamburger-toggle,
-body.member-mode .yt-hamburger-btn {
+/* Pastikan sidebar admin tersembunyi saat member-mode */
+body.member-mode #app-sidebar {
   display: none !important;
 }
 
-/* Hide / disable YT user profile dropdown menu for member */
+/* Hide / disable YT user profile dropdown menu for member (YT Menu Member) */
 body.member-mode #user-profile-dropdown {
   display: none !important;
 }
 body.member-mode #nav-user-profile {
   cursor: default !important;
-}
-
-/* Ensure full width and no sidebar offset when member-mode */
-body.member-mode.yt-has-sidebar {
-  padding-left: 0 !important;
-}
-body.member-mode .main-wrapper {
-  margin-left: 0 !important;
-  width: 100% !important;
 }
 
 /* Return to Member Dashboard banner & buttons */
