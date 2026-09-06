@@ -338,9 +338,15 @@ const AppEngine = {
 
   updateSidebarRoleVisibility() {
     const adminSection = document.getElementById('sidebar-admin-section');
-    if (!adminSection) return;
+    const sponsorSection = document.getElementById('sidebar-sponsor-section');
+    const memberSection = document.getElementById('sidebar-member-section');
+    
     const isAdminRole = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB'].includes(this.currentRole);
-    adminSection.style.display = isAdminRole ? 'block' : 'none';
+    const isSponsorRole = this.currentRole === 'SPONSOR';
+
+    if (adminSection) adminSection.style.display = isAdminRole ? 'block' : 'none';
+    if (sponsorSection) sponsorSection.style.display = (isAdminRole || isSponsorRole) ? 'block' : 'none';
+    if (memberSection) memberSection.style.display = 'block';
   },
 
   setActiveSidebarItem(targetKey) {
@@ -529,6 +535,14 @@ const AppEngine = {
 
   openPortalSponsor(email = null) {
     this.switchAdminTab('m6_sponsorship');
+  },
+
+  openSponsorSubtab(subtab = 'summary') {
+    this.openPortalSponsor();
+    if (window.SponsorPortalEngine && typeof window.SponsorPortalEngine.switchMainTab === 'function') {
+      window.SponsorPortalEngine.switchMainTab(subtab);
+    }
+    this.setActiveSidebarItem('spnd_' + subtab);
   },
 
   openMemberKoperasi(fromView = 'member') {
