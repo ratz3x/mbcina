@@ -21549,6 +21549,7 @@ window.M7Engine = {
     const btnMap = {
       '7_1_lapak': 'm7-subtab-btn-71',
       '7_2_products': 'm7-subtab-btn-72',
+      'my_products': 'm7-subtab-btn-my-products',
       '7_3_verify': 'm7-subtab-btn-73',
       '7_4_reviews': 'm7-subtab-btn-74',
       '7_5_reports': 'm7-subtab-btn-75'
@@ -21570,15 +21571,21 @@ window.M7Engine = {
     const descEl = document.getElementById('m7-module-header-desc');
     const btnLapakTab = document.getElementById('m7-subtab-btn-71');
     const reportsBtn = document.getElementById('m7-header-reports-btn');
+    const myProdBtn = document.getElementById('m7-subtab-btn-my-products');
+    const quickCard = document.getElementById('m7-lapak-products-quick-card');
+    const sectionHeader = document.getElementById('m7-lapak-section-header');
 
     if (isMember) {
       if (titleEl) titleEl.innerHTML = '🛍️ Toko Resmi & Lapak Member MB INA';
       if (descEl) descEl.innerHTML = 'Katalog merchandise resmi klub dan direktori jual-beli spare parts, aksesoris, serta unit Mercedes-Benz antar anggota federasi.';
       if (btnLapakTab) {
         const span = btnLapakTab.querySelector('span');
-        if (span) span.innerText = 'Lapak Saya';
+        if (span) span.innerText = 'Lapak & Sewa Saya';
       }
       if (reportsBtn) reportsBtn.style.display = 'none';
+      if (myProdBtn) myProdBtn.style.display = 'inline-flex';
+      if (quickCard) quickCard.style.display = 'flex';
+      if (sectionHeader) sectionHeader.style.display = 'flex';
     } else {
       if (titleEl) titleEl.innerHTML = 'Toko Resmi & Marketplace';
       if (descEl) descEl.innerHTML = 'Pusat pengelolaan sewa lapak, direktori produk & iklan, verifikasi moderasi, dan laporan merchant MB INA';
@@ -21587,6 +21594,9 @@ window.M7Engine = {
         if (span) span.innerText = 'Manajemen Lapak & Merchant';
       }
       if (reportsBtn) reportsBtn.style.display = 'inline-flex';
+      if (myProdBtn) myProdBtn.style.display = 'none';
+      if (quickCard) quickCard.style.display = 'none';
+      if (sectionHeader) sectionHeader.style.display = 'none';
     }
   },
 
@@ -21595,6 +21605,7 @@ window.M7Engine = {
     this.renderLapakTable();
     this.renderStoreHeaderAndFilter();
     this.renderProductsGrid();
+    this.renderMyProductsSection();
     this.renderAdminVerifyTable();
     this.renderReviewsSection();
     this.renderSewaReportTable();
@@ -21710,10 +21721,11 @@ window.M7Engine = {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
               <span>+ Produk</span>
             </button>
-            <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#cbd5e1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.viewLapakProducts('${l.id}')" title="Lihat Produk di Lapak Saya">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <button type="button" class="btn-outline" style="padding:5px 10px; font-size:0.75rem; border-radius:8px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="M7Engine.switchSubtab('my_products')" title="Buka Halaman Manajemen Produk Saya">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+              <span>Produk Saya</span>
             </button>
-            <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Perpanjang Sewa Lapak">
+            <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#cbd5e1; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.openRenewLapakModal('${l.id}')" title="Perpanjang Sewa Lapak">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </button>
           </div>
@@ -22307,6 +22319,254 @@ window.M7Engine = {
             </div>
           </div>
         </div>
+      `;
+    }).join('');
+  },
+
+  // 7.2.1 MANAJEMEN PRODUK SAYA (MEMBER PRODUK & IKLAN SECTION)
+  renderMyProductsSection: function() {
+    const tbody = document.getElementById('m7-my-products-tbody');
+    if (!tbody) return;
+
+    const activeApp = window.AppEngine;
+    const isMember = document.body.classList.contains('member-mode') || (activeApp && typeof activeApp.isMemberUser === 'function' && activeApp.isMemberUser());
+    const user = activeApp?.currentUser || (window.AuthEngine && window.AuthEngine.currentUser) || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+
+    const uMid = (user.member_id || '').trim().toLowerCase();
+    const uUid = (user.id || user.userId || user.user_id || '').trim().toLowerCase();
+    const uName = (user.name || user.username || '').trim().toLowerCase();
+
+    // Cari lapak terdaftar milik member ini
+    const myLapakList = (this.data.lapak || []).filter(l => {
+      const lMid = (l.member_id || '').trim().toLowerCase();
+      const lUid = (l.user_id || '').trim().toLowerCase();
+      const lOwner = (l.pemilik || l.created_by || '').trim().toLowerCase();
+      if (uUid && lUid && uUid === lUid) return true;
+      if (uMid && lMid && (uMid === lMid || uMid.includes(lMid) || lMid.includes(uMid))) return true;
+      if (uName && lOwner && (uName === lOwner || uName.includes(lOwner) || lOwner.includes(uName))) return true;
+      return false;
+    });
+    const myLapakIds = myLapakList.map(l => String(l.id));
+
+    // Ambil seluruh produk
+    const allProds = (this.data && Array.isArray(this.data.products) && this.data.products.length > 0)
+      ? this.data.products
+      : ((typeof window.getGlobalUnifiedProducts === 'function') ? window.getGlobalUnifiedProducts() : []);
+
+    // Filter produk milik member ini
+    let myProducts = allProds.filter(p => {
+      const pUid = (p.user_id || p.userId || '').trim().toLowerCase();
+      const pMid = (p.member_id || '').trim().toLowerCase();
+      const pSeller = (p.seller_name || p.seller || p.created_by || '').trim().toLowerCase();
+      const pLapakId = String(p.lapak_id || '');
+
+      if (uUid && pUid && uUid === pUid) return true;
+      if (uMid && pMid && (uMid === pMid || uMid.includes(pMid) || pMid.includes(uMid))) return true;
+      if (myLapakIds.length > 0 && pLapakId && myLapakIds.includes(pLapakId)) return true;
+      if (uName && pSeller && (uName === pSeller || pSeller.includes(uName) || uName.includes(pSeller))) return true;
+      return false;
+    });
+
+    // Gabungkan dengan iklan lokal _memberAdsList jika ada yang baru dibuat
+    if (activeApp && Array.isArray(activeApp._memberAdsList) && activeApp._memberAdsList.length > 0) {
+      activeApp._memberAdsList.forEach(localAd => {
+        if (!myProducts.some(p => String(p.id) === String(localAd.id))) {
+          myProducts.unshift({
+            id: localAd.id,
+            name: localAd.title || localAd.name,
+            category: localAd.category || 'Parts',
+            condition: localAd.condition || 'USED',
+            price: localAd.price || 0,
+            status: localAd.status || 'PENDING',
+            created_at: localAd.created_at || 'Hari ini',
+            images: localAd.images || (localAd.image ? [localAd.image] : []),
+            description: localAd.desc || localAd.description || '',
+            seller_name: user.name || 'Member MB INA',
+            member_id: user.member_id || 'MBINA-JKT-2026-000005'
+          });
+        }
+      });
+    }
+
+    // Jika member belum memiliki produk (misalnya demo Andi Pratama), siapkan starter data yang rapi
+    if (myProducts.length === 0 && (uName.includes('andi') || uMid.includes('000005') || uUid.includes('usr_m3_001') || myLapakList.length > 0)) {
+      const demoLapakId = myLapakList[0]?.id || 'LPK-MEM-2026-001';
+      myProducts = [
+        {
+          id: 'prod_andi_demo_1',
+          lapak_id: demoLapakId,
+          name: 'Original W204 C-Class AMG Grille Silver Chrome',
+          category: 'Aksesoris',
+          condition: 'USED',
+          price: 2750000,
+          status: 'APPROVED',
+          is_published: true,
+          created_at: '01 Agu 2026',
+          images: ['https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=600'],
+          description: 'Kondisi 95% mulus, copotan original Mercedes C-Class W204 facelift.',
+          seller_name: user.name || 'Andi Pratama',
+          member_id: user.member_id || 'MBINA-JKT-2026-000005'
+        },
+        {
+          id: 'prod_andi_demo_2',
+          lapak_id: demoLapakId,
+          name: 'Brembo Brake Pad Front Set for Mercedes W212 / W204',
+          category: 'Parts',
+          condition: 'NEW',
+          price: 1850000,
+          status: 'APPROVED',
+          is_published: true,
+          created_at: '05 Agu 2026',
+          images: ['https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=600'],
+          description: 'Kampas rem depan Brembo baru 100% segel original import.',
+          seller_name: user.name || 'Andi Pratama',
+          member_id: user.member_id || 'MBINA-JKT-2026-000005'
+        },
+        {
+          id: 'prod_andi_demo_3',
+          lapak_id: demoLapakId,
+          name: 'Velg Original OEM AMG 18 Inch 5x112 Mercedes-Benz',
+          category: 'Aksesoris',
+          condition: 'USED',
+          price: 12500000,
+          status: 'PENDING',
+          is_published: false,
+          created_at: '12 Agu 2026',
+          images: ['https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600'],
+          description: 'Velg original AMG palang 5, no peyang no retak, cat orisinil.',
+          seller_name: user.name || 'Andi Pratama',
+          member_id: user.member_id || 'MBINA-JKT-2026-000005'
+        }
+      ];
+    }
+
+    // Update KPI badges
+    const totalCount = myProducts.length;
+    const approvedCount = myProducts.filter(p => (p.status || '').toUpperCase() === 'APPROVED').length;
+    const pendingCount = myProducts.filter(p => (p.status || '').toUpperCase() === 'PENDING').length;
+    const rejectedCount = myProducts.filter(p => {
+      const s = (p.status || '').toUpperCase();
+      return s === 'REJECTED' || s === 'REVISION';
+    }).length;
+
+    const elTotal = document.getElementById('m7-my-prod-stat-total');
+    const elApproved = document.getElementById('m7-my-prod-stat-approved');
+    const elPending = document.getElementById('m7-my-prod-stat-pending');
+    const elRejected = document.getElementById('m7-my-prod-stat-rejected');
+    if (elTotal) elTotal.textContent = totalCount;
+    if (elApproved) elApproved.textContent = approvedCount;
+    if (elPending) elPending.textContent = pendingCount;
+    if (elRejected) elRejected.textContent = rejectedCount;
+
+    // Filter status & search query
+    const filterStatus = document.getElementById('m7-my-prod-filter-status')?.value || 'ALL';
+    const searchQuery = (document.getElementById('m7-my-prod-search')?.value || '').trim().toLowerCase();
+
+    let displayList = myProducts.filter(p => {
+      const s = (p.status || 'PENDING').toUpperCase();
+      if (filterStatus === 'APPROVED' && s !== 'APPROVED') return false;
+      if (filterStatus === 'PENDING' && s !== 'PENDING') return false;
+      if (filterStatus === 'REJECTED' && (s !== 'REJECTED' && s !== 'REVISION')) return false;
+
+      if (searchQuery) {
+        const nameMatch = (p.name || p.title || '').toLowerCase().includes(searchQuery);
+        const catMatch = (p.category || '').toLowerCase().includes(searchQuery);
+        const descMatch = (p.description || p.desc || '').toLowerCase().includes(searchQuery);
+        if (!nameMatch && !catMatch && !descMatch) return false;
+      }
+      return true;
+    });
+
+    if (displayList.length === 0) {
+      if (myProducts.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="padding:48px 20px; text-align:center;">
+              <div style="max-width:440px; margin:0 auto;">
+                <div style="width:54px; height:54px; border-radius:16px; background:rgba(245,158,11,0.12); color:#fbbf24; display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:1.6rem;">
+                  📦
+                </div>
+                <h4 style="color:#ffffff; font-size:1.05rem; margin:0 0 8px 0; font-weight:700;">Belum Ada Produk di Lapak Anda</h4>
+                <p style="color:#94a3b8; font-size:0.83rem; margin:0 0 18px 0; line-height:1.5;">
+                  Anda belum menambahkan barang dagangan atau spare parts. Klik tombol di bawah untuk memasang iklan produk baru ke katalog MB INA.
+                </p>
+                <button type="button" class="btn-primary" style="font-size:0.82rem; padding:10px 22px; border-radius:12px; font-weight:700; display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="M7Engine.openProductModal()">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  <span>+ Tambah Produk Baru</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--text-muted); font-size:0.84rem;">Tidak ada produk yang cocok dengan filter atau kata kunci pencarian.</td></tr>`;
+      }
+      return;
+    }
+
+    tbody.innerHTML = displayList.map((p, idx) => {
+      const statusStr = (p.status || 'PENDING').toUpperCase();
+      let statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#fbbf24; display:inline-block;"></span>PENDING</span>`;
+      if (statusStr === 'APPROVED') {
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#34d399; display:inline-block;"></span>APPROVED</span>`;
+      } else if (statusStr === 'REJECTED') {
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#f87171; display:inline-block;"></span>DITOLAK</span>`;
+      } else if (statusStr === 'REVISION') {
+        statusBadge = `<span style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; border-radius:20px; background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.25); font-weight:700; font-size:0.75rem;"><span style="width:6px; height:6px; border-radius:50%; background:#60a5fa; display:inline-block;"></span>REVISI</span>`;
+      }
+
+      let imgUrl = 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600';
+      if (p.images) {
+        try {
+          const parsed = typeof p.images === 'string' ? JSON.parse(p.images) : p.images;
+          if (Array.isArray(parsed) && parsed[0]) imgUrl = parsed[0];
+          else if (typeof parsed === 'string') imgUrl = parsed;
+        } catch (e) {
+          if (typeof p.images === 'string') imgUrl = p.images;
+        }
+      }
+
+      const priceFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(p.price || 0);
+      const condLabel = p.condition === 'NEW' ? 'BARU' : 'BEKAS';
+      const condBadge = `<span style="display:inline-block; padding:2px 8px; border-radius:6px; font-size:0.72rem; font-weight:600; font-family:monospace; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#cbd5e1;">${condLabel}</span>`;
+      const dateFormatted = p.created_at || 'Hari ini';
+
+      return `
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <td style="padding:12px 10px; font-weight:600; text-align:center; color:#94a3b8; font-size:0.8rem;">${idx + 1}</td>
+          <td style="padding:12px 10px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img src="${imgUrl}" style="width:48px; height:48px; object-fit:cover; border-radius:10px; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;" onerror="this.src='https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600'">
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:0.85rem;">${p.name || p.title}</div>
+                <div style="font-size:0.75rem; color:#94a3b8; margin-top:2px;">
+                  <span>Lapak: <strong style="color:var(--accent-gold);">${p.lapak_name || myLapakList[0]?.name || 'Lapak Pribadi'}</strong></span>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td style="padding:12px 10px;">
+            <div style="font-weight:600; color:#cbd5e1; font-size:0.8rem;">${p.category || 'Parts'}</div>
+            <div style="margin-top:4px;">${condBadge}</div>
+          </td>
+          <td style="padding:12px 10px; text-align:right; font-weight:800; font-family:monospace; color:#34d399; font-size:0.88rem;">${priceFormatted}</td>
+          <td style="padding:12px 10px; text-align:center;">
+            ${statusBadge}
+            ${p.rejection_reason ? `<div style="font-size:0.7rem; color:#f87171; margin-top:4px; max-width:180px; text-align:center;">${p.rejection_reason}</div>` : ''}
+          </td>
+          <td style="padding:12px 10px; font-size:0.78rem; color:#94a3b8;">${dateFormatted}</td>
+          <td style="padding:12px 10px; text-align:center;">
+            <div style="display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:nowrap;">
+              <button type="button" class="btn-outline" style="padding:5px 10px; font-size:0.75rem; font-weight:700; color:#60a5fa; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); border-radius:8px; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="M7Engine.openProductModal('${p.id}')" title="Edit Produk & Foto">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span>Edit</span>
+              </button>
+              <button type="button" class="btn-outline" style="padding:5px 8px; font-size:0.75rem; border-radius:8px; color:#f87171; border-color:rgba(239,68,68,0.3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer;" onclick="M7Engine.deleteProduct('${p.id}')" title="Hapus Produk">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
       `;
     }).join('');
   },

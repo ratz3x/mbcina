@@ -2806,6 +2806,15 @@ body.member-mode #m7-btn-filter-my-lapak {
   display: none !important;
 }
 
+body.member-mode #m7-subtab-btn-my-products {
+  display: inline-flex !important;
+}
+
+body:not(.member-mode) #m7-subtab-btn-my-products,
+body:not(.member-mode) #m7-subtab-my_products {
+  display: none !important;
+}
+
 
 
 

@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260907_v178_member_shop_refinement">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v178_member_shop_refinement">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v179_member_my_products">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v179_member_my_products">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -3135,6 +3135,10 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             <span>Katalog Produk & Iklan</span>
           </button>
+          <button class="sub-tab-btn" id="m7-subtab-btn-my-products" onclick="M7Engine.switchSubtab('my_products')" style="display:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+            <span>Produk Saya</span>
+          </button>
           <button class="sub-tab-btn" id="m7-subtab-btn-73" onclick="M7Engine.switchSubtab('7_3_verify')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
             <span>Verifikasi Iklan & Moderasi</span>
@@ -3208,6 +3212,17 @@
             </div>
           </div>
 
+          <!-- LAPAK SECTION HEADER -->
+          <div id="m7-lapak-section-header" style="margin:20px 0 10px; display:none; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h4 style="color:#fbbf24; font-size:1.05rem; margin:0; font-weight:700;">🏢 STATUS LANGGANAN & SEWA LAPAK SAYA</h4>
+              <p style="font-size:0.78rem; color:#94a3b8; margin:2px 0 0 0;">Informasi masa aktif slot lapak, tarif sewa bulanan, dan perpanjangan izin lapak Anda</p>
+            </div>
+            <button type="button" class="btn-outline" style="font-size:0.78rem; padding:6px 14px; border-radius:10px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.switchSubtab('my_products')">
+              <span>📦 Buka Halaman Produk Saya →</span>
+            </button>
+          </div>
+
           <!-- DATA TABLE LAPAK -->
           <div class="glass-card" style="padding:16px; border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow-x:auto;">
             <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.83rem;">
@@ -3228,6 +3243,28 @@
                 <!-- Dynamically filled by M7Engine.renderLapakTable() -->
               </tbody>
             </table>
+          </div>
+
+          <!-- 📦 KELOLA PRODUK SAYA QUICK CARD -->
+          <div id="m7-lapak-products-quick-card" class="glass-card" style="margin-top:20px; padding:18px 22px; border:1px solid rgba(245,158,11,0.2); border-radius:14px; background:rgba(245,158,11,0.03); display:none; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:42px; height:42px; border-radius:12px; background:rgba(245,158,11,0.1); color:#fbbf24; display:flex; align-items:center; justify-content:center; font-size:1.4rem;">
+                📦
+              </div>
+              <div>
+                <h4 style="margin:0; font-size:0.95rem; color:#fff; font-weight:700;">Kelola Produk & Iklan Dagangan Anda</h4>
+                <p style="margin:2px 0 0; font-size:0.78rem; color:#94a3b8;">Lihat stok produk, edit harga, tambah produk baru, atau periksa status verifikasi moderasi admin.</p>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-primary" style="font-size:0.78rem; padding:8px 16px; font-weight:700; border-radius:10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.openProductModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                <span>+ Tambah Produk Baru</span>
+              </button>
+              <button type="button" class="btn-outline" style="font-size:0.78rem; padding:8px 16px; font-weight:600; border-radius:10px; color:#fbbf24; border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.switchSubtab('my_products')">
+                <span>Buka Halaman Produk Saya →</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -3280,6 +3317,83 @@
             <div style="font-size:0.75rem; color:#94a3b8; line-height:1.5;">
               Transaksi dilakukan secara langsung antara penjual & pembeli via WhatsApp / Telepon. MB INA hanya menyediakan platform ruang tempat & direktori iklan dan tidak bertanggung jawab atas isi kesepakatan transaksi mandiri.
             </div>
+          </div>
+        </div>
+
+        <!-- ╔═════════════════════════════════════════════════════╗ -->
+        <!-- ║  7.2.1 PRODUK SAYA (MEMBER PRODUK & IKLAN)          ║ -->
+        <!-- ╚═════════════════════════════════════════════════════╝ -->
+        <div id="m7-subtab-my_products" class="m7-subtab-content" style="display:none;">
+          <!-- Header Banner -->
+          <div class="glass-card" style="padding:20px; border:1px solid rgba(245,158,11,0.25); border-radius:16px; margin-bottom:20px; background:rgba(255,255,255,0.02);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h4 style="font-size:1.15rem; color:var(--accent-gold); margin:0; font-weight:700; display:flex; align-items:center; gap:8px;">
+                  <span>📦</span>
+                  <span>MANAJEMEN PRODUK & IKLAN SAYA</span>
+                </h4>
+                <p style="font-size:0.8rem; color:#94a3b8; margin:4px 0 0 0;">Kelola semua produk & iklan yang Anda jual di lapak Anda, pantau status verifikasi moderasi, dan kelola foto & harga.</p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn-primary" style="font-size:0.8rem; padding:8px 16px; font-weight:700; border-radius:12px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="M7Engine.openProductModal()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                  <span>+ Tambah Produk Baru</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI Summary Badges for My Products -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:20px;">
+            <div class="glass-card" style="padding:14px 18px; border:1px solid rgba(255,255,255,0.08); border-radius:14px;">
+              <div style="font-size:0.75rem; color:#94a3b8;">Total Produk Saya</div>
+              <div id="m7-my-prod-stat-total" style="font-size:1.3rem; font-weight:800; color:#fff; margin-top:2px;">0</div>
+            </div>
+            <div class="glass-card" style="padding:14px 18px; border:1px solid rgba(16,185,129,0.25); border-radius:14px; background:rgba(16,185,129,0.03);">
+              <div style="font-size:0.75rem; color:#34d399;">Tayang di Katalog (Approved)</div>
+              <div id="m7-my-prod-stat-approved" style="font-size:1.3rem; font-weight:800; color:#34d399; margin-top:2px;">0</div>
+            </div>
+            <div class="glass-card" style="padding:14px 18px; border:1px solid rgba(245,158,11,0.25); border-radius:14px; background:rgba(245,158,11,0.03);">
+              <div style="font-size:0.75rem; color:#fbbf24;">Menunggu Review (Pending)</div>
+              <div id="m7-my-prod-stat-pending" style="font-size:1.3rem; font-weight:800; color:#fbbf24; margin-top:2px;">0</div>
+            </div>
+            <div class="glass-card" style="padding:14px 18px; border:1px solid rgba(239,68,68,0.25); border-radius:14px; background:rgba(239,68,68,0.03);">
+              <div style="font-size:0.75rem; color:#f87171;">Ditolak / Perlu Revisi</div>
+              <div id="m7-my-prod-stat-rejected" style="font-size:1.3rem; font-weight:800; color:#f87171; margin-top:2px;">0</div>
+            </div>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <select id="m7-my-prod-filter-status" class="form-input" style="font-size:0.8rem; padding:8px 14px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff;" onchange="M7Engine.renderMyProductsSection()">
+                <option value="ALL">Status: Semua</option>
+                <option value="APPROVED">Disetujui (Tayang)</option>
+                <option value="PENDING">Menunggu Moderasi</option>
+                <option value="REJECTED">Ditolak / Revisi</option>
+              </select>
+              <input type="text" id="m7-my-prod-search" class="form-input" placeholder="Cari nama produk / kategori..." style="font-size:0.8rem; padding:8px 14px; width:240px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; color:#fff;" oninput="M7Engine.renderMyProductsSection()">
+            </div>
+          </div>
+
+          <!-- Data Table Produk Saya -->
+          <div class="glass-card" style="padding:16px; border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow-x:auto;">
+            <table class="data-table" style="width:100%; border-collapse:collapse; font-size:0.83rem;">
+              <thead>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.08); color:#94a3b8; text-align:left; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">
+                  <th style="padding:12px 10px; width:40px; text-align:center;">No</th>
+                  <th style="padding:12px 10px;">Foto & Nama Produk</th>
+                  <th style="padding:12px 10px;">Kategori & Kondisi</th>
+                  <th style="padding:12px 10px; text-align:right;">Harga (Rp)</th>
+                  <th style="padding:12px 10px; text-align:center;">Status Moderasi</th>
+                  <th style="padding:12px 10px;">Tanggal Submit</th>
+                  <th style="padding:12px 10px; text-align:center;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="m7-my-products-tbody">
+                <!-- Dynamically filled by M7Engine.renderMyProductsSection() -->
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -11356,8 +11470,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v178_member_shop_refinement"></script>
-  <script src="js/app.js?v=20260907_v178_member_shop_refinement"></script>
+  <script src="js/auth.js?v=20260907_v179_member_my_products"></script>
+  <script src="js/app.js?v=20260907_v179_member_my_products"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11434,6 +11548,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v178_member_shop_refinement"></script>
+  <script src="js/donation_manager.js?v=20260907_v179_member_my_products"></script>
 </body>
 </html>
