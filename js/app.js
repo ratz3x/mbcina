@@ -6074,8 +6074,8 @@ const AppEngine = {
         <!-- Subtle Dot Grid Matrix Canvas -->
         <rect width="1000" height="480" fill="url(#darkMapGrid)"/>
 
-        <!-- REAL INDONESIA GEOGRAPHICAL MAP IMAGE (DARK LUXURY GOLD PRESENTATION) -->
-        <image href="images/indonesia2.jpg" xlink:href="images/indonesia2.jpg" x="0" y="0" width="1000" height="480" preserveAspectRatio="xMidYMid meet" opacity="0.98" style="filter: drop-shadow(0 4px 18px rgba(0,0,0,0.8));"/>
+        <!-- REAL INDONESIA GEOGRAPHICAL MAP IMAGE (DARK LUXURY TRANSPARENT GOLD) -->
+        <image href="images/indonesia_gold.png" xlink:href="images/indonesia_gold.png" x="0" y="0" width="1000" height="480" preserveAspectRatio="xMidYMid meet" opacity="1" style="filter: drop-shadow(0 6px 20px rgba(0,0,0,0.9));"/>
 
         <!-- SLEEK GLOWING PULSE MAP PINS -->
         ${pinsSvg}
