@@ -188,10 +188,7 @@ const AppEngine = {
 
   switchNavTab(tab) {
     if (tab === 'landing') {
-      document.querySelectorAll('.view-screen, [id^="view-"], .view-container').forEach(v => v.style.display = 'none');
-      const landing = document.getElementById('view-landing-page') || document.getElementById('view-landing') || document.getElementById('view-public-portal');
-      if (landing) landing.style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.navigateToHome();
     } else if (tab === 'member') {
       if (typeof this.openPortalMember === 'function') this.openPortalMember();
       else this.switchAdminTab('m3_membership');
@@ -4558,12 +4555,12 @@ const AppEngine = {
     if (elEvents) elEvents.innerText = new Intl.NumberFormat('id-ID').format(totalEvents);
 
     // Also update Landing Page Versi 2 metrics
-    const v2Members = document.getElementById('v2-stat-members');
+    const v2Regions = document.getElementById('v2-stat-regions') || document.getElementById('v2-stat-members');
     const v2Clubs = document.getElementById('v2-stat-clubs');
-    const v2Events = document.getElementById('v2-stat-events');
-    if (v2Members) v2Members.innerText = new Intl.NumberFormat('id-ID').format(totalMembers);
+    const v2Members = document.getElementById('v2-stat-members-v2') || document.getElementById('v2-stat-events');
+    if (v2Regions) v2Regions.innerText = totalRegions > 0 ? (totalRegions >= 18 ? totalRegions : 18) : 18;
     if (v2Clubs) v2Clubs.innerText = new Intl.NumberFormat('id-ID').format(totalClubs);
-    if (v2Events) v2Events.innerText = '5.000+';
+    if (v2Members) v2Members.innerText = totalMembers > 5000 ? new Intl.NumberFormat('id-ID').format(totalMembers) : '5.000+';
   },
 
   showLoader(message = 'Memuat Data (Supabase Cloud)...') {
@@ -5314,6 +5311,12 @@ const AppEngine = {
   toggleLandingVersion(version, save = true) {
     this.currentLandingVersion = version || 'v2';
     if (save) localStorage.setItem('mbina_landing_version', this.currentLandingVersion);
+
+    const landingView = document.getElementById('view-landing-page');
+    if (landingView && landingView.style.display === 'none') {
+      document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+      landingView.style.display = 'block';
+    }
 
     const v2Container = document.getElementById('landing-v2-container');
     const v1Container = document.getElementById('landing-v1-container');

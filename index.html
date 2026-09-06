@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260906_v163_admin_portal_view_fix">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v163_admin_portal_view_fix">
+  <link rel="stylesheet" href="css/styles.css?v=20260906_v164_landing_v2_fix">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v164_landing_v2_fix">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -879,7 +879,7 @@
     </div> <!-- END view-member-dashboard -->
 
     <!-- VIEW D: PORTAL ADMIN & M2 ORGANISASI -->
-    <div id="view-admin-dashboard" class="view-container" style="max-width:1440px; margin:0 auto; padding:16px 24px;">
+    <div id="view-admin-dashboard" class="view-container" style="display:none; max-width:1440px; margin:0 auto; padding:16px 24px;">
       <div style="margin-bottom:20px;">
         <h2 style="font-size:1.5rem; margin:0;" class="text-gradient">⚙️ Portal Admin & Operasional</h2>
         <p style="color:var(--text-muted); font-size:0.82rem; margin:4px 0 0 0;">Statistik real-time, manajemen organisasi, keanggotaan member, dan pengaturan sistem</p>
@@ -5983,9 +5983,8 @@
       </div>
     </div>
 
-    <!-- VIEW A: LANDING PAGE -->
-        <!-- VIEW A: LANDING PAGE (DUAL VERSION: V2 LUXURY DARK + V1 CLASSIC) -->
-    <div id="view-landing-page" class="view-container" style="display:none;">
+    <!-- VIEW A: LANDING PAGE (DUAL VERSION: V2 LUXURY DARK + V1 CLASSIC) -->
+    <div id="view-landing-page" class="view-container" style="display:block;">
       <div style="max-width:1440px; margin:0 auto; padding:20px 24px;">
 
         <!-- 🔄 TOP VERSION SWITCHER BAR -->
@@ -6143,7 +6142,23 @@
                 </div>
               </div>
               <div id="landing-sponsors-grid-container">
-                <!-- Rendered dynamically by AppEngine.renderLandingSponsors() -->
+                <div class="glass-card" style="grid-column:1/-1; position:relative; width:100%; border-radius:20px; overflow:hidden; border:1.5px solid var(--accent-gold); background:#000; box-shadow:0 12px 35px rgba(0,0,0,0.6);" onmouseenter="AppEngine.stopSponsorCarouselTimer()" onmouseleave="AppEngine.startSponsorCarouselTimer()">
+                  <div style="position:relative; width:100%; height:auto; min-height:160px; max-height:420px; overflow:hidden; background:#0b1120; display:flex; align-items:center; justify-content:center;">
+                    <a href="https://www.michelin.co.id/mbina" target="_blank" rel="noopener noreferrer" style="display:block; width:100%; text-decoration:none; cursor:pointer;" title="Michelin Indonesia">
+                      <img src="https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=1200" alt="Michelin Indonesia" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:100%; height:auto; max-height:400px; object-fit:contain; display:block; margin:0 auto; transition:all 0.5s ease-in-out;">
+                    </a>
+                    <button onclick="event.stopPropagation(); AppEngine.prevSponsorSlide();" style="position:absolute; left:14px; top:50%; transform:translateY(-50%); width:40px; height:40px; border-radius:50%; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.4); color:#fff; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:20; backdrop-filter:blur(6px); transition:all 0.2s;" onmouseenter="this.style.background='var(--accent-gold)'; this.style.color='#000';" onmouseleave="this.style.background='rgba(0,0,0,0.65)'; this.style.color='#fff';">❮</button>
+                    <button onclick="event.stopPropagation(); AppEngine.nextSponsorSlide();" style="position:absolute; right:14px; top:50%; transform:translateY(-50%); width:40px; height:40px; border-radius:50%; background:rgba(0,0,0,0.65); border:1px solid rgba(255,255,255,0.4); color:#fff; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:20; backdrop-filter:blur(6px); transition:all 0.2s;" onmouseenter="this.style.background='var(--accent-gold)'; this.style.color='#000';" onmouseleave="this.style.background='rgba(0,0,0,0.65)'; this.style.color='#fff';">❯</button>
+                  </div>
+                  <div style="display:flex; justify-content:center; align-items:center; gap:8px; padding:12px 18px; background:rgba(15,23,42,0.95); border-top:1px solid var(--chrome-border);">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span style="width:24px; height:8px; border-radius:4px; background:var(--accent-gold); cursor:pointer;"></span>
+                      <span style="width:8px; height:8px; border-radius:4px; background:rgba(255,255,255,0.25); cursor:pointer;"></span>
+                      <span style="width:8px; height:8px; border-radius:4px; background:rgba(255,255,255,0.25); cursor:pointer;"></span>
+                      <span style="width:8px; height:8px; border-radius:4px; background:rgba(255,255,255,0.25); cursor:pointer;"></span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -6153,7 +6168,62 @@
                 Mitra Resmi Gold & Silver MB INA:
               </div>
               <div id="sponsor-grid-wall-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px;">
-                <!-- Rendered dynamically by AppEngine.renderSponsorGridWall() -->
+                <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(245,158,11,0.35); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
+                  <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                    <img src="https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=800" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
+                    <div style="flex:1; min-width:0;">
+                      <div style="font-weight:900; font-size:0.92rem; color:#fff;">FDR Tyre Indonesia</div>
+                      <div style="font-size:0.72rem; color:var(--accent-gold); font-weight:700;">🥇 GOLD SPONSOR</div>
+                    </div>
+                  </div>
+                  <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">Ban & Velg High Performance khusus touring & perlombaan MB INA.</p>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.7rem; color:#22c55e; font-weight:700;">✅ Active Partner</span>
+                    <a href="https://fdrtire.com" target="_blank" class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-color:rgba(255,255,255,0.2); text-decoration:none; color:#fff;">Lihat Penawaran ↗</a>
+                  </div>
+                </div>
+                <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(245,158,11,0.35); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
+                  <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                    <img src="https://images.unsplash.com/photo-1486006920555-c77dce18193b?w=800" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
+                    <div style="flex:1; min-width:0;">
+                      <div style="font-weight:900; font-size:0.92rem; color:#fff;">PT Astra Otoparts Tbk</div>
+                      <div style="font-size:0.72rem; color:var(--accent-gold); font-weight:700;">🥇 GOLD SPONSOR</div>
+                    </div>
+                  </div>
+                  <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">Suku cadang & komponen OEM Mercedes-Benz bergaransi resmi.</p>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.7rem; color:#22c55e; font-weight:700;">✅ Active Partner</span>
+                    <a href="https://www.astra-otoparts.com" target="_blank" class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-color:rgba(255,255,255,0.2); text-decoration:none; color:#fff;">Lihat Penawaran ↗</a>
+                  </div>
+                </div>
+                <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(203,213,225,0.35); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
+                  <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                    <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
+                    <div style="flex:1; min-width:0;">
+                      <div style="font-weight:900; font-size:0.92rem; color:#fff;">PT Pertamina Lubricants</div>
+                      <div style="font-size:0.72rem; color:#cbd5e1; font-weight:700;">🥈 SILVER SPONSOR</div>
+                    </div>
+                  </div>
+                  <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">Pelumas Resmi Fastron Platinum & Synthetic Series.</p>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.7rem; color:#22c55e; font-weight:700;">✅ Active Partner</span>
+                    <a href="https://pertaminalubricants.com" target="_blank" class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-color:rgba(255,255,255,0.2); text-decoration:none; color:#fff;">Lihat Penawaran ↗</a>
+                  </div>
+                </div>
+                <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(203,213,225,0.35); border-radius:14px; padding:16px; position:relative; overflow:hidden;">
+                  <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                    <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?w=800" onerror="this.onerror=null; this.src='assets/mb_badge.jpg';" style="width:44px; height:44px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.1); flex-shrink:0;">
+                    <div style="flex:1; min-width:0;">
+                      <div style="font-weight:900; font-size:0.92rem; color:#fff;">Meguiar's Indonesia</div>
+                      <div style="font-size:0.72rem; color:#cbd5e1; font-weight:700;">🥈 SILVER SPONSOR</div>
+                    </div>
+                  </div>
+                  <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 12px 0; line-height:1.4;">Perawatan bodi & ceramic coating khusus Mercedes-Benz.</p>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.7rem; color:#22c55e; font-weight:700;">✅ Active Partner</span>
+                    <a href="https://www.meguiars.co.id" target="_blank" class="btn-outline" style="font-size:0.7rem; padding:4px 10px; border-color:rgba(255,255,255,0.2); text-decoration:none; color:#fff;">Lihat Penawaran ↗</a>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
@@ -11220,8 +11290,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260906_v163_admin_portal_view_fix"></script>
-  <script src="js/app.js?v=20260906_v163_admin_portal_view_fix"></script>
+  <script src="js/auth.js?v=20260906_v164_landing_v2_fix"></script>
+  <script src="js/app.js?v=20260906_v164_landing_v2_fix"></script>
   <script>
     lucide.createIcons();
     try {

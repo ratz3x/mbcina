@@ -116,11 +116,7 @@ body.light-mode select.form-input option {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
-/* Performance Optimization: Skip layout & paint rendering for hidden views on mobile */
-.view-container:not(.active), .admin-tab-content:not(.active) {
-  content-visibility: auto;
-  contain-intrinsic-size: 400px;
-}
+
 
 .glass-card {
   background: var(--bg-card);
