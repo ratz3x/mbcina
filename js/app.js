@@ -22388,58 +22388,6 @@ window.M7Engine = {
       });
     }
 
-    // Jika member belum memiliki produk (misalnya demo Andi Pratama), siapkan starter data yang rapi
-    if (myProducts.length === 0 && (uName.includes('andi') || uMid.includes('000005') || uUid.includes('usr_m3_001') || myLapakList.length > 0)) {
-      const demoLapakId = myLapakList[0]?.id || 'LPK-MEM-2026-001';
-      myProducts = [
-        {
-          id: 'prod_andi_demo_1',
-          lapak_id: demoLapakId,
-          name: 'Original W204 C-Class AMG Grille Silver Chrome',
-          category: 'Aksesoris',
-          condition: 'USED',
-          price: 2750000,
-          status: 'APPROVED',
-          is_published: true,
-          created_at: '01 Agu 2026',
-          images: ['https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=600'],
-          description: 'Kondisi 95% mulus, copotan original Mercedes C-Class W204 facelift.',
-          seller_name: user.name || 'Andi Pratama',
-          member_id: user.member_id || 'MBINA-JKT-2026-000005'
-        },
-        {
-          id: 'prod_andi_demo_2',
-          lapak_id: demoLapakId,
-          name: 'Brembo Brake Pad Front Set for Mercedes W212 / W204',
-          category: 'Parts',
-          condition: 'NEW',
-          price: 1850000,
-          status: 'APPROVED',
-          is_published: true,
-          created_at: '05 Agu 2026',
-          images: ['https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=600'],
-          description: 'Kampas rem depan Brembo baru 100% segel original import.',
-          seller_name: user.name || 'Andi Pratama',
-          member_id: user.member_id || 'MBINA-JKT-2026-000005'
-        },
-        {
-          id: 'prod_andi_demo_3',
-          lapak_id: demoLapakId,
-          name: 'Velg Original OEM AMG 18 Inch 5x112 Mercedes-Benz',
-          category: 'Aksesoris',
-          condition: 'USED',
-          price: 12500000,
-          status: 'PENDING',
-          is_published: false,
-          created_at: '12 Agu 2026',
-          images: ['https://images.unsplash.com/photo-1578844251758-2f71da64c96f?w=600'],
-          description: 'Velg original AMG palang 5, no peyang no retak, cat orisinil.',
-          seller_name: user.name || 'Andi Pratama',
-          member_id: user.member_id || 'MBINA-JKT-2026-000005'
-        }
-      ];
-    }
-
     // Update KPI badges
     const totalCount = myProducts.length;
     const approvedCount = myProducts.filter(p => (p.status || '').toUpperCase() === 'APPROVED').length;

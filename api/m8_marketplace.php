@@ -10,14 +10,14 @@ switch ($action) {
     case 'get_m7_data':
         try {
             ensureM7Tables($sPdo);
-            $lapak = $sPdo->query("SELECT l.*, COALESCE(u.name, u.username, 'Member MB INA') AS pemilik, COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id, COALESCE(u.tier, 'GOLD') AS tier FROM lapak l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC")->fetchAll() ?: [];
+            $lapak = $sPdo->query("SELECT l.*, COALESCE(NULLIF(l.pemilik, ''), u.name, u.username, 'Member MB INA') AS pemilik, COALESCE(NULLIF(l.member_id, ''), u.member_id, 'MBINA-JKT-2026-000005') AS member_id, COALESCE(u.tier, 'GOLD') AS tier FROM lapak l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC")->fetchAll() ?: [];
             $products = $sPdo->query("
                 SELECT 
                     p.*, 
                     COALESCE(l.name, 'Bursa Jual Beli MB INA') AS lapak_name, 
                     COALESCE(NULLIF(p.contact_whatsapp, ''), l.contact_whatsapp, '081234567890') AS lapak_wa, 
-                    COALESCE(NULLIF(p.seller_name, ''), u.name, 'Member MB INA') AS seller_name, 
-                    COALESCE(u.member_id, 'MBINA-JKT-2026-000005') AS member_id 
+                    COALESCE(NULLIF(p.seller_name, ''), NULLIF(l.pemilik, ''), u.name, 'Member MB INA') AS seller_name, 
+                    COALESCE(NULLIF(p.member_id, ''), NULLIF(l.member_id, ''), u.member_id, 'MBINA-JKT-2026-000005') AS member_id 
                 FROM lapak_products p 
                 LEFT JOIN lapak l ON p.lapak_id = l.id 
                 LEFT JOIN users u ON COALESCE(NULLIF(p.user_id, ''), l.user_id) = u.id 
@@ -137,13 +137,19 @@ switch ($action) {
             $startDate = date('Y-m-d');
             $endDate   = date('Y-m-d', strtotime("+$months months"));
 
-            // Calculate Tier Discount (Base Fee: 5000/month)
+            // Calculate Tier Discount (Base Fee: 5000/month) and retrieve official member_id & pemilik
             $userTier = 'GOLD';
+            $officialMemberId = 'MBINA-JKT-2026-000005';
+            $officialPemilik  = 'Member MB INA';
             try {
-                $stmtUser = $sPdo->prepare("SELECT tier FROM users WHERE id = ? OR username = ? OR member_id = ?");
+                $stmtUser = $sPdo->prepare("SELECT id, name, username, member_id, tier FROM users WHERE id = ? OR username = ? OR member_id = ?");
                 $stmtUser->execute([$userId, $userId, $userId]);
-                $uTier = $stmtUser->fetchColumn();
-                if ($uTier) $userTier = strtoupper($uTier);
+                $uRow = $stmtUser->fetch(PDO::FETCH_ASSOC);
+                if ($uRow) {
+                    if (!empty($uRow['tier'])) $userTier = strtoupper($uRow['tier']);
+                    if (!empty($uRow['member_id'])) $officialMemberId = $uRow['member_id'];
+                    $officialPemilik = $uRow['name'] ?: $uRow['username'] ?: 'Member MB INA';
+                }
             } catch (Exception $ex) {}
 
             $discountPercent = 0;
@@ -161,8 +167,8 @@ switch ($action) {
             while (!$inserted && $retry < 20) {
                 $lapakId = 'lapak_' . uniqid() . '_' . rand(100, 999);
                 try {
-                    $stmt = $sPdo->prepare("INSERT INTO lapak (id, user_id, lapak_code, name, description, category, contact_phone, contact_whatsapp, logo_url, banner_url, payment_proof_url, sewa_start_date, sewa_end_date, sewa_status, sewa_fee, original_fee, tier_discount, final_fee, sewa_paid_status, is_active, is_verified, created_by, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, 'UNPAID', FALSE, FALSE, ?, 'PENDING')");
-                    $stmt->execute([$lapakId, $userId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $userId]);
+                    $stmt = $sPdo->prepare("INSERT INTO lapak (id, user_id, lapak_code, name, description, category, contact_phone, contact_whatsapp, logo_url, banner_url, payment_proof_url, sewa_start_date, sewa_end_date, sewa_status, sewa_fee, original_fee, tier_discount, final_fee, sewa_paid_status, is_active, is_verified, created_by, status, member_id, pemilik) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, 'UNPAID', FALSE, FALSE, ?, 'PENDING', ?, ?)");
+                    $stmt->execute([$lapakId, $userId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $userId, $officialMemberId, $officialPemilik]);
                     $inserted = true;
                 } catch (Throwable $tErr) {
                     if (strpos($tErr->getMessage(), '22001') !== false || strpos($tErr->getMessage(), 'too long') !== false) {
@@ -170,7 +176,7 @@ switch ($action) {
                             $sPdo->exec("ALTER TABLE lapak ALTER COLUMN logo_url TYPE TEXT");
                             $sPdo->exec("ALTER TABLE lapak ALTER COLUMN banner_url TYPE TEXT");
                             $sPdo->exec("ALTER TABLE lapak ALTER COLUMN payment_proof_url TYPE TEXT");
-                            $stmt->execute([$lapakId, $userId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $userId]);
+                            $stmt->execute([$lapakId, $userId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $userId, $officialMemberId, $officialPemilik]);
                             $inserted = true;
                             break;
                         } catch (Throwable $altErr) {
@@ -443,32 +449,59 @@ switch ($action) {
                 exit;
             }
 
-            if (empty($sellerName) && $userId) {
-                $sellerName = $sPdo->query("SELECT name FROM users WHERE id = '$userId'")->fetchColumn() ?: 'Member MB INA';
+            // Retrieve user details: official member_id and role
+            $memberId = 'MBINA-JKT-2026-000005';
+            $userRole = 'MEMBER';
+            if ($userId) {
+                $stmtU = $sPdo->prepare("SELECT id, name, username, member_id, role FROM users WHERE id = ? OR username = ? OR member_id = ?");
+                $stmtU->execute([$userId, $userId, $userId]);
+                $uRow = $stmtU->fetch(PDO::FETCH_ASSOC);
+                if ($uRow) {
+                    if (!empty($uRow['member_id'])) $memberId = $uRow['member_id'];
+                    if (!empty($uRow['role'])) $userRole = strtoupper($uRow['role']);
+                    if (empty($sellerName)) $sellerName = $uRow['name'] ?: $uRow['username'] ?: 'Member MB INA';
+                }
             }
 
-            // Check if updating existing product
-            $stmtCheck = $sPdo->prepare("SELECT id FROM lapak_products WHERE id = ?");
-            $stmtCheck->execute([$prodId]);
-            $existingId = $stmtCheck->fetchColumn();
+            // Only ADMIN / SUPERADMIN can directly approve; Member submissions MUST be PENDING
+            $isAdmin = ($userRole === 'ADMIN' || $userRole === 'SUPERADMIN' || $userId === 'usr_superadmin');
+            $initialStatus = $isAdmin ? 'APPROVED' : 'PENDING';
+            $initialPublished = $isAdmin ? true : false;
 
-            if ($existingId) {
+            // Check if updating existing product
+            $stmtCheck = $sPdo->prepare("SELECT id, status FROM lapak_products WHERE id = ?");
+            $stmtCheck->execute([$prodId]);
+            $existingRow = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+            if ($existingRow) {
+                // If member edits product, it returns to PENDING for re-moderation
+                $newStatus = $isAdmin ? ($existingRow['status'] ?: 'APPROVED') : 'PENDING';
+                $newPublished = ($newStatus === 'APPROVED') ? true : false;
+
                 $stmt = $sPdo->prepare("
                     UPDATE lapak_products 
-                    SET lapak_id = ?, name = ?, description = ?, price = ?, condition = ?, location = ?, images = ?, category = ?, contact_whatsapp = ?, user_id = ?, seller_name = ?, is_published = TRUE, status = 'APPROVED', updated_at = CURRENT_TIMESTAMP
+                    SET lapak_id = ?, name = ?, description = ?, price = ?, condition = ?, location = ?, images = ?, category = ?, contact_whatsapp = ?, user_id = ?, seller_name = ?, member_id = ?, is_published = ?, status = ?, updated_at = CURRENT_TIMESTAMP
                     WHERE id = ?
                 ");
-                $stmt->execute([$lapakId, $name, $description, $price, $condition, $location, $images, $category, $contactWhatsapp, $userId, $sellerName, $prodId]);
-                logAudit($userId, 'UPDATE', 'E_COMMERCE_PRODUCT', ['product_id' => $prodId, 'name' => $name, 'price' => $price]);
-                echo json_encode(['success' => true, 'message' => 'Iklan produk & foto berhasil diperbarui dan aktif di katalog!', 'product_id' => $prodId, 'status' => 'APPROVED']);
+                $stmt->execute([$lapakId, $name, $description, $price, $condition, $location, $images, $category, $contactWhatsapp, $userId, $sellerName, $memberId, $newPublished ? 1 : 0, $newStatus, $prodId]);
+                logAudit($userId, 'UPDATE', 'E_COMMERCE_PRODUCT', ['product_id' => $prodId, 'name' => $name, 'price' => $price, 'status' => $newStatus]);
+                
+                $msg = ($newStatus === 'APPROVED')
+                    ? 'Iklan produk & foto berhasil diperbarui dan aktif di katalog!'
+                    : 'Perubahan iklan berhasil disimpan dan MENUNGGU MODERASI Admin MB INA!';
+                echo json_encode(['success' => true, 'message' => $msg, 'product_id' => $prodId, 'status' => $newStatus]);
             } else {
                 $stmt = $sPdo->prepare("
-                    INSERT INTO lapak_products (id, lapak_id, name, description, price, condition, location, images, views, status, is_published, category, contact_whatsapp, user_id, seller_name)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 'APPROVED', TRUE, ?, ?, ?, ?)
+                    INSERT INTO lapak_products (id, lapak_id, name, description, price, condition, location, images, views, status, is_published, category, contact_whatsapp, user_id, seller_name, member_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
                 ");
-                $stmt->execute([$prodId, $lapakId, $name, $description, $price, $condition, $location, $images, $category, $contactWhatsapp, $userId, $sellerName]);
-                logAudit($userId, 'CREATE', 'E_COMMERCE_PRODUCT', ['product_id' => $prodId, 'name' => $name, 'price' => $price]);
-                echo json_encode(['success' => true, 'message' => 'Iklan produk & foto berhasil disimpan dan DITERBITKAN ke Katalog Marketplace!', 'product_id' => $prodId, 'status' => 'APPROVED']);
+                $stmt->execute([$prodId, $lapakId, $name, $description, $price, $condition, $location, $images, $initialStatus, $initialPublished ? 1 : 0, $category, $contactWhatsapp, $userId, $sellerName, $memberId]);
+                logAudit($userId, 'CREATE', 'E_COMMERCE_PRODUCT', ['product_id' => $prodId, 'name' => $name, 'price' => $price, 'status' => $initialStatus]);
+
+                $msg = $isAdmin
+                    ? 'Iklan produk & foto berhasil disimpan dan DITERBITKAN ke Katalog Marketplace!'
+                    : 'Iklan produk berhasil diajukan dan MENUNGGU VERIFIKASI / MODERASI Admin MB INA!';
+                echo json_encode(['success' => true, 'message' => $msg, 'product_id' => $prodId, 'status' => $initialStatus]);
             }
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
