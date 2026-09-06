@@ -570,7 +570,7 @@
         </div>
 
         <!-- SECTION: TABEL DAFTAR TRANSAKSI -->
-        <div class="mbux-glass-card" style="padding:22px;">
+        <div class="mbux-glass-card member-hide-donor-transactions" style="padding:22px;">
           <!-- FILTER & SEARCH HEADER -->
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px;">
             <div>
@@ -919,8 +919,18 @@
               <tbody>
                 ${this.data.receipts.length === 0 ? `
                   <tr><td colspan="7" style="text-align:center; padding:32px; color:#64748B;">Belum ada arsip Digital Receipt di database.</td></tr>
-                ` : this.data.receipts.map((r, idx) => `
-                  <tr style="border-bottom:1px solid rgba(226,232,240,0.05);">
+                ` : this.data.receipts.map((r, idx) => {
+                  const currentUser = window.AppEngine && window.AppEngine.currentUser;
+                  const isMemberMode = document.body.classList.contains('member-mode');
+                  const currentMid = (currentUser && (currentUser.member_id || currentUser.memberId) || '').toLowerCase();
+                  const currentName = (currentUser && currentUser.name || '').toLowerCase();
+                  const rMid = (r.member_id || '').toLowerCase();
+                  const rName = (r.donor_name || '').toLowerCase();
+                  if (isMemberMode && currentMid && !rMid.includes(currentMid) && !rName.includes(currentName)) {
+                    return '';
+                  }
+                  return `
+                  <tr data-member-id="${r.member_id || ''}" data-donor-name="${r.donor_name || ''}" style="border-bottom:1px solid rgba(226,232,240,0.05);">
                     <td style="padding:12px 10px; text-align:center; color:#64748B; font-family:monospace;">${idx + 1}</td>
                     <td style="padding:12px 10px; font-family:monospace; color:#CBD5E1; font-weight:600;">${r.receipt_number}</td>
                     <td style="padding:12px 10px;">

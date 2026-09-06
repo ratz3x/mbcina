@@ -2692,7 +2692,60 @@ body.light-mode input:-webkit-autofill:active {
   border-color: rgba(212, 175, 55, 0.3);
   transform: translateY(-3px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+/* ==========================================================================
+   🔒 MEMBER MODE STYLES (READ-ONLY FOR REGULAR MEMBERS)
+   ========================================================================== */
+body.member-mode #admin-tab-m2_org button[onclick*="openEditOrgProfileModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="openM2HistoryModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="deleteM2HistorySection"],
+body.member-mode #admin-tab-m2_org button[onclick*="openAddVMModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="openEditVMModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="deleteVM"],
+body.member-mode #admin-tab-m2_org button[onclick*="openAddPresidentModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="openEditPresidentModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="deletePresident"],
+body.member-mode #admin-tab-m2_org button[onclick*="openAddStructureModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="openEditStructureModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="deleteStructure"],
+body.member-mode #admin-tab-m2_org button[onclick*="openAddClubModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="openEditClubModal"],
+body.member-mode #admin-tab-m2_org button[onclick*="deleteClub"],
+body.member-mode #admin-tab-m2_org th:last-child:has(+ *),
+body.member-mode #admin-tab-m2_org table th:nth-last-child(1),
+body.member-mode #admin-tab-m2_org table td:nth-last-child(1) button {
+  display: none !important;
 }
+
+/* Sembunyikan kolom aksi pada tabel kepengurusan pusat dan klub untuk member */
+body.member-mode #admin-tab-m2_org #m2sub-structure table th:last-child,
+body.member-mode #admin-tab-m2_org #m2sub-structure table td:last-child,
+body.member-mode #admin-tab-m2_org #m2-clubs-table-wrapper table th:last-child,
+body.member-mode #admin-tab-m2_org #m2-clubs-table-wrapper table td:last-child {
+  display: none !important;
+}
+
+/* Event tab restrictions for member */
+body.member-mode #admin-tab-m6_event button[data-m6-subtab="6_1_proposal"],
+body.member-mode #admin-tab-m6_event button[data-m6-subtab="6_2_approval"],
+body.member-mode #admin-tab-m6_event button[onclick*="openPortalSponsor"] {
+  display: none !important;
+}
+
+/* Forum tab restrictions for member */
+body.member-mode #admin-tab-m5_forum button[data-m5sub="broadcast"],
+body.member-mode #admin-tab-m5_forum button[data-m5sub="moderation"],
+body.member-mode #admin-tab-m5_forum button[onclick*="openM5CreateBroadcastModal"] {
+  display: none !important;
+}
+
+/* Donation restrictions for member (hide Create Program tab & hide global donor list section) */
+body.member-mode #admin-tab-m7_donation button[data-m73-subtab="7_3_2_form"],
+body.member-mode #admin-tab-m7_donation .mbux-tab-link:nth-child(2),
+body.member-mode #admin-tab-m7_donation .mbux-tab-link:nth-child(4),
+body.member-mode #admin-tab-m7_donation .member-hide-donor-transactions {
+  display: none !important;
+}
+
 
 
 

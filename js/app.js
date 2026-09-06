@@ -341,6 +341,25 @@ const AppEngine = {
   },
 
   openMemberDashboardTab(tabKey) {
+    // Pastikan view-member-dashboard yang tampil dan sembunyikan view lain
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+    const memberView = document.getElementById('view-member-dashboard');
+    if (memberView) {
+      memberView.style.display = 'block';
+    }
+    // Sembunyikan admin tab content jika ada yang terbuka
+    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    document.body.classList.remove('member-mode');
+
+    // Pastikan member-sidebar tampil
+    const adminSidebar = document.getElementById('app-sidebar');
+    const memberSidebar = document.getElementById('member-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (adminSidebar) adminSidebar.style.display = 'none';
+    if (memberSidebar) memberSidebar.style.display = 'flex';
+    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    document.body.classList.add('yt-has-sidebar');
+
     this.setActiveMemberSidebarItem(tabKey);
     this.closeMobileSidebar();
 
@@ -386,95 +405,76 @@ const AppEngine = {
     });
   },
 
-  openMemberOrganisasi() {
+  // =========================================================================
+  // HELPER: Aktifkan "member mode" pada sebuah admin tab
+  // - Tampilkan member-sidebar, sembunyikan admin-sidebar
+  // - Sembunyikan tab yang tidak diizinkan untuk member
+  // - Tandai body class member-mode untuk CSS hide tombol AKSI
+  // =========================================================================
+  _switchToMemberAdminTab(tabId, activeItemKey) {
+    // Hide all views, show admin-dashboard content area
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
     const adminView = document.getElementById('view-admin-dashboard');
     if (adminView) adminView.style.display = 'block';
 
     document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-    const orgTab = document.getElementById('admin-tab-m2_org');
-    if (orgTab) orgTab.style.display = 'block';
+    const tab = document.getElementById(tabId);
+    if (tab) tab.style.display = 'block';
 
-    const sidebar = document.getElementById('app-sidebar');
+    // Selalu gunakan member-sidebar (bukan admin-sidebar) untuk member
+    const adminSidebar = document.getElementById('app-sidebar');
+    const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'flex';
+    if (adminSidebar) adminSidebar.style.display = 'none';
+    if (memberSidebar) memberSidebar.style.display = 'flex';
     if (btnHamburger) btnHamburger.style.display = 'inline-flex';
     document.body.classList.add('yt-has-sidebar');
+    document.body.classList.add('member-mode'); // CSS hook untuk sembunyikan tombol AKSI
 
-    this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('m2_org');
-    this.renderM2Module();
+    this.setActiveMemberSidebarItem(activeItemKey);
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  openMemberOrganisasi() {
+    this._switchToMemberAdminTab('admin-tab-m2_org', 'member_org');
+    this.renderM2Module();
+    // Semua 6 sub-tab boleh terlihat, tapi tanpa tombol AKSI (dikontrol via CSS .member-mode)
   },
 
   openMemberClubs() {
-    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
-    const adminView = document.getElementById('view-admin-dashboard');
-    if (adminView) adminView.style.display = 'block';
-
-    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-    const orgTab = document.getElementById('admin-tab-m2_org');
-    if (orgTab) orgTab.style.display = 'block';
-
-    const sidebar = document.getElementById('app-sidebar');
-    const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
-
-    this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('m2_org');
+    this._switchToMemberAdminTab('admin-tab-m2_org', 'member_org');
     this.switchM2Subtab('clubs');
-    this.closeMobileSidebar();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   openMemberEvents() {
-    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
-    const adminView = document.getElementById('view-admin-dashboard');
-    if (adminView) adminView.style.display = 'block';
-
-    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-    const evtTab = document.getElementById('admin-tab-m6_event');
-    if (evtTab) evtTab.style.display = 'block';
-
-    const sidebar = document.getElementById('app-sidebar');
-    const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
-
-    this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('m6_event');
+    this._switchToMemberAdminTab('admin-tab-m6_event', 'member_events');
+    // Sembunyikan tab yang tidak boleh dilihat member (Proposal & RAB, Persetujuan Presiden)
+    const m6tabs = document.querySelectorAll('[data-m6-subtab]');
+    m6tabs.forEach(btn => {
+      const t = btn.getAttribute('data-m6-subtab');
+      // Member hanya boleh: 6_3_publish dan 6_5_gallery
+      btn.style.display = (t === '6_3_publish' || t === '6_5_gallery') ? '' : 'none';
+    });
+    // Sembunyikan tombol "Portal Mitra & Sponsorship"
+    const sponsorBtn = document.querySelector('#admin-tab-m6_event .btn-outline[onclick*="openPortalSponsor"]');
+    if (sponsorBtn) sponsorBtn.style.display = 'none';
     if (window.M6Engine) {
       M6Engine.init();
       M6Engine.switchSubtab('6_3_publish');
     }
-    this.closeMobileSidebar();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   openMemberForum() {
-    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
-    const adminView = document.getElementById('view-admin-dashboard');
-    if (adminView) adminView.style.display = 'block';
-
-    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-    const forumTab = document.getElementById('admin-tab-m5_forum');
-    if (forumTab) forumTab.style.display = 'block';
-
-    const sidebar = document.getElementById('app-sidebar');
-    const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
-
-    this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('m5_forum');
+    this._switchToMemberAdminTab('admin-tab-m5_forum', 'member_forum');
     this.renderM5Module();
-    this.closeMobileSidebar();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Sembunyikan tab: Broadcast & Analitik, Moderasi & Aturan
+    const m5tabs = document.querySelectorAll('[data-m5sub]');
+    m5tabs.forEach(btn => {
+      const t = btn.getAttribute('data-m5sub');
+      // Member hanya boleh: forum dan thread
+      btn.style.display = (t === 'forum' || t === 'thread') ? '' : 'none';
+    });
   },
 
   openForumThreadModal(threadId) {
@@ -485,30 +485,41 @@ const AppEngine = {
   },
 
   openMemberDonations() {
-    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
-    const adminView = document.getElementById('view-admin-dashboard');
-    if (adminView) adminView.style.display = 'block';
-
-    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-    const donTab = document.getElementById('admin-tab-m7_donation');
-    if (donTab) donTab.style.display = 'block';
-
-    const sidebar = document.getElementById('app-sidebar');
-    const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
-
-    this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('m7_donation');
-
+    this._switchToMemberAdminTab('admin-tab-m7_donation', 'member_donations');
+    // Sembunyikan tab "Buat Program Donasi" untuk member
+    const donTabs = document.querySelectorAll('[data-m73-subtab]');
+    donTabs.forEach(btn => {
+      const t = btn.getAttribute('data-m73-subtab');
+      // Member hanya boleh: 7_3_1_progress dan 7_3_4_receipts
+      btn.style.display = (t === '7_3_2_form') ? 'none' : '';
+    });
     if (window.DonationManager) {
       window.DonationManager.init();
     } else if (typeof this.renderDonationModule === 'function') {
       this.renderDonationModule();
     }
-    this.closeMobileSidebar();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Filter receipt hanya untuk member sendiri
+    this._filterDonationReceiptsForMember();
+  },
+
+  _filterDonationReceiptsForMember() {
+    const u = this.currentUser || {};
+    const memberId = (u.member_id || '').toLowerCase();
+    const userName = (u.name || '').toLowerCase();
+    // Sembunyikan semua baris transaksi orang lain di tabel receipt
+    setTimeout(() => {
+      // Sembunyikan section "Daftar Transaksi Donasi" (semua transaksi)
+      document.querySelectorAll('.donation-all-transactions, [id*="all-donations"], [id*="donation-list-admin"]').forEach(el => {
+        el.style.display = 'none';
+      });
+      // Filter tabel receipt
+      document.querySelectorAll('#m7-subtab-7_3_4_receipts tr[data-member-id], #m7-subtab-7_3_4_receipts tbody tr').forEach(row => {
+        const rowMid = (row.getAttribute('data-member-id') || row.textContent || '').toLowerCase();
+        if (memberId && !rowMid.includes(memberId) && !rowMid.includes(userName)) {
+          row.style.display = 'none';
+        }
+      });
+    }, 500);
   },
 
   openMemberDonasiModal(campaignId = null) {
@@ -530,29 +541,11 @@ const AppEngine = {
   },
 
   openMemberShop() {
-    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
-    const adminView = document.getElementById('view-admin-dashboard');
-    if (adminView) adminView.style.display = 'block';
-
-    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-    const shopTab = document.getElementById('admin-tab-m7_shop');
-    if (shopTab) shopTab.style.display = 'block';
-
-    const sidebar = document.getElementById('app-sidebar');
-    const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
-
-    this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('m7_shop');
-
+    this._switchToMemberAdminTab('admin-tab-m7_shop', 'member_shop');
     if (window.M7Engine) {
       M7Engine.init();
       M7Engine.switchSubtab('7_2_products');
     }
-    this.closeMobileSidebar();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   openMemberUpcomingEventsModal() {
@@ -572,22 +565,7 @@ const AppEngine = {
   },
 
   openMemberKoperasi(fromView = 'member') {
-    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
-    const adminView = document.getElementById('view-admin-dashboard');
-    if (adminView) adminView.style.display = 'block';
-
-    document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-    const kopTab = document.getElementById('admin-tab-m11_koperasi');
-    if (kopTab) kopTab.style.display = 'block';
-
-    const sidebar = document.getElementById('app-sidebar');
-    const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (sidebar) sidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
-
-    this.updateSidebarRoleVisibility();
-    this.setActiveSidebarItem('m11_koperasi');
+    this._switchToMemberAdminTab('admin-tab-m11_koperasi', 'member_koperasi');
 
     const btnReturnAdmin = document.getElementById('btn-kop-return-admin');
     const btnReturnMember = document.getElementById('btn-kop-return-member');
@@ -598,9 +576,6 @@ const AppEngine = {
       if (btnReturnAdmin) btnReturnAdmin.style.display = 'inline-flex';
       if (btnReturnMember) btnReturnMember.style.display = 'none';
     }
-
-    this.closeMobileSidebar();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   getMemberTotalContribution(u) {
@@ -4447,6 +4422,7 @@ const AppEngine = {
     const dd = document.getElementById('user-profile-dropdown');
     if (dd) {
       const isVisible = dd.style.display === 'flex';
+      if (!isVisible) this.updateDropdownByRole();
       dd.style.display = isVisible ? 'none' : 'flex';
     }
   },
@@ -4456,6 +4432,21 @@ const AppEngine = {
     if (dd) {
       dd.style.display = 'none';
     }
+  },
+
+  // Update item dropdown sesuai role yang sedang login
+  updateDropdownByRole() {
+    const role = this.currentRole || 'GUEST';
+    document.querySelectorAll('[data-dropdown-roles]').forEach(btn => {
+      const allowedRoles = btn.getAttribute('data-dropdown-roles').split(',').map(r => r.trim());
+      btn.style.display = allowedRoles.includes(role) ? '' : 'none';
+    });
+    // Sembunyikan "Dashboard Member Saya" jika bukan MEMBER/CALON_MEMBER
+    // dan sembunyikan "Portal Admin" jika bukan admin role
+    const adminRoles = ['SUPER_ADMIN','PRESIDEN','SEKRETARIS_PUSAT','BENDAHARA_PUSAT','PENGURUS_PUSAT','ADMIN_ORGANISASI','PENGURUS_KLUB'];
+    const memberRoles = ['MEMBER','CALON_MEMBER'];
+    const adminBtn = document.getElementById('dropdown-item-home');
+    if (adminBtn) adminBtn.style.display = adminRoles.includes(role) ? '' : 'none';
   },
 
   getMasterLandingEvents() {
@@ -5370,6 +5361,16 @@ const AppEngine = {
     const v1Container = document.getElementById('landing-v1-container');
     const btnV2 = document.getElementById('btn-toggle-v2');
     const btnV1 = document.getElementById('btn-toggle-v1');
+
+    // Pastikan kedua sidebar selalu tertutup di landing page (V1 maupun V2)
+    const adminSidebar = document.getElementById('app-sidebar');
+    const memberSidebar = document.getElementById('member-sidebar');
+    const btnHamburger = document.getElementById('btn-hamburger-toggle');
+    if (adminSidebar) adminSidebar.style.display = 'none';
+    if (memberSidebar) memberSidebar.style.display = 'none';
+    if (btnHamburger) btnHamburger.style.display = 'none';
+    document.body.classList.remove('yt-has-sidebar');
+    document.body.classList.remove('member-mode');
 
     if (this.currentLandingVersion === 'v1') {
       if (v2Container) v2Container.style.display = 'none';
