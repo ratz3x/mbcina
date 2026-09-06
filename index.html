@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260906_v162_zero_empty_pages_audit">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v162_zero_empty_pages_audit">
+  <link rel="stylesheet" href="css/styles.css?v=20260906_v163_admin_portal_view_fix">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260906_v163_admin_portal_view_fix">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -6454,7 +6454,7 @@
                 <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; font-size:0.85rem;">
                   <li><a href="javascript:void(0)" onclick="AppEngine.switchNavTab('member')" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">KTA Digital & Keanggotaan</a></li>
                   <li><a href="javascript:void(0)" onclick="AppEngine.switchNavTab('lapak')" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Marketplace Lapak Member</a></li>
-                  <li><a href="javascript:void(0)" onclick="AppEngine.switchAdminTab('m5_media')" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Galeri Media & Dokumentasi</a></li>
+                  <li><a href="javascript:void(0)" onclick="AppEngine.navigateToForum()" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Galeri Media & Forum Komunitas</a></li>
                   <li><a href="javascript:void(0)" onclick="AppEngine.switchNavTab('sponsor')" style="color:#cbd5e1; text-decoration:none;" onmouseenter="this.style.color='#d4af37'" onmouseleave="this.style.color='#cbd5e1'">Portal Kemitraan Sponsor</a></li>
                 </ul>
               </div>
@@ -8383,6 +8383,27 @@
         <span id="login-security-msg">Brute force detected! Login diblokir sementara.</span>
       </div>
 
+      <!-- QUICK DEMO LOGIN SHORTCUTS -->
+      <div style="margin-bottom:18px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08);">
+        <div style="font-size:0.68rem; font-weight:700; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+          <span>⚡ Demo Role (1-Klik Masuk Langsung):</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(212,175,55,0.35); color:#fbbf24; font-weight:700; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='dtouriano@gmail.com'; document.getElementById('login-password').value='admin123'; window.AuthEngine.handleLogin();">
+            <span>👑 Super Admin</span>
+          </button>
+          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='presiden@mbina.or.id'; document.getElementById('login-password').value='admin123'; window.AuthEngine.handleLogin();">
+            <span>⭐ Presiden</span>
+          </button>
+          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='andi@email.com'; document.getElementById('login-password').value='member123'; window.AuthEngine.handleLogin();">
+            <span>🏎️ Member Aktif</span>
+          </button>
+          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='fdr@sponsor.com'; document.getElementById('login-password').value='sponsor123'; window.AuthEngine.handleLogin();">
+            <span>🏢 Sponsor (FDR)</span>
+          </button>
+        </div>
+      </div>
+
       <!-- LOGIN FORM -->
       <form id="login-form" onsubmit="event.preventDefault(); window.AuthEngine.handleLogin();">
         
@@ -8408,7 +8429,7 @@
             <div style="position:absolute; left:14px; color:#64748b; pointer-events:none; display:flex; align-items:center;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
-            <input type="password" id="login-password" class="form-input" placeholder="Masukkan password Anda" required style="width:100%; padding:12px 42px 12px 42px; font-size:0.875rem; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; transition:all 0.2s;" onfocus="this.style.borderColor='rgba(245,158,11,0.5)'; this.style.boxShadow='0 0 0 1px rgba(245,158,11,0.3)';" onblur="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.boxShadow='none';">
+            <input type="password" id="login-password" class="form-input" value="admin123" placeholder="Masukkan password Anda" required style="width:100%; padding:12px 42px 12px 42px; font-size:0.875rem; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fff; outline:none; transition:all 0.2s;" onfocus="this.style.borderColor='rgba(245,158,11,0.5)'; this.style.boxShadow='0 0 0 1px rgba(245,158,11,0.3)';" onblur="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.boxShadow='none';">
             <button type="button" onclick="AuthEngine.togglePasswordVisibility('login-password', this)" style="position:absolute; right:12px; background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; display:flex; align-items:center; transition:color 0.15s;" onmouseover="this.style.color='#cbd5e1'" onmouseout="this.style.color='#64748b'" title="Tampilkan / Sembunyikan Password">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
@@ -11199,8 +11220,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260906_v162_zero_empty_pages_audit"></script>
-  <script src="js/app.js?v=20260906_v162_zero_empty_pages_audit"></script>
+  <script src="js/auth.js?v=20260906_v163_admin_portal_view_fix"></script>
+  <script src="js/app.js?v=20260906_v163_admin_portal_view_fix"></script>
   <script>
     lucide.createIcons();
     try {

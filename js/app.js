@@ -175,19 +175,21 @@ const AppEngine = {
       if (typeof this.openPortalMember === 'function') this.openPortalMember();
       else if (typeof this.switchAdminTab === 'function') this.switchAdminTab('m1_portal');
     } else if (viewId === 'admin' || viewId === 'admin-dashboard') {
-      this.switchAdminTab('m1_portal');
+      if (typeof this.openPortalAdmin === 'function') this.openPortalAdmin();
+      else this.switchAdminTab('m1_portal');
     } else if (viewId === 'sponsor' || viewId === 'sponsor-dashboard') {
       if (typeof this.openPortalSponsor === 'function') this.openPortalSponsor();
       else this.switchAdminTab('m1_portal');
     } else {
-      this.switchAdminTab('m1_portal');
+      if (typeof this.openPortalAdmin === 'function') this.openPortalAdmin();
+      else this.switchAdminTab('m1_portal');
     }
   },
 
   switchNavTab(tab) {
     if (tab === 'landing') {
-      document.querySelectorAll('.view-screen, [id^="view-"]').forEach(v => v.style.display = 'none');
-      const landing = document.getElementById('view-landing') || document.getElementById('view-public-portal');
+      document.querySelectorAll('.view-screen, [id^="view-"], .view-container').forEach(v => v.style.display = 'none');
+      const landing = document.getElementById('view-landing-page') || document.getElementById('view-landing') || document.getElementById('view-public-portal');
       if (landing) landing.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (tab === 'member') {
@@ -199,7 +201,8 @@ const AppEngine = {
     } else if (tab === 'lapak') {
       this.switchAdminTab('m7_shop');
     } else if (tab === 'admin') {
-      this.switchAdminTab('m1_portal');
+      if (typeof this.openPortalAdmin === 'function') this.openPortalAdmin();
+      else this.switchAdminTab('m1_portal');
     }
   },
 
@@ -292,8 +295,9 @@ const AppEngine = {
         document.body.classList.add('yt-has-sidebar');
 
         this.updateHeaderNavPillsActive('nav-link-admin');
-        this.switchAdminTab(this.activeAdminTab);
+        this.switchAdminTab(this.activeAdminTab || 'm1_portal');
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   },
 
@@ -4816,11 +4820,16 @@ const AppEngine = {
   },
 
   switchAdminTab(tab) {
+    if (!tab) tab = 'm1_portal';
     this.activeAdminTab = tab;
     
     const sidebar = document.getElementById('app-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
     const adminView = document.getElementById('view-admin-dashboard');
+
+    // CRITICAL FIX: Hide all other view containers so that Member Dashboard or Landing Page
+    // do not remain visible and cover or push down the admin dashboard
+    document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
 
     if (adminView) adminView.style.display = 'block';
     if (sidebar) sidebar.style.display = 'flex';
@@ -4836,6 +4845,7 @@ const AppEngine = {
     if (tab === 'm6_sponsorship') {
       // Show Sponsorship View with full active Sidebar
       document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+      if (adminView) adminView.style.display = 'none';
       if (spDash) spDash.style.display = 'block';
       this.closeMobileSidebar();
       if (typeof this.updateHeaderNavPillsActive === 'function') {
@@ -4930,8 +4940,9 @@ const AppEngine = {
       const btnReturnMember = document.getElementById('btn-kop-return-member');
       if (btnReturnAdmin) btnReturnAdmin.style.display = 'inline-flex';
       if (btnReturnMember) btnReturnMember.style.display = 'none';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   },
 
   switchM1Subtab(subtab) {
