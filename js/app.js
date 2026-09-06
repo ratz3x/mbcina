@@ -2328,7 +2328,7 @@ const AppEngine = {
     const suggEl = document.getElementById('member-review-suggestions');
 
     if (nameEl) nameEl.textContent = lapak.name;
-    if (subEl) subEl.textContent = `👤 ${lapak.pemilik || 'Member MB INA'} · 🏷️ ${lapak.lapak_code || 'MB INA'}`;
+    if (subEl) subEl.textContent = `👤 ${lapak.pemilik || 'Member MB INA'} · 🏷️ ${lapak.id || 'MB INA'}`;
     if (logoEl) logoEl.src = lapak.logo_url || 'assets/mb_badge.jpg';
 
     if (card) card.style.display = 'flex';
@@ -2365,7 +2365,7 @@ const AppEngine = {
       if (!q) return true;
       const n = (l.name || '').toLowerCase();
       const p = (l.pemilik || '').toLowerCase();
-      const c = (l.lapak_code || '').toLowerCase();
+      const c = (l.id || '').toLowerCase();
       const cat = (l.category || '').toLowerCase();
       return n.includes(q) || p.includes(q) || c.includes(q) || cat.includes(q);
     });
@@ -2381,7 +2381,7 @@ const AppEngine = {
         <img src="${l.logo_url || 'assets/mb_badge.jpg'}" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
         <div style="flex:1; min-width:0;">
           <div style="font-size:0.84rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${l.name}</div>
-          <div style="font-size:0.72rem; color:var(--accent-gold);">${l.lapak_code || ''} · ${l.pemilik || 'Member'}</div>
+          <div style="font-size:0.72rem; color:var(--accent-gold);">${l.id || ''} · ${l.pemilik || 'Member'}</div>
         </div>
         <button type="button" class="btn-primary" style="padding:3px 8px; font-size:0.7rem; font-weight:700; border-radius:6px; background:var(--accent-gold); color:#000;">Pilih</button>
       </div>
@@ -2692,7 +2692,7 @@ const AppEngine = {
     let topBanner = '';
     if (myLapakFirst) {
       const storeName = myLapakFirst.name;
-      const storeCode = myLapakFirst.lapak_code || 'LPK';
+      const storeCode = myLapakFirst.id || 'LPK';
       const isExpired = (myLapakFirst.sewa_status || '').toUpperCase() === 'EXPIRED';
       topBanner = `
         <div style="background:linear-gradient(135deg, rgba(212,175,55,0.12) 0%, rgba(15,23,42,0.92) 100%); border:1px solid rgba(212,175,55,0.3); border-radius:14px; padding:18px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
@@ -21627,7 +21627,7 @@ window.M7Engine = {
     let filtered = this.data.lapak.filter(l => {
       if (catFilter !== 'ALL' && l.category !== catFilter) return false;
       if (statusFilter !== 'ALL' && l.sewa_status !== statusFilter) return false;
-      if (search && !l.name.toLowerCase().includes(search) && !l.lapak_code.toLowerCase().includes(search) && !(l.pemilik || '').toLowerCase().includes(search)) return false;
+      if (search && !l.name.toLowerCase().includes(search) && !l.id.toLowerCase().includes(search) && !(l.pemilik || '').toLowerCase().includes(search)) return false;
       return true;
     });
 
@@ -21754,7 +21754,7 @@ window.M7Engine = {
         <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
           <td style="padding:12px 10px; font-weight:600; text-align:center; color:#94a3b8; font-size:0.8rem;">${idx + 1}</td>
           <td style="padding:12px 10px;">
-            <span style="font-family:monospace; font-size:0.78rem; color:#e2e8f0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:3px 8px; border-radius:6px; font-weight:700;">${l.lapak_code}</span>
+            <span style="font-family:monospace; font-size:0.78rem; color:#e2e8f0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:3px 8px; border-radius:6px; font-weight:700;">${l.id}</span>
           </td>
           <td style="padding:12px 10px; text-align:center;">
             <img src="${l.logo_url || 'assets/mb_badge.jpg'}" style="width:36px; height:36px; border-radius:10px; object-fit:cover; border:1px solid rgba(255,255,255,0.15); display:inline-block; vertical-align:middle;" onerror="this.src='assets/mb_badge.jpg'">
@@ -21809,29 +21809,30 @@ window.M7Engine = {
     }
   },
 
-  filterMyLapak: function() {
+  // Fitur Filter Cepat "Lapak Saya"
+  onToggleFilterMyLapak: function() {
     const searchInput = document.getElementById('m7-search-lapak');
     if (!searchInput) return;
 
     const user = window.AppEngine?.currentUser || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
-    if (!user || user.role === 'GUEST') {
-      if (window.showToast) window.showToast('Silakan login terlebih dahulu untuk melihat Lapak Anda.', 'warning');
-      else alert('Silakan login terlebih dahulu untuk melihat Lapak Anda.');
-      return;
-    }
+    const uMid = (user.member_id || '').trim().toLowerCase();
+    const uUid = (user.id || user.userId || '').trim().toLowerCase();
+    const uName = (user.name || user.username || '').trim().toLowerCase();
 
-    // Cari lapak milik user di data lapak
-    const myLapak = (this.data && Array.isArray(this.data.lapak)) 
-      ? this.data.lapak.find(l => 
-          (l.user_id && (l.user_id === user.id || l.user_id === user.userId)) ||
-          (l.member_id && user.member_id && l.member_id.trim().toUpperCase() === user.member_id.trim().toUpperCase()) ||
-          (l.pemilik && user.name && l.pemilik.trim().toLowerCase() === user.name.trim().toLowerCase())
-        )
+    const myLapak = (this.data && Array.isArray(this.data.lapak))
+      ? this.data.lapak.find(l => {
+          const lMid = (l.member_id || '').trim().toLowerCase();
+          const lUid = (l.user_id || '').trim().toLowerCase();
+          const lOwner = (l.pemilik || '').trim().toLowerCase();
+          return (uMid && (lMid === uMid || lUid === uMid)) ||
+                 (uUid && (lUid === uUid || lMid === uUid)) ||
+                 (uName && lOwner === uName);
+        })
       : null;
 
     // Toggle: Jika saat ini sudah dalam keadaan difilter ke lapak user, klik lagi untuk reset
     const isCurrentlyFiltered = searchInput.value && (
-      (myLapak && (searchInput.value === myLapak.lapak_code || searchInput.value === myLapak.name)) ||
+      (myLapak && (searchInput.value === myLapak.id || searchInput.value === myLapak.name)) ||
       (user.name && searchInput.value.toLowerCase() === user.name.toLowerCase())
     );
 
@@ -21843,9 +21844,9 @@ window.M7Engine = {
     }
 
     if (myLapak) {
-      searchInput.value = myLapak.lapak_code;
+      searchInput.value = myLapak.id;
       this.renderLapakTable();
-      if (window.showToast) window.showToast(`🏪 Menampilkan lapak Anda: ${myLapak.name} (${myLapak.lapak_code})`, 'success');
+      if (window.showToast) window.showToast(`🏪 Menampilkan lapak Anda: ${myLapak.name} (${myLapak.id})`, 'success');
     } else {
       const confirmOpen = confirm("Anda belum memiliki Lapak terdaftar.\n\nApakah Anda ingin membuka Form Sewa Lapak Baru sekarang?");
       if (confirmOpen) {
@@ -21926,7 +21927,7 @@ window.M7Engine = {
 
     if (selectLapak) {
       selectLapak.innerHTML = `<option value="ALL">🏪 Semua Lapak (All Stores)</option>` + 
-        this.data.lapak.map(l => `<option value="${l.id}" ${l.id === this.selectedLapakId ? 'selected' : ''}>🏪 ${l.name} (${l.lapak_code})</option>`).join('');
+        this.data.lapak.map(l => `<option value="${l.id}" ${l.id === this.selectedLapakId ? 'selected' : ''}>🏪 ${l.name} (${l.id})</option>`).join('');
     }
 
     if (!headerContainer) return;
@@ -22895,7 +22896,7 @@ window.M7Engine = {
     if (logoImg) logoImg.src = lapak.logo_url || 'assets/mb_badge.jpg';
 
     const codeBadge = document.getElementById('review-lapak-code-badge');
-    if (codeBadge) codeBadge.textContent = lapak.lapak_code || '-';
+    if (codeBadge) codeBadge.textContent = lapak.id || '-';
 
     const nameTxt = document.getElementById('review-lapak-name-txt');
     if (nameTxt) nameTxt.textContent = lapak.name || '-';
@@ -22908,21 +22909,15 @@ window.M7Engine = {
     if (statusContainer) {
       const isExpired = lapak.sewa_status === 'EXPIRED' || (lapak.sewa_end_date && new Date(lapak.sewa_end_date) < new Date());
       let badge = `<span class="tier-badge font-bold" style="background:rgba(245,158,11,0.2); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); padding:4px 10px; border-radius:6px; font-weight:800;">⏳ PENDING</span>`;
-      if (lapak.sewa_status === 'ACTIVE' || lapak.sewa_status === 'APPROVED' || lapak.status === 'APPROVED' || lapak.is_active === true || lapak.is_active === 'true') {
-        badge = isExpired 
-          ? `<span class="tier-badge font-bold" style="background:rgba(239,68,68,0.2); color:#f87171; padding:4px 10px; border-radius:6px; font-weight:800;">🔴 EXPIRED</span>`
-          : `<span class="tier-badge font-bold" style="background:rgba(16,185,129,0.2); color:#34d399; padding:4px 10px; border-radius:6px; font-weight:800;">🟢 AKTIF</span>`;
-      } else if (lapak.sewa_status === 'REJECTED' || lapak.status === 'REJECTED') {
-        badge = `<span class="tier-badge font-bold" style="background:rgba(239,68,68,0.2); color:#f87171; padding:4px 10px; border-radius:6px; font-weight:800;">🔴 DITOLAK</span>`;
+      if (lapak.sewa_status === 'ACTIVE' && !isExpired) {
+        badge = `<span class="tier-badge font-bold" style="background:rgba(34,197,94,0.2); color:#4ade80; border:1px solid rgba(34,197,94,0.4); padding:4px 10px; border-radius:6px; font-weight:800;">🟢 AKTIF</span>`;
+      } else if (lapak.sewa_status === 'REJECTED') {
+        badge = `<span class="tier-badge font-bold" style="background:rgba(239,68,68,0.2); color:#f87171; border:1px solid rgba(239,68,68,0.4); padding:4px 10px; border-radius:6px; font-weight:800;">🔴 DITOLAK</span>`;
+      } else if (isExpired) {
+        badge = `<span class="tier-badge font-bold" style="background:rgba(100,116,139,0.2); color:#94a3b8; border:1px solid rgba(100,116,139,0.4); padding:4px 10px; border-radius:6px; font-weight:800;">⚪ EXPIRED</span>`;
       }
       statusContainer.innerHTML = badge;
     }
-
-    // Owner info
-    const ownerName = lapak.pemilik || lapak.created_by || lapak.user_id || 'Member MB INA';
-    const memberId = lapak.member_id || 'MBINA-HQ-2026-000001';
-    const ownerEl = document.getElementById('review-lapak-owner-txt');
-    if (ownerEl) ownerEl.textContent = ownerName;
 
     const midEl = document.getElementById('review-lapak-memberid-txt');
     if (midEl) midEl.textContent = memberId;
@@ -23067,7 +23062,7 @@ window.M7Engine = {
     const container = document.getElementById('m7-reviews-list-container');
 
     if (selectLapak) {
-      selectLapak.innerHTML = this.data.lapak.map(l => `<option value="${l.id}">🏪 ${l.name} (${l.lapak_code})</option>`).join('');
+      selectLapak.innerHTML = this.data.lapak.map(l => `<option value="${l.id}">🏪 ${l.name} (${l.id})</option>`).join('');
     }
 
     if (!container) return;
@@ -23181,7 +23176,7 @@ window.M7Engine = {
         <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
           <td style="padding:12px 10px; font-weight:600; text-align:center; color:#94a3b8; font-size:0.8rem;">${idx + 1}</td>
           <td style="padding:12px 10px;">
-            <span style="font-family:monospace; font-size:0.78rem; color:#e2e8f0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:3px 8px; border-radius:6px; font-weight:700;">${l.lapak_code}</span>
+            <span style="font-family:monospace; font-size:0.78rem; color:#e2e8f0; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:3px 8px; border-radius:6px; font-weight:700;">${l.id}</span>
           </td>
           <td style="padding:12px 10px; font-weight:700; color:#fff; font-size:0.85rem;">${l.name}</td>
           <td style="padding:12px 10px; color:#e2e8f0; font-size:0.83rem;">${ownerName}</td>
@@ -23232,7 +23227,7 @@ window.M7Engine = {
         : null;
 
       if (myLapak) {
-        alert(`ℹ️ Anda sudah memiliki 1 Lapak Resmi terdaftar: "${myLapak.name}" (${myLapak.lapak_code || myLapak.id}).\n\nSesuai aturan federasi MB INA, 1 Nomor Anggota (KTA) hanya berhak memiliki 1 Lapak Resmi dengan kapasitas banyak produk dagangan.\n\nSilakan klik OK untuk langsung menambahkan produk ke lapak Anda.`);
+        alert(`ℹ️ Anda sudah memiliki 1 Lapak Resmi terdaftar: "${myLapak.name}" (${myLapak.id}).\n\nSesuai aturan federasi MB INA, 1 Nomor Anggota (KTA) hanya berhak memiliki 1 Lapak Resmi dengan kapasitas banyak produk dagangan.\n\nSilakan klik OK untuk langsung menambahkan produk ke lapak Anda.`);
         if (typeof this.openProductModal === 'function') {
           this.openProductModal(myLapak.id);
         }
@@ -23382,7 +23377,7 @@ window.M7Engine = {
 
       if (res && res.success) {
         const feeFormatted = 'Rp ' + new Intl.NumberFormat('id-ID').format(res.final_fee || 28500);
-        alert(`🎉 PENDAFTARAN SEWA LAPAK BERHASIL!\n\nKode Lapak: ${res.lapak_code}\nNama Lapak: ${name}\nPeriode: ${months} Bulan\nTotal Biaya Sewa: ${feeFormatted}\nStatus: ⏳ PENDING VERIFIKASI ADMIN\n\n📌 Catatan: Permohonan Anda dan bukti transfer sedang masuk antrean verifikasi Admin MB INA. Status akan berubah 🟢 AKTIF setelah diverifikasi.`);
+        alert(`🎉 PENDAFTARAN SEWA LAPAK BERHASIL!\n\nKode Lapak: ${res.lapak_id}\nNama Lapak: ${name}\nPeriode: ${months} Bulan\nTotal Biaya Sewa: ${feeFormatted}\nStatus: ⏳ PENDING VERIFIKASI ADMIN\n\n📌 Catatan: Permohonan Anda dan bukti transfer sedang masuk antrean verifikasi Admin MB INA. Status akan berubah 🟢 AKTIF setelah diverifikasi.`);
         this.closeSewaModal();
         await this.fetchData();
         this.switchSubtab('7_1_lapak');
@@ -23403,75 +23398,51 @@ window.M7Engine = {
     const previewImg = document.getElementById(`${prefix}-preview-img-${fieldType}`);
     const previewPdf = document.getElementById(`${prefix}-preview-pdf-${fieldType}`);
 
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('⚠️ Ukuran file melebihi batas 5MB! Silakan pilih file yang lebih kecil.');
-      inputEl.value = '';
-      return;
-    }
-
-    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-
-    if (isPdf) {
+    // If PDF (allowed for payment proof)
+    if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
       const reader = new FileReader();
-      reader.onload = async (e) => {
-        const dataUrl = e.target.result;
-        if (textInput) textInput.value = dataUrl;
-        if (previewContainer) previewContainer.style.display = 'block';
+      reader.onload = function(e) {
+        if (textInput) textInput.value = e.target.result;
         if (previewImg) previewImg.style.display = 'none';
         if (previewPdf) {
-          previewPdf.style.display = 'flex';
-          previewPdf.innerHTML = `📄 <strong>${file.name}</strong> (${(file.size/1024).toFixed(1)} KB)`;
+          previewPdf.style.display = 'block';
+          previewPdf.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px; padding:10px; background:rgba(212,175,55,0.1); border:1px solid var(--accent-gold); border-radius:8px; color:#fff;">
+              <span style="font-size:1.5rem;">📄</span>
+              <div style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.82rem;">${file.name}</div>
+              <span style="font-size:0.75rem; color:#4ade80; font-weight:700;">OK</span>
+            </div>
+          `;
         }
+        if (previewContainer) previewContainer.style.display = 'block';
       };
       reader.readAsDataURL(file);
       return;
     }
 
-    // For images: optimize via Canvas to keep payload light and crisp
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const rawDataUrl = e.target.result;
-      const img = new Image();
-      img.onload = function() {
-        const maxDim = 1280;
-        let w = img.width;
-        let h = img.height;
-        if (w > maxDim || h > maxDim) {
-          if (w > h) {
-            h = Math.round((h * maxDim) / w);
-            w = maxDim;
-          } else {
-            w = Math.round((w * maxDim) / h);
-            h = maxDim;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-        if (textInput) textInput.value = compressedDataUrl;
-        if (previewContainer) previewContainer.style.display = 'block';
-        if (previewPdf) previewPdf.style.display = 'none';
+    // Else compress and set image
+    if (window.M7Engine && typeof window.M7Engine.compressImage === 'function') {
+      const compressed = await window.M7Engine.compressImage(file, 900, 0.75);
+      if (textInput) textInput.value = compressed;
+      if (previewImg) {
+        previewImg.src = compressed;
+        previewImg.style.display = 'block';
+      }
+      if (previewPdf) { previewPdf.style.display = 'none'; previewPdf.innerHTML = ''; }
+      if (previewContainer) previewContainer.style.display = 'block';
+    } else {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (textInput) textInput.value = e.target.result;
         if (previewImg) {
+          previewImg.src = e.target.result;
           previewImg.style.display = 'block';
-          previewImg.src = compressedDataUrl;
         }
-      };
-      img.onerror = function() {
-        if (textInput) textInput.value = rawDataUrl;
+        if (previewPdf) { previewPdf.style.display = 'none'; previewPdf.innerHTML = ''; }
         if (previewContainer) previewContainer.style.display = 'block';
-        if (previewImg) {
-          previewImg.style.display = 'block';
-          previewImg.src = rawDataUrl;
-        }
       };
-      img.src = rawDataUrl;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    }
   },
 
   updateSewaPreviewFromUrl: function(fieldType, mode = 'sewa') {
@@ -23504,10 +23475,11 @@ window.M7Engine = {
     }
   },
 
-  openRenewLapakModal: function(lapakId) {
+  // EDIT LAPAK
+  openEditLapakModal: function(lapakId) {
     const lapak = this.data.lapak.find(l => l.id === lapakId);
     if (!lapak) {
-      alert("⚠️ Lapak tidak ditemukan!");
+      alert('Data lapak tidak ditemukan!');
       return;
     }
 
@@ -23528,7 +23500,7 @@ window.M7Engine = {
 
     // Set hidden ID and fields
     document.getElementById('edit-lapak-id').value = lapak.id;
-    document.getElementById('edit-lapak-code').value = lapak.lapak_code || '';
+    document.getElementById('edit-lapak-code').value = lapak.id || '';
     document.getElementById('edit-form-name').value = lapak.name || '';
     document.getElementById('edit-form-category').value = lapak.category || 'Parts';
     document.getElementById('edit-form-description').value = lapak.description || '';
@@ -23543,12 +23515,6 @@ window.M7Engine = {
     // Set Data Penyewa
     const ownerName = lapak.pemilik || (lapak.user_id === 'usr_m3_001' ? 'Andi Pratama' : (lapak.user_id === 'usr_m3_002' ? 'Siti Rahayu' : (lapak.user_id === 'usr_m3_003' ? 'Budi Santoso' : 'Denny Kurniawan')));
     const memberId = lapak.member_id || (lapak.user_id === 'usr_m3_001' ? 'MBINA-JKT-2026-000005' : (lapak.user_id === 'usr_m3_002' ? 'MBINA-SBY-2026-000007' : (lapak.user_id === 'usr_m3_003' ? 'MBINA-BDG-2026-000006' : 'MBINA-JKT-2026-000009')));
-    const tier = (lapak.tier || (lapak.user_id === 'usr_m3_001' ? 'GOLD' : (lapak.user_id === 'usr_m3_002' ? 'SILVER' : (lapak.user_id === 'usr_m3_003' ? 'BRONZE' : 'PLATINUM')))).toUpperCase();
-
-    document.getElementById('edit-user-name').value = ownerName;
-    document.getElementById('edit-user-memberid').value = memberId;
-
-    let tierBadgeStr = '🥇 GOLD';
     if (tier === 'PLATINUM') tierBadgeStr = '💎 PLATINUM';
     else if (tier === 'GOLD') tierBadgeStr = '🥇 GOLD';
     else if (tier === 'SILVER') tierBadgeStr = '🥈 SILVER';
@@ -23720,7 +23686,7 @@ window.M7Engine = {
 
     // If lapakIdParam was passed (e.g. from Lapak Detail "+ Tambah Produk"), lock to that lapak
     if (lapakIdParam && this.data && Array.isArray(this.data.lapak)) {
-      const matchLapak = this.data.lapak.find(l => l.id === lapakIdParam || l.lapak_code === lapakIdParam);
+      const matchLapak = this.data.lapak.find(l => l.id === lapakIdParam);
       if (matchLapak) {
         userLapak = matchLapak;
       }
@@ -23736,7 +23702,7 @@ window.M7Engine = {
         // User has a registered personal lapak -> Strictly lock to their own lapak
         const opt = document.createElement('option');
         opt.value = userLapak.id;
-        opt.textContent = `🏬 ${userLapak.lapak_code} — ${userLapak.name} (Lapak Pribadi Anda)`;
+        opt.textContent = `🏬 ${userLapak.id} — ${userLapak.name} (Lapak Pribadi Anda)`;
         opt.selected = true;
         lapakSel.appendChild(opt);
         lapakSel.style.pointerEvents = 'none';
@@ -23744,7 +23710,7 @@ window.M7Engine = {
         lapakSel.style.color = '#38bdf8';
         lapakSel.style.borderColor = 'rgba(56, 189, 248, 0.4)';
         if (lapakNote) {
-          lapakNote.innerHTML = `✅ Produk ini otomatis diterbitkan ke Lapak Pribadi Anda: <strong>${userLapak.name}</strong> (${userLapak.lapak_code}).`;
+          lapakNote.innerHTML = `✅ Produk ini otomatis diterbitkan ke Lapak Pribadi Anda: <strong>${userLapak.name}</strong> (${userLapak.id}).`;
           lapakNote.style.color = '#4ade80';
         }
       } else if (isSponsor) {
@@ -23820,11 +23786,11 @@ window.M7Engine = {
           lapakSel.innerHTML = '';
           const opt = document.createElement('option');
           opt.value = matchLpk.id;
-          opt.textContent = `🏬 ${matchLpk.lapak_code} — ${matchLpk.name} (Lapak Pribadi Anda)`;
+          opt.textContent = `🏬 ${matchLpk.id} — ${matchLpk.name} (Lapak Pribadi Anda)`;
           opt.selected = true;
           lapakSel.appendChild(opt);
           if (lapakNote) {
-            lapakNote.innerHTML = `✅ Produk ini milik Lapak: <strong>${matchLpk.name}</strong> (${matchLpk.lapak_code}).`;
+            lapakNote.innerHTML = `✅ Produk ini milik Lapak: <strong>${matchLpk.name}</strong> (${matchLpk.id}).`;
             lapakNote.style.color = '#4ade80';
           }
         }
@@ -23993,7 +23959,7 @@ window.M7Engine = {
   exportSewaExcel: function() {
     let csv = "\uFEFFNo,Kode Lapak,Nama Lapak,Category,Status,Mulai,Akhir,Biaya Sewa (Rp)\n";
     this.data.lapak.forEach((l, i) => {
-      csv += `"${i+1}","${l.lapak_code}","${l.name}","${l.category}","${l.sewa_status}","${l.sewa_start_date}","${l.sewa_end_date}","${l.sewa_fee}"\n`;
+      csv += `"${i+1}","${l.id}","${l.name}","${l.category}","${l.sewa_status}","${l.sewa_start_date}","${l.sewa_end_date}","${l.sewa_fee}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -24009,7 +23975,7 @@ window.M7Engine = {
     const rowsHtml = this.data.lapak.map((l, i) => `
       <tr>
         <td style="padding:8px; border:1px solid #ccc; text-align:center;">${i+1}</td>
-        <td style="padding:8px; border:1px solid #ccc; font-weight:bold;">${l.lapak_code}</td>
+        <td style="padding:8px; border:1px solid #ccc; font-weight:bold;">${l.id}</td>
         <td style="padding:8px; border:1px solid #ccc;">${l.name}</td>
         <td style="padding:8px; border:1px solid #ccc;">${l.category}</td>
         <td style="padding:8px; border:1px solid #ccc;">${l.sewa_start_date} s/d ${l.sewa_end_date}</td>

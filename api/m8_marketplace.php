@@ -24,7 +24,7 @@ switch ($action) {
                 ORDER BY p.created_at DESC
             ")->fetchAll() ?: [];
             $reviews = $sPdo->query("SELECT r.*, COALESCE(u.name, u.username, 'Member MB INA') AS user_name, COALESCE(u.member_id, 'MBINA-HQ-2026-000001') AS member_id FROM lapak_reviews r LEFT JOIN users u ON r.user_id = u.id ORDER BY r.created_at DESC")->fetchAll() ?: [];
-            $sewaLogs = $sPdo->query("SELECT s.*, l.name as lapak_name, l.lapak_code, COALESCE(u.name, 'Admin') as creator_name FROM lapak_sewa_logs s LEFT JOIN lapak l ON s.lapak_id = l.id LEFT JOIN users u ON s.created_by = u.id ORDER BY s.created_at DESC")->fetchAll() ?: [];
+            $sewaLogs = $sPdo->query("SELECT s.*, l.name as lapak_name, l.id as lapak_code, COALESCE(u.name, 'Admin') as creator_name FROM lapak_sewa_logs s LEFT JOIN lapak l ON s.lapak_id = l.id LEFT JOIN users u ON s.created_by = u.id ORDER BY s.created_at DESC")->fetchAll() ?: [];
             $categories = $sPdo->query("SELECT * FROM product_categories ORDER BY display_order ASC")->fetchAll() ?: [];
 
             echo json_encode([
@@ -60,16 +60,17 @@ switch ($action) {
     case 'create_lapak':
         try {
             ensureM7Tables($sPdo);
-            $userId          = $input['user_id'] ?? 'usr_superadmin';
-            $name            = trim($input['name'] ?? '');
-            $description     = trim($input['description'] ?? '');
-            $category        = trim($input['category'] ?? 'General');
-            $contactPhone    = trim($input['contact_phone'] ?? '');
-            $contactWhatsapp = trim($input['contact_whatsapp'] ?? '');
-            $logoUrl         = trim($input['logo_url'] ?? '');
-            $bannerUrl       = trim($input['banner_url'] ?? '');
-            $paymentProofUrl = trim($input['payment_proof_url'] ?? '');
-            $months          = intval($input['months'] ?? 6);
+
+            $userId = !empty($input['user_id']) ? $input['user_id'] : 'usr_superadmin';
+            $name = !empty($input['name']) ? trim($input['name']) : '';
+            $description = !empty($input['description']) ? trim($input['description']) : '';
+            $category = !empty($input['category']) ? trim($input['category']) : 'Parts';
+            $contactPhone = !empty($input['contact_phone']) ? trim($input['contact_phone']) : '';
+            $contactWhatsapp = !empty($input['contact_whatsapp']) ? trim($input['contact_whatsapp']) : '';
+            $logoUrl = !empty($input['logo_url']) ? trim($input['logo_url']) : '';
+            $bannerUrl = !empty($input['banner_url']) ? trim($input['banner_url']) : '';
+            $paymentProofUrl = !empty($input['payment_proof_url']) ? trim($input['payment_proof_url']) : '';
+            $months = !empty($input['months']) ? intval($input['months']) : 6;
 
             if (empty($name) || empty($contactWhatsapp)) {
                 echo json_encode(['success' => false, 'message' => 'Nama lapak dan WhatsApp wajib diisi!']);
@@ -78,7 +79,7 @@ switch ($action) {
 
             // Enforce "1 Member = 1 Lapak" rule
             if ($userId && $userId !== 'usr_superadmin') {
-                $checkExisting = $sPdo->prepare("SELECT id, name, lapak_code FROM lapak WHERE user_id = ?");
+                $checkExisting = $sPdo->prepare("SELECT id, name FROM lapak WHERE user_id = ?");
                 $checkExisting->execute([$userId]);
                 $existingLapak = $checkExisting->fetch();
                 if ($existingLapak) {
@@ -113,10 +114,10 @@ switch ($action) {
             $year   = date('Y');
             $maxSeq = 0;
             try {
-                $maxStmt = $sPdo->prepare("SELECT lapak_code FROM lapak WHERE lapak_code LIKE ?");
+                $maxStmt = $sPdo->prepare("SELECT id FROM lapak WHERE id LIKE ?");
                 $maxStmt->execute([$prefix . $year . '-%']);
                 while ($r = $maxStmt->fetch()) {
-                    if (preg_match('/LPK-(?:MEM|SPN)-\d+-(\d+)/i', $r['lapak_code'], $m)) {
+                    if (preg_match('/LPK-(?:MEM|SPN)-\d+-(\d+)/i', $r['id'], $m)) {
                         $val = intval($m[1]);
                         if ($val > $maxSeq) $maxSeq = $val;
                     }
@@ -125,9 +126,9 @@ switch ($action) {
 
             $seq = $maxSeq + 1;
             do {
-                $lapakCode = $prefix . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
-                $check = $sPdo->prepare("SELECT COUNT(*) FROM lapak WHERE TRIM(lapak_code) = TRIM(?)");
-                $check->execute([$lapakCode]);
+                $lapakId = $prefix . $year . '-' . str_pad($seq, 3, '0', STR_PAD_LEFT);
+                $check = $sPdo->prepare("SELECT COUNT(*) FROM lapak WHERE TRIM(id) = TRIM(?)");
+                $check->execute([$lapakId]);
                 $exists = intval($check->fetchColumn());
                 if ($exists > 0) {
                     $seq++;
@@ -166,13 +167,13 @@ switch ($action) {
             }
 
             // ATURAN 2: 1 MEMBER_ID = 1 LAPAK DENGAN BANYAK PRODUK
-            $stmtExisting = $sPdo->prepare("SELECT id, name, lapak_code FROM lapak WHERE user_id = ? OR member_id = ?");
+            $stmtExisting = $sPdo->prepare("SELECT id, name FROM lapak WHERE user_id = ? OR member_id = ?");
             $stmtExisting->execute([$officialMemberId, $officialMemberId]);
             $existingLapak = $stmtExisting->fetch(PDO::FETCH_ASSOC);
             if ($existingLapak) {
                 echo json_encode([
                     'success' => false,
-                    'message' => "⚠️ Sesuai aturan federasi MB INA, 1 Nomor Anggota (KTA) hanya berhak memiliki 1 Lapak Resmi ({$existingLapak['name']} — {$existingLapak['lapak_code']}). Anda dapat menambahkan banyak produk dagangan pada lapak Anda yang sudah aktif!"
+                    'message' => "⚠️ Sesuai aturan federasi MB INA, 1 Nomor Anggota (KTA) hanya berhak memiliki 1 Lapak Resmi ({$existingLapak['name']} — {$existingLapak['id']}). Anda dapat menambahkan banyak produk dagangan pada lapak Anda yang sudah aktif!"
                 ]);
                 exit;
             }
@@ -187,19 +188,17 @@ switch ($action) {
             $potongan    = intval($originalFee * ($discountPercent / 100.0));
             $finalFee    = $originalFee - $potongan;
 
-            // ATURAN 3: ID LAPAK DISAMAKAN LANGSUNG DENGAN LAPAK_CODE (STANDAR FEDERASI)
-            $lapakId = $lapakCode;
             $userId  = $officialMemberId;
 
             try {
-                $stmt = $sPdo->prepare("INSERT INTO lapak (id, user_id, lapak_code, name, description, category, contact_phone, contact_whatsapp, logo_url, banner_url, payment_proof_url, sewa_start_date, sewa_end_date, sewa_status, sewa_fee, original_fee, tier_discount, final_fee, sewa_paid_status, is_active, is_verified, created_by, status, member_id, pemilik) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, 'UNPAID', FALSE, FALSE, ?, 'PENDING', ?, ?)");
-                $stmt->execute([$lapakId, $officialMemberId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $officialMemberId, $officialMemberId, $officialPemilik]);
+                $stmt = $sPdo->prepare("INSERT INTO lapak (id, user_id, name, description, category, contact_phone, contact_whatsapp, logo_url, banner_url, payment_proof_url, sewa_start_date, sewa_end_date, sewa_status, sewa_fee, original_fee, tier_discount, final_fee, sewa_paid_status, is_active, is_verified, created_by, status, member_id, pemilik) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, 'UNPAID', FALSE, FALSE, ?, 'PENDING', ?, ?)");
+                $stmt->execute([$lapakId, $officialMemberId, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $officialMemberId, $officialMemberId, $officialPemilik]);
             } catch (Throwable $tErr) {
                 if (strpos($tErr->getMessage(), '22001') !== false || strpos($tErr->getMessage(), 'too long') !== false) {
                     $sPdo->exec("ALTER TABLE lapak ALTER COLUMN logo_url TYPE TEXT");
                     $sPdo->exec("ALTER TABLE lapak ALTER COLUMN banner_url TYPE TEXT");
                     $sPdo->exec("ALTER TABLE lapak ALTER COLUMN payment_proof_url TYPE TEXT");
-                    $stmt->execute([$lapakId, $officialMemberId, $lapakCode, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $officialMemberId, $officialMemberId, $officialPemilik]);
+                    $stmt->execute([$lapakId, $officialMemberId, $name, $description, $category, $contactPhone, $contactWhatsapp, $logoUrl, $bannerUrl, $paymentProofUrl, $startDate, $endDate, $finalFee, $originalFee, $discountPercent, $finalFee, $officialMemberId, $officialMemberId, $officialPemilik]);
                 } else {
                     throw $tErr;
                 }
@@ -210,9 +209,9 @@ switch ($action) {
             $sPdo->prepare("INSERT INTO lapak_sewa_logs (id, lapak_id, action, period_start, period_end, fee, payment_status, notes, created_by) VALUES (?, ?, 'SEWA', ?, ?, ?, 'UNPAID', ?, ?)")
                  ->execute([$logId, $lapakId, $startDate, $endDate, $finalFee, "Sewa lapak baru $months bulan (Diskon $userTier $discountPercent% - Menunggu Verifikasi Transfer)", $officialMemberId]);
 
-            logAudit($officialMemberId, 'CREATE', 'E_COMMERCE', ['lapak_id' => $lapakId, 'lapak_code' => $lapakCode, 'name' => $name, 'final_fee' => $finalFee]);
+            logAudit($officialMemberId, 'CREATE', 'E_COMMERCE', ['lapak_id' => $lapakId, 'name' => $name, 'final_fee' => $finalFee]);
 
-            echo json_encode(['success' => true, 'message' => 'Sewa Lapak Baru Berhasil Dibuat & Menunggu Verifikasi Admin!', 'lapak_id' => $lapakId, 'lapak_code' => $lapakCode, 'final_fee' => $finalFee, 'status' => 'PENDING']);
+            echo json_encode(['success' => true, 'message' => 'Sewa Lapak Baru Berhasil Dibuat & Menunggu Verifikasi Admin!', 'lapak_id' => $lapakId, 'final_fee' => $finalFee, 'status' => 'PENDING']);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -645,89 +644,14 @@ switch ($action) {
     // ============================================
 
     case 'migrate_lapak_codes':
-        try {
-            ensureM7Tables($sPdo);
-            $year = date('Y');
-
-            // 1. Bersihkan Duplikasi Shell (lapak_6a841104b8a01_577 vs lapak_shell)
-            $checkDupShell = $sPdo->query("SELECT id FROM lapak WHERE id = 'lapak_6a841104b8a01_577'")->fetch();
-            if ($checkDupShell) {
-                $sPdo->prepare("UPDATE lapak_products SET lapak_id = 'lapak_shell' WHERE lapak_id = 'lapak_6a841104b8a01_577'")->execute();
-                $sPdo->prepare("UPDATE lapak_reviews SET lapak_id = 'lapak_shell' WHERE lapak_id = 'lapak_6a841104b8a01_577'")->execute();
-                $sPdo->prepare("DELETE FROM lapak WHERE id = 'lapak_6a841104b8a01_577'")->execute();
-            }
-
-            // 2. Bersihkan Duplikasi Garasi FayFay (lapak_004 dummy vs lapak_6a80f3422be6b real)
-            $checkDupFay = $sPdo->query("SELECT id FROM lapak WHERE id = 'lapak_004'")->fetch();
-            if ($checkDupFay) {
-                $sPdo->prepare("UPDATE lapak_products SET lapak_id = 'lapak_6a80f3422be6b' WHERE lapak_id = 'lapak_004'")->execute();
-                $sPdo->prepare("UPDATE lapak_reviews SET lapak_id = 'lapak_6a80f3422be6b' WHERE lapak_id = 'lapak_004'")->execute();
-                $sPdo->prepare("DELETE FROM lapak WHERE id = 'lapak_004'")->execute();
-            }
-
-            // 3. Bersihkan Lapak Testing Andi Pratama (Official Shell Sponsor Store & Pertamina Lubricants Store)
-            // Sesuai aturan "1 Member = 1 Lapak", Andi Pratama hanya mempertahankan lapak_001 (Andi Parts Store)
-            $testLapakIds = ['lapak_6a8410db861b4_344', 'lapak_6a8410e50f192_263'];
-            foreach ($testLapakIds as $tId) {
-                $sPdo->prepare("UPDATE lapak_products SET lapak_id = 'lapak_001' WHERE lapak_id = ?")->execute([$tId]);
-                $sPdo->prepare("UPDATE lapak_reviews SET lapak_id = 'lapak_001' WHERE lapak_id = ?")->execute([$tId]);
-                $sPdo->prepare("DELETE FROM lapak WHERE id = ?")->execute([$tId]);
-            }
-
-            // 4. Ambil semua lapak yang tersisa
-            $lapaks = $sPdo->query("
-                SELECT l.*, u.role as user_role, u.member_id as user_mid 
-                FROM lapak l 
-                LEFT JOIN users u ON l.user_id = u.id 
-                ORDER BY l.created_at ASC
-            ")->fetchAll() ?: [];
-
-            $spnSeq = 1;
-            $memSeq = 1;
-            $updatedList = [];
-
-            foreach ($lapaks as $l) {
-                $isSponsor = false;
-                $role = strtoupper($l['user_role'] ?? '');
-                $mid  = strtoupper($l['user_mid'] ?? '');
-                $name = strtolower($l['name'] ?? '');
-
-                if ($l['id'] === 'lapak_shell' || $l['id'] === 'lapak_fdr' || $role === 'SPONSOR' || strpos($mid, 'SPN-') !== false) {
-                    if ($l['id'] === 'lapak_6a8410db861b4_344') {
-                        $isSponsor = false;
-                    } else {
-                        $isSponsor = true;
-                    }
-                }
-
-                if ($isSponsor) {
-                    $newCode = 'LPK-SPN-' . $year . '-' . str_pad($spnSeq, 3, '0', STR_PAD_LEFT);
-                    $spnSeq++;
-                } else {
-                    $newCode = 'LPK-MEM-' . $year . '-' . str_pad($memSeq, 3, '0', STR_PAD_LEFT);
-                    $memSeq++;
-                }
-
-                $sPdo->prepare("UPDATE lapak SET lapak_code = ? WHERE id = ?")->execute([$newCode, $l['id']]);
-                $updatedList[] = [
-                    'id' => $l['id'],
-                    'old_code' => $l['lapak_code'],
-                    'new_code' => $newCode,
-                    'name' => $l['name'],
-                    'type' => $isSponsor ? 'SPONSOR' : 'MEMBER'
-                ];
-            }
-
-            echo json_encode([
-                'success' => true,
-                'message' => 'Migrasi kode lapak berhasil!',
-                'total_migrated' => count($updatedList),
-                'details' => $updatedList
-            ]);
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-        break;
+        // Kolom lapak_code telah resmi dihapus (drop column). ID lapak kini langsung menjadi kode unik standar (LPK-MEM-... / LPK-SPN-...).
+        echo json_encode([
+            'success' => true,
+            'message' => 'Kolom lapak_code telah dihapus dari database. ID lapak kini berfungsi sebagai kode unik standar.',
+            'total_migrated' => 0,
+            'details' => []
+        ]);
+        exit;
 
     default:
         echo json_encode(['success' => false, 'message' => 'Unknown action in m8_marketplace: ' . $action]);
