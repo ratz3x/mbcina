@@ -330,12 +330,12 @@ const AppEngine = {
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
 
     if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
+    if (memberSidebar) memberSidebar.style.display = 'none';
+    if (btnHamburger) btnHamburger.style.display = 'none';
+    document.body.classList.remove('yt-has-sidebar');
+    document.body.classList.add('member-mode');
 
     this.updateHeaderNavPillsActive('nav-btn-member-portal');
-    this.setActiveMemberSidebarItem('member_dashboard');
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
@@ -349,18 +349,17 @@ const AppEngine = {
     }
     // Sembunyikan admin tab content jika ada yang terbuka
     document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
-    document.body.classList.remove('member-mode');
+    document.body.classList.add('member-mode');
 
-    // Pastikan member-sidebar tampil
+    // Sembunyikan sidebar & hamburger untuk member
     const adminSidebar = document.getElementById('app-sidebar');
     const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
     if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
+    if (memberSidebar) memberSidebar.style.display = 'none';
+    if (btnHamburger) btnHamburger.style.display = 'none';
+    document.body.classList.remove('yt-has-sidebar');
 
-    this.setActiveMemberSidebarItem(tabKey);
     this.closeMobileSidebar();
 
     if (tabKey === 'member_dashboard') {
@@ -421,17 +420,22 @@ const AppEngine = {
     const tab = document.getElementById(tabId);
     if (tab) tab.style.display = 'block';
 
-    // Selalu gunakan member-sidebar (bukan admin-sidebar) untuk member
+    // Sembunyikan semua sidebar & hamburger untuk member mode (bebas YT sidebar)
     const adminSidebar = document.getElementById('app-sidebar');
     const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
     if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-    document.body.classList.add('yt-has-sidebar');
-    document.body.classList.add('member-mode'); // CSS hook untuk sembunyikan tombol AKSI
+    if (memberSidebar) memberSidebar.style.display = 'none';
+    if (btnHamburger) btnHamburger.style.display = 'none';
+    document.body.classList.remove('yt-has-sidebar');
+    document.body.classList.add('member-mode'); // CSS & JS hook untuk sembunyikan tombol AKSI
 
-    this.setActiveMemberSidebarItem(activeItemKey);
+    // Tampilkan tombol navigasi kembali ke dashboard member
+    const retBanner = document.getElementById('member-return-banner');
+    if (retBanner) retBanner.style.display = 'block';
+    const retM2 = document.getElementById('btn-m2-return-member');
+    if (retM2) retM2.style.display = (tabId === 'admin-tab-m2_org') ? 'inline-flex' : 'none';
+
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
@@ -439,7 +443,7 @@ const AppEngine = {
   openMemberOrganisasi() {
     this._switchToMemberAdminTab('admin-tab-m2_org', 'member_org');
     this.renderM2Module();
-    // Semua 6 sub-tab boleh terlihat, tapi tanpa tombol AKSI (dikontrol via CSS .member-mode)
+    this.hideM2AdminActionsForMember();
   },
 
   openMemberClubs() {
@@ -4418,7 +4422,16 @@ const AppEngine = {
     }
   },
 
+  isMemberUser() {
+    const adminRoles = ['SUPER_ADMIN','PRESIDEN','SEKRETARIS_PUSAT','BENDAHARA_PUSAT','PENGURUS_PUSAT','ADMIN_ORGANISASI','PENGURUS_KLUB','SPONSOR'];
+    return !adminRoles.includes(this.currentRole);
+  },
+
   toggleUserDropdown() {
+    // HAPUS / NONAKTIFKAN YT MENU UNTUK MEMBER
+    if (this.isMemberUser()) {
+      return;
+    }
     const dd = document.getElementById('user-profile-dropdown');
     if (dd) {
       const isVisible = dd.style.display === 'flex';
@@ -4854,6 +4867,15 @@ const AppEngine = {
   switchAdminTab(tab) {
     if (!tab) tab = 'm1_portal';
     this.activeAdminTab = tab;
+
+    // Pastikan admin mode aktif dan member-mode dibersihkan jika admin yang akses
+    if (!this.isMemberUser()) {
+      document.body.classList.remove('member-mode');
+      const retBanner = document.getElementById('member-return-banner');
+      if (retBanner) retBanner.style.display = 'none';
+      const retM2 = document.getElementById('btn-m2-return-member');
+      if (retM2) retM2.style.display = 'none';
+    }
     
     const sidebar = document.getElementById('app-sidebar');
     const memberSidebar = document.getElementById('member-sidebar');
@@ -5138,10 +5160,10 @@ const AppEngine = {
         
         const memberSidebar = document.getElementById('member-sidebar');
         if (sidebar) sidebar.style.display = 'none';
-        if (memberSidebar) memberSidebar.style.display = 'flex';
-        if (btnHamburger) btnHamburger.style.display = 'inline-flex';
-        document.body.classList.add('yt-has-sidebar');
-        this.setActiveMemberSidebarItem('member_dashboard');
+        if (memberSidebar) memberSidebar.style.display = 'none';
+        if (btnHamburger) btnHamburger.style.display = 'none';
+        document.body.classList.remove('yt-has-sidebar');
+        document.body.classList.add('member-mode');
 
         const memberView = document.getElementById('view-member-dashboard');
         if (memberView) {
@@ -6403,6 +6425,60 @@ const AppEngine = {
     else if (subtab === 'presidents') this.renderM2Presidents();
     else if (subtab === 'structure') this.renderM2Structure();
     else if (subtab === 'clubs') this.renderM2Clubs();
+
+    if (this.isMemberUser() || document.body.classList.contains('member-mode')) {
+      this.hideM2AdminActionsForMember();
+    }
+  },
+
+  hideM2AdminActionsForMember() {
+    const m2 = document.getElementById('admin-tab-m2_org');
+    if (!m2) return;
+
+    // Sembunyikan tombol-tombol aksi CRUD di M2 Organisasi untuk member
+    m2.querySelectorAll('button[onclick*="openEditOrgProfileModal"], button[onclick*="openM2HistoryModal"], button[onclick*="deleteM2HistorySection"], button[onclick*="openAddVMModal"], button[onclick*="openEditVMModal"], button[onclick*="deleteVM"], button[onclick*="openAddPresidentModal"], button[onclick*="openEditPresidentModal"], button[onclick*="deletePresident"], button[onclick*="openAddStructureModal"], button[onclick*="openEditStructureModal"], button[onclick*="deleteStructure"], button[onclick*="openAddClubModal"], button[onclick*="openEditClubModal"], button[onclick*="deleteClub"]').forEach(btn => {
+      btn.style.setProperty('display', 'none', 'important');
+    });
+
+    // Tabel Struktur Pengurus Pusat: sembunyikan header Aksi dan sel aksi tiap baris
+    const structTable = document.querySelector('#m2sub-structure table');
+    if (structTable) {
+      structTable.querySelectorAll('tr').forEach(tr => {
+        if (tr.children.length >= 5) {
+          tr.children[tr.children.length - 1].style.setProperty('display', 'none', 'important');
+        }
+      });
+    }
+
+    // Tabel Direktori Klub: sembunyikan header Aksi Management dan sel aksi tiap baris
+    const clubsTable = document.querySelector('#m2-clubs-table-wrapper table');
+    if (clubsTable) {
+      clubsTable.querySelectorAll('tr').forEach(tr => {
+        if (tr.children.length >= 7) {
+          tr.children[tr.children.length - 1].style.setProperty('display', 'none', 'important');
+        }
+      });
+    }
+
+    // Sembunyikan footer container aksi di kartu Presiden
+    document.querySelectorAll('#m2-presidents-container .glass-card > div:last-child').forEach(div => {
+      if (div.querySelector('button[onclick*="President"]')) {
+        div.style.setProperty('display', 'none', 'important');
+      }
+    });
+
+    // Sembunyikan footer container aksi di kartu Visi Misi
+    document.querySelectorAll('#m2-vision-container .glass-card > div:last-child').forEach(div => {
+      if (div.querySelector('button[onclick*="VM"]')) {
+        div.style.setProperty('display', 'none', 'important');
+      }
+    });
+
+    // Pastikan tombol kembali ke Dashboard Member tampil
+    const retM2 = document.getElementById('btn-m2-return-member');
+    if (retM2) retM2.style.setProperty('display', 'inline-flex', 'important');
+    const retBanner = document.getElementById('member-return-banner');
+    if (retBanner) retBanner.style.setProperty('display', 'block', 'important');
   },
 
   renderM2Module() {
@@ -7718,6 +7794,10 @@ const AppEngine = {
     });
 
     tbody.innerHTML = this.generateM2ClubTableRows(filtered);
+
+    if (this.isMemberUser() || document.body.classList.contains('member-mode')) {
+      this.hideM2AdminActionsForMember();
+    }
 
     if (statusEl) {
       statusEl.innerHTML = `Menampilkan <strong>${filtered.length}</strong> dari <strong>${totalClubs}</strong> Klub & Chapter`;
