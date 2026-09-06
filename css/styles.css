@@ -2785,8 +2785,9 @@ body.member-mode #admin-tab-m7_donation .member-hide-donor-transactions {
   display: none !important;
 }
 
+body.member-mode #m73-donor-campaign-filter,
 body.member-mode #btn-m73-member-donate {
-  display: inline-flex !important;
+  display: none !important;
 }
 
 

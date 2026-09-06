@@ -20687,7 +20687,13 @@ const M6Engine = {
     }
 
     const sel = document.getElementById('m73-donor-campaign-filter');
-    const activeVal = filterCampaignId || (sel ? sel.value : 'ALL');
+    const donateBtn = document.getElementById('btn-m73-member-donate');
+
+    // In member mode, hide campaign filter dropdown and header donate button
+    if (sel) sel.style.display = isMember ? 'none' : '';
+    if (donateBtn) donateBtn.style.display = 'none';
+
+    const activeVal = isMember ? 'ALL' : (filterCampaignId || (sel ? sel.value : 'ALL'));
 
     if (sel && (!sel.options || sel.options.length <= 1) && Array.isArray(this.donationData.campaigns)) {
       let opts = '<option value="ALL">🔍 Semua Campaign (All)</option>';
@@ -20701,7 +20707,7 @@ const M6Engine = {
     }
 
     let list = this.donationData.donations || [];
-    if (activeVal && activeVal !== 'ALL') {
+    if (!isMember && activeVal && activeVal !== 'ALL') {
       list = list.filter(d => d.campaign_id === activeVal);
     }
 
@@ -20734,13 +20740,9 @@ const M6Engine = {
               ❤️
             </div>
             <h4 style="color:#ffffff; font-size:0.95rem; margin:0 0 6px 0; font-weight:600;">Belum Ada Riwayat Donasi Pada Akun Anda</h4>
-            <p style="color:#94a3b8; font-size:0.8rem; margin:0 auto 16px; max-width:440px; line-height:1.5;">
+            <p style="color:#94a3b8; font-size:0.8rem; margin:0 auto; max-width:440px; line-height:1.5;">
               Anda belum memiliki transaksi donasi yang tercatat untuk campaign ini. Salurkan kepedulian Anda dengan berpartisipasi dalam program donasi MB INA.
             </p>
-            <button type="button" class="btn-primary" style="font-size:0.78rem; padding:8px 18px; border-radius:10px; display:inline-flex; align-items:center; gap:6px; background:#f59e0b; color:#0a0a0a; font-weight:700; border:none; cursor:pointer;" onclick="AppEngine.openMemberDonasiModal()">
-              <span>Donasi Sekarang</span>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
           </div>
         `;
       } else {
