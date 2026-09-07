@@ -13364,37 +13364,59 @@ const AppEngine = {
       </div>
 
       <!-- REPLIES LIST -->
-      <h4 style="font-size:1.1rem; color:var(--accent-gold); margin-bottom:14px;">💬 Balasan Diskusi (${threadReplies.length})</h4>
-      <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:24px;">
+      <h4 style="font-size:1.1rem; color:var(--accent-gold); margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+        <span>💬</span> Balasan Diskusi (${threadReplies.length})
+      </h4>
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:28px;">
         ${threadReplies.length === 0 
-          ? `<div class="glass-card" style="padding:20px; text-align:center; color:var(--text-muted);">Belum ada balasan pada thread ini. Berikan balasan pertama Anda di bawah.</div>`
+          ? `<div class="glass-card" style="padding:22px; text-align:center; color:var(--text-muted); border-left:3px solid var(--chrome-border);">Belum ada balasan pada thread ini. Berikan tanggapan pertama Anda melalui form di bawah.</div>`
           : threadReplies.map(r => `
-            <div class="glass-card" style="padding:16px; border-left:3px solid var(--chrome-border);">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div class="glass-card" style="padding:16px 20px; border-left:3px solid var(--accent-gold); background:rgba(255,255,255,0.02); border-radius:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
                 <div style="display:flex; align-items:center; gap:10px;">
-                  <div style="width:32px; height:32px; border-radius:50%; background:var(--accent-blue); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:0.78rem;">${(r.author_name || 'US').charAt(0)}</div>
+                  <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, #3b82f6, #1d4ed8); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:0.82rem; box-shadow:0 2px 6px rgba(0,0,0,0.3); flex-shrink:0;">
+                    ${(r.author_name || 'US').charAt(0).toUpperCase()}
+                  </div>
                   <div>
-                    <strong style="font-size:0.85rem; color:#fff;">${r.author_name}</strong>
-                    <span style="font-size:0.72rem; color:var(--text-muted); display:block;">@${r.author_username}</span>
+                    <strong style="font-size:0.88rem; color:#fff; display:block; line-height:1.2;">${r.author_name || 'Member MB INA'}</strong>
+                    <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:2px;">@${r.author_username || 'member'}</span>
                   </div>
                 </div>
-        `).join('')}
+                <div style="font-size:0.75rem; color:var(--text-muted);">
+                  ${r.created_at ? (typeof r.created_at === 'string' && r.created_at.includes('T') ? new Date(r.created_at).toLocaleString('id-ID') : r.created_at) : 'Baru saja'}
+                </div>
+              </div>
+
+              <!-- Reply Content Body -->
+              <div style="font-size:0.88rem; color:#e2e8f0; line-height:1.65; margin-bottom:12px; padding-left:2px;">
+                ${this.parseMarkdownText ? this.parseMarkdownText(r.content || '') : (r.content || '')}
+              </div>
+
+              <!-- Reply Action Buttons -->
+              <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
+                <button class="btn-outline" style="font-size:0.72rem; padding:3px 10px;" onclick="AppEngine.likeM5Post('REPLY', '${r.id}')">👍 Suka (${r.likes_count || 0})</button>
+              </div>
+            </div>
+          `).join('')}
       </div>
 
-      <!-- REPLY EDITOR BOX -->
-      <div class="glass-panel" style="padding:20px;">
-        <h4 style="font-size:1rem; color:var(--accent-gold); margin-bottom:10px;">💬 Tulis Balasan Anda</h4>
+      <!-- REPLY EDITOR BOX (FULL WIDTH LINEAR) -->
+      <div class="glass-panel" style="padding:22px; border-radius:12px; border:1px solid var(--chrome-border);">
+        <h4 style="font-size:1.05rem; color:var(--accent-gold); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span>💭</span> Tulis Balasan Anda
+        </h4>
         <form onsubmit="AppEngine.submitM5Reply(event, '${thread.id}')">
-          <div style="margin-bottom:6px; display:flex; gap:6px;">
-            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px;" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'bold')" title="B"><b>B</b></button>
-            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px;" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'italic')" title="I"><i>I</i></button>
-            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px;" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'underline')" title="U"><u>U</u></button>
-            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px;" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'link')" title="Link">🔗 Link</button>
-            <button type="button" class="btn-outline" style="font-size:0.72rem; padding:2px 6px; color:var(--accent-gold);" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'image')" title="Foto">📷 Foto</button>
+          <div style="margin-bottom:8px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'bold')" title="Tebal"><b>B</b></button>
+            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'italic')" title="Miring"><i>I</i></button>
+            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'underline')" title="Garis Bawah"><u>U</u></button>
+            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:3px 8px;" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'link')" title="Tautan">🔗 Link</button>
+            <button type="button" class="btn-outline" style="font-size:0.75rem; padding:3px 8px; color:var(--accent-gold);" onclick="AppEngine.applyFormatText('m5-reply-textarea', 'image')" title="Foto">📷 Foto</button>
           </div>
-          <textarea id="m5-reply-textarea" class="form-input" rows="3" placeholder="Tuliskan komentar atau tanggapan Anda..." required></textarea>
-          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-            <button type="submit" class="btn-primary" style="padding:8px 18px; font-size:0.85rem;">💬 Kirim Balasan</button>
+          <textarea id="m5-reply-textarea" class="form-input" rows="4" placeholder="Tuliskan komentar atau tanggapan Anda..." style="width:100%; font-size:0.88rem; line-height:1.6; padding:12px; resize:vertical; margin-bottom:12px;" required></textarea>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <span style="font-size:0.75rem; color:var(--text-muted);">Gunakan bahasa yang santun dan hormati sesama member MB INA.</span>
+            <button type="submit" class="btn-primary" style="padding:8px 22px; font-size:0.88rem; font-weight:700;">💬 Kirim Balasan</button>
           </div>
         </form>
       </div>
@@ -13588,6 +13610,10 @@ const AppEngine = {
     const content = contentInput ? contentInput.value.trim() : '';
     if (!content) return;
 
+    const loggedUser = (window.AuthEngine && window.AuthEngine.currentUser) || this.currentUser || {};
+    const authorName = loggedUser.name || loggedUser.full_name || 'Member MB INA';
+    const authorUsername = loggedUser.username || 'member';
+
     try {
       const res = await fetch('api.php?action=reply_forum_thread', {
         method: 'POST',
@@ -13595,13 +13621,14 @@ const AppEngine = {
         body: JSON.stringify({
           thread_id: threadId,
           content,
-          author_name: (this.currentUser && this.currentUser.name) || 'Sponsor MB INA',
-          author_username: (this.currentUser && this.currentUser.username) || 'sponsor'
+          author_name: authorName,
+          author_username: authorUsername
         })
       });
       const data = await res.json();
       if (data.success) {
         alert('🎉 ' + data.message);
+        if (contentInput) contentInput.value = '';
         await this.fetchM5Data();
 
         const spPane = document.getElementById('sponsor-tab-content-forum');
