@@ -2815,6 +2815,30 @@ body:not(.member-mode) #m7-subtab-my_products {
   display: none !important;
 }
 
+/* ==========================================================================
+   🚫 ABSOLUTE RULE: BERANDA / LANDING PAGE NEVER HAS ANY SIDEBAR MENU
+   ========================================================================== */
+body.landing-mode .yt-sidebar,
+body.landing-mode #app-sidebar,
+body.landing-mode #member-sidebar,
+body.landing-mode #btn-hamburger-toggle,
+body.landing-mode #sidebar-backdrop,
+body.landing-mode .yt-sidebar-backdrop {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateX(-100%) !important;
+  width: 0 !important;
+}
+
+body.landing-mode .main-wrapper,
+body.landing-mode footer.app-footer {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  width: 100% !important;
+}
+
+
 
 
 

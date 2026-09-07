@@ -278,10 +278,20 @@ const AppEngine = {
     const adminSidebar = document.getElementById('app-sidebar');
     const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'none';
-    if (btnHamburger) btnHamburger.style.display = 'none';
-    document.body.classList.remove('yt-has-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (adminSidebar) {
+      adminSidebar.style.setProperty('display', 'none', 'important');
+      adminSidebar.classList.remove('mobile-open', 'expanded');
+    }
+    if (memberSidebar) {
+      memberSidebar.style.setProperty('display', 'none', 'important');
+      memberSidebar.classList.remove('mobile-open', 'expanded');
+    }
+    if (btnHamburger) btnHamburger.style.setProperty('display', 'none', 'important');
+    if (backdrop) backdrop.style.setProperty('display', 'none', 'important');
+
+    document.body.classList.remove('yt-has-sidebar', 'member-mode', 'yt-sidebar-expanded');
+    document.body.classList.add('landing-mode');
 
     this.updateHeaderNavPillsActive('nav-btn-home');
     if (typeof this.initLandingVersion === 'function') this.initLandingVersion();
@@ -304,9 +314,21 @@ const AppEngine = {
         adminView.style.display = 'block';
 
         const sidebar = document.getElementById('app-sidebar');
+        const memberSidebar = document.getElementById('member-sidebar');
         const btnHamburger = document.getElementById('btn-hamburger-toggle');
-        if (sidebar) sidebar.style.display = 'flex';
-        if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+        if (memberSidebar) {
+          memberSidebar.style.setProperty('display', 'none', 'important');
+          memberSidebar.classList.remove('mobile-open', 'expanded');
+        }
+        if (sidebar) {
+          sidebar.style.removeProperty('display');
+          sidebar.style.display = 'flex';
+        }
+        if (btnHamburger) {
+          btnHamburger.style.removeProperty('display');
+          btnHamburger.style.display = 'inline-flex';
+        }
+        document.body.classList.remove('landing-mode', 'member-mode');
         document.body.classList.add('yt-has-sidebar');
 
         this.updateHeaderNavPillsActive('nav-link-admin');
@@ -324,8 +346,15 @@ const AppEngine = {
 
       const sidebar = document.getElementById('app-sidebar');
       const btnHamburger = document.getElementById('btn-hamburger-toggle');
-      if (sidebar) sidebar.style.display = 'flex';
-      if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+      if (sidebar) {
+        sidebar.style.removeProperty('display');
+        sidebar.style.display = 'flex';
+      }
+      if (btnHamburger) {
+        btnHamburger.style.removeProperty('display');
+        btnHamburger.style.display = 'inline-flex';
+      }
+      document.body.classList.remove('landing-mode');
       document.body.classList.add('yt-has-sidebar');
 
       this.switchAdminTab('m6_event');
@@ -345,9 +374,19 @@ const AppEngine = {
     const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
 
-    if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    if (adminSidebar) {
+      adminSidebar.style.setProperty('display', 'none', 'important');
+      adminSidebar.classList.remove('mobile-open', 'expanded');
+    }
+    if (memberSidebar) {
+      memberSidebar.style.removeProperty('display');
+      memberSidebar.style.display = 'flex';
+    }
+    if (btnHamburger) {
+      btnHamburger.style.removeProperty('display');
+      btnHamburger.style.display = 'inline-flex';
+    }
+    document.body.classList.remove('landing-mode');
     document.body.classList.add('yt-has-sidebar');
     document.body.classList.add('member-mode');
 
@@ -366,15 +405,26 @@ const AppEngine = {
     }
     // Sembunyikan admin tab content jika ada yang terbuka
     document.querySelectorAll('.admin-tab-content').forEach(el => el.style.display = 'none');
+    document.body.classList.remove('landing-mode');
     document.body.classList.add('member-mode');
+    document.body.classList.add('yt-has-sidebar');
 
     // Tampilkan member-sidebar & hamburger
     const adminSidebar = document.getElementById('app-sidebar');
     const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    if (adminSidebar) {
+      adminSidebar.style.setProperty('display', 'none', 'important');
+      adminSidebar.classList.remove('mobile-open', 'expanded');
+    }
+    if (memberSidebar) {
+      memberSidebar.style.removeProperty('display');
+      memberSidebar.style.display = 'flex';
+    }
+    if (btnHamburger) {
+      btnHamburger.style.removeProperty('display');
+      btnHamburger.style.display = 'inline-flex';
+    }
     document.body.classList.add('yt-has-sidebar');
 
     this.setActiveMemberSidebarItem(tabKey);
@@ -4873,6 +4923,13 @@ const AppEngine = {
   },
 
   toggleSidebar() {
+    const landingView = document.getElementById('view-landing-page');
+    if (landingView && landingView.style.display !== 'none') {
+      return; // Absolute rule: No sidebar on landing page!
+    }
+    if (document.body.classList.contains('landing-mode')) {
+      return;
+    }
     const memberSidebar = document.getElementById('member-sidebar');
     const adminSidebar = document.getElementById('app-sidebar');
     const activeSidebar = (memberSidebar && memberSidebar.style.display === 'flex') ? memberSidebar : adminSidebar;
@@ -4897,6 +4954,7 @@ const AppEngine = {
     this.activeAdminTab = tab;
 
     // Pastikan admin mode aktif dan member-mode dibersihkan jika admin yang akses
+    document.body.classList.remove('landing-mode');
     if (!this.isMemberUser()) {
       document.body.classList.remove('member-mode');
       const retBanner = document.getElementById('member-return-banner');
@@ -4914,10 +4972,19 @@ const AppEngine = {
     // do not remain visible and cover or push down the admin dashboard
     document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
 
-    if (memberSidebar) memberSidebar.style.display = 'none';
+    if (memberSidebar) {
+      memberSidebar.style.setProperty('display', 'none', 'important');
+      memberSidebar.classList.remove('mobile-open', 'expanded');
+    }
     if (adminView) adminView.style.display = 'block';
-    if (sidebar) sidebar.style.display = 'flex';
-    if (btnHamburger) btnHamburger.style.display = 'inline-flex';
+    if (sidebar) {
+      sidebar.style.removeProperty('display');
+      sidebar.style.display = 'flex';
+    }
+    if (btnHamburger) {
+      btnHamburger.style.removeProperty('display');
+      btnHamburger.style.display = 'inline-flex';
+    }
     document.body.classList.add('yt-has-sidebar');
 
     this.updateSidebarRoleVisibility();
@@ -5121,9 +5188,23 @@ const AppEngine = {
       if (adminView) adminView.style.display = 'none';
       if (landingView) landingView.style.display = 'block';
 
-      if (sidebar) sidebar.style.display = 'none';
-      if (btnHamburger) btnHamburger.style.display = 'none';
-      document.body.classList.remove('yt-has-sidebar');
+      const adminSidebar = document.getElementById('app-sidebar');
+      const memberSidebar = document.getElementById('member-sidebar');
+      const btnHamburger = document.getElementById('btn-hamburger-toggle');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (adminSidebar) {
+        adminSidebar.style.setProperty('display', 'none', 'important');
+        adminSidebar.classList.remove('mobile-open', 'expanded');
+      }
+      if (memberSidebar) {
+        memberSidebar.style.setProperty('display', 'none', 'important');
+        memberSidebar.classList.remove('mobile-open', 'expanded');
+      }
+      if (btnHamburger) btnHamburger.style.setProperty('display', 'none', 'important');
+      if (backdrop) backdrop.style.setProperty('display', 'none', 'important');
+
+      document.body.classList.remove('yt-has-sidebar', 'member-mode', 'yt-sidebar-expanded');
+      document.body.classList.add('landing-mode');
 
       const heroLoginBtn = document.getElementById('hero-v2-btn-login');
       if (heroLoginBtn) {
@@ -5131,6 +5212,7 @@ const AppEngine = {
         heroLoginBtn.onclick = () => window.AuthEngine && window.AuthEngine.openModal('modal-login');
       }
     } else {
+      document.body.classList.remove('landing-mode');
       const heroLoginBtn = document.getElementById('hero-v2-btn-login');
       if (heroLoginBtn) {
         heroLoginBtn.innerText = isAdminRole ? 'MASUK PORTAL ADMIN →' : 'BUKA DASHBOARD MEMBER →';
@@ -5439,11 +5521,19 @@ const AppEngine = {
       const adminSidebar = document.getElementById('app-sidebar');
       const memberSidebar = document.getElementById('member-sidebar');
       const btnHamburger = document.getElementById('btn-hamburger-toggle');
-      if (adminSidebar) adminSidebar.style.display = 'none';
-      if (memberSidebar) memberSidebar.style.display = 'none';
-      if (btnHamburger) btnHamburger.style.display = 'none';
-      document.body.classList.remove('yt-has-sidebar');
-      document.body.classList.remove('member-mode');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (adminSidebar) {
+        adminSidebar.style.setProperty('display', 'none', 'important');
+        adminSidebar.classList.remove('mobile-open', 'expanded');
+      }
+      if (memberSidebar) {
+        memberSidebar.style.setProperty('display', 'none', 'important');
+        memberSidebar.classList.remove('mobile-open', 'expanded');
+      }
+      if (btnHamburger) btnHamburger.style.setProperty('display', 'none', 'important');
+      if (backdrop) backdrop.style.setProperty('display', 'none', 'important');
+      document.body.classList.remove('yt-has-sidebar', 'member-mode', 'yt-sidebar-expanded');
+      document.body.classList.add('landing-mode');
     }
 
     if (this.currentLandingVersion === 'v1') {
