@@ -218,6 +218,10 @@ photo_url: sbUser.user_metadata?.picture || '',
   },
 
   openModal(modalId) {
+    if (modalId === 'modal-login' && window.AppEngine && window.AppEngine.currentRole && window.AppEngine.currentRole !== 'GUEST') {
+      window.AppEngine.navigateHomeForUser();
+      return;
+    }
     this.closeAllModals();
     const targetModal = document.getElementById(modalId);
     if (targetModal) {
@@ -778,12 +782,12 @@ photo_url: sbUser.user_metadata?.picture || '',
         console.warn('LocalStorage Quota Warning:', storageErr);
       }
       
-      if (window.AppEngine && typeof AppEngine.setRole === 'function') {
-        AppEngine.setRole(loggedUser.role || 'MEMBER', loggedUser);
-        if (loggedUser.role === 'MEMBER' || loggedUser.role === 'CALON_MEMBER') {
-          if (typeof AppEngine.openPortalMember === 'function') {
-            AppEngine.openPortalMember();
-          }
+      if (window.AppEngine) {
+        if (typeof AppEngine.setRole === 'function') {
+          AppEngine.setRole(loggedUser.role || 'MEMBER', loggedUser);
+        }
+        if (typeof AppEngine.navigateHomeForUser === 'function') {
+          AppEngine.navigateHomeForUser();
         }
       }
       this.closeAllModals();

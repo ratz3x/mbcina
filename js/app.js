@@ -115,7 +115,11 @@ const AppEngine = {
     this.closeAllModals();
     document.body.style.overflow = '';
     this.initSession();
-    this.renderView();
+    if (this.currentRole && this.currentRole !== 'GUEST') {
+      this.navigateHomeForUser();
+    } else {
+      this.renderView();
+    }
     this.initTheme();
     this.bindAdminTabs();
 
@@ -134,7 +138,9 @@ const AppEngine = {
       this.fetchDonationData();
       this.renderTestimonials();
       this.updateLandingCounters();
-      this.initLandingVersion();
+      if (this.currentRole === 'GUEST' || !this.currentRole) {
+        this.initLandingVersion();
+      }
     }, 20);
   },
 
@@ -212,12 +218,20 @@ const AppEngine = {
           this.currentRole = u.role;
           this.currentUser = u;
 
-          // Recalculate live contribution & tier on session init
-          const realTotal = this.getMemberTotalContribution(this.currentUser);
-          const realTierCalc = this.calculateMemberTier(realTotal);
-          this.currentUser.totalDonation = realTotal;
-          this.currentUser.tier = realTierCalc.tier;
-          localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
+          // Safely recalculate live contribution & tier if data exists
+          try {
+            const realTotal = (typeof this.getMemberTotalContribution === 'function') 
+              ? this.getMemberTotalContribution(this.currentUser) 
+              : Number(this.currentUser.total_donation || this.currentUser.totalDonation || 0);
+            if (realTotal > 0 && typeof this.calculateMemberTier === 'function') {
+              const realTierCalc = this.calculateMemberTier(realTotal);
+              this.currentUser.totalDonation = realTotal;
+              this.currentUser.tier = realTierCalc.tier;
+              localStorage.setItem('mbina_session_user', JSON.stringify(this.currentUser));
+            }
+          } catch (calcErr) {
+            console.warn("Tier calc error on initSession:", calcErr);
+          }
           return;
         }
       } catch (e) {
@@ -5110,7 +5124,18 @@ const AppEngine = {
       if (sidebar) sidebar.style.display = 'none';
       if (btnHamburger) btnHamburger.style.display = 'none';
       document.body.classList.remove('yt-has-sidebar');
+
+      const heroLoginBtn = document.getElementById('hero-v2-btn-login');
+      if (heroLoginBtn) {
+        heroLoginBtn.innerText = 'LOGIN MEMBER / PENGURUS';
+        heroLoginBtn.onclick = () => window.AuthEngine && window.AuthEngine.openModal('modal-login');
+      }
     } else {
+      const heroLoginBtn = document.getElementById('hero-v2-btn-login');
+      if (heroLoginBtn) {
+        heroLoginBtn.innerText = isAdminRole ? 'MASUK PORTAL ADMIN →' : 'BUKA DASHBOARD MEMBER →';
+        heroLoginBtn.onclick = () => this.navigateHomeForUser();
+      }
       if (userProfileWidget) {
         userProfileWidget.style.display = 'flex';
         const nameEl = document.getElementById('nav-user-name');
@@ -23267,11 +23292,11 @@ window.M7Engine = {
     const userPhoneInput = document.getElementById('sewa-form-phone');
 
     const memberName = user.name || 'Member MB INA';
-    const memberId = user.member_id || user.memberId || window.AppEngine?.getOfficialMemberId?.(user) || 'MBINA-HQ-2026-000001';
+    const officialMid = memberId || window.AppEngine?.getOfficialMemberId?.(user) || 'MBINA-HQ-2026-000001';
     const tierStr = (user.tier || 'BRONZE').toUpperCase();
 
     if (userNameInput) userNameInput.value = memberName;
-    if (userMemberIdInput) userMemberIdInput.value = memberId;
+    if (userMemberIdInput) userMemberIdInput.value = officialMid;
     if (userPhoneInput && user.phone) userPhoneInput.value = user.phone;
 
     let tierBadgeStr = '🥉 BRONZE';
