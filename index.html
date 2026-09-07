@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260907_v193_permanent_member_headers">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v193_permanent_member_headers">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v194_hide_sponsor_amounts_from_member">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v194_hide_sponsor_amounts_from_member">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -27,12 +27,14 @@
     [id^="modal-"]:not(.active) {
       display: none;
     }
-    /* Sembunyikan header Portal Admin dan tombol Kembali ke Dashboard Member dari Portal Member */
+    /* Sembunyikan header Portal Admin, nominal sponsor, dan tombol Kembali ke Dashboard Member dari Portal Member */
     body.member-mode #admin-dashboard-page-header,
     body.member-mode #btn-kop-return-admin,
     body.member-mode #btn-kop-bottom-return-admin,
     body.member-mode .m7-badge-admin,
     body.member-mode .m7-admin-actions,
+    body.member-mode .m6-sponsor-dana-masuk,
+    body.member-mode .m6-sponsor-nominal,
     #member-return-banner,
     #btn-m2-return-member,
     #btn-kop-return-member,
@@ -11278,8 +11280,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v193_permanent_member_headers"></script>
-  <script src="js/app.js?v=20260907_v193_permanent_member_headers"></script>
+  <script src="js/auth.js?v=20260907_v194_hide_sponsor_amounts_from_member"></script>
+  <script src="js/app.js?v=20260907_v194_hide_sponsor_amounts_from_member"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11364,6 +11366,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v193_permanent_member_headers"></script>
+  <script src="js/donation_manager.js?v=20260907_v194_hide_sponsor_amounts_from_member"></script>
 </body>
 </html>

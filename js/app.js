@@ -14129,9 +14129,11 @@ const M6Engine = {
                       <span style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); display:inline-flex; align-items:center; gap:6px;">
                         🤝 SPONSOR RESMI TERKONFIRMASI (${evtSponsors.length})
                       </span>
-                      <span style="font-size:0.72rem; color:var(--primary-emerald); font-weight:700;">
+                      ${!isMemberViewer ? `
+                      <span class="m6-sponsor-dana-masuk" style="font-size:0.72rem; color:var(--primary-emerald); font-weight:700;">
                         Dana Masuk: Rp ${totalSponsorVal.toLocaleString('id-ID')}
                       </span>
+                      ` : ''}
                     </div>
                     ${evtSponsors.length === 0 ? `
                       <div style="font-size:0.75rem; color:#94a3b8; font-style:italic;">Belum ada mitra sponsor terkonfirmasi untuk kegiatan ini.</div>
@@ -14141,7 +14143,9 @@ const M6Engine = {
                           <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(245,158,11,0.35); border-radius:20px; padding:4px 12px; display:inline-flex; align-items:center; gap:8px;">
                             <span style="font-size:0.8rem; font-weight:800; color:#fff;">${s.name}</span>
                             <span class="tier-badge" style="background:var(--accent-gold); color:#000; font-size:0.68rem; font-weight:900; padding:1px 8px; border-radius:12px;">${s.pkg}</span>
-                            <span style="font-size:0.72rem; color:var(--primary-emerald); font-weight:700;">Rp ${(s.value/1e6).toFixed(1)} JT</span>
+                            ${!isMemberViewer ? `
+                            <span class="m6-sponsor-nominal" style="font-size:0.72rem; color:var(--primary-emerald); font-weight:700;">Rp ${(s.value/1e6).toFixed(1)} JT</span>
+                            ` : ''}
                           </div>
                         `).join('')}
                       </div>

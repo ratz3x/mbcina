@@ -2838,6 +2838,12 @@ body.landing-mode footer.app-footer {
   width: 100% !important;
 }
 
+body.member-mode .m6-sponsor-dana-masuk,
+body.member-mode .m6-sponsor-nominal {
+  display: none !important;
+  visibility: hidden !important;
+}
+
 
 
 
