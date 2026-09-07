@@ -275,6 +275,12 @@ const AppEngine = {
     const landingView = document.getElementById('view-landing-page');
     if (landingView) landingView.style.display = 'block';
 
+    const globalNotifBtn = document.getElementById('global-notif-btn');
+    if (globalNotifBtn) {
+      const isLoggedIn = this.currentRole && this.currentRole !== 'GUEST';
+      globalNotifBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
+    }
+
     const adminSidebar = document.getElementById('app-sidebar');
     const memberSidebar = document.getElementById('member-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
@@ -5180,7 +5186,10 @@ const AppEngine = {
     const sidebar = document.getElementById('app-sidebar');
     const btnHamburger = document.getElementById('btn-hamburger-toggle');
 
+    const globalNotifBtn = document.getElementById('global-notif-btn');
+
     if (this.currentRole === 'GUEST' || !this.currentRole) {
+      if (globalNotifBtn) globalNotifBtn.style.display = 'none';
       if (userProfileWidget) userProfileWidget.style.display = 'none';
       if (btnLogout) btnLogout.style.display = 'none';
       if (btnLogin) btnLogin.style.display = 'inline-flex';
@@ -5212,6 +5221,7 @@ const AppEngine = {
         heroLoginBtn.onclick = () => window.AuthEngine && window.AuthEngine.openModal('modal-login');
       }
     } else {
+      if (globalNotifBtn) globalNotifBtn.style.display = 'inline-flex';
       document.body.classList.remove('landing-mode');
       const heroLoginBtn = document.getElementById('hero-v2-btn-login');
       if (heroLoginBtn) {
@@ -5489,18 +5499,19 @@ const AppEngine = {
   },
 
   // ============================================================
-  // 🌟 LANDING PAGE VERSION SWITCHER & V2 ENGINE
+  // 🌟 LANDING PAGE (MODERN LUXURY V2 SOLE ENGINE)
   // ============================================================
   currentLandingVersion: 'v2',
 
   initLandingVersion() {
-    const savedVer = localStorage.getItem('mbina_landing_version') || 'v2';
-    this.toggleLandingVersion(savedVer, false);
+    this.toggleLandingVersion('v2', false);
   },
 
-  toggleLandingVersion(version, save = true) {
-    this.currentLandingVersion = version || 'v2';
-    if (save) localStorage.setItem('mbina_landing_version', this.currentLandingVersion);
+  toggleLandingVersion(version = 'v2', save = false) {
+    this.currentLandingVersion = 'v2';
+    try {
+      localStorage.setItem('mbina_landing_version', 'v2');
+    } catch(e) {}
 
     const landingView = document.getElementById('view-landing-page');
     // Hanya alihkan tampilan ke landing page jika role adalah GUEST atau memang landingView sedang aktif
@@ -5513,8 +5524,8 @@ const AppEngine = {
 
     const v2Container = document.getElementById('landing-v2-container');
     const v1Container = document.getElementById('landing-v1-container');
-    const btnV2 = document.getElementById('btn-toggle-v2');
-    const btnV1 = document.getElementById('btn-toggle-v1');
+    if (v2Container) v2Container.style.display = 'block';
+    if (v1Container) v1Container.style.display = 'none';
 
     // Pastikan kedua sidebar selalu tertutup HANYA jika landing page sedang aktif
     if (landingView && landingView.style.display !== 'none') {
@@ -5534,44 +5545,6 @@ const AppEngine = {
       if (backdrop) backdrop.style.setProperty('display', 'none', 'important');
       document.body.classList.remove('yt-has-sidebar', 'member-mode', 'yt-sidebar-expanded');
       document.body.classList.add('landing-mode');
-    }
-
-    if (this.currentLandingVersion === 'v1') {
-      if (v2Container) v2Container.style.display = 'none';
-      if (v1Container) v1Container.style.display = 'block';
-
-      if (btnV1) {
-        btnV1.style.background = 'linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)';
-        btnV1.style.color = '#000';
-        btnV1.style.fontWeight = '800';
-        btnV1.style.boxShadow = '0 2px 10px rgba(212,175,55,0.35)';
-        btnV1.style.border = 'none';
-      }
-      if (btnV2) {
-        btnV2.style.background = 'rgba(255,255,255,0.05)';
-        btnV2.style.color = '#94a3b8';
-        btnV2.style.fontWeight = '600';
-        btnV2.style.boxShadow = 'none';
-        btnV2.style.border = '1px solid rgba(255,255,255,0.1)';
-      }
-    } else {
-      if (v1Container) v1Container.style.display = 'none';
-      if (v2Container) v2Container.style.display = 'block';
-
-      if (btnV2) {
-        btnV2.style.background = 'linear-gradient(135deg, #d4af37 0%, #aa7c11 100%)';
-        btnV2.style.color = '#000';
-        btnV2.style.fontWeight = '800';
-        btnV2.style.boxShadow = '0 2px 10px rgba(212,175,55,0.35)';
-        btnV2.style.border = 'none';
-      }
-      if (btnV1) {
-        btnV1.style.background = 'rgba(255,255,255,0.05)';
-        btnV1.style.color = '#94a3b8';
-        btnV1.style.fontWeight = '600';
-        btnV1.style.boxShadow = 'none';
-        btnV1.style.border = '1px solid rgba(255,255,255,0.1)';
-      }
     }
 
     if (typeof this.updateLandingCounters === 'function') this.updateLandingCounters();
@@ -28379,6 +28352,11 @@ window.NotificationEngine = {
 
   updateBadgeCounters: function() {
     const unread = this.getUnreadCount();
+    const globalNotifBtn = document.getElementById('global-notif-btn');
+    const isLoggedIn = window.AppEngine && window.AppEngine.currentRole && window.AppEngine.currentRole !== 'GUEST';
+    if (globalNotifBtn) {
+      globalNotifBtn.style.display = isLoggedIn ? 'inline-flex' : 'none';
+    }
     const globalBadge = document.getElementById('global-notif-badge');
     const memberBadge = document.getElementById('member-portal-notif-badge');
     const sponsorBadge = document.querySelector('#view-sponsor-dashboard [title="Notifikasi Sponsor"] span');

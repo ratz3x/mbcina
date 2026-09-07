@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260907_v185_no_sidebar_on_landing">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v185_no_sidebar_on_landing">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v186_landing_modern_luxury_only">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v186_landing_modern_luxury_only">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -165,8 +165,8 @@
         <span class="hide-mobile" style="font-size:0.7rem; letter-spacing:0.04em; text-transform:uppercase;">Theme</span>
       </button>
 
-      <!-- Global Notification Center Button -->
-      <button id="global-notif-btn" class="btn-outline" style="position:relative; padding:6px 9px; border-radius:18px; border:1px solid rgba(226,232,240,0.18); background:rgba(255,255,255,0.03); color:#CBD5E1; display:flex; align-items:center; justify-content:center;" onclick="NotificationEngine.openModal()" title="Pusat Notifikasi">
+      <!-- Global Notification Center Button (Only visible after member/admin login) -->
+      <button id="global-notif-btn" class="btn-outline" style="position:relative; padding:6px 9px; border-radius:18px; border:1px solid rgba(226,232,240,0.18); background:rgba(255,255,255,0.03); color:#CBD5E1; display:none; align-items:center; justify-content:center;" onclick="NotificationEngine.openModal()" title="Pusat Notifikasi">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span id="global-notif-badge" style="position:absolute; top:-3px; right:-3px; background:#f43f5e; color:#fff; font-size:0.6rem; font-weight:800; padding:1px 5px; border-radius:10px; border:1.5px solid #0A0B10;">4</span>
       </button>
@@ -6167,22 +6167,6 @@
     <div id="view-landing-page" class="view-container" style="display:block;">
       <div style="max-width:1440px; margin:0 auto; padding:20px 24px;">
 
-        <!-- 🔄 TOP VERSION SWITCHER BAR -->
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding:10px 20px; background:rgba(14,19,31,0.7); border:1px solid rgba(212,175,55,0.25); border-radius:14px; backdrop-filter:blur(12px);">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="display:inline-flex; width:8px; height:8px; border-radius:50%; background:#d4af37; box-shadow:0 0 10px #d4af37;"></span>
-            <span style="font-size:0.8rem; font-weight:700; color:#e2e8f0; letter-spacing:0.06em; text-transform:uppercase;">Pilihan Tampilan Landing Page:</span>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button id="btn-toggle-v2" type="button" onclick="AppEngine.toggleLandingVersion('v2')" style="font-size:0.75rem; font-weight:800; padding:6px 14px; border-radius:10px; cursor:pointer; background:linear-gradient(135deg, #d4af37 0%, #aa7c11 100%); color:#000; border:none; box-shadow:0 2px 10px rgba(212,175,55,0.35); transition:all 0.2s;">
-              ✨ Versi 2 (Modern Luxury)
-            </button>
-            <button id="btn-toggle-v1" type="button" onclick="AppEngine.toggleLandingVersion('v1')" style="font-size:0.75rem; font-weight:600; padding:6px 14px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,0.05); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); transition:all 0.2s;">
-              🏛️ Versi 1 (Classic)
-            </button>
-          </div>
-        </div>
-
         <!-- ============================================================ -->
         <!-- 🌟 LANDING PAGE VERSI 2 - LUXURY DARK AUTOMOTIVE (DEFAULT) -->
         <!-- ============================================================ -->
@@ -6733,166 +6717,6 @@
             </div>
           </footer>
 
-        </div>
-
-        <!-- ============================================================ -->
-        <!-- 🏛️ LANDING PAGE VERSI 1 - KLASIK (TOGGLEABLE) -->
-        <!-- ============================================================ -->
-        <div id="landing-v1-container" style="display:none;">
-          <div style="max-width:1440px; margin:0 auto; padding:24px;">
-
-        <!-- HERO SECTION -->
-        <section class="hero-section">
-          <img src="assets/mb_hero.jpg" alt="MB Club INA" class="hero-bg-img">
-          <div class="hero-overlay"></div>
-          <div class="hero-content">
-            <h1 class="hero-title-modern">
-              <span class="hero-title-light">The Home of</span>
-              <span class="hero-title-italic-bold">Star Enthusiasts</span>
-            </h1>
-            <p class="hero-description-modern">
-              Wadah resmi bagi seluruh pecinta dan pemilik Mercedes-Benz di Indonesia. Menjaga warisan, merayakan inovasi, dan mempererat persaudaraan antar bintang.
-            </p>
-            <div class="btn-group">
-              <button class="btn-primary" data-open-modal="modal-register">
-                [Daftar Member] →
-              </button>
-              <button class="btn-outline" data-open-modal="modal-login">
-                [Login Member / Pengurus]
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- STATISTIK (Member, Klub, Event) - REAL-TIME SUPABASE COUNTER -->
-        <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:20px; margin-bottom:48px;">
-          <div class="glass-panel" style="padding:24px; text-align:center;">
-            <div id="landing-stat-members" style="font-size:2.4rem; font-weight:900; color:var(--accent-gold); font-family:var(--font-heading);">18</div>
-            <div style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Member Terdaftar</div>
-            <p id="landing-stat-members-sub" style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Di 38 Provinsi Indonesia</p>
-          </div>
-          <div class="glass-panel" style="padding:24px; text-align:center;">
-            <div id="landing-stat-clubs" style="font-size:2.4rem; font-weight:900; color:var(--accent-blue); font-family:var(--font-heading);">23</div>
-            <div style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Klub & Chapter Resmi</div>
-            <p id="landing-stat-clubs-sub" style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">8 Regional Wilayah</p>
-          </div>
-          <div class="glass-panel" style="padding:24px; text-align:center;">
-            <div id="landing-stat-events" style="font-size:2.4rem; font-weight:900; color:var(--primary-emerald); font-family:var(--font-heading);">4</div>
-            <div style="font-size:0.9rem; font-weight:600; color:var(--text-main);">Agenda Event & Jamnas</div>
-            <p id="landing-stat-events-sub" style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;">Touring & Social Rally</p>
-          </div>
-        </section>
-
-        <!-- TENTANG KAMI (Informasi Organisasi & Visi Misi) -->
-        <section id="tentang-kami-section" style="margin-bottom:48px;">
-          <div class="glass-panel" style="padding:36px;">
-            <div style="max-width:800px; margin:0 auto; text-align:center; margin-bottom:32px;">
-              <span class="hero-badge">Tentang MB INA</span>
-              <h2 style="font-size:2rem; margin-top:8px;" class="text-gradient">Visi & Misi Mercedes-Benz Club Indonesia</h2>
-              <p style="color:var(--text-muted); font-size:1rem; margin-top:12px;">
-                MB INA didirikan pada Agustus 2004 di Jakarta untuk menyatukan klub dan pengagum otomotif dalam wadah organisasi yang solid, berasas solidaritas, serta menjunjung tinggi keselamatan berkendara di Indonesia.
-              </p>
-            </div>
-
-            <div id="landing-vm-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
-              <div class="glass-card" style="padding:28px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); border-radius:16px;">
-                <div style="display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:14px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.25); color:var(--accent-gold); margin-bottom:14px;">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-                </div>
-                <h3 style="font-size:1.2rem; margin-bottom:10px; color:var(--accent-gold); font-weight:800;">Visi Utama</h3>
-                <p style="font-size:0.92rem; color:var(--text-main); line-height:1.7; font-style:italic;">
-                  "Menjadi wadah komunitas Mercedes-Benz terbesar, terbaik, dan paling solid di Indonesia serta menjadi kebanggaan bangsa."
-                </p>
-              </div>
-              <div class="glass-card" style="padding:28px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); border-radius:16px;">
-                <h3 style="font-size:1.2rem; margin-bottom:14px; color:var(--accent-gold); font-weight:800;">Misi Strategis</h3>
-                <ul style="font-size:0.85rem; color:var(--text-muted); padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; margin:0;">
-                  <li style="display:flex; align-items:center; gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-emerald); flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Mempererat tali persaudaraan antar anggota.</li>
-                  <li style="display:flex; align-items:center; gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-emerald); flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Menyediakan platform edukasi tentang Mercedes-Benz.</li>
-                  <li style="display:flex; align-items:center; gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-emerald); flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Aktif dalam kegiatan sosial dan bakti sosial.</li>
-                  <li style="display:flex; align-items:center; gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-emerald); flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Melestarikan dan mengapresiasi warisan otomotif Mercedes-Benz.</li>
-                  <li style="display:flex; align-items:center; gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary-emerald); flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Terus berkembang dan beradaptasi dengan era digital.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SPONSOR UTAMA & PLATINUM (4x2 Grid - 8 Kartu Sponsor) -->
-        <section id="sponsors-landing-section" style="margin-bottom:48px;">
-          <div style="margin-bottom:20px;">
-            <span class="hero-badge">Official Partners</span>
-            <h2 style="font-size:1.8rem; margin-top:6px;" class="text-gradient">🤝 Sponsor Utama & Platinum MB INA</h2>
-            <p style="color:var(--text-muted); font-size:0.9rem;">Mitra strategis perbankan, energi, pelumas, dan otomotif pendukung utama seluruh kegiatan Mercedes-Benz Club Indonesia</p>
-          </div>
-          <div id="landing-sponsors-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px;">
-            <!-- Rendered dynamically by AppEngine.renderLandingSponsors() -->
-          </div>
-        </section>
-
-        <!-- EVENT TERBARU (Card) -->
-        <section id="events-section" style="margin-bottom:48px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
-            <div>
-              <h2 style="font-size:1.8rem;" class="text-gradient">Event Terbaru MB INA</h2>
-              <p style="color:var(--text-muted); font-size:0.9rem;">Jadwal event touring, gathering, dan jambore nasional mendatang</p>
-            </div>
-          </div>
-          <div id="events-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:20px;"></div>
-        </section>
-
-        <!-- TESTIMONI MEMBER -->
-        <section id="testimoni-section" style="margin-bottom:48px;">
-          <div style="margin-bottom:20px;">
-            <h2 style="font-size:1.8rem;" class="text-gradient">Testimoni Member & Pengurus</h2>
-            <p style="color:var(--text-muted); font-size:0.9rem;">Apa kata para pengurus dan member mengenai platform digital MB INA</p>
-          </div>
-          <div id="testimonials-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px;"></div>
-        </section>
-
-        <!-- FOOTER SECTION -->
-        <footer style="border-top:1px solid var(--chrome-border); padding-top:40px; margin-top:40px;">
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:32px; margin-bottom:32px;">
-            <div>
-              <div class="logo-container" style="margin-bottom:12px; display:flex; align-items:center; gap:10px;">
-                <img src="assets/mb_badge.jpg" alt="MB INA Logo" style="width:36px; height:36px; border-radius:50%; border:1px solid var(--accent-gold);">
-                <div>
-                  <div class="brand-title text-gradient" style="font-weight:900; font-size:1.1rem;">MB Club INA</div>
-                  <div class="brand-subtitle" style="font-size:0.75rem; color:var(--accent-gold);">Portal Resmi Mercedes Benz Club Indonesia</div>
-                </div>
-              </div>
-              <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">
-                Platform resmi manajemen keanggotaan dan klub Mercedes-Benz se-Indonesia dengan sistem RBAC & Supabase Cloud PostgreSQL.
-              </p>
-            </div>
-
-            <div>
-              <h4 style="font-size:1rem; margin-bottom:14px; color:var(--accent-gold);">Navigasi Cepat</h4>
-              <ul style="list-style:none; padding:0; font-size:0.85rem; display:flex; flex-direction:column; gap:8px;">
-                <li><a href="#tentang-kami-section" style="color:var(--text-muted); text-decoration:none;">Tentang Kami & Visi Misi</a></li>
-                <li><a href="#sponsors-landing-section" style="color:var(--text-muted); text-decoration:none;">Sponsor Utama & Platinum</a></li>
-                <li><a href="#events-section" style="color:var(--text-muted); text-decoration:none;">Event Terbaru & Jamnas</a></li>
-                <li><a href="#testimoni-section" style="color:var(--text-muted); text-decoration:none;">Testimoni Member</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 style="font-size:1rem; margin-bottom:14px; color:var(--accent-gold);">Kontak Sekretariat</h4>
-              <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
-                📍 Gedung Sekretariat MB INA, Jakarta Selatan<br>
-                📞 WhatsApp: +62 821-2970-9595<br>
-                ✉️ Email: info@mbina.or.id
-              </p>
-            </div>
-          </div>
-
-          <div style="border-top:1px solid var(--chrome-border); padding-top:20px; text-align:center; font-size:0.8rem; color:var(--text-muted);">
-            © 2026 Mercedes-Benz Club Indonesia (MB INA). All rights reserved. Created by Derist Touriano (Super Admin & System Architect).
-          </div>
-        </footer>
-
-      </div>
-    
         </div>
 
       </div>
@@ -11470,8 +11294,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v185_no_sidebar_on_landing"></script>
-  <script src="js/app.js?v=20260907_v185_no_sidebar_on_landing"></script>
+  <script src="js/auth.js?v=20260907_v186_landing_modern_luxury_only"></script>
+  <script src="js/app.js?v=20260907_v186_landing_modern_luxury_only"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11556,6 +11380,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v185_no_sidebar_on_landing"></script>
+  <script src="js/donation_manager.js?v=20260907_v186_landing_modern_luxury_only"></script>
 </body>
 </html>
