@@ -528,6 +528,8 @@ const AppEngine = {
 
   openMemberEvents() {
     this._switchToMemberAdminTab('admin-tab-m6_event', 'member_events');
+    const titleEl = document.getElementById('m6-event-module-title');
+    if (titleEl) titleEl.innerText = 'Event & Touring';
     // Sembunyikan tab yang tidak boleh dilihat member (Proposal & RAB, Persetujuan Presiden)
     const m6tabs = document.querySelectorAll('[data-m6-subtab]');
     m6tabs.forEach(btn => {
@@ -5057,6 +5059,8 @@ const AppEngine = {
     } else if (tab === 'm5_forum') {
       this.renderM5Module();
     } else if (tab === 'm6_event') {
+      const titleEl = document.getElementById('m6-event-module-title');
+      if (titleEl) titleEl.innerText = this.isMemberUser() ? 'Event & Touring' : 'Manajemen Event';
       if (window.M6Engine) {
         M6Engine.init();
         M6Engine.switchSubtab('6_1_proposal');
@@ -13980,6 +13984,7 @@ const M6Engine = {
       return;
     }
 
+    const isMemberViewer = (window.AppEngine && typeof window.AppEngine.isMemberUser === 'function' && window.AppEngine.isMemberUser()) || document.body.classList.contains('member-mode');
     const curEvent = this.publishedEvents.find(e => e.id === this.selectedEventId || e.code === this.selectedEventId) || this.publishedEvents[0];
     const participants = this.getParticipantsForEvent(curEvent.id || curEvent.code);
     const verifiedCount = participants.filter(p => p.status === 'VERIFIED' || p.status === 'ACCEPTED').length;
@@ -14126,8 +14131,10 @@ const M6Engine = {
                   <span>Daftar Online</span>
                 </button>
                 <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openOfflineRegModal('${e.id || e.code}')">Daftar Offline</button>
+                ${!isMemberViewer ? `
                 <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openOfficialProposalModal('${e.id || e.code}')">Proposal PDF</button>
                 <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openEditPublishedEventModal('${e.id || e.code}')">Edit Data</button>
+                ` : ''}
               </div>
             </div>
           `;
