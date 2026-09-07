@@ -334,8 +334,6 @@
       if (!container) return;
 
       const isMember = (typeof document !== 'undefined' && document.body.classList.contains('member-mode')) || (window.AppEngine && typeof window.AppEngine.isMemberUser === 'function' && window.AppEngine.isMemberUser());
-      const donTitleAdminStyle = isMember ? 'display:none;' : 'display:inline;';
-      const donTitleMemberStyle = isMember ? 'display:inline;' : 'display:none;';
       const donBadgeAdminStyle = isMember ? 'display:none;' : 'inline-block;';
       const donActionsAdminStyle = isMember ? 'display:none;' : 'display:flex;';
 
@@ -346,8 +344,7 @@
             <div>
               <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
                 <h1 id="mbux-donation-title" class="mbux-chrome-text" style="margin:0; font-size:1.5rem; font-weight:700; letter-spacing:-0.02em;">
-                  <span class="m7-title-admin" style="${donTitleAdminStyle}">Manajemen Donasi &amp; Filantropi</span>
-                  <span class="m7-title-member" style="${donTitleMemberStyle}">Donasi &amp; Filantropi</span>
+                  Donasi &amp; Filantropi
                 </h1>
                 <span class="m7-badge-admin" style="${donBadgeAdminStyle}font-family:monospace; font-size:0.65rem; color:#CBD5E1; border:1px solid rgba(226,232,240,0.2); background:rgba(255,255,255,0.03); padding:3px 8px; border-radius:6px; letter-spacing:0.08em; text-transform:uppercase;">
                   MBUX CORE // V4 DATABASE

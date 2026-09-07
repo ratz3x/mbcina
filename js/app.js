@@ -516,16 +516,7 @@ const AppEngine = {
   openMemberOrganisasi() {
     this._switchToMemberAdminTab('admin-tab-m2_org', 'member_org');
     const titleEl = document.getElementById('m2-org-module-title');
-    if (titleEl) {
-      const memSpan = titleEl.querySelector('.m2-title-member');
-      const admSpan = titleEl.querySelector('.m2-title-admin');
-      if (memSpan && admSpan) {
-        memSpan.style.display = 'inline';
-        admSpan.style.display = 'none';
-      } else {
-        titleEl.innerText = '🏛️ Organisasi & Federasi';
-      }
-    }
+    if (titleEl) titleEl.innerText = '🏛️ Organisasi & Federasi';
     this.renderM2Module();
     this.hideM2AdminActionsForMember();
   },
@@ -580,17 +571,10 @@ const AppEngine = {
     this.switchDonationSubtab('7_3_1_progress');
 
     const updateDonationTitles = () => {
-      ['mbux-donation-title', 'm7-donation-module-title'].forEach(id => {
-        const titleEl = document.getElementById(id);
-        if (titleEl) {
-          const memSpan = titleEl.querySelector('.m7-title-member');
-          const admSpan = titleEl.querySelector('.m7-title-admin');
-          if (memSpan && admSpan) {
-            memSpan.style.display = 'inline';
-            admSpan.style.display = 'none';
-          }
-        }
-      });
+      const m7Title = document.getElementById('m7-donation-module-title');
+      if (m7Title) m7Title.innerText = '❤️ Donasi & Filantropi';
+      const mbuxTitle = document.getElementById('mbux-donation-title');
+      if (mbuxTitle) mbuxTitle.innerText = 'Donasi & Filantropi';
       const badge = document.querySelector('.m7-badge-admin');
       if (badge) badge.style.display = 'none';
       const actions = document.querySelector('.m7-admin-actions');
@@ -5088,18 +5072,9 @@ const AppEngine = {
     } else if (tab === 'settings') {
       this.switchM1Subtab('settings');
     } else if (tab === 'm2_org') {
-      const isMem = this.isMemberUser();
+      const isMem = this.isMemberUser() || document.body.classList.contains('member-mode');
       const titleEl = document.getElementById('m2-org-module-title');
-      if (titleEl) {
-        const memSpan = titleEl.querySelector('.m2-title-member');
-        const admSpan = titleEl.querySelector('.m2-title-admin');
-        if (memSpan && admSpan) {
-          memSpan.style.display = isMem ? 'inline' : 'none';
-          admSpan.style.display = isMem ? 'none' : 'inline';
-        } else {
-          titleEl.innerText = isMem ? '🏛️ Organisasi & Federasi' : '🏛️ Manajemen Organisasi & Federasi';
-        }
-      }
+      if (titleEl) titleEl.innerText = '🏛️ Organisasi & Federasi';
       this.renderM2Module();
       if (isMem) {
         this.hideM2AdminActionsForMember();
@@ -5123,7 +5098,7 @@ const AppEngine = {
         M6Engine.switchSubtab('6_4_sponsorship');
       }
     } else if (tab === 'm7_donation') {
-      const isMem = this.isMemberUser();
+      const isMem = this.isMemberUser() || document.body.classList.contains('member-mode');
       if (!isMem) {
         const donTabs = document.querySelectorAll('#admin-tab-m7_donation [data-m73-subtab]');
         donTabs.forEach(btn => btn.style.display = '');
@@ -5133,17 +5108,10 @@ const AppEngine = {
       } else if (typeof this.renderDonationModule === 'function') {
         this.renderDonationModule();
       }
-      ['mbux-donation-title', 'm7-donation-module-title'].forEach(id => {
-        const titleEl = document.getElementById(id);
-        if (titleEl) {
-          const memSpan = titleEl.querySelector('.m7-title-member');
-          const admSpan = titleEl.querySelector('.m7-title-admin');
-          if (memSpan && admSpan) {
-            memSpan.style.display = isMem ? 'inline' : 'none';
-            admSpan.style.display = isMem ? 'none' : 'inline';
-          }
-        }
-      });
+      const m7Title = document.getElementById('m7-donation-module-title');
+      if (m7Title) m7Title.innerText = '❤️ Donasi & Filantropi';
+      const mbuxTitle = document.getElementById('mbux-donation-title');
+      if (mbuxTitle) mbuxTitle.innerText = 'Donasi & Filantropi';
       const badge = document.querySelector('.m7-badge-admin');
       if (badge) badge.style.display = isMem ? 'none' : 'inline-block';
       const actions = document.querySelector('.m7-admin-actions');
