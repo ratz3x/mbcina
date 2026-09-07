@@ -1164,11 +1164,14 @@ const AppEngine = {
     const dateFormatted = evt.start_formatted || (evt.start_date ? new Date(evt.start_date).toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric'}) : '5 September 2026');
     const timeFormatted = (evt.start_date && evt.start_date.includes('T')) ? evt.start_date.split('T')[1].slice(0,5) + ' WIB' : '14:00 WIB';
 
+    const now = new Date();
+    const isCompleted = evt.lifecycle === 'COMPLETED' || (now > new Date(evt.end_date || evt.date_end || evt.start_date || evt.date_start || 0));
+
     modal.innerHTML = `
       <div class="modal-container" style="max-width:560px; max-height:90vh; overflow-y:auto;">
         <div class="modal-header">
           <div>
-            <span style="font-family:monospace; font-weight:700; color:var(--accent-gold); font-size:0.75rem; background:rgba(245,158,11,0.12); padding:2px 8px; border-radius:4px; border:1px solid rgba(245,158,11,0.25);">${evt.code || evt.event_code || 'EVT'}</span>
+            <span style="font-family:monospace; font-weight:700; color:${isCompleted ? '#94a3b8' : 'var(--accent-gold)'}; font-size:0.75rem; background:${isCompleted ? 'rgba(255,255,255,0.05)' : 'rgba(245,158,11,0.12)'}; padding:2px 8px; border-radius:4px; border:1px solid ${isCompleted ? 'rgba(255,255,255,0.15)' : 'rgba(245,158,11,0.25)'};">${evt.code || evt.event_code || 'EVT'}</span>
             <h3 style="font-size:1.15rem; margin-top:4px; color:#fff;" class="text-gradient">${evt.title}</h3>
           </div>
           <button class="modal-close-btn" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none';">✕</button>
@@ -1180,16 +1183,25 @@ const AppEngine = {
               <div><span style="color:var(--text-muted);">Biaya Pendaftaran:</span><br><strong>${priceDisplay}</strong></div>
               <div style="grid-column:1 / -1;"><span style="color:var(--text-muted);">Lokasi & Alamat:</span><br><strong style="color:#fff;">${evt.location || evt.address || 'TOPGOLF Fatmawati, Jakarta'}</strong></div>
               <div><span style="color:var(--text-muted);">Kapasitas Peserta:</span><br><strong style="color:var(--accent-gold);">${evt.capacity || 150} Orang</strong></div>
-              <div><span style="color:var(--text-muted);">Status Kegiatan:</span><br><span style="color:var(--primary-emerald); font-weight:700;">Resmi Disetujui</span></div>
+              <div><span style="color:var(--text-muted);">Status Kegiatan:</span><br>${isCompleted ? '<span style="color:#cbd5e1; font-weight:700; background:rgba(148,163,184,0.15); padding:2px 8px; border-radius:6px; border:1px solid rgba(148,163,184,0.3);">📁 Selesai (Arsip Event)</span>' : '<span style="color:var(--primary-emerald); font-weight:700;">🟢 Resmi Disetujui</span>'}</div>
             </div>
           </div>
           <div style="margin-bottom:16px;">
             <div style="font-size:0.75rem; font-weight:700; color:var(--accent-gold); text-transform:uppercase; margin-bottom:6px;">Rangkaian Agenda Kegiatan</div>
             <div style="font-size:0.82rem; color:#cbd5e1; background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); white-space:pre-line; line-height:1.6;">${evt.description || 'Kegiatan resmi Mercedes-Benz Club Indonesia.'}</div>
           </div>
-          <div style="display:flex; gap:10px; justify-content:flex-end;">
-            <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','ONLINE');">Daftar Online</button>
-            <button class="btn-primary" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); font-weight:600; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','OFFLINE');">Daftar Offline</button>
+          <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; align-items:center;">
+            ${isCompleted ? `
+              <span style="font-size:0.8rem; color:#94a3b8; background:rgba(255,255,255,0.04); padding:6px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                🔒 Pendaftaran Ditutup (Event Selesai)
+              </span>
+              <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px; border-radius:8px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; if(window.M6Engine){ M6Engine.switchSubtab('6_5_gallery'); }">
+                🖼️ Buka Galeri & Dokumentasi
+              </button>
+            ` : `
+              <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','ONLINE');">Daftar Online</button>
+              <button class="btn-primary" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); font-weight:600; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','OFFLINE');">Daftar Offline</button>
+            `}
           </div>
         </div>
       </div>
@@ -13953,10 +13965,27 @@ const M6Engine = {
 
     const approvedProps = Array.from(propMap.values());
     
+    const now = new Date();
     this.publishedEvents = approvedProps.map(p => {
       const code = p.event_code || 'EVT-2026-012';
       const sDate = p.date_start ? (p.date_start.includes('T') ? p.date_start : p.date_start + 'T14:00') : (code === 'EVT-2026-012' ? '2026-09-05T14:00' : '2026-09-13T08:00');
       const eDate = p.date_end ? (p.date_end.includes('T') ? p.date_end : p.date_end + 'T17:00') : (code === 'EVT-2026-012' ? '2026-09-05T17:00' : '2026-09-14T18:00');
+
+      const sObj = new Date(sDate);
+      const eObj = new Date(eDate || sDate);
+      const isCompleted = now > eObj;
+      const isOngoing = now >= sObj && now <= eObj;
+      const lifecycle = isCompleted ? 'COMPLETED' : (isOngoing ? 'ONGOING' : 'UPCOMING');
+
+      let badgeColor = 'rgba(16,185,129,0.2)';
+      let badgeText = '🟢 PUBLISHED (DISETUJUI PRESIDEN)';
+      if (isCompleted) {
+        badgeColor = 'rgba(148,163,184,0.15)';
+        badgeText = '📁 ARSIP EVENT (SELESAI)';
+      } else if (isOngoing) {
+        badgeColor = 'rgba(239,68,68,0.2)';
+        badgeText = '🔴 SEDANG BERLANGSUNG';
+      }
 
       return {
         id: p.event_code || p.id || code,
@@ -13975,21 +14004,35 @@ const M6Engine = {
         htm_nett: p.htm_base || 0,
         total_budget: Number(p.total_budget) || (p.rab_items && Array.isArray(p.rab_items) && p.rab_items.length ? p.rab_items.reduce((s, it) => s + ((it.qty || 1) * (it.unit_cost || it.price || 0)), 0) : (code === 'EVT-2026-004' ? 500000000 : (code === 'EVT-2026-002' ? 250000000 : (code === 'EVT-2026-003' ? 120000000 : (code === 'EVT-2026-012' ? 35000000 : 75000000))))),
         rab_items: p.rab_items || [],
-        status: 'PUBLISHED',
-        badge_color: 'rgba(16,185,129,0.2)',
-        badge_text: '🟢 PUBLISHED (DISETUJUI PRESIDEN)'
+        status: isCompleted ? 'ARCHIVED' : 'PUBLISHED',
+        lifecycle: lifecycle,
+        badge_color: badgeColor,
+        badge_text: badgeText
       };
     });
 
-    // Sort so closest upcoming event is first
+    // Sort: upcoming & ongoing first (start_date asc), then completed (start_date desc)
     this.publishedEvents.sort((a, b) => {
       const da = new Date(a.start_date || 0);
       const db = new Date(b.start_date || 0);
-      return da - db;
+      const aDone = a.lifecycle === 'COMPLETED';
+      const bDone = b.lifecycle === 'COMPLETED';
+      if (aDone && !bDone) return 1;
+      if (!aDone && bDone) return -1;
+      return aDone ? (db - da) : (da - db);
     });
 
+    const upcomingEvents = this.publishedEvents.filter(e => e.lifecycle !== 'COMPLETED');
+    const defaultUpcomingId = upcomingEvents[0]?.id || this.publishedEvents[0]?.id || 'EVT-2026-001';
+
     if (!this.selectedEventId || !this.publishedEvents.some(e => e.id === this.selectedEventId || e.code === this.selectedEventId)) {
-      this.selectedEventId = this.publishedEvents[0]?.id || 'EVT-2026-012';
+      this.selectedEventId = defaultUpcomingId;
+    } else {
+      // If currently selected event is completed and user didn't explicitly select an archive filter, prefer upcoming by default
+      const cur = this.publishedEvents.find(e => e.id === this.selectedEventId || e.code === this.selectedEventId);
+      if (cur && cur.lifecycle === 'COMPLETED' && !this._explicitEventSelection && upcomingEvents.length > 0) {
+        this.selectedEventId = defaultUpcomingId;
+      }
     }
 
     try {
@@ -14060,24 +14103,61 @@ const M6Engine = {
       return '<span class="tier-badge" style="background:rgba(255,255,255,0.05); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); font-weight:600; padding:2px 8px; font-size:0.7rem; border-radius:20px;">Non-Member</span>';
     };
 
+    const activeFilter = this._publishEventsFilter || 'UPCOMING';
+    const upcomingList = this.publishedEvents.filter(e => e.lifecycle !== 'COMPLETED');
+    const completedList = this.publishedEvents.filter(e => e.lifecycle === 'COMPLETED');
+
+    let displayList = [];
+    if (activeFilter === 'UPCOMING') {
+      displayList = upcomingList;
+    } else if (activeFilter === 'COMPLETED') {
+      displayList = completedList;
+    } else {
+      displayList = this.publishedEvents;
+    }
+
     cardsContainer.innerHTML = `
+      <!-- SUB-FILTER TABS & STATUS BAR -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px; background:rgba(255,255,255,0.02); padding:12px 18px; border-radius:14px; border:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${activeFilter === 'UPCOMING' ? '#34d399' : 'rgba(255,255,255,0.08)'}; background:${activeFilter === 'UPCOMING' ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)'}; color:${activeFilter === 'UPCOMING' ? '#34d399' : '#94a3b8'}; font-weight:${activeFilter === 'UPCOMING' ? '800' : '600'};" onclick="M6Engine.setPublishEventsFilter('UPCOMING')">
+            🔥 Event Aktif & Akan Datang (${upcomingList.length})
+          </button>
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${activeFilter === 'COMPLETED' ? '#94a3b8' : 'rgba(255,255,255,0.08)'}; background:${activeFilter === 'COMPLETED' ? 'rgba(148,163,184,0.15)' : 'rgba(255,255,255,0.03)'}; color:${activeFilter === 'COMPLETED' ? '#e2e8f0' : '#94a3b8'}; font-weight:${activeFilter === 'COMPLETED' ? '800' : '600'};" onclick="M6Engine.setPublishEventsFilter('COMPLETED')">
+            📁 Arsip Event (Selesai) (${completedList.length})
+          </button>
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${activeFilter === 'ALL' ? 'var(--accent-gold)' : 'rgba(255,255,255,0.08)'}; background:${activeFilter === 'ALL' ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.03)'}; color:${activeFilter === 'ALL' ? 'var(--accent-gold)' : '#94a3b8'}; font-weight:${activeFilter === 'ALL' ? '800' : '600'};" onclick="M6Engine.setPublishEventsFilter('ALL')">
+            📋 Semua Event (${this.publishedEvents.length})
+          </button>
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-muted); display:inline-flex; align-items:center; gap:6px;">
+          <span>Waktu Sistem:</span>
+          <span style="color:#ffffff; font-family:monospace; font-weight:700; background:rgba(255,255,255,0.05); padding:2px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+        </div>
+      </div>
+
       <!-- TOP: GRID OF OFFICIAL PUBLISHED EVENT CARDS -->
       <div style="display:flex; flex-direction:column; gap:20px; margin-bottom:28px;">
-        ${this.publishedEvents.map(e => {
+        ${displayList.length === 0 ? `
+          <div style="text-align:center; padding:36px; color:var(--text-muted); background:rgba(255,255,255,0.02); border-radius:16px; border:1px dashed rgba(255,255,255,0.1);">
+            Tidak ada event pada kategori ini.
+          </div>
+        ` : displayList.map(e => {
           const isSelected = e.id === curEvent.id || e.code === curEvent.code;
+          const isCompleted = e.lifecycle === 'COMPLETED';
           const evtParts = this.getParticipantsForEvent(e.id || e.code);
 
           return `
-            <div class="glass-card" style="padding:22px; border:1px solid ${isSelected ? 'var(--accent-gold)' : 'rgba(255,255,255,0.08)'}; background:${isSelected ? 'rgba(212,175,55,0.04)' : 'rgba(255,255,255,0.02)'}; backdrop-filter:blur(14px); border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease;">
+            <div class="glass-card" style="padding:22px; border:1px solid ${isSelected ? 'var(--accent-gold)' : (isCompleted ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)')}; background:${isSelected ? 'rgba(212,175,55,0.04)' : (isCompleted ? 'rgba(255,255,255,0.015)' : 'rgba(255,255,255,0.02)')}; backdrop-filter:blur(14px); border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.3); transition:all 0.3s ease;">
               
               <!-- TOP HEADER BAR: CODE, TITLE, STATUS -->
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
                 <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                  <span style="font-family:monospace; font-weight:700; color:var(--accent-gold); font-size:0.8rem; background:rgba(245,158,11,0.12); padding:3px 10px; border-radius:6px; border:1px solid rgba(245,158,11,0.3);">${e.code}</span>
+                  <span style="font-family:monospace; font-weight:700; color:${isCompleted ? '#94a3b8' : 'var(--accent-gold)'}; font-size:0.8rem; background:${isCompleted ? 'rgba(255,255,255,0.05)' : 'rgba(245,158,11,0.12)'}; padding:3px 10px; border-radius:6px; border:1px solid ${isCompleted ? 'rgba(255,255,255,0.1)' : 'rgba(245,158,11,0.3)'};">${e.code}</span>
                   <h4 style="color:#fff; font-size:1.15rem; margin:0; font-weight:800;">${e.title}</h4>
-                  <span class="tier-badge" style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); font-weight:700; font-size:0.72rem; padding:3px 10px; border-radius:20px;">${e.badge_text || '🟢 PUBLISHED'}</span>
+                  <span class="tier-badge" style="background:${e.badge_color || 'rgba(16,185,129,0.15)'}; color:${isCompleted ? '#cbd5e1' : '#34d399'}; border:1px solid ${isCompleted ? 'rgba(148,163,184,0.3)' : 'rgba(16,185,129,0.3)'}; font-weight:700; font-size:0.72rem; padding:3px 10px; border-radius:20px;">${e.badge_text || (isCompleted ? '📁 ARSIP EVENT (SELESAI)' : '🟢 PUBLISHED')}</span>
                 </div>
-                ${isSelected ? '<span style="color:var(--accent-gold); font-weight:800; font-size:0.75rem; background:rgba(245,158,11,0.15); border:1px solid var(--accent-gold); padding:4px 12px; border-radius:12px;">⭐ Event Aktif Terpilih</span>' : '<button class="btn-outline" style="font-size:0.75rem; padding:4px 14px; border-radius:8px; font-weight:700;" onclick="M6Engine.selectEventToPublish(\'' + (e.id || e.code) + '\')">👉 Pilih Event Ini</button>'}
+                ${isSelected ? (isCompleted ? '<span style="color:#cbd5e1; font-weight:800; font-size:0.75rem; background:rgba(148,163,184,0.15); border:1px solid rgba(148,163,184,0.4); padding:4px 12px; border-radius:12px;">📁 Arsip Event Terpilih</span>' : '<span style="color:var(--accent-gold); font-weight:800; font-size:0.75rem; background:rgba(245,158,11,0.15); border:1px solid var(--accent-gold); padding:4px 12px; border-radius:12px;">⭐ Event Aktif Terpilih</span>') : '<button class="btn-outline" style="font-size:0.75rem; padding:4px 14px; border-radius:8px; font-weight:700;" onclick="M6Engine.selectEventToPublish(\'' + (e.id || e.code) + '\')">' + (isCompleted ? '📁 Buka Arsip Ini' : '👉 Pilih Event Ini') + '</button>'}
               </div>
 
               <!-- DESCRIPTION & DETAILS GRID -->
@@ -14093,7 +14173,7 @@ const M6Engine = {
                     </span>
                     <span style="display:flex; align-items:center; gap:5px;">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                      <span>Kapasitas:</span> <strong style="color:var(--accent-gold);">${e.capacity} Peserta (${evtParts.length} Terdaftar)</strong>
+                      <span>Kapasitas:</span> <strong style="color:var(--accent-gold);">${e.capacity} Peserta (${evtParts.length} ${isCompleted ? 'Hadir' : 'Terdaftar'})</strong>
                     </span>
                     <span style="display:flex; align-items:center; gap:5px;">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -14108,7 +14188,7 @@ const M6Engine = {
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                       Waktu Mulai
                     </div>
-                    <strong style="color:var(--primary-emerald); font-size:0.85rem;">${e.start_formatted}</strong>
+                    <strong style="color:${isCompleted ? '#94a3b8' : 'var(--primary-emerald)'}; font-size:0.85rem;">${e.start_formatted}</strong>
                   </div>
                   <div>
                     <div style="font-size:0.7rem; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:2px; display:flex; align-items:center; gap:5px;">
@@ -14155,18 +14235,28 @@ const M6Engine = {
               })()}
 
               <!-- ACTION BUTTONS BAR -->
-              <div style="display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
-                <button class="btn-primary" style="background:#f59e0b; color:#000; font-weight:700; font-size:0.78rem; border-radius:8px; display:inline-flex; align-items:center; gap:5px;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); document.getElementById('m6-unified-participant-table-section')?.scrollIntoView({behavior:'smooth'});">
+              <div style="display:flex; gap:8px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px; align-items:center;">
+                <button class="btn-primary" style="background:${isCompleted ? '#64748b' : '#f59e0b'}; color:${isCompleted ? '#fff' : '#000'}; font-weight:700; font-size:0.78rem; border-radius:8px; display:inline-flex; align-items:center; gap:5px;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); document.getElementById('m6-unified-participant-table-section')?.scrollIntoView({behavior:'smooth'});">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   <span>Daftar Peserta (${e.registered_count})</span>
                 </button>
-                <button class="btn-outline" style="background:rgba(255,255,255,0.05); color:#fff; font-weight:600; font-size:0.78rem; border-radius:8px; display:inline-flex; align-items:center; gap:5px; border-color:rgba(255,255,255,0.15);" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openMemberRegModal('${e.id || e.code}')">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                  <span>Daftar Online</span>
-                </button>
-                <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openOfflineRegModal('${e.id || e.code}')">Daftar Offline</button>
+                ${isCompleted ? `
+                  <button class="btn-outline" style="background:rgba(255,255,255,0.03); color:#94a3b8; font-weight:600; font-size:0.78rem; border-radius:8px; display:inline-flex; align-items:center; gap:5px; border-color:rgba(255,255,255,0.08); cursor:not-allowed;" disabled title="Event sudah selesai terlaksana">
+                    <span>🔒 Pendaftaran Ditutup (Event Selesai)</span>
+                  </button>
+                  <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(245,158,11,0.08); color:var(--accent-gold); border-color:rgba(245,158,11,0.25); display:inline-flex; align-items:center; gap:5px;" onclick="M6Engine.switchSubtab('6_5_gallery')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    <span>🖼️ Galeri & Dokumentasi Event</span>
+                  </button>
+                ` : `
+                  <button class="btn-outline" style="background:rgba(255,255,255,0.05); color:#fff; font-weight:600; font-size:0.78rem; border-radius:8px; display:inline-flex; align-items:center; gap:5px; border-color:rgba(255,255,255,0.15);" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openMemberRegModal('${e.id || e.code}')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    <span>Daftar Online</span>
+                  </button>
+                  <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openOfflineRegModal('${e.id || e.code}')">Daftar Offline</button>
+                `}
                 ${!isMemberViewer ? `
-                <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openOfficialProposalModal('${e.id || e.code}')">Proposal PDF</button>
+                <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openOfficialProposalModal('${e.id || e.code}')">${isCompleted ? 'Arsip Proposal & LPJ' : 'Proposal PDF'}</button>
                 <button class="btn-outline" style="font-size:0.78rem; font-weight:600; border-radius:8px; background:rgba(255,255,255,0.03); color:#cbd5e1;" onclick="M6Engine.selectEventToPublish('${e.id || e.code}'); M6Engine.openEditPublishedEventModal('${e.id || e.code}')">Edit Data</button>
                 ` : ''}
               </div>
@@ -14540,7 +14630,13 @@ const M6Engine = {
     }
   ],
 
+  setPublishEventsFilter(filter) {
+    this._publishEventsFilter = filter;
+    this.renderPublishPage();
+  },
+
   selectEventToPublish(eventId) {
+    this._explicitEventSelection = true;
     this.selectedEventId = eventId;
     this.renderPublishPage();
   },
