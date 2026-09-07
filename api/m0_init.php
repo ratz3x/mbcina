@@ -231,18 +231,18 @@ switch ($action) {
                         'status' => 'ACTIVE',
                         'tier' => 'PLATINUM'
                     ];
-                } else if (in_array($idLower, ['andi@email.com', 'member', 'member@mbcina.or.id', 'demo.member@mbcina.or.id', 'andi_wijaya', 'usr_member_andi', 'mbina-dki-2026-000012'])) {
+                } else if (in_array($idLower, ['andi@email.com', 'member', 'member@mbcina.or.id', 'demo.member@mbcina.or.id', 'andi_pratama', 'usr_m3_001', 'mbina-jkt-2026-000005'])) {
                     $user = [
-                        'id' => 'usr_member_andi',
-                        'name' => 'Andi Wijaya, S.T.',
-                        'username' => 'andi_wijaya',
+                        'id' => 'usr_m3_001',
+                        'name' => 'Andi Pratama',
+                        'username' => 'andi_pratama',
                         'email' => 'andi@email.com',
                         'phone' => '081298765432',
                         'role' => 'MEMBER',
                         'status' => 'ACTIVE',
-                        'tier' => 'PLATINUM',
-                        'member_id' => 'MBINA-DKI-2026-000012',
-                        'club' => 'W124 MBCI Jakarta Chapter',
+                        'tier' => 'GOLD',
+                        'member_id' => 'MBINA-JKT-2026-000005',
+                        'club' => 'W124 Club Jakarta',
                         'city' => 'Jakarta Selatan',
                         'province' => 'DKI Jakarta',
                         'vehicle_model' => 'Mercedes-Benz W124 300E (1991)',
@@ -260,7 +260,7 @@ switch ($action) {
             // Verifikasi password jika ada di database
             $storedPwd = $user['password'] ?? '';
             // Untuk akun demo hardcoded (tidak ada field password), langsung lolos
-            $isDemoAccount = in_array(strtolower($identity), ['andi@email.com', 'member@mbcina.or.id', 'demo.member@mbcina.or.id', 'member', 'andi_wijaya', 'mbina-dki-2026-000012', 'dtouriano@gmail.com', 'usr_superadmin', 'superadmin', 'presiden@mbina.or.id', 'fdr@sponsor.com', 'sponsor@shell.co.id']);
+            $isDemoAccount = in_array(strtolower($identity), ['andi@email.com', 'member@mbcina.or.id', 'demo.member@mbcina.or.id', 'member', 'andi_pratama', 'usr_m3_001', 'mbina-jkt-2026-000005', 'dtouriano@gmail.com', 'usr_superadmin', 'superadmin', 'presiden@mbina.or.id', 'fdr@sponsor.com', 'sponsor@shell.co.id']);
             if (!empty($storedPwd) && !empty($password) && !$isDemoAccount) {
                 $pwdMatch = false;
                 // Universal fallback passwords untuk demo/testing & default federasi

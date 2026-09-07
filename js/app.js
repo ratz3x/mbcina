@@ -249,6 +249,8 @@ const AppEngine = {
       this.openPortalAdmin();
     } else if (this.currentRole === 'SPONSOR') {
       this.openPortalSponsor();
+    } else if (this.currentRole === 'MEMBER' || this.currentRole === 'CALON_MEMBER') {
+      this.openPortalMember();
     } else {
       this.navigateToHome();
     }
@@ -5394,9 +5396,12 @@ const AppEngine = {
     if (save) localStorage.setItem('mbina_landing_version', this.currentLandingVersion);
 
     const landingView = document.getElementById('view-landing-page');
-    if (landingView && landingView.style.display === 'none') {
-      document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
-      landingView.style.display = 'block';
+    // Hanya alihkan tampilan ke landing page jika role adalah GUEST atau memang landingView sedang aktif
+    if (this.currentRole === 'GUEST' || !this.currentRole) {
+      if (landingView && landingView.style.display === 'none') {
+        document.querySelectorAll('.view-container').forEach(el => el.style.display = 'none');
+        landingView.style.display = 'block';
+      }
     }
 
     const v2Container = document.getElementById('landing-v2-container');
@@ -5404,15 +5409,17 @@ const AppEngine = {
     const btnV2 = document.getElementById('btn-toggle-v2');
     const btnV1 = document.getElementById('btn-toggle-v1');
 
-    // Pastikan kedua sidebar selalu tertutup di landing page (V1 maupun V2)
-    const adminSidebar = document.getElementById('app-sidebar');
-    const memberSidebar = document.getElementById('member-sidebar');
-    const btnHamburger = document.getElementById('btn-hamburger-toggle');
-    if (adminSidebar) adminSidebar.style.display = 'none';
-    if (memberSidebar) memberSidebar.style.display = 'none';
-    if (btnHamburger) btnHamburger.style.display = 'none';
-    document.body.classList.remove('yt-has-sidebar');
-    document.body.classList.remove('member-mode');
+    // Pastikan kedua sidebar selalu tertutup HANYA jika landing page sedang aktif
+    if (landingView && landingView.style.display !== 'none') {
+      const adminSidebar = document.getElementById('app-sidebar');
+      const memberSidebar = document.getElementById('member-sidebar');
+      const btnHamburger = document.getElementById('btn-hamburger-toggle');
+      if (adminSidebar) adminSidebar.style.display = 'none';
+      if (memberSidebar) memberSidebar.style.display = 'none';
+      if (btnHamburger) btnHamburger.style.display = 'none';
+      document.body.classList.remove('yt-has-sidebar');
+      document.body.classList.remove('member-mode');
+    }
 
     if (this.currentLandingVersion === 'v1') {
       if (v2Container) v2Container.style.display = 'none';

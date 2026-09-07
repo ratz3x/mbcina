@@ -727,25 +727,25 @@ photo_url: sbUser.user_metadata?.picture || '',
           tier: 'GOLD'
         };
         loginMessage = `Login Berhasil! Selamat Datang kembali, ${loggedUser.name} (Portal Sponsor MB INA).`;
-      } else if (['andi@email.com', 'member', 'member@mbcina.or.id', 'demo.member@mbcina.or.id', 'andi_wijaya', 'mbina-dki-2026-000012'].includes(idLower)) {
+      } else if (['andi@email.com', 'member', 'member@mbcina.or.id', 'demo.member@mbcina.or.id', 'andi_pratama', 'mbina-jkt-2026-000005', 'usr_m3_001'].includes(idLower)) {
         const passLower = password.toLowerCase();
         const validPasses = ['member123', 'mbcina2026', '123456', 'member'];
         if (!validPasses.includes(passLower) && password !== '') {
-          alert('❌ Password salah! Gunakan password: member123');
+          alert('❌ Password salah! Gunakan password: mbcina2026 atau member123');
           return;
         }
         loginSuccess = true;
         loggedUser = {
-          id: 'usr_member_andi',
-          name: 'Andi Wijaya, S.T.',
-          username: 'andi_wijaya',
+          id: 'usr_m3_001',
+          name: 'Andi Pratama',
+          username: 'andi_pratama',
           email: 'andi@email.com',
           phone: '081298765432',
           role: 'MEMBER',
           status: 'ACTIVE',
-          tier: 'PLATINUM',
-          member_id: 'MBINA-DKI-2026-000012',
-          club: 'W124 MBCI Jakarta Chapter',
+          tier: 'GOLD',
+          member_id: 'MBINA-JKT-2026-000005',
+          club: 'W124 Club Jakarta',
           city: 'Jakarta Selatan',
           province: 'DKI Jakarta',
           vehicle_model: 'Mercedes-Benz W124 300E (1991)',
@@ -754,7 +754,7 @@ photo_url: sbUser.user_metadata?.picture || '',
           total_contribution: 9500000,
           photo_url: 'assets/mb_hero.jpg'
         };
-        loginMessage = 'Login Berhasil! Selamat Datang kembali, Andi Wijaya (Member Resmi MB INA).';
+        loginMessage = 'Login Berhasil! Selamat Datang kembali, Andi Pratama (Member Resmi MB INA).';
       }
     }
 
@@ -780,6 +780,11 @@ photo_url: sbUser.user_metadata?.picture || '',
       
       if (window.AppEngine && typeof AppEngine.setRole === 'function') {
         AppEngine.setRole(loggedUser.role || 'MEMBER', loggedUser);
+        if (loggedUser.role === 'MEMBER' || loggedUser.role === 'CALON_MEMBER') {
+          if (typeof AppEngine.openPortalMember === 'function') {
+            AppEngine.openPortalMember();
+          }
+        }
       }
       this.closeAllModals();
       alert('🎉 ' + loginMessage);
