@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260907_v186_landing_modern_luxury_only">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v186_landing_modern_luxury_only">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v187_fix_login_duplicate_alert">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v187_fix_login_duplicate_alert">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -8463,23 +8463,23 @@
           <span>⚡ Demo Role (1-Klik Masuk Langsung):</span>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(212,175,55,0.35); color:#fbbf24; font-weight:700; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='dtouriano@gmail.com'; document.getElementById('login-password').value='admin123'; window.AuthEngine.handleLogin();">
+          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(212,175,55,0.35); color:#fbbf24; font-weight:700; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='dtouriano@gmail.com'; document.getElementById('login-password').value='admin123'; window.AuthEngine.handleLogin(event);">
             <span>👑 Super Admin</span>
           </button>
-          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='presiden@mbina.or.id'; document.getElementById('login-password').value='admin123'; window.AuthEngine.handleLogin();">
+          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='presiden@mbina.or.id'; document.getElementById('login-password').value='admin123'; window.AuthEngine.handleLogin(event);">
             <span>⭐ Presiden</span>
           </button>
-          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='andi@email.com'; document.getElementById('login-password').value='mbcina2026'; window.AuthEngine.handleLogin();">
+          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='andi@email.com'; document.getElementById('login-password').value='mbcina2026'; window.AuthEngine.handleLogin(event);">
             <span>🏎️ Member Aktif</span>
           </button>
-          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='fdr@sponsor.com'; document.getElementById('login-password').value='sponsor123'; window.AuthEngine.handleLogin();">
+          <button type="button" class="btn-outline" style="padding:6px 8px; font-size:0.72rem; border-radius:8px; border-color:rgba(255,255,255,0.15); color:#e2e8f0; font-weight:600; text-align:left; display:flex; align-items:center; gap:5px; cursor:pointer;" onclick="document.getElementById('login-email').value='fdr@sponsor.com'; document.getElementById('login-password').value='sponsor123'; window.AuthEngine.handleLogin(event);">
             <span>🏢 Sponsor (FDR)</span>
           </button>
         </div>
       </div>
 
       <!-- LOGIN FORM -->
-      <form id="login-form" onsubmit="event.preventDefault(); window.AuthEngine.handleLogin();">
+      <form id="login-form" onsubmit="event.preventDefault(); window.AuthEngine.handleLogin(event); return false;">
         
         <!-- USERNAME / EMAIL / ID MEMBER -->
         <div style="margin-bottom:16px;">
@@ -11294,8 +11294,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v186_landing_modern_luxury_only"></script>
-  <script src="js/app.js?v=20260907_v186_landing_modern_luxury_only"></script>
+  <script src="js/auth.js?v=20260907_v187_fix_login_duplicate_alert"></script>
+  <script src="js/app.js?v=20260907_v187_fix_login_duplicate_alert"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11380,6 +11380,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v186_landing_modern_luxury_only"></script>
+  <script src="js/donation_manager.js?v=20260907_v187_fix_login_duplicate_alert"></script>
 </body>
 </html>

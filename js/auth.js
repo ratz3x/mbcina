@@ -36,7 +36,12 @@ const AuthEngine = {
   supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwbXBvb2J2Zm13ZG5iemdvZmhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MDM3NDgsImV4cCI6MjEwMjE3OTc0OH0.public_anon_key',
   supabaseClient: null,
 
+  _initialized: false,
+  _isLoggingIn: false,
+
   async init() {
+    if (this._initialized) return;
+    this._initialized = true;
     this.bindEvents();
     if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('error'))) {
       try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch(e) {}
@@ -208,11 +213,12 @@ photo_url: sbUser.user_metadata?.picture || '',
       prevBtn.addEventListener('click', () => this.prevStep());
     }
 
-    // Login Form Submit
+    // Login Form Submit safeguard
     document.addEventListener('submit', (e) => {
       if (e.target && e.target.id === 'login-form') {
         e.preventDefault();
-        this.handleLogin();
+        e.stopPropagation();
+        // Handled via onsubmit on the form element itself
       }
     });
   },
@@ -576,13 +582,24 @@ photo_url: sbUser.user_metadata?.picture || '',
     }
   },
 
-  async handleLogin() {
+  async handleLogin(event) {
+    if (event) {
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+    }
+
+    if (this._isLoggingIn) {
+      console.warn('⚠️ Login request already in progress, skipping duplicate call.');
+      return;
+    }
+
     if (this.security.lockoutEndTime && new Date() < this.security.lockoutEndTime) {
       alert('Akun terkunci sementara karena 5x percobaan gagal! Coba lagi dalam 15 menit.');
       return;
     }
 
-    const email = document.getElementById('login-email').value.trim();
+    const email = document.getElementById('login-email')?.value?.trim();
     const password = document.getElementById('login-password')?.value || '';
 
     if (!email) {
@@ -590,10 +607,24 @@ photo_url: sbUser.user_metadata?.picture || '',
       return;
     }
 
+    this._isLoggingIn = true;
+    const submitBtn = document.querySelector('#login-form button[type="submit"]');
+    const demoBtns = document.querySelectorAll('#modal-login button');
+    let originalBtnHtml = '';
+    if (submitBtn) {
+      originalBtnHtml = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.7';
+      submitBtn.style.cursor = 'wait';
+      submitBtn.innerHTML = '<span>Memverifikasi...</span>';
+    }
+    demoBtns.forEach(b => { if (b !== submitBtn) b.style.pointerEvents = 'none'; });
+
     let loginSuccess = false;
     let loggedUser = null;
     let loginMessage = '';
 
+    try {
     // =========================================================================
     // STEP 1: Coba login via Backend API PHP (Localhost & Vercel Serverless)
     // =========================================================================
@@ -791,9 +822,21 @@ photo_url: sbUser.user_metadata?.picture || '',
         }
       }
       this.closeAllModals();
-      alert('🎉 ' + loginMessage);
+      let cleanMsg = (loginMessage || `Login Berhasil! Selamat Datang kembali, ${loggedUser.name}.`).trim();
+      cleanMsg = cleanMsg.replace(/\.+$/, '.');
+      alert('🎉 ' + cleanMsg);
     } else {
       alert('❌ Login Gagal: Akun tidak ditemukan atau password salah! Silakan periksa kembali atau klik [Lupa Password?].');
+    }
+    } finally {
+      this._isLoggingIn = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+        submitBtn.innerHTML = originalBtnHtml || '<span>Masuk ke Portal</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+      }
+      demoBtns.forEach(b => { b.style.pointerEvents = ''; });
     }
   },
 
