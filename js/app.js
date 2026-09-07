@@ -14349,7 +14349,7 @@ const M6Engine = {
                     </div>
                   </td>
                 </tr>
-              `)}
+              `).join('')}
             </tbody>
           </table>
         </div>
