@@ -27,7 +27,7 @@
     [id^="modal-"]:not(.active) {
       display: none;
     }
-    /* Sembunyikan header Portal Admin, nominal sponsor, dan tombol Kembali ke Dashboard Member dari Portal Member */
+    /* Sembunyikan header Portal Admin, nominal sponsor, tombol aksi galeri, dan tombol Kembali ke Dashboard Member dari Portal Member */
     body.member-mode #admin-dashboard-page-header,
     body.member-mode #btn-kop-return-admin,
     body.member-mode #btn-kop-bottom-return-admin,
@@ -35,6 +35,10 @@
     body.member-mode .m7-admin-actions,
     body.member-mode .m6-sponsor-dana-masuk,
     body.member-mode .m6-sponsor-nominal,
+    body.member-mode #m6-gl-admin-actions,
+    body.member-mode #m6-gl-inner-btn-652,
+    body.member-mode #m6-gl-inner-652,
+    body.member-mode .m6-gallery-admin-only,
     #member-return-banner,
     #btn-m2-return-member,
     #btn-kop-return-member,
@@ -2799,7 +2803,7 @@
                   </div>
                 </div>
 
-                <div style="display:flex; gap:8px;">
+                <div id="m6-gl-admin-actions" style="display:flex; gap:8px;">
                   <button class="btn-primary" style="font-size:0.8rem; font-weight:800; background:var(--accent-gold); color:#000;" onclick="M6Engine.openCreateAlbumModal()">📁 + Buat Album Baru</button>
                   <button class="btn-primary" style="font-size:0.8rem; font-weight:800;" onclick="M6Engine.openUploadMediaModal()">📤 + Upload Media</button>
                 </div>
@@ -11331,8 +11335,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260908_v201_album_banner_cover_upload"></script>
-  <script src="js/app.js?v=20260908_v201_album_banner_cover_upload"></script>
+  <script src="js/auth.js?v=20260908_v202_hide_gallery_admin_actions_for_members"></script>
+  <script src="js/app.js?v=20260908_v202_hide_gallery_admin_actions_for_members"></script>
   <script>
     lucide.createIcons();
     try {

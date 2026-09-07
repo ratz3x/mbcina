@@ -540,6 +540,7 @@ const AppEngine = {
     // Sembunyikan tombol "Portal Mitra & Sponsorship"
     const sponsorBtn = document.querySelector('#admin-tab-m6_event .btn-outline[onclick*="openPortalSponsor"]');
     if (sponsorBtn) sponsorBtn.style.display = 'none';
+    this.hideM6AdminActionsForMember();
     if (window.M6Engine) {
       M6Engine.init();
       M6Engine.switchSubtab('6_3_publish');
@@ -5098,11 +5099,23 @@ const AppEngine = {
     } else if (tab === 'm5_forum') {
       this.renderM5Module();
     } else if (tab === 'm6_event') {
+      const isMem = this.isMemberUser() || document.body.classList.contains('member-mode');
       const titleEl = document.getElementById('m6-event-module-title');
-      if (titleEl) titleEl.innerText = this.isMemberUser() ? 'Event & Touring' : 'Manajemen Event';
+      if (titleEl) titleEl.innerText = isMem ? 'Event & Touring' : 'Manajemen Event';
       if (window.M6Engine) {
         M6Engine.init();
-        M6Engine.switchSubtab('6_1_proposal');
+        if (isMem) {
+          this.hideM6AdminActionsForMember();
+          M6Engine.switchSubtab('6_3_publish');
+        } else {
+          const adminActions = document.getElementById('m6-gl-admin-actions');
+          if (adminActions) adminActions.style.removeProperty('display');
+          const uploadPill = document.getElementById('m6-gl-inner-btn-652');
+          if (uploadPill) uploadPill.style.removeProperty('display');
+          const uploadPanel = document.getElementById('m6-gl-inner-652');
+          if (uploadPanel) uploadPanel.style.removeProperty('display');
+          M6Engine.switchSubtab('6_1_proposal');
+        }
       }
     } else if (tab === 'm6_sponsorship') {
       if (window.M6Engine) {
@@ -6637,6 +6650,18 @@ const AppEngine = {
       if (div.querySelector('button[onclick*="VM"]')) {
         div.style.setProperty('display', 'none', 'important');
       }
+    });
+  },
+
+  hideM6AdminActionsForMember() {
+    const adminActions = document.getElementById('m6-gl-admin-actions');
+    if (adminActions) adminActions.style.setProperty('display', 'none', 'important');
+    const uploadPill = document.getElementById('m6-gl-inner-btn-652');
+    if (uploadPill) uploadPill.style.setProperty('display', 'none', 'important');
+    const uploadPanel = document.getElementById('m6-gl-inner-652');
+    if (uploadPanel) uploadPanel.style.setProperty('display', 'none', 'important');
+    document.querySelectorAll('.m6-gallery-admin-only').forEach(el => {
+      el.style.setProperty('display', 'none', 'important');
     });
   },
 
@@ -19773,6 +19798,11 @@ const M6Engine = {
   stagedUploadFiles: [],
 
   switchGalleryInnerTab(tabId) {
+    if (tabId === '652' && !this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Pengunggahan media hanya dapat dilakukan oleh Admin Pusat & Pengurus MB INA.');
+      tabId = '651';
+    }
+
     ['651','652','653','654'].forEach(id => {
       const panel = document.getElementById('m6-gl-inner-' + id);
       const btn   = document.getElementById('m6-gl-inner-btn-' + id);
@@ -19794,9 +19824,27 @@ const M6Engine = {
     if (tabId === '654') this.renderDownloadShareList();
   },
 
+  canUserManageGallery() {
+    const isMem = (window.AppEngine && typeof window.AppEngine.isMemberUser === 'function')
+      ? window.AppEngine.isMemberUser()
+      : document.body.classList.contains('member-mode');
+    if (isMem) return false;
+
+    const role = (window.AppEngine && window.AppEngine.currentRole) ||
+                 (window.AuthEngine && window.AuthEngine.currentUser && window.AuthEngine.currentUser.role) || 'GUEST';
+    const adminRoles = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB', 'ADMIN'];
+    return adminRoles.includes(role);
+  },
+
   renderGaleri() {
     const container = document.getElementById('m6-galeri-container');
     if (!container) return;
+
+    const canManage = this.canUserManageGallery();
+    const adminActions = document.getElementById('m6-gl-admin-actions');
+    if (adminActions) adminActions.style.display = canManage ? 'flex' : 'none';
+    const uploadPill = document.getElementById('m6-gl-inner-btn-652');
+    if (uploadPill) uploadPill.style.display = canManage ? '' : 'none';
 
     if (!this.data.albums || this.data.albums.length === 0) {
       this.data.albums = this.sampleAlbums;
@@ -19834,9 +19882,9 @@ const M6Engine = {
               <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0;">${alb ? alb.description : ''} • ${albMedia.length} Media</p>
             </div>
             <div style="display:flex; gap:8px;">
-              <button class="btn-primary" style="font-size:0.8rem; font-weight:800;" onclick="M6Engine.openUploadMediaModal('${this.activeGalleryAlbumId}')">📤 Upload ke Album ini</button>
+              ${canManage ? `<button class="btn-primary m6-gallery-admin-only" style="font-size:0.8rem; font-weight:800;" onclick="M6Engine.openUploadMediaModal('${this.activeGalleryAlbumId}')">📤 Upload ke Album ini</button>` : ''}
               <button class="btn-outline" style="font-size:0.8rem;" onclick="M6Engine.downloadAlbumZip('${this.activeGalleryAlbumId}')">📥 Download ZIP</button>
-              <button class="btn-outline" style="font-size:0.8rem;" onclick="M6Engine.editAlbum('${this.activeGalleryAlbumId}')">✏️ Edit Album</button>
+              ${canManage ? `<button class="btn-outline m6-gallery-admin-only" style="font-size:0.8rem;" onclick="M6Engine.editAlbum('${this.activeGalleryAlbumId}')">✏️ Edit Album</button>` : ''}
             </div>
           </div>
         </div>
@@ -19898,8 +19946,10 @@ const M6Engine = {
 
             <div style="padding:0 16px 16px 16px; display:flex; gap:8px;">
               <button class="btn-primary" style="flex:1; font-weight:800; font-size:0.8rem; padding:8px;" onclick="M6Engine.openAlbumDetail('${a.id}')">👁️ Lihat Album</button>
-              <button class="btn-outline" style="padding:8px 12px; font-size:0.78rem;" onclick="M6Engine.editAlbum('${a.id}')">✏️</button>
-              <button class="btn-outline" style="padding:8px 12px; font-size:0.78rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteAlbum('${a.id}')">🗑️</button>
+              ${canManage ? `
+                <button class="btn-outline m6-gallery-admin-only" style="padding:8px 12px; font-size:0.78rem;" onclick="M6Engine.editAlbum('${a.id}')" title="Edit Album">✏️</button>
+                <button class="btn-outline m6-gallery-admin-only" style="padding:8px 12px; font-size:0.78rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteAlbum('${a.id}')" title="Hapus Album">🗑️</button>
+              ` : ''}
             </div>
           </div>`;
         }).join('')}
@@ -20031,6 +20081,10 @@ const M6Engine = {
   },
 
   openCreateAlbumModal() {
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin Pusat & Pengurus Resmi MB INA yang berhak membuat album kegiatan.');
+      return;
+    }
     const idEl = document.getElementById('m6-alb-id');
     const tiEl = document.getElementById('m6-alb-title');
     const deEl = document.getElementById('m6-alb-desc');
@@ -20056,6 +20110,10 @@ const M6Engine = {
   },
 
   editAlbum(albumId) {
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin Pusat & Pengurus Resmi MB INA yang berhak mengedit album kegiatan.');
+      return;
+    }
     const alb = this.data.albums.find(a => a.id === albumId);
     if (!alb) return;
 
@@ -20088,6 +20146,10 @@ const M6Engine = {
 
   saveAlbumFromModal(e) {
     e.preventDefault();
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin Pusat & Pengurus Resmi MB INA yang berhak menyimpan album.');
+      return;
+    }
     const id        = document.getElementById('m6-alb-id')?.value;
     const title     = document.getElementById('m6-alb-title')?.value.trim();
     const eventId   = document.getElementById('m6-alb-event-sel')?.value || '';
@@ -20127,6 +20189,10 @@ const M6Engine = {
   },
 
   deleteAlbum(albumId) {
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin Pusat & Pengurus Resmi MB INA yang berhak menghapus album.');
+      return;
+    }
     if (!confirm('Hapus album ini beserta seluruh media di dalamnya?')) return;
     this.data.albums = this.data.albums.filter(a => a.id !== albumId);
     this.data.media  = this.data.media.filter(m => m.album_id !== albumId);
@@ -20141,6 +20207,10 @@ const M6Engine = {
   },
 
   openUploadMediaModal(albumId) {
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin & Tim Dokumentasi/Humas yang berhak mengunggah media galeri.');
+      return;
+    }
     this.switchGalleryInnerTab('652');
     if (albumId) {
       const sel = document.getElementById('m6-gl-upload-album-sel');
@@ -20169,6 +20239,10 @@ const M6Engine = {
 
   submitGalleryUploadForm(e) {
     e.preventDefault();
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin & Tim Dokumentasi/Humas yang berhak mengunggah media galeri.');
+      return;
+    }
     const albumId = document.getElementById('m6-gl-upload-album-sel')?.value;
     const caption = document.getElementById('m6-gl-upload-caption')?.value.trim();
 
@@ -20215,6 +20289,7 @@ const M6Engine = {
     const grid = document.getElementById('m6-gl-tagging-grid');
     if (!grid) return;
 
+    const canManage = this.canUserManageGallery();
     const query = (document.getElementById('m6-gl-tag-search')?.value || '').toLowerCase();
     let mediaList = this.data.media;
 
@@ -20238,18 +20313,22 @@ const M6Engine = {
         <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:10px;">
           ${(m.tags || []).map(t => `
             <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.68rem;">
-              @${t} <a href="javascript:void(0)" onclick="M6Engine.removeTagFromMedia('${m.id}', '${t}')" style="color:var(--accent-red); margin-left:3px; text-decoration:none;">✕</a>
+              @${t} ${canManage ? `<a href="javascript:void(0)" onclick="M6Engine.removeTagFromMedia('${m.id}', '${t}')" style="color:var(--accent-red); margin-left:3px; text-decoration:none;" title="Hapus Tag">✕</a>` : ''}
             </span>
           `).join('')}
           ${(!m.tags || m.tags.length === 0) ? '<span style="font-size:0.7rem; color:var(--text-muted);">Belum ada tag</span>' : ''}
         </div>
 
-        <button class="btn-primary" style="width:100%; font-size:0.75rem; padding:6px; font-weight:800;" onclick="M6Engine.openMediaDetailModal('${m.id}')">🏷️ Kelola Tag Member</button>
+        <button class="btn-primary" style="width:100%; font-size:0.75rem; padding:6px; font-weight:800;" onclick="M6Engine.openMediaDetailModal('${m.id}')">${canManage ? '🏷️ Kelola Tag Member' : '👁️ Lihat Detail Foto'}</button>
       </div>
     `).join('');
   },
 
   removeTagFromMedia(mediaId, memberName) {
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin & Pengurus Resmi yang berhak menghapus tag member.');
+      return;
+    }
     const m = this.data.media.find(x => x.id === mediaId);
     if (!m || !m.tags) return;
     m.tags = m.tags.filter(t => t !== memberName);
@@ -20260,6 +20339,10 @@ const M6Engine = {
   },
 
   openTagMemberModal() {
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin & Pengurus Resmi yang berhak menandai (tag) member.');
+      return;
+    }
     if (!this.activeDetailMediaId) return;
     const memberName = prompt('Masukkan nama member / E-KTA untuk di-tag pada foto ini:', 'Andi Pratama');
     if (memberName) {
@@ -20319,11 +20402,12 @@ const M6Engine = {
     }
 
     if (tagsListEl) {
+      const canManage = this.canUserManageGallery();
       tagsListEl.innerHTML = (m.tags || []).map(t => `
         <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">
-          @${t} <a href="javascript:void(0)" onclick="M6Engine.removeTagFromMedia('${m.id}', '${t}')" style="color:var(--accent-red); margin-left:4px; text-decoration:none;">✕</a>
+          @${t} ${canManage ? `<a href="javascript:void(0)" onclick="M6Engine.removeTagFromMedia('${m.id}', '${t}')" style="color:var(--accent-red); margin-left:4px; text-decoration:none;" title="Hapus Tag">✕</a>` : ''}
         </span>
-      `).join('') + '<button class="btn-outline" style="font-size:0.7rem; padding:2px 8px;" onclick="M6Engine.openTagMemberModal()">+ Tag</button>';
+      `).join('') + (canManage ? '<button class="btn-outline m6-gallery-admin-only" style="font-size:0.7rem; padding:2px 8px;" onclick="M6Engine.openTagMemberModal()">+ Tag</button>' : '');
     }
 
     AuthEngine.openModal('modal-m6-media-detail');
