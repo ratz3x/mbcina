@@ -27,8 +27,14 @@
     [id^="modal-"]:not(.active) {
       display: none;
     }
-    /* Sembunyikan header Portal Admin dari Portal Member */
-    body.member-mode #admin-dashboard-page-header {
+    /* Sembunyikan header Portal Admin dan tombol Kembali ke Dashboard Member dari Portal Member */
+    body.member-mode #admin-dashboard-page-header,
+    body.member-mode #btn-kop-return-admin,
+    body.member-mode #btn-kop-bottom-return-admin,
+    #member-return-banner,
+    #btn-m2-return-member,
+    #btn-kop-return-member,
+    .btn-return-member-dashboard {
       display: none !important;
     }
   </style>
@@ -928,13 +934,6 @@
 
     <!-- VIEW D: PORTAL ADMIN & M2 ORGANISASI -->
     <div id="view-admin-dashboard" class="view-container" style="display:none; max-width:1440px; margin:0 auto; padding:16px 24px;">
-      <!-- Banner Navigasi Kembali ke Dashboard Member (Hanya muncul saat member mengakses tab admin) -->
-      <div id="member-return-banner" style="display:none; margin-bottom:18px;">
-        <button type="button" class="btn-outline" style="padding:8px 18px; border-radius:12px; font-size:0.8rem; font-weight:700; color:#fbbf24; border-color:rgba(245,158,11,0.35); background:rgba(245,158,11,0.08); display:inline-flex; align-items:center; gap:8px; cursor:pointer;" onclick="AppEngine.openPortalMember()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-          <span>← Kembali ke Dashboard Member</span>
-        </button>
-      </div>
 
       <div id="admin-dashboard-page-header" style="margin-bottom:20px;">
         <h2 style="font-size:1.5rem; margin:0;" class="text-gradient">⚙️ Portal Admin & Operasional</h2>
@@ -1466,11 +1465,6 @@
       <!-- TAB M2: MANAJEMEN ORGANISASI & FEDERASI -->
       <div id="admin-tab-m2_org" class="admin-tab-content" style="display:none;">
         <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
-          <!-- Tombol Kembali ke Dashboard Member (Hanya muncul saat member membuka Organisasi) -->
-          <button id="btn-m2-return-member" type="button" class="btn-outline" style="display:none; margin-bottom:18px; padding:8px 18px; border-radius:12px; font-size:0.8rem; font-weight:700; color:#fbbf24; border-color:rgba(245,158,11,0.35); background:rgba(245,158,11,0.08); align-items:center; gap:8px; cursor:pointer;" onclick="AppEngine.openPortalMember()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            <span>← Kembali ke Dashboard Member</span>
-          </button>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
             <div>
               <h3 style="font-size:1.3rem;" class="text-gradient">🏛️ Manajemen Organisasi & Federasi</h3>
@@ -4671,10 +4665,6 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               <span>Kembali ke Dashboard Admin</span>
             </button>
-            <button id="btn-kop-return-member" type="button" onclick="AppEngine.openPortalMember()" style="background:rgba(255,255,255,0.05); color:#cbd5e1; border:1px solid rgba(255,255,255,0.1); font-weight:500; font-size:0.75rem; padding:8px 18px; border-radius:12px; cursor:pointer; display:none; align-items:center; gap:6px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#cbd5e1';">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-              <span>Kembali ke Dashboard Member</span>
-            </button>
           </div>
         </div>
 
@@ -4953,13 +4943,9 @@
 
         <!-- 8. Bottom Action Bar -->
         <div style="display:flex; justify-content:center; gap:14px; flex-wrap:wrap; border-top:1px solid rgba(255,255,255,0.08); padding-top:24px;">
-          <button type="button" onclick="AppEngine.switchAdminTab('m1_portal')" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:10px 24px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';">
+          <button id="btn-kop-bottom-return-admin" type="button" onclick="AppEngine.switchAdminTab('m1_portal')" style="background:#f59e0b; color:#09090b; font-weight:600; font-size:0.75rem; padding:10px 24px; border-radius:12px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s;" onmouseover="this.style.background='#fbbf24';" onmouseout="this.style.background='#f59e0b';">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             <span>Kembali ke Dashboard Admin</span>
-          </button>
-          <button type="button" onclick="AppEngine.openPortalMember()" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#cbd5e1; font-weight:500; font-size:0.75rem; padding:10px 24px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#cbd5e1';">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            <span>Kembali ke Dashboard Member</span>
           </button>
         </div>
 
@@ -11290,8 +11276,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v190_hide_admin_header_from_member"></script>
-  <script src="js/app.js?v=20260907_v190_hide_admin_header_from_member"></script>
+  <script src="js/auth.js?v=20260907_v191_remove_return_member_button"></script>
+  <script src="js/app.js?v=20260907_v191_remove_return_member_button"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11376,6 +11362,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v190_hide_admin_header_from_member"></script>
+  <script src="js/donation_manager.js?v=20260907_v191_remove_return_member_button"></script>
 </body>
 </html>

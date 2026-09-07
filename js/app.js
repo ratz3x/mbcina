@@ -508,12 +508,6 @@ const AppEngine = {
     const admHeader = document.getElementById('admin-dashboard-page-header');
     if (admHeader) admHeader.style.setProperty('display', 'none', 'important');
 
-    // Tampilkan tombol navigasi kembali ke dashboard member
-    const retBanner = document.getElementById('member-return-banner');
-    if (retBanner) retBanner.style.display = 'block';
-    const retM2 = document.getElementById('btn-m2-return-member');
-    if (retM2) retM2.style.display = (tabId === 'admin-tab-m2_org') ? 'inline-flex' : 'none';
-
     this.setActiveMemberSidebarItem(activeItemKey);
     this.closeMobileSidebar();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -662,12 +656,15 @@ const AppEngine = {
     this._switchToMemberAdminTab('admin-tab-m11_koperasi', 'member_koperasi');
 
     const btnReturnAdmin = document.getElementById('btn-kop-return-admin');
+    const btnBottomAdmin = document.getElementById('btn-kop-bottom-return-admin');
     const btnReturnMember = document.getElementById('btn-kop-return-member');
     if (fromView === 'member') {
       if (btnReturnAdmin) btnReturnAdmin.style.display = 'none';
-      if (btnReturnMember) btnReturnMember.style.display = 'inline-flex';
+      if (btnBottomAdmin) btnBottomAdmin.style.display = 'none';
+      if (btnReturnMember) btnReturnMember.style.display = 'none';
     } else {
       if (btnReturnAdmin) btnReturnAdmin.style.display = 'inline-flex';
+      if (btnBottomAdmin) btnBottomAdmin.style.display = 'inline-flex';
       if (btnReturnMember) btnReturnMember.style.display = 'none';
     }
   },
@@ -6598,12 +6595,6 @@ const AppEngine = {
         div.style.setProperty('display', 'none', 'important');
       }
     });
-
-    // Pastikan tombol kembali ke Dashboard Member tampil
-    const retM2 = document.getElementById('btn-m2-return-member');
-    if (retM2) retM2.style.setProperty('display', 'inline-flex', 'important');
-    const retBanner = document.getElementById('member-return-banner');
-    if (retBanner) retBanner.style.setProperty('display', 'block', 'important');
   },
 
   renderM2Module() {
