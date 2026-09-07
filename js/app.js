@@ -22514,7 +22514,7 @@ window.M7Engine = {
             </div>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-            <a href="https://wa.me/${(lapak.contact_whatsapp || '081234567890').replace(/[^0-9]/g,'')}" target="_blank" class="btn-primary" style="font-size:0.75rem; padding:6px; font-weight:800; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; text-align:center; text-decoration:none; border-radius:6px;">💬 Chat WA</a>
+            <a href="https://wa.me/${(lapak.contact_whatsapp || '081234567890').replace(/[^0-9]/g,'')}" target="_blank" class="btn-primary" style="font-size:0.75rem; padding:6px; font-weight:800; background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; text-align:center; text-decoration:none; border-radius:6px;" onclick="M7Engine.recordLapakInteraction('${lapak.id}', '${(p.name || p.title || 'Produk').replace(/'/g, "\\'")}')">💬 Chat WA</a>
             <button class="btn-outline" style="font-size:0.75rem; padding:6px; font-weight:700; border-radius:6px;" onclick="alert('Membuka Detail Produk: ${p.name || p.title}')">👁️ Detail</button>
           </div>
         </div>
@@ -23663,13 +23663,149 @@ window.M7Engine = {
     }
   },
 
-  // 7.4 REVIEWS SECTION
+  // 7.4 REVIEWS & VERIFIED TRANSACTIONS SECTION
+  getDefaultInteractions: function() {
+    return [
+      {
+        lapak_id: 'LPK-MEM-2026-001',
+        lapak_name: 'Andi Parts Store',
+        contact_person: 'Andi Pratama',
+        product_name: 'Velg AMG Monoblock 18 Inch Original',
+        interaction_date: '05/09/2026',
+        interaction_type: 'TRANSAKSI_SELESAI',
+        reviewed: false
+      },
+      {
+        lapak_id: 'LPK-MEM-2026-004',
+        lapak_name: 'Garasi FayFay',
+        contact_person: 'FayFay',
+        product_name: 'Steering Wheel Wood Classic W124',
+        interaction_date: '02/09/2026',
+        interaction_type: 'CHAT_SELLER',
+        reviewed: true,
+        user_rating: 5,
+        user_review: 'Respon penjual sangat ramah dan part original sesuai deskripsi. Pengiriman cepat!'
+      }
+    ];
+  },
+
+  getInteractions: function() {
+    try {
+      const stored = localStorage.getItem('mbcina_m7_interactions');
+      if (stored) return JSON.parse(stored);
+    } catch(e) {}
+    const defaults = this.getDefaultInteractions();
+    try { localStorage.setItem('mbcina_m7_interactions', JSON.stringify(defaults)); } catch(e) {}
+    return defaults;
+  },
+
+  recordLapakInteraction: function(lapakId, productName) {
+    if (!lapakId) return;
+    const lapak = (this.data.lapak || []).find(l => l.id === lapakId);
+    if (!lapak) return;
+
+    let list = this.getInteractions();
+    const existing = list.find(x => x.lapak_id === lapakId);
+    if (existing) {
+      existing.interaction_date = new Date().toLocaleDateString('id-ID');
+      if (productName) existing.product_name = productName;
+    } else {
+      list.unshift({
+        lapak_id: lapakId,
+        lapak_name: lapak.name,
+        contact_person: lapak.owner_name || lapak.user_id || 'Penjual MB INA',
+        product_name: productName || 'Spare Parts / Unit Mercedes-Benz',
+        interaction_date: new Date().toLocaleDateString('id-ID'),
+        interaction_type: 'CHAT_SELLER',
+        reviewed: false
+      });
+    }
+    try { localStorage.setItem('mbcina_m7_interactions', JSON.stringify(list)); } catch(e) {}
+  },
+
+  openReviewForInteraction: function(lapakId) {
+    const list = this.getInteractions();
+    const item = list.find(x => x.lapak_id === lapakId);
+    const lapak = (this.data.lapak || []).find(l => l.id === lapakId) || { name: item ? item.lapak_name : 'Lapak MB INA', id: lapakId };
+
+    const formBox = document.getElementById('m7-verified-review-form-box');
+    const targetId = document.getElementById('m7-review-lapak-id');
+    const targetName = document.getElementById('m7-target-lapak-name');
+    const targetSub = document.getElementById('m7-target-lapak-sub');
+    const contentInput = document.getElementById('m7-review-content');
+
+    if (targetId) targetId.value = lapakId;
+    if (targetName) targetName.textContent = lapak.name || item?.lapak_name || 'Lapak MB INA';
+    if (targetSub) targetSub.textContent = `ID: ${lapakId} • ${item?.product_name || 'Transaksi Terverifikasi'}`;
+    if (contentInput) {
+      contentInput.value = item && item.user_review ? item.user_review : '';
+    }
+    if (item && item.user_rating) {
+      this.setStarRating(item.user_rating);
+    } else {
+      this.setStarRating(5);
+    }
+
+    if (formBox) {
+      formBox.style.display = 'block';
+      formBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  },
+
+  closeReviewForm: function() {
+    const formBox = document.getElementById('m7-verified-review-form-box');
+    if (formBox) formBox.style.display = 'none';
+  },
+
   renderReviewsSection: function() {
-    const selectLapak = document.getElementById('m7-review-lapak-sel');
+    const interactionListEl = document.getElementById('m7-interacted-lapak-list');
     const container = document.getElementById('m7-reviews-list-container');
 
-    if (selectLapak) {
-      selectLapak.innerHTML = this.data.lapak.map(l => `<option value="${l.id}">🏪 ${l.name} (${l.id})</option>`).join('');
+    const interactions = this.getInteractions();
+
+    if (interactionListEl) {
+      if (interactions.length === 0) {
+        interactionListEl.innerHTML = `
+          <div style="text-align:center; padding:24px 16px; background:rgba(255,255,255,0.02); border:1px dashed var(--chrome-border); border-radius:12px;">
+            <div style="font-size:2rem; margin-bottom:8px;">🤝</div>
+            <div style="font-size:0.85rem; color:#fff; font-weight:700; margin-bottom:4px;">Belum Ada Riwayat Transaksi</div>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin:0 0 14px 0; line-height:1.4;">
+              Untuk menjaga reputasi review tetap otentik, Anda hanya dapat menilai lapak yang pernah Anda hubungi atau beli.
+            </p>
+            <button type="button" class="btn-primary" style="font-size:0.78rem; padding:6px 14px; font-weight:700;" onclick="M7Engine.switchSubtab('7_2_products')">
+              🛍️ Buka Katalog Produk
+            </button>
+          </div>
+        `;
+      } else {
+        interactionListEl.innerHTML = interactions.map(item => {
+          const stars = item.user_rating ? '⭐'.repeat(item.user_rating) : '';
+          return `
+            <div class="glass-panel" style="padding:14px; border:1px solid ${item.reviewed ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}; border-radius:12px; margin-bottom:10px; background:rgba(255,255,255,0.02);">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:8px;">
+                <div>
+                  <div style="font-size:0.85rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px;">
+                    <span>🏪 ${item.lapak_name}</span>
+                  </div>
+                  <div style="font-size:0.72rem; color:var(--text-muted); margin-top:2px;">
+                    Produk: <span style="color:#cbd5e1;">${item.product_name || 'Spare Parts / Unit'}</span>
+                  </div>
+                </div>
+                <span style="font-size:0.68rem; padding:2px 8px; border-radius:10px; font-weight:700; background:${item.reviewed ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)'}; color:${item.reviewed ? 'var(--primary-emerald)' : 'var(--accent-gold)'}; border:1px solid ${item.reviewed ? 'var(--primary-emerald)' : 'var(--accent-gold)'}; flex-shrink:0;">
+                  ${item.reviewed ? '✅ Sudah Diulas' : '⏳ Siap Dinilai'}
+                </span>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:8px; margin-top:6px;">
+                <span style="font-size:0.7rem; color:var(--text-muted);">📅 Kontak: ${item.interaction_date}</span>
+                <button type="button" class="${item.reviewed ? 'btn-outline' : 'btn-primary'}" style="font-size:0.75rem; padding:5px 12px; font-weight:800; border-radius:8px; ${!item.reviewed ? 'background:var(--accent-gold); color:#000;' : ''}" onclick="M7Engine.openReviewForInteraction('${item.lapak_id}')">
+                  ${item.reviewed ? '✏️ Edit Ulasan (' + stars + ')' : '⭐ Nilai Penjual'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     if (!container) return;
@@ -23683,13 +23819,16 @@ window.M7Engine = {
       const lapak = this.data.lapak.find(l => l.id === r.lapak_id) || { name: 'Lapak MB INA' };
       const stars = '⭐'.repeat(r.rating || 5);
       return `
-        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--chrome-border); padding:14px; border-radius:10px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-            <div style="font-size:0.82rem; font-weight:800; color:var(--accent-gold);">🏪 ${lapak.name}</div>
-            <div style="font-size:0.9rem;">${stars}</div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--chrome-border); padding:14px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+            <div style="font-size:0.85rem; font-weight:800; color:var(--accent-gold); display:flex; align-items:center; gap:6px;">
+              <span>🏪 ${lapak.name}</span>
+              <span style="font-size:0.65rem; background:rgba(16,185,129,0.15); color:var(--primary-emerald); border:1px solid var(--primary-emerald); padding:1px 6px; border-radius:8px; font-weight:700;">✅ Transaksi Terverifikasi</span>
+            </div>
+            <div style="font-size:0.85rem;">${stars}</div>
           </div>
-          <div style="font-size:0.83rem; color:#fff; margin-bottom:6px; font-weight:600;">"${r.content}"</div>
-          <div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+          <div style="font-size:0.82rem; color:#fff; margin-bottom:8px; line-height:1.5;">"${r.content}"</div>
+          <div style="font-size:0.73rem; color:var(--text-muted); display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.05); padding-top:6px;">
             <span>👤 ${r.user_name || 'Member MB INA'} (${r.member_id || 'MBINA-HQ-2026-000001'})</span>
             <span>📅 ${r.created_at || '2026-08-10'}</span>
           </div>
@@ -23714,40 +23853,42 @@ window.M7Engine = {
   },
 
   submitReviewForm: async function() {
-    const lapakId = document.getElementById('m7-review-lapak-sel')?.value;
-    const content = document.getElementById('m7-review-content')?.value;
+    const lapakId = document.getElementById('m7-review-lapak-id')?.value;
+    const content = document.getElementById('m7-review-content')?.value.trim();
 
     if (!lapakId || !content) {
-      alert("❌ Mohon lengkapi seluruh field review!");
+      alert("⚠️ Mohon isi ulasan pengalaman bertransaksi Anda!");
       return;
     }
 
-    try {
-      const res = await fetch('api.php?action=create_lapak_review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lapak_id: lapakId, rating: this.selectedStarRating, content: content })
-      }).then(r => r.json());
-
-      if (res && res.success) {
-        alert("⭐ Review & Rating Berhasil Dikirim!");
-        this.data.reviews.unshift({
-          id: 'rev_' + Date.now(),
-          lapak_id: lapakId,
-          user_name: 'Derist Touriano',
-          member_id: 'MBINA-HQ-2026-000001',
-          rating: this.selectedStarRating,
-          content: content,
-          created_at: new Date().toISOString().split('T')[0]
-        });
-        document.getElementById('m7-review-content').value = '';
-        this.renderReviewsSection();
-      } else {
-        alert(`❌ Gagal mengirim review: ${res?.message || 'Error'}`);
-      }
-    } catch (e) {
-      alert(`❌ Connection error: ${e.message}`);
+    // Update in interaction list
+    let list = this.getInteractions();
+    const item = list.find(x => x.lapak_id === lapakId);
+    if (item) {
+      item.reviewed = true;
+      item.user_rating = this.selectedStarRating || 5;
+      item.user_review = content;
+      try { localStorage.setItem('mbcina_m7_interactions', JSON.stringify(list)); } catch(e) {}
     }
+
+    const lapak = (this.data.lapak || []).find(l => l.id === lapakId) || { name: item ? item.lapak_name : 'Lapak MB INA' };
+    const curUser = (window.AppEngine && window.AppEngine.currentUser) || { name: 'Derist Touriano', member_id: 'MBINA-HQ-2026-000001' };
+
+    this.data.reviews.unshift({
+      id: 'rev_' + Date.now(),
+      lapak_id: lapakId,
+      user_name: curUser.name || 'Member MB INA',
+      member_id: curUser.member_id || 'MBINA-HQ-2026-000001',
+      rating: this.selectedStarRating || 5,
+      content: content,
+      verified: true,
+      created_at: new Date().toLocaleDateString('id-ID')
+    });
+
+    alert("⭐ Ulasan Terverifikasi Berhasil Dikirim!\n\nTerima kasih telah berkontribusi menjaga reputasi transaksi sehat antar-anggota Mercedes-Benz Club Indonesia.");
+    document.getElementById('m7-review-content').value = '';
+    this.closeReviewForm();
+    this.renderReviewsSection();
   },
 
   // 7.5 LAPORAN SEWA LAPAK TABLE & EXPORTS
