@@ -534,8 +534,8 @@ const AppEngine = {
     const m6tabs = document.querySelectorAll('[data-m6-subtab]');
     m6tabs.forEach(btn => {
       const t = btn.getAttribute('data-m6-subtab');
-      // Member hanya boleh: 6_3_publish dan 6_5_gallery
-      btn.style.display = (t === '6_3_publish' || t === '6_5_gallery') ? '' : 'none';
+      // Member boleh melihat: 6_3_publish, 6_4_archive dan 6_5_gallery
+      btn.style.display = (t === '6_3_publish' || t === '6_4_archive' || t === '6_5_gallery') ? '' : 'none';
     });
     // Sembunyikan tombol "Portal Mitra & Sponsorship"
     const sponsorBtn = document.querySelector('#admin-tab-m6_event .btn-outline[onclick*="openPortalSponsor"]');
@@ -13931,6 +13931,23 @@ const M6Engine = {
       }
       return;
     }
+    if (subtab === '6_4_archive') {
+      this._publishEventsFilter = 'COMPLETED';
+      this.data.activeSubtab = '6_4_archive';
+      document.querySelectorAll('[data-m6-subtab]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-m6-subtab') === '6_4_archive');
+      });
+      document.querySelectorAll('.m6-subtab-content').forEach(c => {
+        c.style.display = c.id === 'm6-subtab-6_3_publish' ? 'block' : 'none';
+      });
+      this.renderPublishPage();
+      return;
+    }
+    if (subtab === '6_3_publish') {
+      if (this._publishEventsFilter === 'COMPLETED') {
+        this._publishEventsFilter = 'UPCOMING';
+      }
+    }
     this.data.activeSubtab = subtab;
     // Toggle only M6 subtab buttons (data-m6-subtab)
     document.querySelectorAll('[data-m6-subtab]').forEach(btn => {
@@ -14632,6 +14649,19 @@ const M6Engine = {
 
   setPublishEventsFilter(filter) {
     this._publishEventsFilter = filter;
+    if (filter === 'COMPLETED') {
+      this.data.activeSubtab = '6_4_archive';
+    } else if (filter === 'UPCOMING') {
+      this.data.activeSubtab = '6_3_publish';
+    }
+    document.querySelectorAll('[data-m6-subtab]').forEach(btn => {
+      const t = btn.getAttribute('data-m6-subtab');
+      if (this.data.activeSubtab === '6_4_archive') {
+        btn.classList.toggle('active', t === '6_4_archive');
+      } else if (this.data.activeSubtab === '6_3_publish') {
+        btn.classList.toggle('active', t === '6_3_publish');
+      }
+    });
     this.renderPublishPage();
   },
 

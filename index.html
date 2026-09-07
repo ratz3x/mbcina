@@ -2455,6 +2455,7 @@
             <button class="sub-tab-btn active" data-m6-subtab="6_1_proposal" onclick="M6Engine.switchSubtab('6_1_proposal')">Proposal & RAB Event</button>
             <button class="sub-tab-btn" data-m6-subtab="6_2_approval" onclick="M6Engine.switchSubtab('6_2_approval')">Persetujuan Presiden</button>
             <button class="sub-tab-btn" data-m6-subtab="6_3_publish" onclick="M6Engine.switchSubtab('6_3_publish')">Publikasi & Tiket Peserta</button>
+            <button class="sub-tab-btn" data-m6-subtab="6_4_archive" onclick="M6Engine.switchSubtab('6_4_archive')">Arsip & LPJ Event</button>
             <button class="sub-tab-btn" data-m6-subtab="6_5_gallery" onclick="M6Engine.switchSubtab('6_5_gallery')">Dokumentasi & Galeri</button>
             <button type="button" class="btn-outline" style="margin-left:auto; font-size:0.75rem; padding:6px 14px; border-radius:12px; color:var(--accent-gold); border-color:rgba(245,158,11,0.3); display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="AppEngine.openPortalSponsor()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -2684,7 +2685,7 @@
             <div style="margin-bottom:20px;">
               <h4 style="color:var(--accent-gold); font-size:1.15rem; margin-bottom:4px;">Persetujuan Presiden</h4>
               <p style="font-size:0.83rem; color:var(--text-muted); margin:0;">
-                Fungsi: Presiden melakukan review dan memberikan keputusan terhadap proposal event yang diajukan Admin di 5.1.
+                Fungsi: Presiden melakukan review dan memberikan keputusan terhadap proposal event yang diajukan oleh Admin/Panitia.
               </p>
             </div>
 
@@ -2760,16 +2761,16 @@
             <!-- ── HEADER & INNER SUBTABS ── -->
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
               <div>
-                <h4 style="color:var(--accent-gold); font-size:1.15rem; margin:0;">🖼️ 5.5 Galeri & Dokumentasi Event MB INA</h4>
-                <p style="font-size:0.8rem; color:var(--text-muted); margin:2px 0 0;">Mengelola arsip foto, video, album event, tag participant, serta layanan download & share.</p>
+                <h4 style="color:var(--accent-gold); font-size:1.15rem; margin:0;">🖼️ Galeri & Dokumentasi Event MB INA</h4>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin:2px 0 0;">Mengelola arsip foto, video, album kegiatan, tag peserta, serta layanan unduh & bagikan.</p>
               </div>
 
               <!-- SUB-TAB INNER PILLS -->
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                <button id="m6-gl-inner-btn-651" class="btn-primary" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('651')">📁 5.5.1 Album Event</button>
-                <button id="m6-gl-inner-btn-652" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('652')">📤 5.5.2 Upload Media</button>
-                <button id="m6-gl-inner-btn-653" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('653')">🏷️ 5.5.3 Tag Participant</button>
-                <button id="m6-gl-inner-btn-654" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('654')">📥 5.5.4 Download & Share</button>
+                <button id="m6-gl-inner-btn-651" class="btn-primary" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('651')">📁 Album Event</button>
+                <button id="m6-gl-inner-btn-652" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('652')">📤 Upload Media</button>
+                <button id="m6-gl-inner-btn-653" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('653')">🏷️ Tag Peserta</button>
+                <button id="m6-gl-inner-btn-654" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('654')">📥 Unduh & Bagikan</button>
               </div>
             </div>
 
@@ -2866,7 +2867,7 @@
               <div class="glass-card" style="padding:20px; border:1px solid var(--chrome-border); margin-bottom:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
                   <div>
-                    <h5 style="color:var(--accent-gold); font-size:1rem; margin:0;">🏷️ Tag Member Participant di Foto Event</h5>
+                    <h5 style="color:var(--accent-gold); font-size:1rem; margin:0;">🏷️ Tag Peserta di Foto Event</h5>
                     <p style="font-size:0.78rem; color:var(--text-muted); margin:2px 0 0;">Tandai anggota member pada foto dokumentasi event untuk pengarsipan digital E-KTA.</p>
                   </div>
                   <div style="display:flex; gap:10px; align-items:center;">
@@ -2881,11 +2882,11 @@
             </div>
 
             <!-- ╔═════════════════════════════════════════════════════╗ -->
-            <!-- ║  6.5.4 DOWNLOAD & SHARE                             ║ -->
+            <!-- ║  DOWNLOAD & BAGIKAN                                 ║ -->
             <!-- ╚═════════════════════════════════════════════════════╝ -->
             <div id="m6-gl-inner-654" style="display:none;">
               <div class="glass-card" style="padding:20px; border:1px solid var(--chrome-border);">
-                <h5 style="color:var(--accent-gold); font-size:1rem; margin-bottom:14px;">📥 Download Album ZIP & Share Publik</h5>
+                <h5 style="color:var(--accent-gold); font-size:1rem; margin-bottom:14px;">📥 Unduh Album ZIP & Bagikan Publik</h5>
                 <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:18px;">Unduh seluruh koleksi foto event dalam paket ZIP beresolusi tinggi atau bagikan link album ke media sosial.</p>
 
                 <div id="m6-gl-download-albums-list" style="display:flex; flex-direction:column; gap:14px;">
@@ -11280,8 +11281,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260908_v198_format_proposal_proposer_member_info"></script>
-  <script src="js/app.js?v=20260908_v198_format_proposal_proposer_member_info"></script>
+  <script src="js/auth.js?v=20260908_v199_m6_archive_tab_and_clean_gallery_headers"></script>
+  <script src="js/app.js?v=20260908_v199_m6_archive_tab_and_clean_gallery_headers"></script>
   <script>
     lucide.createIcons();
     try {
