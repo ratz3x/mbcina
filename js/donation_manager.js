@@ -65,6 +65,75 @@
           if (Array.isArray(parsed.receipts) && parsed.receipts.length)   this.data.receipts  = parsed.receipts;
         }
       } catch (e) {}
+
+      // Fallback sample campaigns jika kosong
+      if (!this.data.campaigns || this.data.campaigns.length === 0) {
+        if (window.AppEngine && window.AppEngine.donationData && Array.isArray(window.AppEngine.donationData.campaigns) && window.AppEngine.donationData.campaigns.length) {
+          this.data.campaigns = window.AppEngine.donationData.campaigns;
+        } else {
+          this.data.campaigns = [
+            {
+              id: 'camp_baksos_2026',
+              title: 'Peduli Bencana & Baksos MB INA 2026',
+              description: 'Program tanggap darurat bencana alam dan santunan sosial kemanusiaan nasional MB INA.',
+              target_amount: 50000000,
+              collected_amount: 18500000,
+              start_date: '2026-01-01',
+              end_date: '2026-12-31',
+              is_active: true
+            },
+            {
+              id: 'camp_ramadhan_2026',
+              title: 'Santunan Yatim Piatu Ramadhan 1447H',
+              description: 'Pemberian santunan dan sembako untuk 1.000 anak yatim piatu di seluruh chapter se-Indonesia.',
+              target_amount: 30000000,
+              collected_amount: 15000000,
+              start_date: '2026-03-01',
+              end_date: '2026-04-15',
+              is_active: true
+            },
+            {
+              id: 'camp_yogya_2026',
+              title: 'Peduli Pendidikan Anak Asuh MB Club Ina',
+              description: 'Beasiswa pendidikan anak asuh berprestasi dari keluarga anggota dan masyarakat binaan klub.',
+              target_amount: 25000000,
+              collected_amount: 8500000,
+              start_date: '2026-05-01',
+              end_date: '2026-11-30',
+              is_active: true
+            }
+          ];
+        }
+      }
+
+      // Fallback sample donations jika kosong (termasuk Andi Pratama & Derist Touriano)
+      if (!this.data.donations || this.data.donations.length === 0) {
+        if (window.AppEngine && window.AppEngine.donationData && Array.isArray(window.AppEngine.donationData.donations) && window.AppEngine.donationData.donations.length) {
+          this.data.donations = window.AppEngine.donationData.donations;
+        } else {
+          this.data.donations = [
+            { id: 'DON-TRX-2026-001', trx_code: 'DON-TRX-2026-001', campaign_id: 'camp_baksos_2026', user_id: 'usr_superadmin', donor_name: 'Derist Touriano', member_id: 'MBINA-HQ-2026-000001', amount: 5000000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-10 08:30', notes: 'Donasi bakti sosial kemanusiaan' },
+            { id: 'DON-TRX-2026-002', trx_code: 'DON-TRX-2026-002', campaign_id: 'camp_baksos_2026', user_id: 'usr_mem_005', donor_name: 'Andi Pratama', member_id: 'MBINA-JKT-2026-000005', amount: 2000000, payment_method: 'QRIS', status: 'SUCCESS', created_at: '2026-08-10 09:15', notes: 'Donasi bencana alam & baksos' },
+            { id: 'DON-TRX-2026-003', trx_code: 'DON-TRX-2026-003', campaign_id: 'camp_ramadhan_2026', user_id: 'usr_mem_005', donor_name: 'Andi Pratama', member_id: 'MBINA-JKT-2026-000005', amount: 1500000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-18 14:20', notes: 'Santunan anak yatim' },
+            { id: 'DON-TRX-2026-004', trx_code: 'DON-TRX-2026-004', campaign_id: 'camp_yogya_2026', user_id: 'usr_mem_005', donor_name: 'Andi Pratama', member_id: 'MBINA-JKT-2026-000005', amount: 500000, payment_method: 'TRANSFER', status: 'PENDING', created_at: '2026-09-02 11:10', notes: 'Beasiswa pendidikan anak asuh' },
+            { id: 'DON-TRX-2026-005', trx_code: 'DON-TRX-2026-005', campaign_id: 'camp_ramadhan_2026', user_id: 'usr_mem_007', donor_name: 'Siti Rahmawati', member_id: 'MBINA-SBY-2026-000007', amount: 1000000, payment_method: 'CASH', status: 'SUCCESS', created_at: '2026-08-10 10:00', notes: 'Santunan yatim piatu' },
+            { id: 'DON-TRX-2026-006', trx_code: 'DON-TRX-2026-006', campaign_id: 'camp_baksos_2026', user_id: 'usr_mem_006', donor_name: 'Budi Santoso', member_id: 'MBINA-BDG-2026-000006', amount: 500000, payment_method: 'TRANSFER', status: 'SUCCESS', created_at: '2026-08-09 14:20', notes: 'Baksos MB INA' }
+          ];
+        }
+      }
+
+      // Fallback sample receipts jika kosong
+      if (!this.data.receipts || this.data.receipts.length === 0) {
+        if (window.AppEngine && window.AppEngine.donationData && Array.isArray(window.AppEngine.donationData.receipts) && window.AppEngine.donationData.receipts.length) {
+          this.data.receipts = window.AppEngine.donationData.receipts;
+        } else {
+          this.data.receipts = [
+            { id: 'rec_1', receipt_number: 'REC-2026-0001', donation_id: 'DON-TRX-2026-001', donor_name: 'Derist Touriano', member_id: 'MBINA-HQ-2026-000001', amount: 5000000, campaign_title: 'Peduli Bencana & Baksos MB INA 2026', payment_method: 'TRANSFER', created_at: '2026-08-10 09:00' },
+            { id: 'rec_2', receipt_number: 'REC-2026-0002', donation_id: 'DON-TRX-2026-002', donor_name: 'Andi Pratama', member_id: 'MBINA-JKT-2026-000005', amount: 2000000, campaign_title: 'Peduli Bencana & Baksos MB INA 2026', payment_method: 'QRIS', created_at: '2026-08-10 09:45' },
+            { id: 'rec_3', receipt_number: 'REC-2026-0003', donation_id: 'DON-TRX-2026-003', donor_name: 'Andi Pratama', member_id: 'MBINA-JKT-2026-000005', amount: 1500000, campaign_title: 'Santunan Yatim Piatu Ramadhan 1447H', payment_method: 'TRANSFER', created_at: '2026-08-18 15:00' }
+          ];
+        }
+      }
     },
 
     saveStoredData() {
@@ -80,9 +149,9 @@
         this.isLoading = true;
         const res = await fetch('api.php?action=get_donation_campaigns').then(r => r.json());
         if (res && res.success) {
-          if (Array.isArray(res.campaigns)) this.data.campaigns = res.campaigns;
-          if (Array.isArray(res.donations)) this.data.donations = res.donations;
-          if (Array.isArray(res.receipts))  this.data.receipts  = res.receipts;
+          if (Array.isArray(res.campaigns) && res.campaigns.length) this.data.campaigns = res.campaigns;
+          if (Array.isArray(res.donations) && res.donations.length) this.data.donations = res.donations;
+          if (Array.isArray(res.receipts) && res.receipts.length)   this.data.receipts  = res.receipts;
           this.saveStoredData();
           this.renderActiveSubtab();
         }
@@ -419,22 +488,63 @@
 
     // ─── TAB 1: MONITORING & DAFTAR TRANSAKSI (MBUX STYLE) ───────────────────
     renderMonitoringTab(container) {
+      const isMemberViewer = (typeof document !== 'undefined' && document.body.classList.contains('member-mode')) || (window.AppEngine && typeof window.AppEngine.isMemberUser === 'function' && window.AppEngine.isMemberUser());
+
+      const curUser  = (window.AppEngine && window.AppEngine.currentUser) || (window.AuthEngine && window.AuthEngine.currentUser) || JSON.parse(localStorage.getItem('mbina_session_user') || '{}');
+      const curUid   = String(curUser.id || curUser.user_id || '').toLowerCase().trim();
+      const curMid   = String(curUser.member_id || curUser.memberId || '').toLowerCase().trim();
+      const curName  = String(curUser.name || curUser.full_name || curUser.username || '').toLowerCase().trim();
+      const curEmail = String(curUser.email || '').toLowerCase().trim();
+
+      const isMyDonation = (d) => {
+        const dUid   = String(d.user_id || '').toLowerCase().trim();
+        const dMid   = String(d.member_id || '').toLowerCase().trim();
+        const dName  = String(d.donor_name || '').toLowerCase().trim();
+        const dNotes = String(d.notes || '').toLowerCase();
+
+        if (curUid && (dUid === curUid || (curUid === 'usr_mem_005' && dUid === 'usr_m3_001') || (curUid === 'usr_m3_001' && dUid === 'usr_mem_005'))) return true;
+        if (curMid && (dMid === curMid || dNotes.includes(curMid))) return true;
+        if (curName && curName !== 'pengunjung' && curName !== 'member' && (dName === curName || dName.includes(curName) || curName.includes(dName))) return true;
+        if (curEmail && dNotes.includes(curEmail)) return true;
+        return false;
+      };
+
       let totalCollected = 0;
       let pendingCount = 0;
       let successCount = 0;
       const donorSet = new Set();
 
+      let myTotalDonation = 0;
+      let mySuccessCount = 0;
+      let myPendingCount = 0;
+
       this.data.donations.forEach(d => {
-        if (d.status === 'SUCCESS' || d.status === 'CONFIRMED') {
+        const isSuccess = (d.status === 'SUCCESS' || d.status === 'CONFIRMED');
+        const isPending = (d.status === 'PENDING');
+        const isMine    = isMyDonation(d);
+
+        if (isSuccess) {
           totalCollected += Number(d.amount || 0);
           successCount++;
           if (d.member_id || d.donor_name) donorSet.add(d.member_id || d.donor_name);
-        } else if (d.status === 'PENDING') {
+          if (isMine) {
+            myTotalDonation += Number(d.amount || 0);
+            mySuccessCount++;
+          }
+        } else if (isPending) {
           pendingCount++;
+          if (isMine) {
+            myPendingCount++;
+          }
         }
       });
 
+      const myTier = calcTier(myTotalDonation);
+
       let filtered = [...this.data.donations];
+      if (isMemberViewer) {
+        filtered = filtered.filter(d => isMyDonation(d));
+      }
       if (this.filterCampaign !== 'ALL') {
         filtered = filtered.filter(d => d.campaign_id === this.filterCampaign);
       }
@@ -464,15 +574,19 @@
           <!-- Tile 1 -->
           <div class="mbux-glass-card" style="padding:20px 22px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Dana Terkumpul</span>
+              <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">
+                ${isMemberViewer ? 'Total Donasi Saya' : 'Dana Terkumpul'}
+              </span>
               <div style="color:#CBD5E1;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
             </div>
             <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
-              Rp ${totalCollected.toLocaleString('id-ID')}
+              Rp ${(isMemberViewer ? myTotalDonation : totalCollected).toLocaleString('id-ID')}
             </div>
-            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">${successCount} transaksi terverifikasi</div>
+            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">
+              ${isMemberViewer ? `${mySuccessCount} donasi terverifikasi` : `${successCount} transaksi terverifikasi`}
+            </div>
           </div>
 
           <!-- Tile 2 -->
@@ -484,23 +598,33 @@
               </div>
             </div>
             <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
-              ${pendingCount}
+              ${isMemberViewer ? myPendingCount : pendingCount}
             </div>
-            <div style="font-size:0.72rem; color:#94A3B8; margin-top:4px;">Struk menunggu peninjauan</div>
+            <div style="font-size:0.72rem; color:#94A3B8; margin-top:4px;">
+              ${isMemberViewer ? 'Menunggu konfirmasi admin' : 'Struk menunggu peninjauan'}
+            </div>
           </div>
 
           <!-- Tile 3 -->
           <div class="mbux-glass-card" style="padding:20px 22px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Total Donatur</span>
+              <span style="font-size:0.75rem; color:#94A3B8; font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">
+                ${isMemberViewer ? 'Tier Keanggotaan' : 'Total Donatur'}
+              </span>
               <div style="color:#CBD5E1;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                ${isMemberViewer ? `
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                ` : `
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                `}
               </div>
             </div>
-            <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
-              ${donorSet.size}
+            <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; letter-spacing:-0.02em;">
+              ${isMemberViewer ? myTier.label : donorSet.size}
             </div>
-            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">Anggota terdaftar</div>
+            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">
+              ${isMemberViewer ? 'Status Donatur Aktif' : 'Anggota terdaftar'}
+            </div>
           </div>
 
           <!-- Tile 4 -->
@@ -514,7 +638,9 @@
             <div style="font-size:1.5rem; font-weight:700; color:#FFFFFF; font-family:monospace; letter-spacing:-0.02em;">
               ${this.data.campaigns.length}
             </div>
-            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">Live Supabase Database</div>
+            <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">
+              ${isMemberViewer ? 'Program Donasi MB INA' : 'Live Supabase Database'}
+            </div>
           </div>
         </div>
 
@@ -525,10 +651,12 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="12 6 12 12 16 14"/></svg>
               <span>Program Donasi Aktif</span>
             </h2>
+            ${!isMemberViewer ? `
             <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.switchTab('campaign_form')">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               <span>Buat Program Baru</span>
             </button>
+            ` : ''}
           </div>
 
           <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:18px;">
@@ -574,16 +702,16 @@
         </div>
 
         <!-- SECTION: TABEL DAFTAR TRANSAKSI -->
-        <div class="mbux-glass-card member-hide-donor-transactions" style="padding:22px;">
+        <div class="mbux-glass-card" style="padding:22px;">
           <!-- FILTER & SEARCH HEADER -->
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px;">
             <div>
               <h2 style="margin:0; font-size:0.95rem; font-weight:600; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.06em; display:flex; align-items:center; gap:8px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                <span>Daftar Transaksi Donasi</span>
+                <span>${isMemberViewer ? '📜 LOG TRANSAKSI DONASI SAYA' : 'Daftar Transaksi Donasi'}</span>
               </h2>
               <p style="margin:4px 0 0; font-size:0.75rem; color:#64748B;">
-                Pemeriksaan bukti transfer wajib dilakukan sebelum persetujuan transaksi dan pembaruan Tier Anggota.
+                ${isMemberViewer ? `Riwayat penyaluran donasi atas nama Anda (${curUser.name || 'Member'}${curMid ? ' • ' + curMid : ''}) beserta bukti transfer dan kwitansi resmi.` : 'Pemeriksaan bukti transfer wajib dilakukan sebelum persetujuan transaksi dan pembaruan Tier Anggota.'}
               </p>
             </div>
 
@@ -595,7 +723,7 @@
                   id="mbux-donation-search-input"
                   name="mbux_search_query_no_autofill"
                   class="mbux-input"
-                  placeholder="Cari nama / ID..."
+                  placeholder="${isMemberViewer ? 'Cari kode trx / program...' : 'Cari nama / ID...'}"
                   value="${this.searchQuery}"
                   autocomplete="new-password"
                   autocorrect="off"
@@ -630,15 +758,17 @@
                 <option value="REJECTED" ${this.filterStatus === 'REJECTED' ? 'selected' : ''}>Ditolak (Rejected)</option>
               </select>
 
-              <!-- Exports -->
-              <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.exportExcel()">
+              ${!isMemberViewer ? `
+              <!-- Exports Admin Only -->
+              <button type="button" class="mbux-btn-stroke member-hide-admin-export" onclick="window.DonationManager.exportExcel()">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Excel</span>
               </button>
-              <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.exportPdf()">
+              <button type="button" class="mbux-btn-stroke member-hide-admin-export" onclick="window.DonationManager.exportPdf()">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
                 <span>PDF</span>
               </button>
+              ` : ''}
             </div>
           </div>
 
@@ -649,28 +779,49 @@
                 <tr style="border-bottom:1px solid rgba(226,232,240,0.08); color:#94A3B8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em;">
                   <th style="padding:12px 10px; text-align:center; width:40px;">No</th>
                   <th style="padding:12px 10px; text-align:left;">Kode Trx</th>
-                  <th style="padding:12px 10px; text-align:left;">Donatur &amp; Member ID</th>
+                  <th style="padding:12px 10px; text-align:left;">${isMemberViewer ? 'Tanggal / Waktu' : 'Donatur &amp; Member ID'}</th>
                   <th style="padding:12px 10px; text-align:left;">Program</th>
                   <th style="padding:12px 10px; text-align:right;">Nominal (Rp)</th>
                   <th style="padding:12px 10px; text-align:center;">Metode</th>
                   <th style="padding:12px 10px; text-align:center;">Status</th>
-                  <th style="padding:12px 10px; text-align:center; width:180px;">Aksi</th>
+                  <th style="padding:12px 10px; text-align:center; width:180px;">${isMemberViewer ? 'Kwitansi &amp; Bukti' : 'Aksi'}</th>
                 </tr>
               </thead>
               <tbody>
                 ${filtered.length === 0 ? `
                   <tr>
                     <td colspan="8" style="text-align:center; padding:38px; color:#64748B;">
-                      <div style="margin-bottom:6px; color:#CBD5E1; font-weight:600; font-size:0.88rem;">
-                        ${this.searchQuery ? `Tidak ada transaksi yang cocok dengan kata kunci "${this.searchQuery}"` : 'Tidak ada transaksi donasi yang sesuai kriteria filter.'}
-                      </div>
-                      <div style="font-size:0.75rem; color:#64748B; margin-bottom:14px;">
-                        Klik tombol di bawah untuk membersihkan filter pencarian dan menampilkan seluruh donasi.
-                      </div>
-                      <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.clearFilters()">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-                        <span>Reset Pencarian &amp; Tampilkan Semua Donasi</span>
-                      </button>
+                      ${isMemberViewer ? `
+                        <div style="margin-bottom:6px; color:#CBD5E1; font-weight:600; font-size:0.95rem;">
+                          ${this.searchQuery ? `Tidak ada riwayat donasi Anda yang cocok dengan "${this.searchQuery}"` : 'Belum Ada Riwayat Donasi Terdaftar'}
+                        </div>
+                        <div style="font-size:0.78rem; color:#94A3B8; max-width:480px; margin:0 auto 16px; line-height:1.5;">
+                          ${this.searchQuery ? 'Silakan periksa kembali kata kunci atau reset filter pencarian Anda.' : 'Anda belum memiliki transaksi donasi yang tercatat. Mari berpartisipasi dalam kegiatan sosial kepedulian bersama Mercedes-Benz Club Indonesia.'}
+                        </div>
+                        <div style="display:flex; justify-content:center; gap:10px;">
+                          ${this.searchQuery ? `
+                            <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.clearFilters()">
+                              <span>Reset Pencarian</span>
+                            </button>
+                          ` : `
+                            <button type="button" class="mbux-btn-primary" onclick="window.DonationManager.openDonateModal()">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                              <span>Salurkan Donasi Sekarang</span>
+                            </button>
+                          `}
+                        </div>
+                      ` : `
+                        <div style="margin-bottom:6px; color:#CBD5E1; font-weight:600; font-size:0.88rem;">
+                          ${this.searchQuery ? `Tidak ada transaksi yang cocok dengan kata kunci "${this.searchQuery}"` : 'Tidak ada transaksi donasi yang sesuai kriteria filter.'}
+                        </div>
+                        <div style="font-size:0.75rem; color:#64748B; margin-bottom:14px;">
+                          Klik tombol di bawah untuk membersihkan filter pencarian dan menampilkan seluruh donasi.
+                        </div>
+                        <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.clearFilters()">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                          <span>Reset Pencarian &amp; Tampilkan Semua Donasi</span>
+                        </button>
+                      `}
                     </td>
                   </tr>
                 ` : filtered.map((d, idx) => {
@@ -689,39 +840,77 @@
                   }
 
                   let actionHtml = '';
-                  if (isPending) {
-                    actionHtml = `
-                      <button type="button" class="mbux-btn-stroke"
-                        style="border-color:rgba(226,232,240,0.35); background:rgba(255,255,255,0.06);"
-                        onclick="window.DonationManager.openVerifyModal('${d.id}')">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <span>Periksa Bukti</span>
-                      </button>
-                    `;
-                  } else if (isSuccess) {
-                    actionHtml = `
-                      <div style="display:flex; gap:6px; justify-content:center;">
+                  if (isMemberViewer) {
+                    if (isSuccess) {
+                      actionHtml = `
+                        <div style="display:flex; gap:6px; justify-content:center;">
+                          <button type="button" class="mbux-btn-stroke"
+                            onclick="window.DonationManager.openVerifyModal('${d.id}')" title="Tinjau Bukti Transfer">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span>Bukti</span>
+                          </button>
+                          <button type="button" class="mbux-btn-stroke"
+                            onclick="window.DonationManager.openReceiptModalByDonation('${d.id}')" title="Buka Digital Receipt Sah">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+                            <span>Kwitansi</span>
+                          </button>
+                        </div>
+                      `;
+                    } else if (isPending) {
+                      actionHtml = `
                         <button type="button" class="mbux-btn-stroke"
-                          onclick="window.DonationManager.openVerifyModal('${d.id}')" title="Tinjau Bukti">
+                          style="border-color:rgba(226,232,240,0.3); background:rgba(255,255,255,0.04);"
+                          onclick="window.DonationManager.openVerifyModal('${d.id}')" title="Lihat Struk Transfer yang Diunggah">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                          <span>Lihat Bukti</span>
+                        </button>
+                      `;
+                    } else {
+                      actionHtml = `
+                        <button type="button" class="mbux-btn-stroke"
+                          style="color:#CBD5E1;"
+                          onclick="window.DonationManager.openVerifyModal('${d.id}')" title="Lihat Bukti">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                          <span>Lihat Bukti</span>
+                        </button>
+                      `;
+                    }
+                  } else {
+                    // Admin actions
+                    if (isPending) {
+                      actionHtml = `
+                        <button type="button" class="mbux-btn-stroke"
+                          style="border-color:rgba(226,232,240,0.35); background:rgba(255,255,255,0.06);"
+                          onclick="window.DonationManager.openVerifyModal('${d.id}')">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                          <span>Periksa Bukti</span>
+                        </button>
+                      `;
+                    } else if (isSuccess) {
+                      actionHtml = `
+                        <div style="display:flex; gap:6px; justify-content:center;">
+                          <button type="button" class="mbux-btn-stroke"
+                            onclick="window.DonationManager.openVerifyModal('${d.id}')" title="Tinjau Bukti">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span>Bukti</span>
+                          </button>
+                          <button type="button" class="mbux-btn-stroke"
+                            onclick="window.DonationManager.openReceiptModalByDonation('${d.id}')" title="Lihat Digital Receipt">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+                            <span>Kwitansi</span>
+                          </button>
+                        </div>
+                      `;
+                    } else {
+                      actionHtml = `
+                        <button type="button" class="mbux-btn-stroke"
+                          style="color:#CBD5E1;"
+                          onclick="window.DonationManager.openVerifyModal('${d.id}')">
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                           <span>Bukti</span>
                         </button>
-                        <button type="button" class="mbux-btn-stroke"
-                          onclick="window.DonationManager.openReceiptModalByDonation('${d.id}')" title="Lihat Digital Receipt">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
-                          <span>Kwitansi</span>
-                        </button>
-                      </div>
-                    `;
-                  } else {
-                    actionHtml = `
-                      <button type="button" class="mbux-btn-stroke"
-                        style="color:#CBD5E1;"
-                        onclick="window.DonationManager.openVerifyModal('${d.id}')">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <span>Lihat Bukti</span>
-                      </button>
-                    `;
+                      `;
+                    }
                   }
 
                   return `
@@ -729,8 +918,13 @@
                       <td style="padding:14px 10px; text-align:center; color:#64748B; font-family:monospace;">${idx + 1}</td>
                       <td style="padding:14px 10px; font-family:monospace; color:#94A3B8; font-size:0.75rem;">${d.trx_code || d.id}</td>
                       <td style="padding:14px 10px;">
-                        <div style="font-weight:600; color:#FFFFFF;">${d.donor_name || 'Hamba Allah'}</div>
-                        <div style="font-size:0.72rem; color:#CBD5E1; font-family:monospace;">${d.member_id || '-'}</div>
+                        ${isMemberViewer ? `
+                          <div style="font-weight:600; color:#FFFFFF;">${d.created_at || 'Hari Ini'}</div>
+                          <div style="font-size:0.72rem; color:#64748B; font-family:monospace;">${d.donor_name || 'Member MB INA'}</div>
+                        ` : `
+                          <div style="font-weight:600; color:#FFFFFF;">${d.donor_name || 'Hamba Allah'}</div>
+                          <div style="font-size:0.72rem; color:#CBD5E1; font-family:monospace;">${d.member_id || '-'}</div>
+                        `}
                       </td>
                       <td style="padding:14px 10px; color:#CBD5E1; font-size:0.78rem;">${camp.title || d.campaign_id}</td>
                       <td style="padding:14px 10px; text-align:right; font-family:monospace; font-weight:700; color:#FFFFFF; font-size:0.9rem;">
@@ -1332,6 +1526,8 @@
     },
 
     openVerifyModal(donationId) {
+      const isMemberViewer = (typeof document !== 'undefined' && document.body.classList.contains('member-mode')) || (window.AppEngine && typeof window.AppEngine.isMemberUser === 'function' && window.AppEngine.isMemberUser());
+
       const don = this.data.donations.find(d => String(d.id) === String(donationId) || String(d.trx_code) === String(donationId));
       if (!don) {
         this.notifyToast('Transaksi donasi tidak ditemukan.', 'error');
@@ -1361,7 +1557,7 @@
             <div class="mbux-modal-header">
               <div>
                 <h3 style="margin:0; font-size:1.1rem; font-weight:700; color:#FFFFFF;">
-                  Pemeriksaan Bukti Transfer Donasi
+                  ${isMemberViewer ? 'Bukti Transfer Donasi' : 'Pemeriksaan Bukti Transfer Donasi'}
                 </h3>
                 <span style="font-size:0.72rem; color:#94A3B8; font-family:monospace;">TRX ID: ${don.trx_code || don.id}</span>
               </div>
@@ -1372,6 +1568,7 @@
 
             <!-- BODY -->
             <div class="mbux-modal-body">
+              ${!isMemberViewer ? `
               <!-- PERINGATAN VERIFIKASI KETAT PENGURUS -->
               <div style="background:rgba(217,119,6,0.08); border:1px solid rgba(217,119,6,0.3); border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; align-items:flex-start; gap:12px;">
                 <div style="color:#FBBF24; font-size:1.1rem; line-height:1; margin-top:2px;">⚠️</div>
@@ -1380,10 +1577,11 @@
                   Bukti transfer ini adalah bukti sah bahwa donatur telah mengirim sejumlah uang. Periksa nominal, tanggal, nomor referensi mutasi bank, dan pastikan dana telah masuk ke rekening kas MB INA sebelum menyetujui.
                 </div>
               </div>
+              ` : ''}
 
               <!-- 1. BUKTI TRANSFER IMAGE DENGAN INSPECTION TOOLBAR -->
               <div style="margin-bottom:18px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:gap; gap:8px;">
                   <span style="font-size:0.72rem; font-weight:700; color:#F8FAFC; text-transform:uppercase; letter-spacing:0.05em; display:flex; align-items:center; gap:6px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
                     <span>Struk / Bukti Transfer Bank (Inspeksi Fisik):</span>
@@ -1418,6 +1616,7 @@
                 </div>
               </div>
 
+              ${!isMemberViewer ? `
               <!-- CHECKLIST VERIFIKASI KETAT PENGURUS -->
               <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.12); border-radius:12px; padding:14px 16px; margin-bottom:18px;">
                 <div style="font-size:0.75rem; font-weight:700; color:#CBD5E1; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;">
@@ -1442,6 +1641,7 @@
                   </label>
                 </div>
               </div>
+              ` : ''}
 
               <!-- 2. DETAIL INFORMASI TRANSAKSI -->
               <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(226,232,240,0.08); border-radius:14px; padding:16px; margin-bottom:16px;">
@@ -1511,7 +1711,15 @@
 
             <!-- FOOTER ACTION BUTTONS -->
             <div class="mbux-modal-footer">
-              ${isPending ? `
+              ${isMemberViewer ? `
+                <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.closeModal()">Tutup</button>
+                ${isSuccess ? `
+                  <button type="button" class="mbux-btn-primary" onclick="window.DonationManager.openReceiptModalByDonation('${don.id}')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-8"/><path d="M16 12h-8"/><path d="M10 16H8"/></svg>
+                    <span>Buka Kwitansi Resmi</span>
+                  </button>
+                ` : ''}
+              ` : (isPending ? `
                 <button type="button" class="mbux-btn-stroke" style="color:#FB7185; border-color:rgba(244,63,94,0.3);"
                   onclick="window.DonationManager.processVerification('${don.id}', false)">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1530,7 +1738,7 @@
                 </button>
               ` : `
                 <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.closeModal()">Tutup</button>
-              `)}
+              `))}
             </div>
           </div>
         </div>
