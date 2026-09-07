@@ -27,6 +27,10 @@
     [id^="modal-"]:not(.active) {
       display: none;
     }
+    /* Sembunyikan header Portal Admin dari Portal Member */
+    body.member-mode #admin-dashboard-page-header {
+      display: none !important;
+    }
   </style>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0b0e14">
@@ -932,7 +936,7 @@
         </button>
       </div>
 
-      <div style="margin-bottom:20px;">
+      <div id="admin-dashboard-page-header" style="margin-bottom:20px;">
         <h2 style="font-size:1.5rem; margin:0;" class="text-gradient">⚙️ Portal Admin & Operasional</h2>
         <p style="color:var(--text-muted); font-size:0.82rem; margin:4px 0 0 0;">Statistik real-time, manajemen organisasi, keanggotaan member, dan pengaturan sistem</p>
       </div>
@@ -11286,8 +11290,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v189_member_event_touring_clean"></script>
-  <script src="js/app.js?v=20260907_v189_member_event_touring_clean"></script>
+  <script src="js/auth.js?v=20260907_v190_hide_admin_header_from_member"></script>
+  <script src="js/app.js?v=20260907_v190_hide_admin_header_from_member"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11372,6 +11376,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v189_member_event_touring_clean"></script>
+  <script src="js/donation_manager.js?v=20260907_v190_hide_admin_header_from_member"></script>
 </body>
 </html>

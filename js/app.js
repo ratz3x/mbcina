@@ -504,6 +504,10 @@ const AppEngine = {
     document.body.classList.add('yt-has-sidebar');
     document.body.classList.add('member-mode'); // CSS & JS hook untuk sembunyikan tombol AKSI
 
+    // Sembunyikan header "Portal Admin & Operasional" dari Portal Member
+    const admHeader = document.getElementById('admin-dashboard-page-header');
+    if (admHeader) admHeader.style.setProperty('display', 'none', 'important');
+
     // Tampilkan tombol navigasi kembali ke dashboard member
     const retBanner = document.getElementById('member-return-banner');
     if (retBanner) retBanner.style.display = 'block';
@@ -4963,12 +4967,16 @@ const AppEngine = {
 
     // Pastikan admin mode aktif dan member-mode dibersihkan jika admin yang akses
     document.body.classList.remove('landing-mode');
+    const admHeader = document.getElementById('admin-dashboard-page-header');
     if (!this.isMemberUser()) {
       document.body.classList.remove('member-mode');
+      if (admHeader) admHeader.style.removeProperty('display');
       const retBanner = document.getElementById('member-return-banner');
       if (retBanner) retBanner.style.display = 'none';
       const retM2 = document.getElementById('btn-m2-return-member');
       if (retM2) retM2.style.display = 'none';
+    } else {
+      if (admHeader) admHeader.style.setProperty('display', 'none', 'important');
     }
     
     const sidebar = document.getElementById('app-sidebar');
