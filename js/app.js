@@ -16231,6 +16231,94 @@ const M6Engine = {
     alert('🔗 Link proposal publik berhasil disalin ke clipboard:\n' + link);
   },
 
+  // Helper to format proposer information with full name & Member ID (KTA)
+  getProposerInfo(p) {
+    if (!p) {
+      return {
+        name: 'Derist Touriano',
+        member_id: 'MBINA-HQ-2026-000001'
+      };
+    }
+
+    if (p.created_by_name && p.created_by_id) {
+      return {
+        name: p.created_by_name,
+        member_id: p.created_by_id
+      };
+    }
+
+    const rawId = (p.created_by || '').toString().trim();
+    const rawLower = rawId.toLowerCase();
+
+    // Map known system and admin IDs
+    if (['usr_superadmin', 'superadmin', 'admin', 'dtouriano', 'derist touriano', 'derist'].includes(rawLower)) {
+      return {
+        name: 'Derist Touriano',
+        member_id: 'MBINA-HQ-2026-000001'
+      };
+    }
+
+    if (['usr_presiden', 'usr_presiden2527', 'presiden', 'presiden_mbina', 'presiden2527'].includes(rawLower) || rawLower.includes('rochady')) {
+      return {
+        name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
+        member_id: 'MBINA-HQ-2026-000004'
+      };
+    }
+
+    // Try lookup from loaded members in AppEngine / sampleMembersDb
+    if (typeof AppEngine !== 'undefined' && AppEngine.m3Data && Array.isArray(AppEngine.m3Data.members)) {
+      const found = AppEngine.m3Data.members.find(m => 
+        (m.id && m.id.toLowerCase() === rawLower) ||
+        (m.username && m.username.toLowerCase() === rawLower) ||
+        (m.member_id && m.member_id.toLowerCase() === rawLower) ||
+        (m.name && m.name.toLowerCase() === rawLower)
+      );
+      if (found) {
+        return {
+          name: found.name,
+          member_id: found.member_id || found.kta_number || 'MBINA-HQ-2026-000001'
+        };
+      }
+    }
+
+    // If current logged-in user matches
+    if (typeof AuthEngine !== 'undefined' && AuthEngine.currentUser) {
+      const u = AuthEngine.currentUser;
+      if (u.id === rawId || u.username === rawId || u.name === rawId) {
+        return {
+          name: u.name || 'Derist Touriano',
+          member_id: u.member_id || u.kta_number || 'MBINA-HQ-2026-000001'
+        };
+      }
+    }
+
+    // If p.created_by is already a human name (not usr_...)
+    if (rawId && !rawId.startsWith('usr_')) {
+      return {
+        name: rawId,
+        member_id: p.created_by_id || 'MBINA-HQ-2026-000001'
+      };
+    }
+
+    return {
+      name: 'Derist Touriano',
+      member_id: 'MBINA-HQ-2026-000001'
+    };
+  },
+
+  formatProposerHtml(p) {
+    const info = this.getProposerInfo(p);
+    return `
+      <div>
+        <div style="font-weight:700; color:#fff; font-size:0.82rem; line-height:1.25;">${info.name}</div>
+        <div style="font-size:0.71rem; color:var(--accent-gold); font-family:monospace; margin-top:3px; display:inline-flex; align-items:center; gap:4px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+          <span>${info.member_id}</span>
+        </div>
+      </div>
+    `;
+  },
+
   getMasterOfficialProposals() {
     return [
       {
@@ -16238,6 +16326,8 @@ const M6Engine = {
         event_code: 'EVT-2026-012',
         title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
         created_by: 'usr_superadmin',
+        created_by_name: 'Derist Touriano',
+        created_by_id: 'MBINA-HQ-2026-000001',
         created_at: '2026-09-02T10:00:00Z',
         status: 'APPROVED',
         approved_by: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
@@ -16265,6 +16355,8 @@ const M6Engine = {
         event_code: 'EVT-2026-001',
         title: 'Touring & Bakti Sosial MB INA - Yogyakarta 2026',
         created_by: 'usr_superadmin',
+        created_by_name: 'Derist Touriano',
+        created_by_id: 'MBINA-HQ-2026-000001',
         created_at: '2026-08-09T10:00:00Z',
         status: 'APPROVED',
         approved_by: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
@@ -16296,6 +16388,8 @@ const M6Engine = {
         event_code: 'EVT-2026-002',
         title: 'Jamnas MB INA XXV & Musyawarah Nasional 2026',
         created_by: 'usr_presiden2527',
+        created_by_name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
+        created_by_id: 'MBINA-HQ-2026-000004',
         created_at: '2026-08-09T09:30:00Z',
         status: 'APPROVED',
         approved_by: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
@@ -16323,6 +16417,8 @@ const M6Engine = {
         event_code: 'EVT-2026-003',
         title: 'Grand Touring Trans Sumatra & Celebes Rally 2026',
         created_by: 'usr_presiden2527',
+        created_by_name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
+        created_by_id: 'MBINA-HQ-2026-000004',
         created_at: '2026-08-03T14:00:00Z',
         status: 'APPROVED',
         approved_by: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
@@ -16349,6 +16445,8 @@ const M6Engine = {
         event_code: 'EVT-2026-004',
         title: 'Jambore Nasional MB INA XXI 2026',
         created_by: 'usr_presiden2527',
+        created_by_name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
+        created_by_id: 'MBINA-HQ-2026-000004',
         created_at: '2026-08-01T08:00:00Z',
         status: 'APPROVED',
         approved_by: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.',
@@ -16420,7 +16518,7 @@ const M6Engine = {
             <tr style="border-bottom:1px solid rgba(255,255,255,0.06); color:#94a3b8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; text-align:left; background:rgba(255,255,255,0.02);">
               <th style="padding:10px 12px; width:130px; font-weight:600;">KODE EVENT</th>
               <th style="padding:10px 12px; font-weight:600;">JUDUL EVENT</th>
-              <th style="padding:10px 12px; width:140px; font-weight:600;">PENGAJU</th>
+              <th style="padding:10px 12px; width:170px; font-weight:600;">PENGAJU</th>
               <th style="padding:10px 12px; width:110px; font-weight:600;">TANGGAL</th>
               <th style="padding:10px 12px; width:130px; text-align:center; font-weight:600;">STATUS</th>
               <th style="padding:10px 12px; width:110px; text-align:center; font-weight:600;">AKSI</th>
@@ -16454,7 +16552,9 @@ const M6Engine = {
                       </span>
                     </div>
                   </td>
-                  <td style="padding:12px; font-size:0.78rem; color:var(--text-muted);">${p.created_by || 'usr_superadmin'}</td>
+                  <td style="padding:12px;">
+                    ${this.formatProposerHtml(p)}
+                  </td>
                   <td style="padding:12px; font-size:0.78rem; color:var(--text-muted);">${new Date(p.created_at || Date.now()).toLocaleDateString('id-ID')}</td>
                   <td style="padding:12px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
                   <td style="padding:12px; text-align:center;">
@@ -16552,6 +16652,9 @@ const M6Engine = {
         id: propId || 'prop_evt_012',
         event_code: 'EVT-2026-012',
         title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+        created_by: 'usr_superadmin',
+        created_by_name: 'Derist Touriano',
+        created_by_id: 'MBINA-HQ-2026-000001',
         event_type: 'MEETING',
         city: 'Jakarta',
         address: 'TOPGOLF JAKARTA, Jl. RS. Fatmawati Raya No. 1 RT.01/RW.01, Pondok Labu, Kec. Cilandak, Jakarta Selatan 12450',
@@ -16598,6 +16701,7 @@ const M6Engine = {
     const startStr = this.formatEventDateTime(p.date_start || '2026-09-13T08:00');
     const endStr = this.formatEventDateTime(p.date_end || '2026-09-14T18:00');
     const dateRangeDisplay = (p.date_start && p.date_end) ? `${startStr} <br><span style="color:var(--accent-gold); font-weight:600;">s/d</span> ${endStr}` : startStr;
+    const proposer = this.getProposerInfo(p);
 
     modalBody.innerHTML = `
       <!-- INFORMASI EVENT -->
@@ -16616,7 +16720,11 @@ const M6Engine = {
           <div style="grid-column:1 / -1;"><span style="color:var(--text-muted);">Alamat Lengkap:</span> <strong style="color:#fff;">${p.address || p.location || 'TOPGOLF JAKARTA, Jl. RS. Fatmawati Raya No. 1 RT.01/RW.01, Pondok Labu, Kec. Cilandak, Jakarta Selatan 12450'}</strong></div>
           <div style="grid-column:1 / -1; margin-top:2px; padding:8px 12px; background:rgba(0,0,0,0.25); border-radius:8px; border:1px solid rgba(255,255,255,0.06);"><span style="color:var(--text-muted); display:block; font-size:0.75rem; margin-bottom:2px;">Waktu & Tanggal Resmi Event:</span> <div style="color:#fff; font-size:0.82rem; line-height:1.4;">${dateRangeDisplay}</div></div>
           <div><span style="color:var(--text-muted);">Status Proposal:</span> <strong style="color:var(--accent-gold);">${p.status}</strong></div>
-          <div><span style="color:var(--text-muted);">Diajukan Oleh:</span> <strong style="color:#fff;">${p.created_by || 'usr_superadmin'}</strong></div>
+          <div>
+            <span style="color:var(--text-muted);">Diajukan Oleh:</span> 
+            <strong style="color:#fff;">${proposer.name}</strong>
+            <span style="display:inline-block; margin-left:6px; font-family:monospace; font-size:0.75rem; color:var(--accent-gold); background:rgba(245,158,11,0.1); padding:2px 8px; border-radius:4px; border:1px solid rgba(245,158,11,0.25);">${proposer.member_id}</span>
+          </div>
         </div>
         ${p.banner_url ? `
           <div style="margin-top:10px; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.08); display:flex; align-items:center; gap:10px;">
@@ -17118,11 +17226,17 @@ const M6Engine = {
     const nextNum = maxNum + 1;
     const eventCode = 'EVT-2026-' + String(nextNum).padStart(3, '0');
 
+    const curUser = (typeof AuthEngine !== 'undefined' && AuthEngine.currentUser) ? AuthEngine.currentUser : null;
+    const proposerName = (curUser && curUser.name) ? curUser.name : 'Derist Touriano';
+    const proposerId = (curUser && (curUser.member_id || curUser.kta_number)) ? (curUser.member_id || curUser.kta_number) : 'MBINA-HQ-2026-000001';
+
     const newProp = {
       id: 'prop_evt_' + Date.now(),
       event_code: eventCode,
       title: title,
-      created_by: (typeof AuthEngine !== 'undefined' && AuthEngine.currentUser?.name) ? AuthEngine.currentUser.name : 'Admin Event',
+      created_by: proposerName,
+      created_by_name: proposerName,
+      created_by_id: proposerId,
       created_at: new Date().toISOString(),
       status: 'PENDING',
       event_type: document.getElementById('m6-evt-type')?.value || 'MEETING / RAKERNAS',
