@@ -19686,7 +19686,7 @@ const M6Engine = {
       id: 'alb_2',
       title: '📁 PARADE MERCEDES-BENZ',
       description: 'Iring-iringan parade touring mobil Mercedes-Benz keliling kota Yogyakarta',
-      cover_image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500',
+      cover_image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
       is_public: true,
       created_by: 'Humas MB INA',
       created_at: '13/09/2026 11:00',
@@ -19874,7 +19874,8 @@ const M6Engine = {
           const albMedia = media.filter(m => m.album_id === a.id);
           const imgCount = albMedia.filter(m => m.type !== 'VIDEO').length;
           const vidCount = albMedia.filter(m => m.type === 'VIDEO').length;
-          const cover = a.cover_image || (albMedia[0]?.media_url) || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400';
+          const eventBanner = this.getEventBannerForAlbum(a);
+          const cover = a.cover_image || (albMedia[0]?.media_url) || eventBanner || 'assets/mb_hero.jpg';
 
           return `
           <div class="glass-panel" style="padding:0; border:1px solid var(--chrome-border); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;">
@@ -19915,19 +19916,142 @@ const M6Engine = {
     this.renderGaleri();
   },
 
+  getEventBannerForAlbum(album) {
+    if (!album) return 'assets/mb_hero.jpg';
+    const eventId = album.event_id;
+    const events = (this.publishedEvents && this.publishedEvents.length) ? this.publishedEvents :
+                   ((window.AppEngine && window.AppEngine.publishedEvents) ? window.AppEngine.publishedEvents :
+                   (this.data && this.data.events ? this.data.events : []));
+    if (eventId) {
+      const ev = events.find(e => e.id === eventId || e.code === eventId);
+      if (ev && ev.banner_image) return ev.banner_image;
+      if (ev && ev.image_url) return ev.image_url;
+    }
+    // Fallback if title mentions touring / parade / ceremony
+    const titleUpper = (album.title || '').toUpperCase();
+    if (titleUpper.includes('PARADE') || titleUpper.includes('TOURING')) {
+      return 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800';
+    }
+    if (titleUpper.includes('OPENING') || titleUpper.includes('JAMBORE')) {
+      return 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800';
+    }
+    if (titleUpper.includes('BAKTI') || titleUpper.includes('SOSIAL')) {
+      return 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800';
+    }
+    return 'assets/mb_hero.jpg';
+  },
+
+  populateAlbumEventSelect(selectedEventId) {
+    const sel = document.getElementById('m6-alb-event-sel');
+    if (!sel) return;
+    const events = (this.publishedEvents && this.publishedEvents.length) ? this.publishedEvents :
+                   ((window.AppEngine && window.AppEngine.publishedEvents) ? window.AppEngine.publishedEvents :
+                   (this.data && this.data.events ? this.data.events : []));
+    
+    let options = '<option value="">— Tidak terhubung event tertentu (Album Mandiri) —</option>';
+    events.forEach(ev => {
+      const code = ev.code || ev.id || '';
+      const isSel = (selectedEventId && (ev.id === selectedEventId || code === selectedEventId)) ? 'selected' : '';
+      options += `<option value="${ev.id || code}" ${isSel}>[${code}] ${ev.title}</option>`;
+    });
+    sel.innerHTML = options;
+  },
+
+  onAlbumEventSelectChange(eventId) {
+    const preview = document.getElementById('m6-alb-cover-preview');
+    const coverInput = document.getElementById('m6-alb-cover');
+    const statusText = document.getElementById('m6-alb-cover-status');
+    if (!eventId) {
+      if (statusText) statusText.textContent = 'Format: JPG, PNG, WebP (Bebas upload / gunakan banner event)';
+      return;
+    }
+    const events = (this.publishedEvents && this.publishedEvents.length) ? this.publishedEvents :
+                   ((window.AppEngine && window.AppEngine.publishedEvents) ? window.AppEngine.publishedEvents :
+                   (this.data && this.data.events ? this.data.events : []));
+    const ev = events.find(e => e.id === eventId || e.code === eventId);
+    if (ev) {
+      const banner = ev.banner_image || ev.image_url || 'assets/mb_hero.jpg';
+      if (!coverInput.value || coverInput.value.startsWith('http') || coverInput.value.startsWith('assets')) {
+        coverInput.value = banner;
+        if (preview) preview.src = banner;
+        if (statusText) statusText.textContent = `⭐ Banner otomatis disinkronkan dengan event: [${ev.code || ev.id}]`;
+      }
+    }
+  },
+
+  handleAlbumCoverSelect(input) {
+    if (!input || !input.files || !input.files[0]) return;
+    const file = input.files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('⚠️ File harus berupa gambar (JPG, PNG, atau WebP)!');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const preview = document.getElementById('m6-alb-cover-preview');
+      const coverInput = document.getElementById('m6-alb-cover');
+      const statusText = document.getElementById('m6-alb-cover-status');
+      if (preview) preview.src = dataUrl;
+      if (coverInput) coverInput.value = dataUrl;
+      if (statusText) statusText.textContent = `✅ File terpilih: ${file.name} (${(file.size / 1024).toFixed(0)} KB)`;
+    };
+    reader.readAsDataURL(file);
+  },
+
+  useCurrentEventBannerForAlbum() {
+    const sel = document.getElementById('m6-alb-event-sel');
+    const eventId = sel ? sel.value : '';
+    if (!eventId) {
+      alert('ℹ️ Silakan pilih event resmi pada menu dropdown di atas terlebih dahulu.');
+      return;
+    }
+    const events = (this.publishedEvents && this.publishedEvents.length) ? this.publishedEvents :
+                   ((window.AppEngine && window.AppEngine.publishedEvents) ? window.AppEngine.publishedEvents :
+                   (this.data && this.data.events ? this.data.events : []));
+    const ev = events.find(e => e.id === eventId || e.code === eventId);
+    const banner = ev ? (ev.banner_image || ev.image_url || 'assets/mb_hero.jpg') : 'assets/mb_hero.jpg';
+    const preview = document.getElementById('m6-alb-cover-preview');
+    const coverInput = document.getElementById('m6-alb-cover');
+    const statusText = document.getElementById('m6-alb-cover-status');
+    if (coverInput) coverInput.value = banner;
+    if (preview) preview.src = banner;
+    if (statusText) statusText.textContent = `⭐ Menggunakan banner event: ${ev ? ev.title : eventId}`;
+  },
+
+  resetAlbumCover() {
+    const preview = document.getElementById('m6-alb-cover-preview');
+    const coverInput = document.getElementById('m6-alb-cover');
+    const fileInput = document.getElementById('m6-alb-cover-file');
+    const statusText = document.getElementById('m6-alb-cover-status');
+    if (coverInput) coverInput.value = '';
+    if (fileInput) fileInput.value = '';
+    if (preview) preview.src = 'assets/mb_hero.jpg';
+    if (statusText) statusText.textContent = 'Sampul di-reset ke default Mercedes-Benz MB INA';
+  },
+
   openCreateAlbumModal() {
     const idEl = document.getElementById('m6-alb-id');
     const tiEl = document.getElementById('m6-alb-title');
     const deEl = document.getElementById('m6-alb-desc');
     const pubEl = document.getElementById('m6-alb-public');
+    const covEl = document.getElementById('m6-alb-cover');
+    const covPrv = document.getElementById('m6-alb-cover-preview');
+    const covFile = document.getElementById('m6-alb-cover-file');
+    const covStat = document.getElementById('m6-alb-cover-status');
     const headerTxt = document.getElementById('modal-m6-album-title-txt');
 
     if (idEl) idEl.value = '';
     if (tiEl) tiEl.value = '';
     if (deEl) deEl.value = '';
     if (pubEl) pubEl.value = 'true';
+    if (covEl) covEl.value = '';
+    if (covFile) covFile.value = '';
+    if (covPrv) covPrv.src = 'assets/mb_hero.jpg';
+    if (covStat) covStat.textContent = 'Format: JPG, PNG, WebP (Bebas upload / gunakan banner event)';
     if (headerTxt) headerTxt.textContent = '📁 Buat Album Event Baru';
 
+    this.populateAlbumEventSelect('');
     AuthEngine.openModal('modal-m6-create-album');
   },
 
@@ -19939,12 +20063,24 @@ const M6Engine = {
     const tiEl = document.getElementById('m6-alb-title');
     const deEl = document.getElementById('m6-alb-desc');
     const pubEl = document.getElementById('m6-alb-public');
+    const covEl = document.getElementById('m6-alb-cover');
+    const covPrv = document.getElementById('m6-alb-cover-preview');
+    const covFile = document.getElementById('m6-alb-cover-file');
+    const covStat = document.getElementById('m6-alb-cover-status');
     const headerTxt = document.getElementById('modal-m6-album-title-txt');
 
     if (idEl) idEl.value = alb.id;
     if (tiEl) tiEl.value = alb.title;
     if (deEl) deEl.value = alb.description || '';
     if (pubEl) pubEl.value = alb.is_public ? 'true' : 'false';
+    if (covFile) covFile.value = '';
+
+    const currentCover = alb.cover_image || this.getEventBannerForAlbum(alb) || 'assets/mb_hero.jpg';
+    if (covEl) covEl.value = alb.cover_image || '';
+    if (covPrv) covPrv.src = currentCover;
+    if (covStat) covStat.textContent = alb.cover_image ? 'Cover kustom tersimpan' : 'Menggunakan sampul default/event';
+
+    this.populateAlbumEventSelect(alb.event_id || '');
     if (headerTxt) headerTxt.textContent = '✏️ Edit Album: ' + alb.title;
 
     AuthEngine.openModal('modal-m6-create-album');
@@ -19952,10 +20088,12 @@ const M6Engine = {
 
   saveAlbumFromModal(e) {
     e.preventDefault();
-    const id    = document.getElementById('m6-alb-id')?.value;
-    const title = document.getElementById('m6-alb-title')?.value.trim();
-    const desc  = document.getElementById('m6-alb-desc')?.value.trim();
-    const isPublic = document.getElementById('m6-alb-public')?.value === 'true';
+    const id        = document.getElementById('m6-alb-id')?.value;
+    const title     = document.getElementById('m6-alb-title')?.value.trim();
+    const eventId   = document.getElementById('m6-alb-event-sel')?.value || '';
+    const cover     = document.getElementById('m6-alb-cover')?.value || '';
+    const desc      = document.getElementById('m6-alb-desc')?.value.trim();
+    const isPublic  = document.getElementById('m6-alb-public')?.value === 'true';
 
     if (!title) { alert('⚠️ Judul album wajib diisi!'); return; }
 
@@ -19963,15 +20101,18 @@ const M6Engine = {
       const alb = this.data.albums.find(a => a.id === id);
       if (alb) {
         alb.title = title;
+        alb.event_id = eventId;
+        alb.cover_image = cover;
         alb.description = desc;
         alb.is_public = isPublic;
       }
     } else {
       const newAlbum = {
         id: 'alb_' + Date.now(),
+        event_id: eventId,
         title: title.startsWith('📁') ? title : '📁 ' + title,
         description: desc,
-        cover_image: '',
+        cover_image: cover,
         is_public: isPublic,
         created_by: 'Admin MB INA',
         created_at: new Date().toLocaleDateString('id-ID'),
