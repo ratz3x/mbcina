@@ -515,6 +515,17 @@ const AppEngine = {
 
   openMemberOrganisasi() {
     this._switchToMemberAdminTab('admin-tab-m2_org', 'member_org');
+    const titleEl = document.getElementById('m2-org-module-title');
+    if (titleEl) {
+      const memSpan = titleEl.querySelector('.m2-title-member');
+      const admSpan = titleEl.querySelector('.m2-title-admin');
+      if (memSpan && admSpan) {
+        memSpan.style.display = 'inline';
+        admSpan.style.display = 'none';
+      } else {
+        titleEl.innerText = '🏛️ Organisasi & Federasi';
+      }
+    }
     this.renderM2Module();
     this.hideM2AdminActionsForMember();
   },
@@ -568,6 +579,25 @@ const AppEngine = {
     // Pastikan subtab progress yang aktif
     this.switchDonationSubtab('7_3_1_progress');
 
+    const updateDonationTitles = () => {
+      ['mbux-donation-title', 'm7-donation-module-title'].forEach(id => {
+        const titleEl = document.getElementById(id);
+        if (titleEl) {
+          const memSpan = titleEl.querySelector('.m7-title-member');
+          const admSpan = titleEl.querySelector('.m7-title-admin');
+          if (memSpan && admSpan) {
+            memSpan.style.display = 'inline';
+            admSpan.style.display = 'none';
+          }
+        }
+      });
+      const badge = document.querySelector('.m7-badge-admin');
+      if (badge) badge.style.display = 'none';
+      const actions = document.querySelector('.m7-admin-actions');
+      if (actions) actions.style.display = 'none';
+    };
+    updateDonationTitles();
+
     // Sembunyikan tab "Buat Program Donasi" dan "Log Digital Receipt" untuk member
     const donTabs = document.querySelectorAll('#admin-tab-m7_donation [data-m73-subtab]');
     donTabs.forEach(btn => {
@@ -584,8 +614,10 @@ const AppEngine = {
 
     if (typeof this.renderDonationModule === 'function') {
       this.renderDonationModule();
+      updateDonationTitles();
     } else if (typeof this.renderDonationDonorTable === 'function') {
       this.renderDonationDonorTable();
+      updateDonationTitles();
     }
   },
 
@@ -5056,7 +5088,22 @@ const AppEngine = {
     } else if (tab === 'settings') {
       this.switchM1Subtab('settings');
     } else if (tab === 'm2_org') {
+      const isMem = this.isMemberUser();
+      const titleEl = document.getElementById('m2-org-module-title');
+      if (titleEl) {
+        const memSpan = titleEl.querySelector('.m2-title-member');
+        const admSpan = titleEl.querySelector('.m2-title-admin');
+        if (memSpan && admSpan) {
+          memSpan.style.display = isMem ? 'inline' : 'none';
+          admSpan.style.display = isMem ? 'none' : 'inline';
+        } else {
+          titleEl.innerText = isMem ? '🏛️ Organisasi & Federasi' : '🏛️ Manajemen Organisasi & Federasi';
+        }
+      }
       this.renderM2Module();
+      if (isMem) {
+        this.hideM2AdminActionsForMember();
+      }
     } else if (tab === 'm3_membership') {
       this.renderM3Module();
     } else if (tab === 'm4_registration') {
@@ -5076,7 +5123,8 @@ const AppEngine = {
         M6Engine.switchSubtab('6_4_sponsorship');
       }
     } else if (tab === 'm7_donation') {
-      if (!this.isMemberUser()) {
+      const isMem = this.isMemberUser();
+      if (!isMem) {
         const donTabs = document.querySelectorAll('#admin-tab-m7_donation [data-m73-subtab]');
         donTabs.forEach(btn => btn.style.display = '');
       }
@@ -5085,6 +5133,21 @@ const AppEngine = {
       } else if (typeof this.renderDonationModule === 'function') {
         this.renderDonationModule();
       }
+      ['mbux-donation-title', 'm7-donation-module-title'].forEach(id => {
+        const titleEl = document.getElementById(id);
+        if (titleEl) {
+          const memSpan = titleEl.querySelector('.m7-title-member');
+          const admSpan = titleEl.querySelector('.m7-title-admin');
+          if (memSpan && admSpan) {
+            memSpan.style.display = isMem ? 'inline' : 'none';
+            admSpan.style.display = isMem ? 'none' : 'inline';
+          }
+        }
+      });
+      const badge = document.querySelector('.m7-badge-admin');
+      if (badge) badge.style.display = isMem ? 'none' : 'inline-block';
+      const actions = document.querySelector('.m7-admin-actions');
+      if (actions) actions.style.display = isMem ? 'none' : 'flex';
     } else if (tab === 'm7_shop' || tab === 'm7_ecommerce') {
       if (window.M7Engine) {
         if (typeof M7Engine.updateRoleView === 'function') M7Engine.updateRoleView();

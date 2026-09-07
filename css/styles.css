@@ -2710,10 +2710,24 @@ body.member-mode #nav-user-profile {
   cursor: default !important;
 }
 
-/* Return to Member Dashboard banner & buttons */
-body.member-mode #member-return-banner,
-body.member-mode #btn-m2-return-member {
-  display: inline-flex !important;
+/* Member mode header titles for M2 Organisasi & M7 Donasi */
+body.member-mode .m2-title-admin,
+body.member-mode .m7-title-admin,
+body.member-mode .m7-badge-admin,
+body.member-mode .m7-admin-actions {
+  display: none !important;
+}
+body.member-mode .m2-title-member,
+body.member-mode .m7-title-member {
+  display: inline !important;
+}
+body:not(.member-mode) .m2-title-member,
+body:not(.member-mode) .m7-title-member {
+  display: none !important;
+}
+body:not(.member-mode) .m2-title-admin,
+body:not(.member-mode) .m7-title-admin {
+  display: inline !important;
 }
 
 /* STRICT READ-ONLY M2 (ORGANISASI & FEDERASI) FOR MEMBER MODE */

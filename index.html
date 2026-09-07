@@ -16,8 +16,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="assets/mb_badge.jpg">
   <link rel="shortcut icon" href="assets/mb_badge.jpg">
-  <link rel="stylesheet" href="css/styles.css?v=20260907_v188_remove_repetitive_buttons">
-  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v188_remove_repetitive_buttons">
+  <link rel="stylesheet" href="css/styles.css?v=20260907_v192_member_header_titles">
+  <link rel="stylesheet" href="assets/css/theme-luxury.css?v=20260907_v192_member_header_titles">
   <style id="modal-anti-fouc-guard">
     /* Instant zero-FOUC guard: all inactive modals remain 100% hidden during load & refresh */
     .modal-backdrop:not(.active),
@@ -31,10 +31,22 @@
     body.member-mode #admin-dashboard-page-header,
     body.member-mode #btn-kop-return-admin,
     body.member-mode #btn-kop-bottom-return-admin,
+    body.member-mode .m2-title-admin,
+    body.member-mode .m7-title-admin,
+    body.member-mode .m7-badge-admin,
+    body.member-mode .m7-admin-actions,
     #member-return-banner,
     #btn-m2-return-member,
     #btn-kop-return-member,
     .btn-return-member-dashboard {
+      display: none !important;
+    }
+    body.member-mode .m2-title-member,
+    body.member-mode .m7-title-member {
+      display: inline !important;
+    }
+    body:not(.member-mode) .m2-title-member,
+    body:not(.member-mode) .m7-title-member {
       display: none !important;
     }
   </style>
@@ -1467,7 +1479,10 @@
         <div class="glass-panel" style="padding:24px; margin-bottom:24px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
             <div>
-              <h3 style="font-size:1.3rem;" class="text-gradient">🏛️ Manajemen Organisasi & Federasi</h3>
+              <h3 id="m2-org-module-title" style="font-size:1.3rem;" class="text-gradient">
+                <span class="m2-title-admin">🏛️ Manajemen Organisasi &amp; Federasi</span>
+                <span class="m2-title-member">🏛️ Organisasi &amp; Federasi</span>
+              </h3>
               <p style="font-size:0.85rem; color:var(--text-muted);">Pusat data resmi federasi Mercedes-Benz Club Indonesia, sejarah pendiri, struktur dewan, dan direktori klub nasional</p>
             </div>
             <span class="tier-badge" style="background:rgba(212,175,55,0.12); color:var(--accent-gold); border:1px solid var(--accent-gold);">FEDERASI MB INA RESMI</span>
@@ -2902,7 +2917,10 @@
         
         <!-- MODULE HEADER -->
         <div style="margin-bottom:20px;">
-          <h3 style="font-size:1.25rem; margin:0;" class="text-gradient">❤️ Manajemen Donasi & Filantropi</h3>
+          <h3 id="m7-donation-module-title" style="font-size:1.25rem; margin:0;" class="text-gradient">
+            <span class="m7-title-admin">❤️ Manajemen Donasi &amp; Filantropi</span>
+            <span class="m7-title-member">❤️ Donasi &amp; Filantropi</span>
+          </h3>
           <p style="font-size:0.82rem; color:var(--text-muted); margin:4px 0 0 0;">Pusat pengelolaan program donasi bakti sosial, verifikasi donatur, dan penerbitan Digital Receipt resmi</p>
         </div>
 
@@ -11276,8 +11294,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260907_v191_remove_return_member_button"></script>
-  <script src="js/app.js?v=20260907_v191_remove_return_member_button"></script>
+  <script src="js/auth.js?v=20260907_v192_member_header_titles"></script>
+  <script src="js/app.js?v=20260907_v192_member_header_titles"></script>
   <script>
     lucide.createIcons();
     try {
@@ -11362,6 +11380,6 @@
   </script>
 
 
-  <script src="js/donation_manager.js?v=20260907_v191_remove_return_member_button"></script>
+  <script src="js/donation_manager.js?v=20260907_v192_member_header_titles"></script>
 </body>
 </html>

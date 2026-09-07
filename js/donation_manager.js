@@ -333,16 +333,23 @@
       const container = document.getElementById('admin-tab-m7_donation');
       if (!container) return;
 
+      const isMember = (typeof document !== 'undefined' && document.body.classList.contains('member-mode')) || (window.AppEngine && typeof window.AppEngine.isMemberUser === 'function' && window.AppEngine.isMemberUser());
+      const donTitleAdminStyle = isMember ? 'display:none;' : 'display:inline;';
+      const donTitleMemberStyle = isMember ? 'display:inline;' : 'display:none;';
+      const donBadgeAdminStyle = isMember ? 'display:none;' : 'inline-block;';
+      const donActionsAdminStyle = isMember ? 'display:none;' : 'display:flex;';
+
       container.innerHTML = `
         <div class="mbux-root" style="padding: 12px 6px 36px;">
           <!-- HEADER -->
           <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
             <div>
               <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
-                <h1 class="mbux-chrome-text" style="margin:0; font-size:1.5rem; font-weight:700; letter-spacing:-0.02em;">
-                  Manajemen Donasi &amp; Filantropi
+                <h1 id="mbux-donation-title" class="mbux-chrome-text" style="margin:0; font-size:1.5rem; font-weight:700; letter-spacing:-0.02em;">
+                  <span class="m7-title-admin" style="${donTitleAdminStyle}">Manajemen Donasi &amp; Filantropi</span>
+                  <span class="m7-title-member" style="${donTitleMemberStyle}">Donasi &amp; Filantropi</span>
                 </h1>
-                <span style="font-family:monospace; font-size:0.65rem; color:#CBD5E1; border:1px solid rgba(226,232,240,0.2); background:rgba(255,255,255,0.03); padding:3px 8px; border-radius:6px; letter-spacing:0.08em; text-transform:uppercase;">
+                <span class="m7-badge-admin" style="${donBadgeAdminStyle}font-family:monospace; font-size:0.65rem; color:#CBD5E1; border:1px solid rgba(226,232,240,0.2); background:rgba(255,255,255,0.03); padding:3px 8px; border-radius:6px; letter-spacing:0.08em; text-transform:uppercase;">
                   MBUX CORE // V4 DATABASE
                 </span>
               </div>
@@ -350,7 +357,7 @@
                 Pusat verifikasi bukti transfer donasi, penyesuaian otomatis Tier Keanggotaan, penerbitan Digital Receipt resmi, dan monitoring program sosial Mercedes-Benz Club Indonesia.
               </p>
             </div>
-            <div style="display:flex; gap:10px;">
+            <div class="m7-admin-actions" style="${donActionsAdminStyle} gap:10px;">
               <button type="button" class="mbux-btn-stroke" onclick="window.DonationManager.fetchLiveData()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 <span>Refresh Data Database</span>
