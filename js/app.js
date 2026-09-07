@@ -19919,12 +19919,14 @@ const M6Engine = {
     const idEl = document.getElementById('m6-alb-id');
     const tiEl = document.getElementById('m6-alb-title');
     const deEl = document.getElementById('m6-alb-desc');
+    const pubEl = document.getElementById('m6-alb-public');
     const headerTxt = document.getElementById('modal-m6-album-title-txt');
 
     if (idEl) idEl.value = '';
     if (tiEl) tiEl.value = '';
     if (deEl) deEl.value = '';
-    if (headerTxt) headerTxt.textContent = '📁 BUAT ALBUM EVENT BARU';
+    if (pubEl) pubEl.value = 'true';
+    if (headerTxt) headerTxt.textContent = '📁 Buat Album Event Baru';
 
     AuthEngine.openModal('modal-m6-create-album');
   },
@@ -19936,12 +19938,14 @@ const M6Engine = {
     const idEl = document.getElementById('m6-alb-id');
     const tiEl = document.getElementById('m6-alb-title');
     const deEl = document.getElementById('m6-alb-desc');
+    const pubEl = document.getElementById('m6-alb-public');
     const headerTxt = document.getElementById('modal-m6-album-title-txt');
 
     if (idEl) idEl.value = alb.id;
     if (tiEl) tiEl.value = alb.title;
     if (deEl) deEl.value = alb.description || '';
-    if (headerTxt) headerTxt.textContent = '✏️ EDIT ALBUM: ' + alb.title;
+    if (pubEl) pubEl.value = alb.is_public ? 'true' : 'false';
+    if (headerTxt) headerTxt.textContent = '✏️ Edit Album: ' + alb.title;
 
     AuthEngine.openModal('modal-m6-create-album');
   },
@@ -19951,6 +19955,7 @@ const M6Engine = {
     const id    = document.getElementById('m6-alb-id')?.value;
     const title = document.getElementById('m6-alb-title')?.value.trim();
     const desc  = document.getElementById('m6-alb-desc')?.value.trim();
+    const isPublic = document.getElementById('m6-alb-public')?.value === 'true';
 
     if (!title) { alert('⚠️ Judul album wajib diisi!'); return; }
 
@@ -19959,6 +19964,7 @@ const M6Engine = {
       if (alb) {
         alb.title = title;
         alb.description = desc;
+        alb.is_public = isPublic;
       }
     } else {
       const newAlbum = {
@@ -19966,7 +19972,7 @@ const M6Engine = {
         title: title.startsWith('📁') ? title : '📁 ' + title,
         description: desc,
         cover_image: '',
-        is_public: true,
+        is_public: isPublic,
         created_by: 'Admin MB INA',
         created_at: new Date().toLocaleDateString('id-ID'),
         views: 0
