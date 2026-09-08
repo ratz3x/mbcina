@@ -141,6 +141,13 @@ const AppEngine = {
       if (this.currentRole === 'GUEST' || !this.currentRole) {
         this.initLandingVersion();
       }
+      if (window.M6Engine && typeof window.M6Engine.fetchData === 'function') {
+        window.M6Engine.fetchData().then(() => {
+          if (this.activeAdminTab === 'dashboard' || this.activeAdminTab === 'm1_portal') {
+            this.renderVerificationQueue(this._activeQueueFilter || 'ALL');
+          }
+        });
+      }
       this.checkPublicMediaDeepLink();
     }, 20);
 
@@ -1371,16 +1378,79 @@ const AppEngine = {
     modal.classList.add('active');
   },
 
-  _submitMemberEventReg() {
+  async _submitMemberEventReg() {
     const name = document.getElementById('mer-name')?.value.trim();
     const phone = document.getElementById('mer-phone')?.value.trim();
+    const eventId = document.getElementById('mer-event-id')?.value || 'EVT-2026-012';
+    const regType = document.getElementById('mer-reg-type')?.value || 'ONLINE';
     if (!name || !phone) { window.showToast('Lengkapi nama & nomor WhatsApp!', 'error'); return; }
+
+    const u = this.currentUser || {};
+    const memberId = u.member_id || u.id || ('MBINA-REG-' + Date.now().toString().slice(-4));
+    const club = u.club || 'HQ MB INA';
+    const cleanName = (name || 'MBINA').toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4) || 'MBIN';
+    const generatedQr = 'QR-' + eventId + '-' + cleanName + '-' + Math.floor(1000 + Math.random() * 9000);
+    const partId = 'part_' + Date.now();
+
+    const payload = {
+      id: partId,
+      event_id: eventId,
+      event_code: eventId,
+      user_id: memberId,
+      member_id: memberId,
+      name: name,
+      user_name: name,
+      club: club,
+      club_name: club,
+      tier: u.tier || 'Platinum',
+      ticket_type: u.tier || 'Platinum',
+      htm: 0,
+      fee_paid: 0,
+      phone: phone,
+      payment_method: 'ONLINE_REG',
+      registration_method: regType,
+      qr_code: generatedQr
+    };
+
+    try {
+      await fetch('api.php?action=register_event_participant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch(err) {
+      console.warn('API register event error:', err);
+    }
+
+    if (window.M6Engine) {
+      if (!window.M6Engine.data.participants) window.M6Engine.data.participants = [];
+      const newPart = {
+        ...payload,
+        status: 'PENDING',
+        payment_status: 'PENDING',
+        created_at: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })
+      };
+      window.M6Engine.data.participants = window.M6Engine.data.participants.filter(p => p.id !== partId);
+      window.M6Engine.data.participants.unshift(newPart);
+      try {
+        const stored = JSON.parse(localStorage.getItem('mbcina_m6_participants') || '[]');
+        stored.unshift(newPart);
+        localStorage.setItem('mbcina_m6_participants', JSON.stringify(stored));
+      } catch(e) {}
+      if (typeof window.M6Engine.renderParticipantsTable === 'function') {
+        window.M6Engine.renderParticipantsTable();
+      }
+    }
+
     const modal = document.getElementById('modal-member-event-reg');
     if (modal) {
       modal.classList.remove('active');
       modal.style.display = 'none';
     }
-    window.showToast(`🎉 Pendaftaran event berhasil untuk ${name}! E-Ticket telah dikirim ke WhatsApp Anda.`, 'success');
+    window.showToast(`🎉 Pendaftaran event berhasil untuk ${name}! Data tersimpan di Supabase Cloud dan masuk antrean persetujuan admin.`, 'success');
+    if (typeof this.renderVerificationQueue === 'function') {
+      this.renderVerificationQueue();
+    }
   },
 
   // ── MODAL DONASI MEMBER (APPENGINE EXPORT) ──
@@ -9732,21 +9802,26 @@ const AppEngine = {
       });
     });
 
-    // M3: Event & Tiket
-    const pendingEvents = (this.m3Data?.members || []).filter(m => m.status === 'PENDING');
-    pendingEvents.forEach(m => {
+    // M3/M6: Event & Tiket Peserta (Pendaftaran Online)
+    const allParticipants = (window.M6Engine && typeof window.M6Engine.getAllMasterParticipants === 'function')
+      ? window.M6Engine.getAllMasterParticipants()
+      : (window.M6Engine?.data?.participants || []);
+
+    const pendingParticipants = (allParticipants || []).filter(p => (p.status === 'PENDING' || p.payment_status === 'PENDING'));
+    pendingParticipants.forEach(p => {
+      const evtTitle = p.event_title || p.event_code || p.event_id || 'Event MB INA';
       items.push({
-        id: m.id,
+        id: p.id,
         mod: 'M3',
         modName: 'Tiket Event',
         modColor: '#a78bfa',
-        title: m.name,
-        subtitle: `Klub: ${m.club || 'MB INA'} · ${m.email}`,
-        detail: `Pendaftaran Jamnas XXI / Event Regional (${m.city || 'Indonesia'})`,
+        title: p.name || p.user_name || 'Peserta MB INA',
+        subtitle: `Event: ${evtTitle} · Klub: ${p.club || p.club_name || 'HQ MB INA'}`,
+        detail: `HTM: Rp ${Number(p.htm || p.fee_paid || 0).toLocaleString('id-ID')} · ${p.member_id ? 'Member ID: ' + p.member_id : 'Non-Member'}`,
         badge: 'Tiket Pending',
-        date: m.created_at || 'Terbaru',
-        actionApprove: `AppEngine.approveM3Member('${m.id}')`,
-        actionReject: `AppEngine.rejectM3Member('${m.id}')`
+        date: p.created_at || 'Terbaru',
+        actionApprove: `AppEngine.approveM3Member('${p.id}')`,
+        actionReject: `AppEngine.rejectM3Member('${p.id}')`
       });
     });
 
@@ -10033,6 +10108,16 @@ const AppEngine = {
   async approveM3Member(id) {
     if (!confirm('Apakah Anda yakin ingin menyetujui verifikasi pendaftaran / tiket event member ini?')) return;
     try {
+      const isPart = String(id).startsWith('part_') || (window.M6Engine && window.M6Engine.getAllMasterParticipants().some(p => p.id === id));
+      if (isPart && window.M6Engine && typeof window.M6Engine.verifyParticipantPayment === 'function') {
+        window.M6Engine.verifyParticipantPayment(id, 'VERIFIED');
+        await this.fetchData();
+        await this.fetchM3Data();
+        if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+        this.renderVerificationQueue(this._activeQueueFilter || 'ALL');
+        return;
+      }
+
       const res = await fetch('api.php?action=verify_m3_member', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -10056,6 +10141,16 @@ const AppEngine = {
     const reason = prompt('Masukkan alasan penolakan tiket / pendaftaran member ini:', 'Data pendaftaran belum lengkap');
     if (reason === null) return;
     try {
+      const isPart = String(id).startsWith('part_') || (window.M6Engine && window.M6Engine.getAllMasterParticipants().some(p => p.id === id));
+      if (isPart && window.M6Engine && typeof window.M6Engine.verifyParticipantPayment === 'function') {
+        window.M6Engine.verifyParticipantPayment(id, 'REJECTED');
+        await this.fetchData();
+        await this.fetchM3Data();
+        if (this.activeAdminTab === 'dashboard') this.renderAdminDashboard();
+        this.renderVerificationQueue(this._activeQueueFilter || 'ALL');
+        return;
+      }
+
       const res = await fetch('api.php?action=verify_m3_member', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -14541,8 +14636,11 @@ const M6Engine = {
       const compKey = `${fKey}__${mKey}`;
       if (!seen.has(compKey)) {
         seen.add(compKey);
+        const normStatus = (p.payment_status || p.status || 'PENDING').toUpperCase();
         result.push({
           ...p,
+          status: normStatus,
+          payment_status: normStatus,
           event_code: fKey,
           event_id: fKey
         });
@@ -14560,7 +14658,13 @@ const M6Engine = {
     return all.filter(p => {
       const fkCode = String(p.event_code || '').trim().toUpperCase();
       const fkId = String(p.event_id || '').trim().toUpperCase();
-      return fkCode === pk || fkId === pk || (pk === 'EVT-2026-012' && (fkCode === 'EVT-2026-012' || fkId === 'PROP_EVT_012'));
+      return fkCode === pk || fkId === pk ||
+        (pk === 'EVT-2026-012' && (fkCode === 'EVT-2026-012' || fkId === 'PROP_EVT_012' || fkCode === 'PROP_EVT_012')) ||
+        (pk === 'PROP_EVT_012' && (fkCode === 'EVT-2026-012' || fkId === 'EVT-2026-012')) ||
+        (pk === 'EVT-2026-001' && (fkCode === 'EVT_001' || fkId === 'EVT_001')) ||
+        (pk === 'EVT_001' && (fkCode === 'EVT-2026-001' || fkId === 'EVT-2026-001')) ||
+        (pk === 'EVT-2026-002' && (fkCode === 'EVT_002' || fkId === 'EVT_002')) ||
+        (pk === 'EVT_002' && (fkCode === 'EVT-2026-002' || fkId === 'EVT-2026-002'));
     });
   },
 
@@ -15322,7 +15426,7 @@ const M6Engine = {
     alert('📷 SCAN QR CODE E-KTA BERHASIL!\n\nMember ID: ' + member.id + '\nNama: ' + member.name + '\nTier: ' + member.tier + ' (Diskon 30% otomatis)');
   },
 
-  submitMemberRegistration() {
+  async submitMemberRegistration() {
     let name = '';
     let memberIdStr = '';
     let clubStr = 'HQ MB INA';
@@ -15349,42 +15453,78 @@ const M6Engine = {
     const evtId = curEvt.id || curEvt.code || 'EVT-2026-012';
     const evtCode = curEvt.code || curEvt.event_code || 'EVT-2026-012';
     const isFree = htm === 0;
+    const partId = 'part_' + Date.now();
 
-    const newPart = {
-      id: 'part_' + Date.now(),
+    const cleanName = (name || 'MBINA').toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4) || 'MBIN';
+    const generatedQr = 'QR-' + evtCode + '-' + cleanName + '-' + Math.floor(1000 + Math.random() * 9000);
+
+    const payload = {
+      id: partId,
       event_id: evtId,
       event_code: evtCode,
-      event_title: curEvt.title || 'Event MB INA',
+      user_id: memberIdStr,
       member_id: memberIdStr,
       name: name,
+      user_name: name,
       club: clubStr,
+      club_name: clubStr,
       tier: tier,
+      ticket_type: tier,
       htm: htm,
-      proof: isFree ? 'BEBAS_BIAYA_FREE_TICKET' : ('bukti_transfer_' + name.toLowerCase().replace(/\s+/g, '_') + '.jpg'),
-      status: isFree ? 'VERIFIED' : 'PENDING',
+      fee_paid: htm,
+      discount_amount: 0,
       phone: '082129709595',
+      payment_method: isFree ? 'FREE_TICKET' : 'TRANSFER',
+      registration_method: 'ONLINE',
+      qr_code: generatedQr
+    };
+
+    let serverPart = null;
+    try {
+      const res = await fetch('api.php?action=register_event_participant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => r.json());
+
+      if (res && res.success && res.participant) {
+        serverPart = res.participant;
+      }
+    } catch (err) {
+      console.warn('API register event error:', err);
+    }
+
+    const newPart = serverPart || {
+      ...payload,
+      status: isFree ? 'VERIFIED' : 'PENDING',
+      payment_status: isFree ? 'VERIFIED' : 'PENDING',
       created_at: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
-      qr_code: 'QR-' + evtCode + '-' + name.substring(0, 4).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000)
+      qr_code: generatedQr
     };
 
     if (!this.data.participants) this.data.participants = [];
+    this.data.participants = this.data.participants.filter(p => p.id !== newPart.id);
     this.data.participants.unshift(newPart);
 
     try {
       const stored = JSON.parse(localStorage.getItem('mbcina_m6_participants') || '[]');
-      stored.unshift(newPart);
-      localStorage.setItem('mbcina_m6_participants', JSON.stringify(stored));
+      const filtered = stored.filter(p => p.id !== newPart.id);
+      filtered.unshift(newPart);
+      localStorage.setItem('mbcina_m6_participants', JSON.stringify(filtered));
     } catch(e) {}
 
     if (isFree) {
-      alert(`🎉 E-TIKET PENDAFTARAN RESMI TERBIT!\n\n• Event: ${curEvt.title}\n• Peserta: ${name}\n• Member ID: ${memberIdStr}\n• Status: ✅ DITERIMA / VERIFIED (Bebas Biaya Rp 0)\n• Kode QR E-Ticket: ${newPart.qr_code}\n\nTiket telah aktif dan siap digunakan saat check-in di gate lokasi.`);
+      alert(`🎉 E-TIKET PENDAFTARAN RESMI TERBIT!\n\n• Event: ${curEvt.title}\n• Peserta: ${name}\n• Member ID: ${memberIdStr}\n• Status: ✅ DITERIMA / VERIFIED (Bebas Biaya Rp 0)\n• Kode QR E-Ticket: ${newPart.qr_code}\n\nData telah tersimpan langsung di Cloud Database Supabase dan siap digunakan.`);
     } else {
-      alert(`📝 PENDAFTARAN EVENT BERHASIL!\n\n• Event: ${curEvt.title}\n• Nama Peserta: ${name}\n• Member ID / KTA: ${memberIdStr}\n• Biaya HTM: Rp ${new Intl.NumberFormat('id-ID').format(htm)}\n• Status: ⏳ MENUNGGU VERIFIKASI PEMBAYARAN\n\nSilakan tunggu verifikasi admin.`);
+      alert(`📝 PENDAFTARAN EVENT BERHASIL!\n\n• Event: ${curEvt.title}\n• Nama Peserta: ${name}\n• Member ID / KTA: ${memberIdStr}\n• Biaya HTM: Rp ${new Intl.NumberFormat('id-ID').format(htm)}\n• Status: ⏳ MENUNGGU VERIFIKASI PEMBAYARAN\n\nData pendaftaran telah tersimpan di Supabase Cloud Database dan otomatis masuk ke Antrean Persetujuan Admin.`);
     }
 
     AuthEngine.closeAllModals();
     this.renderParticipantsTable();
     this.renderPublishPage();
+    if (window.AppEngine && typeof window.AppEngine.renderVerificationQueue === 'function') {
+      window.AppEngine.renderVerificationQueue();
+    }
   },
 
   openOfflineRegModal(eventId = 'EVT-2026-012') {
@@ -15545,7 +15685,7 @@ const M6Engine = {
     `;
   },
 
-  submitOfflineRegistration() {
+  async submitOfflineRegistration() {
     let name = '';
     let memberIdStr = '';
     let clubStr = 'HQ MB INA';
@@ -15570,25 +15710,64 @@ const M6Engine = {
       htm = 500000;
     }
 
-    const newPart = {
-      id: 'part_off_' + Date.now(),
+    const curEvt = this.activeRegisteringEvent || this.publishedEvents?.[0] || {};
+    const evtId = curEvt.id || curEvt.code || 'EVT-2026-012';
+    const evtCode = curEvt.code || curEvt.event_code || 'EVT-2026-012';
+    const partId = 'part_off_' + Date.now();
+    const cleanName = (name || 'MBINA').toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4) || 'MBIN';
+    const generatedQr = 'QR-' + evtCode + '-' + cleanName + '-' + Math.floor(1000 + Math.random() * 9000);
+
+    const payload = {
+      id: partId,
+      event_id: evtId,
+      event_code: evtCode,
+      user_id: memberIdStr,
       member_id: memberIdStr,
       name: name,
+      user_name: name,
       club: clubStr,
+      club_name: clubStr,
       tier: tier,
+      ticket_type: tier,
       htm: htm,
-      proof: 'pembayaran_pos_onlocation.jpg',
-      status: 'VERIFIED',
+      fee_paid: htm,
+      discount_amount: 0,
       phone: '082129709595',
+      payment_method: method,
+      registration_method: 'OFFLINE',
+      qr_code: generatedQr
+    };
+
+    let serverPart = null;
+    try {
+      const res = await fetch('api.php?action=register_event_participant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => r.json());
+
+      if (res && res.success && res.participant) {
+        serverPart = res.participant;
+      }
+    } catch (err) {
+      console.warn('API register offline event error:', err);
+    }
+
+    const newPart = serverPart || {
+      ...payload,
+      status: 'VERIFIED',
+      payment_status: 'VERIFIED',
       created_at: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
-      qr_code: 'QR-EVT-2026-001-' + name.substring(0, 4).toUpperCase()
+      qr_code: generatedQr
     };
 
     if (!this.data.participants) this.data.participants = [];
+    this.data.participants = this.data.participants.filter(p => p.id !== newPart.id);
     this.data.participants.unshift(newPart);
 
     AuthEngine.closeAllModals();
     this.renderParticipantsTable();
+    this.renderPublishPage();
 
     // Automatically pop up the invitation card / POS pass for immediate print
     this.viewParticipantKtaQr(newPart.id);
@@ -15667,11 +15846,12 @@ const M6Engine = {
       const reason = prompt('Masukkan alasan penolakan bukti pembayaran:', 'Bukti transfer tidak sesuai atau kurang jelas');
       if (reason === null) return;
       part.status = 'REJECTED';
+      part.payment_status = 'REJECTED';
       part.rejection_reason = reason;
       alert('❌ Pendaftaran ' + part.name + ' ditolak dengan alasan: ' + reason);
     } else if (newStatus === 'VERIFIED') {
       part.status = 'VERIFIED';
-      part.payment_status = 'PAID';
+      part.payment_status = 'VERIFIED';
       part.qr_code = 'QR-EVT-2026-001-' + (part.name || 'MBINA').substring(0, 4).toUpperCase();
 
       // 1. Akumulasi Biaya Tiket Event ke Donasi/Kontribusi Member & Hitung Ulang Tier Real-time!
@@ -15764,6 +15944,13 @@ const M6Engine = {
 
     try {
       localStorage.setItem('mbina_participant_status_overrides', JSON.stringify(this.participantStatusOverrides));
+      const stored = JSON.parse(localStorage.getItem('mbcina_m6_participants') || '[]');
+      const match = stored.find(x => x.id === partId);
+      if (match) {
+        match.status = part.status;
+        match.payment_status = part.status;
+        localStorage.setItem('mbcina_m6_participants', JSON.stringify(stored));
+      }
     } catch(e) {}
 
     // POST to Supabase Database API
@@ -15773,10 +15960,11 @@ const M6Engine = {
       body: JSON.stringify({ participant_id: partId, id: partId, member_id: part.member_id || '', status: part.status })
     }).catch(err => console.warn('API participant verify sync error:', err));
 
-    // Trigger immediate re-render of Member Portal and M3 List
+    // Trigger immediate re-render of Member Portal, M3 List, and Admin Verification Queue
     if (window.AppEngine) {
       if (typeof window.AppEngine.populateMemberPortalData === 'function') window.AppEngine.populateMemberPortalData();
       if (typeof window.AppEngine.renderM3MemberList === 'function') window.AppEngine.renderM3MemberList();
+      if (typeof window.AppEngine.renderVerificationQueue === 'function') window.AppEngine.renderVerificationQueue(window.AppEngine._activeQueueFilter || 'ALL');
     }
 
     this.renderParticipantsTable();

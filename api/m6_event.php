@@ -10,7 +10,34 @@ switch ($action) {
             $budgets = $sPdo->query("SELECT * FROM event_budgets ORDER BY created_at DESC")->fetchAll();
             $revenues = $sPdo->query("SELECT * FROM event_revenues ORDER BY created_at DESC")->fetchAll();
             $proposals = $sPdo->query("SELECT * FROM event_proposals ORDER BY created_at DESC")->fetchAll();
-            $participants = $sPdo->query("SELECT p.*, u.name as user_name, u.email as user_email, u.phone as user_phone, u.member_id as user_mid, u.tier_id as user_tier FROM event_participants p LEFT JOIN users u ON p.user_id = u.id ORDER BY p.registered_at DESC")->fetchAll();
+            $participants = $sPdo->query("
+                SELECT p.id, p.event_id, p.event_id as event_code, p.user_id,
+                       COALESCE(NULLIF(p.user_name, ''), u.name, 'Peserta MB INA') as user_name,
+                       COALESCE(NULLIF(p.user_name, ''), u.name, 'Peserta MB INA') as name,
+                       COALESCE(NULLIF(u.email, ''), '') as user_email,
+                       COALESCE(NULLIF(u.phone, ''), '') as user_phone,
+                       COALESCE(NULLIF(u.phone, ''), '') as phone,
+                       COALESCE(NULLIF(u.member_id, ''), p.user_id, '') as user_mid,
+                       COALESCE(NULLIF(u.member_id, ''), p.user_id, '') as member_id,
+                       COALESCE(NULLIF(p.club_name, ''), u.club, 'HQ MB INA') as club_name,
+                       COALESCE(NULLIF(p.club_name, ''), u.club, 'HQ MB INA') as club,
+                       COALESCE(NULLIF(p.ticket_type, ''), 'MEMBER') as ticket_type,
+                       COALESCE(NULLIF(u.tier_id, ''), p.ticket_type, 'Platinum') as tier,
+                       COALESCE(p.payment_status, 'PENDING') as payment_status,
+                       COALESCE(p.payment_status, 'PENDING') as status,
+                       COALESCE(p.fee_paid, 0) as fee_paid,
+                       COALESCE(p.fee_paid, 0) as htm,
+                       COALESCE(p.discount_amount, 0) as discount_amount,
+                       p.registration_method,
+                       p.payment_method,
+                       p.check_in_status,
+                       p.check_in_at,
+                       p.qr_code,
+                       TO_CHAR(COALESCE(p.registered_at, p.created_at, NOW()), 'DD/MM/YYYY HH24:MI') as created_at
+                FROM event_participants p 
+                LEFT JOIN users u ON (p.user_id = u.id OR p.user_id = u.member_id)
+                ORDER BY COALESCE(p.registered_at, p.created_at) DESC
+            ")->fetchAll();
             $posTx = $sPdo->query("SELECT * FROM event_offline_transactions ORDER BY created_at DESC")->fetchAll();
             $broadcasts = $sPdo->query("SELECT * FROM event_broadcasts ORDER BY created_at DESC")->fetchAll();
             $rawAlbums = $sPdo->query("SELECT * FROM event_albums ORDER BY created_at DESC")->fetchAll();
@@ -608,6 +635,110 @@ switch ($action) {
             ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'register_event_participant':
+        try {
+            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+            $eventId = trim($input['event_id'] ?? $input['event_code'] ?? 'EVT-2026-012');
+            $userId = trim($input['user_id'] ?? $input['member_id'] ?? 'usr_guest');
+            $userName = trim($input['name'] ?? $input['user_name'] ?? '');
+            $clubName = trim($input['club'] ?? $input['club_name'] ?? 'HQ MB INA');
+            $ticketType = trim($input['tier'] ?? $input['ticket_type'] ?? 'MEMBER');
+            $feePaid = floatval($input['htm'] ?? $input['fee_paid'] ?? 0);
+            $discountAmount = floatval($input['discount_amount'] ?? 0);
+            $paymentMethod = trim($input['payment_method'] ?? ($feePaid == 0 ? 'FREE_TICKET' : 'TRANSFER'));
+            $regMethod = 'ONLINE';
+            $paymentStatus = ($feePaid == 0) ? 'VERIFIED' : 'PENDING';
+            
+            // Generate unique participant ID
+            $partId = !empty($input['id']) && str_starts_with($input['id'], 'part_') ? $input['id'] : ('part_' . uniqid());
+            
+            // Generate QR Code
+            $cleanName = strtoupper(preg_replace('/[^A-Za-z]/', '', $userName));
+            if (strlen($cleanName) < 4) $cleanName = str_pad($cleanName, 4, 'MB');
+            $cleanName = substr($cleanName, 0, 4);
+            $qrCode = 'QR-' . $eventId . '-' . $cleanName . '-' . rand(1000, 9999);
+            
+            // Upsert into event_participants table in Supabase Cloud
+            $stmt = $sPdo->prepare("
+                INSERT INTO event_participants (
+                    id, event_id, user_id, user_name, club_name, ticket_type, 
+                    payment_status, registered_at, created_at, fee_paid, 
+                    registration_method, payment_method, check_in_status, check_in_at, 
+                    discount_amount, check_in_method, qr_code
+                ) VALUES (
+                    :id, :event_id, :user_id, :user_name, :club_name, :ticket_type,
+                    :payment_status, NOW(), NOW(), :fee_paid,
+                    :registration_method, :payment_method, :check_in_status, NULL,
+                    :discount_amount, 'QR_CODE', :qr_code
+                )
+                ON CONFLICT (id) DO UPDATE SET
+                    event_id = EXCLUDED.event_id,
+                    user_name = EXCLUDED.user_name,
+                    club_name = EXCLUDED.club_name,
+                    ticket_type = EXCLUDED.ticket_type,
+                    payment_status = EXCLUDED.payment_status,
+                    fee_paid = EXCLUDED.fee_paid,
+                    discount_amount = EXCLUDED.discount_amount,
+                    qr_code = EXCLUDED.qr_code
+            ");
+
+            $stmt->execute([
+                ':id' => $partId,
+                ':event_id' => $eventId,
+                ':user_id' => $userId,
+                ':user_name' => $userName,
+                ':club_name' => $clubName,
+                ':ticket_type' => $ticketType,
+                ':payment_status' => $paymentStatus,
+                ':fee_paid' => $feePaid,
+                ':registration_method' => $regMethod,
+                ':payment_method' => $paymentMethod,
+                ':check_in_status' => ($feePaid == 0) ? 'true' : 'false',
+                ':discount_amount' => $discountAmount,
+                ':qr_code' => $qrCode
+            ]);
+
+            // If verified immediately (e.g. Free event), update user stats
+            if ($paymentStatus === 'VERIFIED') {
+                try {
+                    $sPdo->prepare("UPDATE users SET total_events = COALESCE(total_events, 0) + 1 WHERE id = :uid OR member_id = :uid")->execute([':uid' => $userId]);
+                } catch (Exception $eU) {}
+            }
+
+            logAudit($userId, 'INSERT', 'M6_ONLINE_REGISTRATION', ['event_id' => $eventId, 'participant_id' => $partId, 'fee_paid' => $feePaid, 'status' => $paymentStatus]);
+
+            echo json_encode([
+                'success' => true,
+                'message' => ($paymentStatus === 'VERIFIED') 
+                    ? "🎉 Pendaftaran Online & E-Tiket Berhasil Terbit di Cloud Database!" 
+                    : "📝 Pendaftaran Online Berhasil Disimpan! Menunggu Persetujuan / Verifikasi Pembayaran oleh Admin.",
+                'participant' => [
+                    'id' => $partId,
+                    'event_id' => $eventId,
+                    'event_code' => $eventId,
+                    'user_id' => $userId,
+                    'member_id' => $userId,
+                    'name' => $userName,
+                    'user_name' => $userName,
+                    'club' => $clubName,
+                    'club_name' => $clubName,
+                    'tier' => $ticketType,
+                    'ticket_type' => $ticketType,
+                    'htm' => $feePaid,
+                    'fee_paid' => $feePaid,
+                    'discount_amount' => $discountAmount,
+                    'status' => $paymentStatus,
+                    'payment_status' => $paymentStatus,
+                    'registration_method' => 'ONLINE',
+                    'created_at' => date('d/m/Y H:i'),
+                    'qr_code' => $qrCode
+                ]
+            ]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Gagal mendaftar event di Supabase Cloud: ' . $e->getMessage()]);
         }
         break;
 

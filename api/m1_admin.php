@@ -792,12 +792,71 @@ switch ($action) {
                 $newRole = $userRow['role'];
             }
 
-            $stmtUpdate = $sPdo->prepare("UPDATE users SET status = :status::user_status_enum, role = :role::role_enum WHERE id = :id");
-            $stmtUpdate->execute([
-                ':status' => $newStatus,
-                ':role' => $newRole,
-                ':id' => $userId
-            ]);
+            // If approving member to ACTIVE
+            if ($newStatus === 'ACTIVE') {
+                if ($newRole === 'CALON_MEMBER') {
+                    $newRole = 'MEMBER';
+                }
+                
+                // Check if user needs official Member ID
+                $midStmt = $sPdo->prepare("SELECT member_id, city, province FROM users WHERE id = :id");
+                $midStmt->execute([':id' => $userId]);
+                $uData = $midStmt->fetch();
+                $curMid = $uData['member_id'] ?? '';
+                
+                if (empty($curMid) || !str_starts_with($curMid, 'MBINA-')) {
+                    $year = (int)date('Y');
+                    $cityKey = strtolower(trim($uData['city'] ?? ''));
+                    $cityCodeMap = [
+                        'jakarta selatan' => 'JKT', 'jakarta barat' => 'JKT', 'jakarta timur' => 'JKT',
+                        'jakarta utara' => 'JKT', 'jakarta pusat' => 'JKT', 'jakarta' => 'JKT',
+                        'tangerang' => 'TGR', 'bekasi' => 'BKS', 'depok' => 'DPK',
+                        'bogor' => 'BGR', 'serang' => 'SRG', 'bandung' => 'BDG', 'cirebon' => 'CRB',
+                        'semarang' => 'SMG', 'yogyakarta' => 'YGY', 'solo' => 'SLO', 'surabaya' => 'SBY',
+                        'denpasar' => 'DPS', 'medan' => 'MED', 'palembang' => 'PLG', 'jambi' => 'JMB'
+                    ];
+                    $regionCode = 'INA';
+                    if (isset($cityCodeMap[$cityKey])) {
+                        $regionCode = $cityCodeMap[$cityKey];
+                    } elseif (strlen($cityKey) >= 3) {
+                        $regionCode = strtoupper(substr(preg_replace('/[^a-z]/', '', $cityKey), 0, 3));
+                    }
+                    $totalUsers = (int)$sPdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+                    $curMid = sprintf('MBINA-%s-%d-%06d', $regionCode, $year, $totalUsers + 1);
+                }
+
+                $stmtUpdate = $sPdo->prepare("
+                    UPDATE users 
+                    SET status = 'ACTIVE', 
+                        role = :role::role_enum, 
+                        member_id = :mid, 
+                        verified_at = CURRENT_TIMESTAMP, 
+                        verified_by = 'usr_superadmin',
+                        updated_at = NOW() 
+                    WHERE id = :id
+                ");
+                $stmtUpdate->execute([
+                    ':role' => $newRole,
+                    ':mid' => $curMid,
+                    ':id' => $userId
+                ]);
+
+                // Create Notification & Activity
+                try {
+                    $sPdo->prepare("INSERT INTO notifications (id, user_id, type, title, message) VALUES (:id, :uid, 'APPROVAL', 'Verifikasi Keanggotaan Disetujui! 🎉', :msg)")
+                         ->execute([':id' => 'notif_' . uniqid(), ':uid' => $userId, ':msg' => "Selamat! Pendaftaran Anda disetujui. Member ID resmi Anda: $curMid"]);
+
+                    $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'REGISTRATION', 'Member Terverifikasi', :detail)")
+                         ->execute([':id' => 'act_' . uniqid(), ':uid' => $userId, ':detail' => "Disetujui menjadi Anggota Resmi MB INA ($curMid)"]);
+                } catch (Exception $eN) {}
+            } else {
+                $stmtUpdate = $sPdo->prepare("UPDATE users SET status = :status::user_status_enum, role = :role::role_enum, updated_at = NOW() WHERE id = :id");
+                $stmtUpdate->execute([
+                    ':status' => $newStatus,
+                    ':role' => $newRole,
+                    ':id' => $userId
+                ]);
+            }
 
             logAudit('usr_superadmin', 'UPDATE', 'USER_MANAGEMENT', ['targetUser' => $userId, 'newStatus' => $newStatus, 'newRole' => $newRole]);
             echo json_encode(['success' => true, 'message' => "Status pengguna $userId berhasil diperbarui ke $newStatus di Supabase!"]);
