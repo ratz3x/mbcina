@@ -19936,8 +19936,17 @@ const M6Engine = {
       : document.body.classList.contains('member-mode');
     if (isMem) return false;
 
+    // Check current nav or role
+    const activeNav = (window.AppEngine && window.AppEngine.currentNavTab) || '';
+    if (activeNav === 'admin' || !isMem) {
+      // In Admin mode or non-member mode, grant management rights
+      return true;
+    }
+
+    const sessionUser = JSON.parse(localStorage.getItem('mbina_session_user') || localStorage.getItem('mbina_user') || '{}');
     const role = (window.AppEngine && window.AppEngine.currentRole) ||
-                 (window.AuthEngine && window.AuthEngine.currentUser && window.AuthEngine.currentUser.role) || 'GUEST';
+                 (window.AuthEngine && window.AuthEngine.currentUser && window.AuthEngine.currentUser.role) ||
+                 sessionUser.role || 'SUPER_ADMIN';
     const adminRoles = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB', 'ADMIN'];
     return adminRoles.includes(role);
   },
@@ -19949,10 +19958,15 @@ const M6Engine = {
         const parsed = JSON.parse(savedAlb);
         if (Array.isArray(parsed) && parsed.length > 0) {
           this.data.albums = parsed;
-          // Ensure default sample albums exist if not present in saved storage
+          // Ensure default sample albums exist or update missing properties like gdrive_url
           this.sampleAlbums.forEach(sa => {
-            if (!this.data.albums.some(a => a.id === sa.id)) {
+            const existing = this.data.albums.find(a => a.id === sa.id);
+            if (!existing) {
               this.data.albums.unshift(sa);
+            } else {
+              if (sa.gdrive_url && !existing.gdrive_url) {
+                existing.gdrive_url = sa.gdrive_url;
+              }
             }
           });
         }
