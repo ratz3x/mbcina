@@ -19883,15 +19883,30 @@ const M6Engine = {
     return (match && match[2].length === 11) ? match[2] : null;
   },
 
-  previewYouTubeInput(url) {
+  async previewYouTubeInput(url) {
     const previewEl = document.getElementById('m6-gl-youtube-preview');
     const imgEl = document.getElementById('m6-gl-yt-preview-img');
     const idEl = document.getElementById('m6-gl-yt-preview-id');
+    const capInput = document.getElementById('m6-gl-upload-caption');
     const ytId = this.extractYouTubeId(url);
     if (ytId) {
       if (imgEl) imgEl.src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
       if (idEl) idEl.textContent = `ID: ${ytId} (https://youtu.be/${ytId})`;
       if (previewEl) previewEl.style.display = 'flex';
+
+      // Auto-fetch video title from YouTube if caption is empty
+      try {
+        const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${ytId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.title) {
+            if (capInput && (!capInput.value.trim() || capInput.value.startsWith('Dokumentasi Video YouTube'))) {
+              capInput.value = data.title;
+            }
+            if (idEl) idEl.textContent = `${data.title} (ID: ${ytId})`;
+          }
+        }
+      } catch(e) {}
     } else {
       if (previewEl) previewEl.style.display = 'none';
     }
@@ -19958,7 +19973,6 @@ const M6Engine = {
         const parsed = JSON.parse(savedAlb);
         if (Array.isArray(parsed) && parsed.length > 0) {
           this.data.albums = parsed;
-          // Ensure default sample albums exist or update missing properties like gdrive_url
           this.sampleAlbums.forEach(sa => {
             const existing = this.data.albums.find(a => a.id === sa.id);
             if (!existing) {
@@ -19976,12 +19990,25 @@ const M6Engine = {
         const parsedM = JSON.parse(savedMed);
         if (Array.isArray(parsedM)) {
           this.data.media = parsedM;
-          // Ensure default sample media (including YouTube) exists if not present
-          this.sampleMedia.forEach(sm => {
-            if (!this.data.media.some(m => m.id === sm.id)) {
-              this.data.media.unshift(sm);
-            }
-          });
+          
+          // Auto-clean dummy media from alb_anniv_2026 if user has uploaded real media (like k68heI9xML0)
+          const hasRealMediaInAnniv = this.data.media.some(m => 
+            m.album_id === 'alb_anniv_2026' && 
+            !['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1'].includes(m.id)
+          );
+          if (hasRealMediaInAnniv) {
+            this.data.media = this.data.media.filter(m => 
+              !(m.album_id === 'alb_anniv_2026' && ['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1'].includes(m.id))
+            );
+            localStorage.setItem('mbcina_m6_media', JSON.stringify(this.data.media));
+          }
+
+          // Update caption for k68heI9xML0 if still default generic
+          const userYt = this.data.media.find(m => m.youtube_id === 'k68heI9xML0');
+          if (userYt && (!userYt.caption || userYt.caption.startsWith('Dokumentasi Video YouTube'))) {
+            userYt.caption = 'Aftermovie & Dokumentasi Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026';
+            localStorage.setItem('mbcina_m6_media', JSON.stringify(this.data.media));
+          }
         }
       }
     } catch(e) {
@@ -20061,6 +20088,11 @@ const M6Engine = {
               ${canManage ? `<button class="btn-primary m6-gallery-admin-only" style="font-size:0.8rem; font-weight:800;" onclick="M6Engine.openUploadMediaModal('${this.activeGalleryAlbumId}')">📤 Upload ke Album ini</button>` : ''}
               <button class="btn-outline" style="font-size:0.8rem;" onclick="M6Engine.downloadAlbumZip('${this.activeGalleryAlbumId}')">📥 Download ZIP</button>
               ${canManage ? `<button class="btn-outline m6-gallery-admin-only" style="font-size:0.8rem;" onclick="M6Engine.editAlbum('${this.activeGalleryAlbumId}')">✏️ Edit Album</button>` : ''}
+              ${canManage && albMedia.some(m => ['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5'].includes(m.id)) ? `
+                <button class="btn-outline m6-gallery-admin-only" style="font-size:0.78rem; color:#f87171; border-color:rgba(239,68,68,0.4); background:rgba(239,68,68,0.08); padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="M6Engine.cleanDummyMediaFromAlbum('${this.activeGalleryAlbumId}')" title="Hapus seluruh foto & video contoh bawaan dari album ini">
+                  🧹 Bersihkan Media Dummy
+                </button>
+              ` : ''}
             </div>
           </div>
         </div>
@@ -20905,6 +20937,20 @@ const M6Engine = {
     alert(`🗑️ ${mediaType === 'video' ? 'Video' : 'Foto'} berhasil dihapus dari galeri.`);
     this.renderGaleri();
     this.renderTagParticipantGrid();
+  },
+
+  cleanDummyMediaFromAlbum(albumId) {
+    const targetAlbId = albumId || this.activeGalleryAlbumId;
+    if (!targetAlbId) return;
+
+    if (!confirm('Hapus seluruh foto & video contoh bawaan (dummy) dari album ini sehingga hanya tersisa dokumentasi asli Anda?')) return;
+
+    const dummyIds = new Set(['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
+    this.data.media = (this.data.media || []).filter(m => !(m.album_id === targetAlbId && dummyIds.has(m.id)));
+    this.saveGalleryToStorage();
+    this.renderGaleri();
+    this.renderTagParticipantGrid();
+    alert('✅ Seluruh media contoh bawaan (dummy) pada album ini berhasil dibersihkan! Kini hanya tersisa file asli Anda.');
   },
 
   // ─────────────────────────────────────────────
