@@ -42,7 +42,7 @@ switch ($action) {
                     'event_id' => 'EVT-2026-012',
                     'title' => '📁 Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
                     'description' => 'Dokumentasi resmi HUT ke-22 MB Club Indonesia, Press Conference Jamnas XXI, & Rakernas di TOPGOLF Jakarta',
-                    'cover_image' => 'assets/mb_hero.jpg',
+                    'cover_image' => 'assets/docs/dok_pressconf_anniv2026.jpg',
                     'gdrive_url' => 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
                     'is_public' => true,
                     'created_by' => 'Derist Touriano (Admin)',
@@ -51,10 +51,13 @@ switch ($action) {
                 ]);
             }
 
-            // Attach gdrive_url to alb_anniv_2026 if missing
+            // Attach gdrive_url and cover_image to alb_anniv_2026
             foreach ($albums as &$a) {
-                if (($a['id'] ?? '') === 'alb_anniv_2026' && empty($a['gdrive_url'])) {
-                    $a['gdrive_url'] = 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026';
+                if (($a['id'] ?? '') === 'alb_anniv_2026') {
+                    if (empty($a['gdrive_url'])) {
+                        $a['gdrive_url'] = 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026';
+                    }
+                    $a['cover_image'] = 'assets/docs/dok_pressconf_anniv2026.jpg';
                 }
             }
             unset($a);
@@ -66,15 +69,28 @@ switch ($action) {
                 $cap = strtolower($m['caption'] ?? '');
                 $url = strtolower($m['media_url'] ?? '');
                 if (str_starts_with($url, 'blob:')) return false;
-                if (in_array($id, ['med_001', 'med_002', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1'])) return false;
+                if (in_array($id, ['med_001', 'med_002', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_anniv_photo_1', 'med_anniv_photo_2', 'med_anniv_photo_3'])) return false;
                 if (in_array($albId, ['alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3'])) return false;
                 if (str_contains($cap, 'gala dinner') || str_contains($cap, 'opening ceremony') || str_contains($cap, 'parade mercedes') || str_contains($cap, 'bakti sosial')) return false;
                 return true;
             }));
 
-            // If no media exists in database, seed official video and photos
+            // If no media exists in database, provide the exact 2 official media
             if (empty($media)) {
                 $media = [
+                    [
+                        'id' => 'med_anniv_photo_pressconf',
+                        'album_id' => 'alb_anniv_2026',
+                        'media_url' => 'assets/docs/dok_pressconf_anniv2026.jpg',
+                        'file_name' => 'Dokumentasi_Foto_Press_Conference_2026.jpg',
+                        'type' => 'IMAGE',
+                        'caption' => 'Dokumentasi Foto - Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+                        'uploaded_by' => 'Derist Touriano',
+                        'uploaded_at' => '08/09/2026 17:00',
+                        'view_count' => 0,
+                        'download_count' => 0,
+                        'tags' => ['Press Conference', 'Derist Touriano', 'MB Club Indonesia']
+                    ],
                     [
                         'id' => 'med_anniv_yt_user',
                         'album_id' => 'alb_anniv_2026',
@@ -86,48 +102,9 @@ switch ($action) {
                         'caption' => 'Dokumentasi & Video Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
                         'uploaded_by' => 'Derist Touriano',
                         'uploaded_at' => '08/09/2026 17:00',
-                        'view_count' => 128,
+                        'view_count' => 129,
                         'download_count' => 24,
                         'tags' => ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
-                    ],
-                    [
-                        'id' => 'med_anniv_photo_1',
-                        'album_id' => 'alb_anniv_2026',
-                        'media_url' => 'assets/mb_hero.jpg',
-                        'file_name' => 'Dokumentasi_Press_Conference_Jamnas_XXI_2026.jpg',
-                        'type' => 'IMAGE',
-                        'caption' => 'Dokumentasi Foto: Press Conference Jamnas XXI & Rakernas 2026 di TOPGOLF Jakarta',
-                        'uploaded_by' => 'Derist Touriano (Admin)',
-                        'uploaded_at' => '08/09/2026 17:05',
-                        'view_count' => 95,
-                        'download_count' => 18,
-                        'tags' => ['MB Club Indonesia', 'Press Conference', 'TOPGOLF']
-                    ],
-                    [
-                        'id' => 'med_anniv_photo_2',
-                        'album_id' => 'alb_anniv_2026',
-                        'media_url' => 'assets/mb_founders.jpg',
-                        'file_name' => 'Dokumentasi_Pelantikan_Pengurus_MBINA_2026_2028.jpg',
-                        'type' => 'IMAGE',
-                        'caption' => 'Dokumentasi Foto: Pelantikan & Pengukuhan Badan Pengurus Federasi MB Club Indonesia 2026-2028',
-                        'uploaded_by' => 'Derist Touriano (Admin)',
-                        'uploaded_at' => '08/09/2026 17:10',
-                        'view_count' => 110,
-                        'download_count' => 22,
-                        'tags' => ['Pelantikan Pengurus', 'HUT ke-22 MBINA', 'Rakernas 2026']
-                    ],
-                    [
-                        'id' => 'med_anniv_photo_3',
-                        'album_id' => 'alb_anniv_2026',
-                        'media_url' => 'assets/gwagon_hero.jpg',
-                        'file_name' => 'Dokumentasi_Lineup_Mercedes_Benz_Rakernas_2026.jpg',
-                        'type' => 'IMAGE',
-                        'caption' => 'Dokumentasi Foto: Display & Line-up Unit Mercedes-Benz di TOPGOLF Jakarta',
-                        'uploaded_by' => 'Derist Touriano (Admin)',
-                        'uploaded_at' => '08/09/2026 17:15',
-                        'view_count' => 88,
-                        'download_count' => 15,
-                        'tags' => ['Display Unit', 'Mercedes-Benz', 'TOPGOLF']
                     ]
                 ];
             }

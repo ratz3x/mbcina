@@ -20358,7 +20358,7 @@ const M6Engine = {
       event_id: 'EVT-2026-012',
       title: '📁 Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
       description: 'Dokumentasi resmi HUT ke-22 MB Club Indonesia, Press Conference Jamnas XXI, & Rakernas di TOPGOLF Jakarta',
-      cover_image: 'assets/mb_hero.jpg',
+      cover_image: 'assets/docs/dok_pressconf_anniv2026.jpg',
       gdrive_url: 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
       is_public: true,
       created_by: 'Derist Touriano (Admin)',
@@ -20367,8 +20367,21 @@ const M6Engine = {
     }
   ],
 
-  // Official real media items (no dummy stock photos)
+  // Official real media items (exact 2 items: 1 photo + 1 video)
   sampleMedia: [
+    {
+      id: 'med_anniv_photo_pressconf',
+      album_id: 'alb_anniv_2026',
+      media_url: 'assets/docs/dok_pressconf_anniv2026.jpg',
+      file_name: 'Dokumentasi_Foto_Press_Conference_2026.jpg',
+      type: 'IMAGE',
+      caption: 'Dokumentasi Foto - Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+      uploaded_by: 'Derist Touriano',
+      uploaded_at: '08/09/2026 17:00',
+      view_count: 0,
+      download_count: 0,
+      tags: ['Press Conference', 'Derist Touriano', 'MB Club Indonesia']
+    },
     {
       id: 'med_anniv_yt_user',
       album_id: 'alb_anniv_2026',
@@ -20380,48 +20393,9 @@ const M6Engine = {
       caption: 'Dokumentasi & Video Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
       uploaded_by: 'Derist Touriano',
       uploaded_at: '08/09/2026 17:00',
-      view_count: 128,
+      view_count: 129,
       download_count: 24,
       tags: ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
-    },
-    {
-      id: 'med_anniv_photo_1',
-      album_id: 'alb_anniv_2026',
-      media_url: 'assets/mb_hero.jpg',
-      file_name: 'Dokumentasi_Press_Conference_Jamnas_XXI_2026.jpg',
-      type: 'IMAGE',
-      caption: 'Dokumentasi Foto: Press Conference Jamnas XXI & Rakernas 2026 di TOPGOLF Jakarta',
-      uploaded_by: 'Derist Touriano (Admin)',
-      uploaded_at: '08/09/2026 17:05',
-      view_count: 95,
-      download_count: 18,
-      tags: ['MB Club Indonesia', 'Press Conference', 'TOPGOLF']
-    },
-    {
-      id: 'med_anniv_photo_2',
-      album_id: 'alb_anniv_2026',
-      media_url: 'assets/mb_founders.jpg',
-      file_name: 'Dokumentasi_Pelantikan_Pengurus_MBINA_2026_2028.jpg',
-      type: 'IMAGE',
-      caption: 'Dokumentasi Foto: Pelantikan & Pengukuhan Badan Pengurus Federasi MB Club Indonesia 2026-2028',
-      uploaded_by: 'Derist Touriano (Admin)',
-      uploaded_at: '08/09/2026 17:10',
-      view_count: 110,
-      download_count: 22,
-      tags: ['Pelantikan Pengurus', 'HUT ke-22 MBINA', 'Rakernas 2026']
-    },
-    {
-      id: 'med_anniv_photo_3',
-      album_id: 'alb_anniv_2026',
-      media_url: 'assets/gwagon_hero.jpg',
-      file_name: 'Dokumentasi_Lineup_Mercedes_Benz_Rakernas_2026.jpg',
-      type: 'IMAGE',
-      caption: 'Dokumentasi Foto: Display & Line-up Unit Mercedes-Benz di TOPGOLF Jakarta',
-      uploaded_by: 'Derist Touriano (Admin)',
-      uploaded_at: '08/09/2026 17:15',
-      view_count: 88,
-      download_count: 15,
-      tags: ['Display Unit', 'Mercedes-Benz', 'TOPGOLF']
     }
   ],
 
@@ -20533,7 +20507,11 @@ const M6Engine = {
     const cap = (m.caption || '').toLowerCase();
     const url = (m.media_url || '').toLowerCase();
     if (url.startsWith('blob:')) return true;
-    const dummyMediaIds = new Set(['med_001', 'med_002', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
+    const dummyMediaIds = new Set([
+      'med_001', 'med_002', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1',
+      'med_1', 'med_2', 'med_3', 'med_4', 'med_5',
+      'med_anniv_photo_1', 'med_anniv_photo_2', 'med_anniv_photo_3'
+    ]);
     if (dummyMediaIds.has(id)) return true;
     if (['alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3'].includes(albId)) return true;
     if (cap.includes('gala dinner') || cap.includes('opening ceremony') || cap.includes('parade mercedes') || cap.includes('bakti sosial')) return true;
@@ -20576,6 +20554,7 @@ const M6Engine = {
       if (!annivAlb && this.sampleAlbums[0]) {
         this.data.albums.unshift(this.sampleAlbums[0]);
       } else if (annivAlb && this.sampleAlbums[0]) {
+        annivAlb.cover_image = 'assets/docs/dok_pressconf_anniv2026.jpg';
         if (!annivAlb.gdrive_url && this.sampleAlbums[0].gdrive_url) {
           annivAlb.gdrive_url = this.sampleAlbums[0].gdrive_url;
         }
@@ -20587,12 +20566,25 @@ const M6Engine = {
       // Ensure official media are unblocked from tombstones
       try {
         let delList = JSON.parse(localStorage.getItem('mbcina_m6_deleted_media') || '[]');
-        const protectedIds = ['med_anniv_yt_user', 'PH9foXkufB8', 'https://youtu.be/PH9foXkufB8', 'med_anniv_photo_1', 'med_anniv_photo_2', 'med_anniv_photo_3'];
+        const protectedIds = ['med_anniv_yt_user', 'PH9foXkufB8', 'https://youtu.be/PH9foXkufB8', 'med_anniv_photo_pressconf'];
         if (delList.some(x => protectedIds.includes(x))) {
           delList = delList.filter(x => !protectedIds.includes(x));
           localStorage.setItem('mbcina_m6_deleted_media', JSON.stringify(delList));
         }
       } catch(e) {}
+
+      // Auto-migrate any local blob photo to the persistent image
+      const migrateBlob = (item) => {
+        if (!item) return;
+        if ((item.media_url && item.media_url.startsWith('blob:')) || item.id === 'med_1788904004593_0') {
+          item.id = 'med_anniv_photo_pressconf';
+          item.media_url = 'assets/docs/dok_pressconf_anniv2026.jpg';
+          item.caption = 'Dokumentasi Foto - Mercedes-Benz Club 22nd Anniversary & Rakernas 2026';
+          item.type = 'IMAGE';
+        }
+      };
+
+      (this.data.media || []).forEach(migrateBlob);
 
       // 2. MEDIA MERGE (In-memory/API -> LocalStorage -> SampleMedia)
       const mapMed = new Map();
@@ -20603,7 +20595,10 @@ const M6Engine = {
         try {
           const parsedM = JSON.parse(savedMed);
           if (Array.isArray(parsedM)) {
-            parsedM.forEach(m => { if (m && m.id && !mapMed.has(m.id)) mapMed.set(m.id, m); });
+            parsedM.forEach(m => {
+              migrateBlob(m);
+              if (m && m.id && !mapMed.has(m.id)) mapMed.set(m.id, m);
+            });
           }
         } catch(e) {}
       }
@@ -20622,8 +20617,15 @@ const M6Engine = {
         });
         // Ensure the official video is present
         const hasOfficial = this.data.media.some(m => m.id === 'med_anniv_yt_user' || (m.youtube_id === 'PH9foXkufB8'));
-        if (!hasOfficial && this.sampleMedia && this.sampleMedia[0]) {
-          this.data.media.unshift(this.sampleMedia[0]);
+        if (!hasOfficial && this.sampleMedia) {
+          const ytSample = this.sampleMedia.find(x => x.id === 'med_anniv_yt_user');
+          if (ytSample) this.data.media.push(ytSample);
+        }
+        // Ensure official photo is present
+        const hasPhoto = this.data.media.some(m => m.id === 'med_anniv_photo_pressconf');
+        if (!hasPhoto && this.sampleMedia) {
+          const pSample = this.sampleMedia.find(x => x.id === 'med_anniv_photo_pressconf');
+          if (pSample) this.data.media.unshift(pSample);
         }
         this.data.media = this.data.media.filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
       }
