@@ -64,6 +64,19 @@
           localStorage.removeItem(key);
         }
       });
+      var a = JSON.parse(localStorage.getItem('mbcina_m6_albums') || 'null');
+      if (Array.isArray(a)) {
+        var cleanA = a.filter(function(x) { return !['alb_1', 'alb_2', 'alb_3'].includes(x.id); });
+        localStorage.setItem('mbcina_m6_albums', JSON.stringify(cleanA));
+      }
+      var m = JSON.parse(localStorage.getItem('mbcina_m6_media') || 'null');
+      if (Array.isArray(m)) {
+        var cleanM = m.filter(function(x) { 
+          return !['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5'].includes(x.id) &&
+                 !['alb_1', 'alb_2', 'alb_3'].includes(x.album_id); 
+        });
+        localStorage.setItem('mbcina_m6_media', JSON.stringify(cleanM));
+      }
     } catch(e) {}
   </script>
     <!-- Clean Minimal Bridge for Dynamic Event Handlers -->
@@ -2784,23 +2797,23 @@
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
                 <div style="display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
                   <div>
-                    <div style="font-size:0.75rem; color:var(--text-muted);">Event Aktif</div>
-                    <strong style="color:var(--accent-gold); font-size:0.95rem;">📍 Touring & Bakti Sosial Yogyakarta 2026</strong>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Event Aktif / Dokumentasi</div>
+                    <strong style="color:var(--accent-gold); font-size:0.95rem;" id="m6-gl-stat-active-event">📍 [EVT-2026-012] Mercedes-Benz Club 22nd Anniversary & Rakernas 2026</strong>
                   </div>
                   <div style="height:28px; width:1px; background:var(--chrome-border);"></div>
                   <div>
                     <div style="font-size:0.75rem; color:var(--text-muted);">Total Album</div>
-                    <strong style="color:#fff; font-size:1.1rem;" id="m6-gl-stat-albums">3 Album</strong>
+                    <strong style="color:#fff; font-size:1.1rem;" id="m6-gl-stat-albums">1 Album</strong>
                   </div>
                   <div style="height:28px; width:1px; background:var(--chrome-border);"></div>
                   <div>
                     <div style="font-size:0.75rem; color:var(--text-muted);">Total Media (Foto & Video)</div>
-                    <strong style="color:var(--primary-emerald); font-size:1.1rem;" id="m6-gl-stat-media">45 Media</strong>
+                    <strong style="color:var(--primary-emerald); font-size:1.1rem;" id="m6-gl-stat-media">1 Media</strong>
                   </div>
                   <div style="height:28px; width:1px; background:var(--chrome-border);"></div>
                   <div>
                     <div style="font-size:0.75rem; color:var(--text-muted);">Total Views</div>
-                    <strong style="color:var(--accent-blue); font-size:1.1rem;" id="m6-gl-stat-views">2.340 Views</strong>
+                    <strong style="color:var(--accent-blue); font-size:1.1rem;" id="m6-gl-stat-views">0 Views</strong>
                   </div>
                 </div>
 
@@ -11416,8 +11429,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260909_v211_clean_dummy_media"></script>
-  <script src="js/app.js?v=20260909_v211_clean_dummy_media"></script>
+  <script src="js/auth.js?v=20260909_v212_purge_all_gallery_dummy"></script>
+  <script src="js/app.js?v=20260909_v212_purge_all_gallery_dummy"></script>
   <script>
     lucide.createIcons();
     try {

@@ -2005,7 +2005,7 @@ const AppEngine = {
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
             ${isPast ? `
               <span style="background:rgba(148,163,184,0.1); color:#94a3b8; font-size:0.75rem; padding:6px 14px; border-radius:8px; border:1px solid rgba(148,163,184,0.2); font-weight:600;">Pendaftaran Ditutup (Event Telah Selesai)</span>
-              <button class="btn-outline" style="font-size:0.75rem; padding:6px 12px; font-weight:700; border-radius:8px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.switchTab('m5_media');">📸 Dokumentasi & Galeri</button>
+              <button class="btn-outline" style="font-size:0.75rem; padding:6px 12px; font-weight:700; border-radius:8px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.openMemberEvents(); if(window.M6Engine){ M6Engine.switchSubtab('6_5_gallery'); }">📸 Dokumentasi & Galeri</button>
             ` : `
               <button class="btn-primary" style="background:var(--accent-blue); color:#fff; font-weight:800; font-size:0.75rem; padding:6px 12px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.openMemberEventRegisterModal('${e.id}','ONLINE')">🎟️ Daftar Online Event</button>
               <button class="btn-primary" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-weight:800; font-size:0.75rem; padding:6px 12px;" onclick="document.getElementById('modal-member-all-events').classList.remove('active'); AppEngine.openMemberEventRegisterModal('${e.id}','OFFLINE')">📝 Daftar Offline</button>
@@ -19722,152 +19722,38 @@ const M6Engine = {
   // 6.5 GALERI EVENT ENGINE (FULL SPECIFICATION)
   // ─────────────────────────────────────────────────────────────────────
 
-  // Default sample albums
+  // Official real albums (no dummy sample data)
   sampleAlbums: [
     {
       id: 'alb_anniv_2026',
       event_id: 'EVT-2026-012',
       title: '📁 Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
       description: 'Dokumentasi resmi HUT ke-22 MB Club Indonesia, Press Conference Jamnas XXI, & Rakernas di TOPGOLF Jakarta',
-      cover_image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
+      cover_image: 'assets/mb_hero.jpg',
       gdrive_url: 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
       is_public: true,
       created_by: 'Derist Touriano (Admin)',
       created_at: '05/09/2026 14:00',
-      views: 1540
-    },
-    {
-      id: 'alb_1',
-      title: '📁 OPENING CEREMONY',
-      description: 'Dokumentasi pembukaan acara Jambore & Bakti Sosial MB INA Yogyakarta 2026',
-      cover_image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500',
-      is_public: true,
-      created_by: 'Derist Touriano (Admin)',
-      created_at: '13/09/2026 08:30',
-      views: 2340
-    },
-    {
-      id: 'alb_2',
-      title: '📁 PARADE MERCEDES-BENZ',
-      description: 'Iring-iringan parade touring mobil Mercedes-Benz keliling kota Yogyakarta',
-      cover_image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
-      is_public: true,
-      created_by: 'Humas MB INA',
-      created_at: '13/09/2026 11:00',
-      views: 1890
-    },
-    {
-      id: 'alb_3',
-      title: '📁 BAKTI SOSIAL & DONASI',
-      description: 'Penyerahan bantuan donasi & santunan anak yatim Jambore MB INA',
-      cover_image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500',
-      is_public: true,
-      created_by: 'Sekjen MB INA',
-      created_at: '13/09/2026 14:00',
-      views: 1250
+      views: 180
     }
   ],
 
-  // Default sample media items
+  // Official real media items (no dummy stock photos)
   sampleMedia: [
     {
-      id: 'med_anniv_yt_1',
+      id: 'med_anniv_yt_user',
       album_id: 'alb_anniv_2026',
-      media_url: 'https://www.youtube.com/watch?v=kYJybw_v2z0',
-      youtube_id: 'kYJybw_v2z0',
+      media_url: 'https://youtu.be/k68heI9xML0',
+      youtube_id: 'k68heI9xML0',
       is_youtube: true,
-      file_name: 'YouTube: Highlight 22nd Anniversary MB Club Indonesia',
+      file_name: 'YouTube: Aftermovie HUT ke-22 & Rakernas MB Club Indonesia',
       type: 'VIDEO',
-      caption: 'Official Highlight Video HUT ke-22 & Rakernas MB Club Indonesia 2026 (YouTube)',
-      uploaded_by: 'Tim Media & Humas MB INA',
-      uploaded_at: '06/09/2026 10:00',
-      view_count: 890,
-      download_count: 140,
-      tags: ['Derist Touriano', 'MB Club INA', 'YouTube']
-    },
-    {
-      id: 'med_anniv_vid_1',
-      album_id: 'alb_anniv_2026',
-      media_url: 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4',
-      type: 'VIDEO',
-      caption: 'Video Highlight Acara HUT ke-22 Mercedes-Benz Club Indonesia TOPGOLF',
-      uploaded_by: 'Tim Dokumentasi MB INA',
-      uploaded_at: '05/09/2026 16:30',
-      view_count: 512,
-      download_count: 120,
-      tags: ['Derist Touriano', 'Dr. Rochady Hendra Setya Wibawa']
-    },
-    {
-      id: 'med_anniv_img_1',
-      album_id: 'alb_anniv_2026',
-      media_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
-      type: 'IMAGE',
-      caption: 'Press Conference Jambore Nasional XXI & HUT ke-22 MB Club Indonesia',
-      uploaded_by: 'Humas MB INA',
-      uploaded_at: '05/09/2026 14:30',
-      view_count: 380,
-      download_count: 85,
-      tags: ['Derist Touriano']
-    },
-    {
-      id: 'med_1',
-      album_id: 'alb_1',
-      media_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800',
-      type: 'IMAGE',
-      caption: 'Sambutan pembukaan acara Jambore MB INA Yogyakarta 2026 oleh Presiden MB INA',
-      uploaded_by: 'Derist Touriano (Admin)',
-      uploaded_at: '13/09/2026 08:30',
-      view_count: 234,
-      download_count: 45,
-      tags: ['Derist Touriano', 'Andi Pratama', 'Budi Santoso']
-    },
-    {
-      id: 'med_2',
-      album_id: 'alb_1',
-      media_url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800',
-      type: 'IMAGE',
-      caption: 'Pemukulan Gong pembukaan acara secara resmi',
-      uploaded_by: 'Sekretaris MB INA',
-      uploaded_at: '13/09/2026 08:45',
-      view_count: 189,
-      download_count: 32,
-      tags: ['Derist Touriano', 'Siti Rahma']
-    },
-    {
-      id: 'med_3',
-      album_id: 'alb_1',
-      media_url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800',
-      type: 'VIDEO',
-      caption: 'Video Highlight Opening Ceremony Jambore MB INA Yogyakarta',
-      uploaded_by: 'Tim Media MB INA',
-      uploaded_at: '13/09/2026 09:00',
-      view_count: 312,
-      download_count: 68,
-      tags: ['Derist Touriano', 'Budi Santoso']
-    },
-    {
-      id: 'med_4',
-      album_id: 'alb_2',
-      media_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
-      type: 'IMAGE',
-      caption: 'Barisan parade touring Mercedes-Benz W124 & W210 di Malioboro',
-      uploaded_by: 'Humas MB INA',
-      uploaded_at: '13/09/2026 11:30',
-      view_count: 278,
-      download_count: 51,
-      tags: ['Andi Pratama', 'Rudy Hartono']
-    },
-    {
-      id: 'med_5',
-      album_id: 'alb_3',
-      media_url: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800',
-      type: 'IMAGE',
-      caption: 'Penyerahan secara simbolis bantuan sosial untuk panti asuhan',
-      uploaded_by: 'Bendahara MB INA',
-      uploaded_at: '13/09/2026 14:30',
-      view_count: 195,
-      download_count: 29,
-      tags: ['Derist Touriano', 'Siti Rahma']
+      caption: 'Aftermovie & Dokumentasi Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
+      uploaded_by: 'Derist Touriano',
+      uploaded_at: '08/09/2026 17:00',
+      view_count: 85,
+      download_count: 14,
+      tags: ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
     }
   ],
 
@@ -19968,71 +19854,79 @@ const M6Engine = {
 
   loadGalleryFromStorage() {
     try {
+      const dummyAlbumIds = new Set(['alb_1', 'alb_2', 'alb_3']);
+      const dummyMediaIds = new Set(['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
+
       const savedAlb = localStorage.getItem('mbcina_m6_albums');
       if (savedAlb) {
         const parsed = JSON.parse(savedAlb);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          this.data.albums = parsed;
-          this.sampleAlbums.forEach(sa => {
-            const existing = this.data.albums.find(a => a.id === sa.id);
-            if (!existing) {
-              this.data.albums.unshift(sa);
-            } else {
-              if (sa.gdrive_url && !existing.gdrive_url) {
-                existing.gdrive_url = sa.gdrive_url;
-              }
-            }
-          });
+          this.data.albums = parsed.filter(a => !dummyAlbumIds.has(a.id));
         }
       }
+
+      if (!this.data.albums || this.data.albums.length === 0) {
+        this.data.albums = [...this.sampleAlbums];
+      } else {
+        const annivAlb = this.data.albums.find(a => a.id === 'alb_anniv_2026');
+        if (!annivAlb) {
+          this.data.albums.unshift(this.sampleAlbums[0]);
+        } else if (!annivAlb.gdrive_url && this.sampleAlbums[0].gdrive_url) {
+          annivAlb.gdrive_url = this.sampleAlbums[0].gdrive_url;
+        }
+      }
+
       const savedMed = localStorage.getItem('mbcina_m6_media');
       if (savedMed !== null) {
         const parsedM = JSON.parse(savedMed);
         if (Array.isArray(parsedM)) {
-          this.data.media = parsedM;
-          
-          // Auto-clean dummy media from alb_anniv_2026 if user has uploaded real media (like k68heI9xML0)
-          const hasRealMediaInAnniv = this.data.media.some(m => 
-            m.album_id === 'alb_anniv_2026' && 
-            !['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1'].includes(m.id)
-          );
-          if (hasRealMediaInAnniv) {
-            this.data.media = this.data.media.filter(m => 
-              !(m.album_id === 'alb_anniv_2026' && ['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1'].includes(m.id))
-            );
-            localStorage.setItem('mbcina_m6_media', JSON.stringify(this.data.media));
-          }
-
-          // Update caption for k68heI9xML0 if still default generic
-          const userYt = this.data.media.find(m => m.youtube_id === 'k68heI9xML0');
-          if (userYt && (!userYt.caption || userYt.caption.startsWith('Dokumentasi Video YouTube'))) {
-            userYt.caption = 'Aftermovie & Dokumentasi Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026';
-            localStorage.setItem('mbcina_m6_media', JSON.stringify(this.data.media));
-          }
+          this.data.media = parsedM.filter(m => !dummyMediaIds.has(m.id) && !dummyAlbumIds.has(m.album_id));
         }
       }
+
+      if (!this.data.media || this.data.media.length === 0) {
+        this.data.media = [...this.sampleMedia];
+      } else {
+        const hasRealYt = this.data.media.some(m => m.youtube_id === 'k68heI9xML0' || (m.media_url && m.media_url.includes('k68heI9xML0')));
+        if (!hasRealYt) {
+          this.data.media.unshift(this.sampleMedia[0]);
+        }
+      }
+
+      const userYt = this.data.media.find(m => m.youtube_id === 'k68heI9xML0' || (m.media_url && m.media_url.includes('k68heI9xML0')));
+      if (userYt) {
+        if (!userYt.caption || userYt.caption.startsWith('Dokumentasi Video YouTube')) {
+          userYt.caption = 'Aftermovie & Dokumentasi Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026';
+        }
+        userYt.album_id = 'alb_anniv_2026';
+        userYt.type = 'VIDEO';
+        userYt.is_youtube = true;
+        userYt.youtube_id = 'k68heI9xML0';
+      }
+
+      this.saveGalleryToStorage();
     } catch(e) {
       console.warn('loadGalleryFromStorage error:', e);
-    }
-    if (!this.data.albums || this.data.albums.length === 0) {
-      this.data.albums = [...this.sampleAlbums];
-      this.saveGalleryToStorage();
-    }
-    if (!this.data.media || (this.data.media.length === 0 && localStorage.getItem('mbcina_m6_media') === null)) {
-      this.data.media = [...this.sampleMedia];
-      this.saveGalleryToStorage();
+      if (!this.data.albums || this.data.albums.length === 0) this.data.albums = [...this.sampleAlbums];
+      if (!this.data.media || this.data.media.length === 0) this.data.media = [...this.sampleMedia];
     }
   },
 
   saveGalleryToStorage() {
     try {
-      localStorage.setItem('mbcina_m6_albums', JSON.stringify(this.data.albums));
-      const safeMedia = (this.data.media || []).map(m => {
-        if (m.media_url && m.media_url.length > 500000) {
-          return { ...m, media_url: m.type === 'VIDEO' ? 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4' : 'assets/mb_hero.jpg' };
-        }
-        return m;
-      });
+      const dummyAlbumIds = new Set(['alb_1', 'alb_2', 'alb_3']);
+      const dummyMediaIds = new Set(['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
+      const safeAlbums = (this.data.albums || []).filter(a => !dummyAlbumIds.has(a.id));
+      localStorage.setItem('mbcina_m6_albums', JSON.stringify(safeAlbums));
+
+      const safeMedia = (this.data.media || [])
+        .filter(m => !dummyMediaIds.has(m.id) && !dummyAlbumIds.has(m.album_id))
+        .map(m => {
+          if (m.media_url && m.media_url.length > 500000) {
+            return { ...m, media_url: 'assets/mb_hero.jpg' };
+          }
+          return m;
+        });
       localStorage.setItem('mbcina_m6_media', JSON.stringify(safeMedia));
     } catch(e) {
       console.warn('saveGalleryToStorage error:', e);
@@ -20051,20 +19945,30 @@ const M6Engine = {
     const uploadPill = document.getElementById('m6-gl-inner-btn-652');
     if (uploadPill) uploadPill.style.display = canManage ? '' : 'none';
 
-    const albums = this.data.albums;
-    const media  = this.data.media;
+    const albums = this.data.albums || [];
+    const media  = this.data.media || [];
 
-    // Update Header Stats
+    // Update Header Stats (strictly from actual data)
     const totalAlbums = albums.length;
     const totalMedia  = media.length;
-    const totalViews  = media.reduce((s, m) => s + (m.view_count || 0), 0) + 1820;
+    const totalViews  = media.reduce((s, m) => s + (m.view_count || 0), 0);
 
     const elAlb = document.getElementById('m6-gl-stat-albums');
     const elMed = document.getElementById('m6-gl-stat-media');
     const elVws = document.getElementById('m6-gl-stat-views');
+    const elActive = document.getElementById('m6-gl-stat-active-event');
     if (elAlb) elAlb.textContent = totalAlbums + ' Album';
     if (elMed) elMed.textContent = totalMedia + ' Media';
     if (elVws) elVws.textContent = totalViews.toLocaleString('id-ID') + ' Views';
+    if (elActive) {
+      const allEvents = this.getAllAvailableEventsForGallery();
+      const latestEvt = allEvents.find(e => e.id === 'EVT-2026-012' || e.code === 'EVT-2026-012') || allEvents[0];
+      if (latestEvt) {
+        elActive.textContent = `📍 [${latestEvt.code || latestEvt.id}] ${latestEvt.title}`;
+      } else {
+        elActive.textContent = '📍 Mercedes-Benz Club Indonesia';
+      }
+    }
 
     // If an album is opened detail view
     if (this.activeGalleryAlbumId) {
@@ -20088,11 +19992,6 @@ const M6Engine = {
               ${canManage ? `<button class="btn-primary m6-gallery-admin-only" style="font-size:0.8rem; font-weight:800;" onclick="M6Engine.openUploadMediaModal('${this.activeGalleryAlbumId}')">📤 Upload ke Album ini</button>` : ''}
               <button class="btn-outline" style="font-size:0.8rem;" onclick="M6Engine.downloadAlbumZip('${this.activeGalleryAlbumId}')">📥 Download ZIP</button>
               ${canManage ? `<button class="btn-outline m6-gallery-admin-only" style="font-size:0.8rem;" onclick="M6Engine.editAlbum('${this.activeGalleryAlbumId}')">✏️ Edit Album</button>` : ''}
-              ${canManage && albMedia.some(m => ['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5'].includes(m.id)) ? `
-                <button class="btn-outline m6-gallery-admin-only" style="font-size:0.78rem; color:#f87171; border-color:rgba(239,68,68,0.4); background:rgba(239,68,68,0.08); padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="M6Engine.cleanDummyMediaFromAlbum('${this.activeGalleryAlbumId}')" title="Hapus seluruh foto & video contoh bawaan dari album ini">
-                  🧹 Bersihkan Media Dummy
-                </button>
-              ` : ''}
             </div>
           </div>
         </div>
@@ -20138,7 +20037,13 @@ const M6Engine = {
             </div>
             `;
           }).join('')}
-          ${albMedia.length === 0 ? '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">Belum ada foto/video dalam album ini. Klik "+ Upload Media" untuk menambahkan.</div>' : ''}
+          ${albMedia.length === 0 ? `
+            <div style="grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--text-muted); background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed var(--chrome-border);">
+              <div style="font-size:2.5rem; margin-bottom:10px;">📷</div>
+              <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Belum Ada Media di Album Ini</div>
+              <div style="font-size:0.8rem;">${canManage ? 'Klik tombol "+ Upload ke Album ini" di atas untuk menambahkan dokumentasi foto/video.' : 'Dokumentasi foto & video resmi akan segera diunggah oleh pengurus.'}</div>
+            </div>
+          ` : ''}
         </div>
       `;
       return;
@@ -20206,6 +20111,14 @@ const M6Engine = {
             </div>
           </div>`;
         }).join('')}
+        ${albums.length === 0 ? `
+          <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-muted); background:rgba(255,255,255,0.02); border-radius:14px; border:1px dashed var(--chrome-border);">
+            <div style="font-size:3rem; margin-bottom:12px;">📁</div>
+            <div style="font-weight:800; color:#fff; font-size:1.1rem; margin-bottom:6px;">Belum Ada Album Dokumentasi</div>
+            <div style="font-size:0.85rem; max-width:500px; margin:0 auto 18px; line-height:1.5;">${canManage ? 'Buat album dokumentasi resmi pertama untuk mengarsipkan foto dan video kegiatan komunitas MB INA.' : 'Arsip album dokumentasi resmi event MB INA akan segera dirilis oleh pengurus federasi.'}</div>
+            ${canManage ? '<button class="btn-primary" style="font-size:0.82rem; font-weight:800;" onclick="M6Engine.openCreateAlbumModal()">📁 + Buat Album Baru</button>' : ''}
+          </div>
+        ` : ''}
       </div>`;
   },
 
@@ -20309,17 +20222,6 @@ const M6Engine = {
       const ev = allEvents.find(e => e.id === eventId || e.code === eventId);
       if (ev && ev.banner_image) return ev.banner_image;
       if (ev && ev.image_url) return ev.image_url;
-    }
-    // Fallback if title mentions touring / parade / ceremony
-    const titleUpper = (album.title || '').toUpperCase();
-    if (titleUpper.includes('PARADE') || titleUpper.includes('TOURING')) {
-      return 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800';
-    }
-    if (titleUpper.includes('OPENING') || titleUpper.includes('JAMBORE')) {
-      return 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800';
-    }
-    if (titleUpper.includes('BAKTI') || titleUpper.includes('SOSIAL')) {
-      return 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800';
     }
     return 'assets/mb_hero.jpg';
   },
@@ -20709,7 +20611,7 @@ const M6Engine = {
 
     const canManage = this.canUserManageGallery();
     const query = (document.getElementById('m6-gl-tag-search')?.value || '').toLowerCase();
-    let mediaList = this.data.media;
+    let mediaList = this.data.media || [];
 
     if (query) {
       mediaList = mediaList.filter(m => 
@@ -20718,11 +20620,29 @@ const M6Engine = {
       );
     }
 
-    grid.innerHTML = mediaList.map(m => `
+    if (mediaList.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:40px 20px; color:var(--text-muted); background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed var(--chrome-border);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">🏷️</div>
+          <div style="font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:4px;">Belum Ada Media Ter-tag</div>
+          <div style="font-size:0.8rem; color:var(--text-muted);">${query ? 'Tidak ditemukan media dengan kata kunci pencarian tersebut.' : 'Tandai anggota member pada foto dokumentasi resmi untuk pengarsipan digital E-KTA.'}</div>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = mediaList.map(m => {
+      const isYt = m.is_youtube || !!this.extractYouTubeId(m.media_url);
+      const ytId = m.youtube_id || this.extractYouTubeId(m.media_url);
+      const thumb = (isYt && ytId) 
+        ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` 
+        : (m.media_url || 'assets/mb_hero.jpg');
+
+      return `
       <div class="glass-panel" style="padding:12px; border:1px solid var(--chrome-border); border-radius:12px;">
         <div style="height:140px; border-radius:8px; overflow:hidden; position:relative; margin-bottom:10px; background:#000;">
-          <img src="${m.media_url}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
-          ${m.type === 'VIDEO' ? '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.5rem; color:#fff;">▶</div>' : ''}
+          <img src="${thumb}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
+          ${m.type === 'VIDEO' ? '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(220,38,38,0.85); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:1rem; color:#fff;">▶</div>' : ''}
+          ${isYt ? '<div style="position:absolute; top:6px; left:6px; background:rgba(220,38,38,0.95); color:#fff; font-size:0.6rem; font-weight:800; padding:2px 6px; border-radius:4px;">▶ YOUTUBE</div>' : ''}
         </div>
         <div style="font-size:0.78rem; font-weight:800; color:#fff; margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.caption || 'Dokumentasi Event'}</div>
         
@@ -20734,12 +20654,13 @@ const M6Engine = {
               @${t} ${canManage ? `<a href="javascript:void(0)" onclick="M6Engine.removeTagFromMedia('${m.id}', '${t}')" style="color:var(--accent-red); margin-left:3px; text-decoration:none;" title="Hapus Tag">✕</a>` : ''}
             </span>
           `).join('')}
-          ${(!m.tags || m.tags.length === 0) ? '<span style="font-size:0.7rem; color:var(--text-muted);">Belum ada tag</span>' : ''}
+          ${(!m.tags || m.tags.length === 0) ? '<span style="font-size:0.7rem; color:var(--text-muted);">Belum ada tag member</span>' : ''}
         </div>
 
-        <button class="btn-primary" style="width:100%; font-size:0.75rem; padding:6px; font-weight:800;" onclick="M6Engine.openMediaDetailModal('${m.id}')">${canManage ? '🏷️ Kelola Tag Member' : '👁️ Lihat Detail Foto'}</button>
+        <button class="btn-primary" style="width:100%; font-size:0.75rem; padding:6px; font-weight:800;" onclick="M6Engine.openMediaDetailModal('${m.id}')">${canManage ? '🏷️ Kelola Tag Member' : '👁️ Lihat Detail Foto/Video'}</button>
       </div>
-    `).join('');
+      `;
+    }).join('');
   },
 
   removeTagFromMedia(mediaId, memberName) {
@@ -20960,20 +20881,35 @@ const M6Engine = {
     const container = document.getElementById('m6-gl-download-albums-list');
     if (!container) return;
 
+    if (!this.data.albums || this.data.albums.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:40px 20px; color:var(--text-muted); background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed var(--chrome-border);">
+          <div style="font-size:2.2rem; margin-bottom:8px;">📁</div>
+          <div style="font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:4px;">Belum Ada Album Dokumentasi</div>
+          <div style="font-size:0.8rem; color:var(--text-muted);">Paket unduh ZIP dan tautan publik akan tersedia saat album resmi dibuat.</div>
+        </div>`;
+      return;
+    }
+
     container.innerHTML = this.data.albums.map(a => {
-      const albMedia = this.data.media.filter(m => m.album_id === a.id);
+      const albMedia = (this.data.media || []).filter(m => m.album_id === a.id);
       const estSize  = (albMedia.length * 2.8).toFixed(1);
 
       return `
         <div class="glass-panel" style="padding:16px 20px; border:1px solid var(--chrome-border); border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
             <div style="font-weight:800; color:#fff; font-size:0.95rem; margin-bottom:2px;">${a.title}</div>
-            <div style="font-size:0.78rem; color:var(--text-muted);">${albMedia.length} Media (Foto/Video) • Est Size: ~${estSize} MB</div>
+            <div style="font-size:0.78rem; color:var(--text-muted);">${albMedia.length} Media (Foto/Video) ${albMedia.length > 0 ? `• Est Size: ~${estSize} MB` : '• Master arsip resolusi tinggi di Google Drive'}</div>
           </div>
 
-          <div style="display:flex; gap:8px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            ${a.gdrive_url ? `
+              <a href="${a.gdrive_url}" target="_blank" rel="noopener noreferrer" class="btn-outline" style="font-size:0.8rem; border-color:#4285F4; color:#93c5fd; text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(66,133,244,0.12); padding:6px 12px; border-radius:6px; font-weight:700;" title="Akses seluruh file foto & video resolusi tinggi di Google Drive">
+                📁 Google Drive (Full HD) ↗
+              </a>
+            ` : ''}
             <button class="btn-primary" style="font-size:0.8rem; font-weight:800;" onclick="M6Engine.downloadAlbumZip('${a.id}')">📥 Download ZIP (${estSize} MB)</button>
-            <button class="btn-outline" style="font-size:0.8rem;" onclick="M6Engine.shareAlbumLink('${a.id}')">🔗 Share Album Link</button>
+            <button class="btn-outline" style="font-size:0.8rem;" onclick="M6Engine.shareAlbumLink('${a.id}')">🔗 Share Link</button>
           </div>
         </div>
       `;
