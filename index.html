@@ -2841,10 +2841,10 @@
 
                   <!-- DROPZONE -->
                   <div style="border:2px dashed var(--accent-gold); border-radius:12px; padding:30px 20px; text-align:center; background:rgba(245,158,11,0.03); margin-bottom:16px; cursor:pointer; position:relative;" onclick="document.getElementById('m6-gl-file-input').click()">
-                    <input type="file" id="m6-gl-file-input" multiple accept="image/*,video/mp4" style="display:none;" onchange="M6Engine.handleGalleryFileSelect(this)">
+                    <input type="file" id="m6-gl-file-input" multiple accept="image/*,video/*" style="display:none;" onchange="M6Engine.handleGalleryFileSelect(this)">
                     <div style="font-size:2.5rem; margin-bottom:8px;">📁</div>
                     <div style="font-weight:800; color:#fff; font-size:0.95rem; margin-bottom:4px;">Drag & Drop file foto/video di sini atau Klik untuk memilih</div>
-                    <div style="font-size:0.75rem; color:var(--text-muted);">Format Support: JPG, PNG, WebP (Max 5MB) | Video MP4 (Max 50MB) • Bisa pilih banyak sekaligus</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Format Support: JPG, PNG, WebP, GIF | Video MP4, MOV, WebM, AVI, MKV • Bisa pilih banyak file sekaligus</div>
                   </div>
 
                   <!-- PREVIEW THUMBNAILS CONTAINER -->
@@ -11365,8 +11365,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260908_v204_fix_forum_thread_reply_layout"></script>
-  <script src="js/app.js?v=20260908_v204_fix_forum_thread_reply_layout"></script>
+  <script src="js/auth.js?v=20260908_v205_enable_video_upload_gallery_anniversary"></script>
+  <script src="js/app.js?v=20260908_v205_enable_video_upload_gallery_anniversary"></script>
   <script>
     lucide.createIcons();
     try {

@@ -19725,6 +19725,17 @@ const M6Engine = {
   // Default sample albums
   sampleAlbums: [
     {
+      id: 'alb_anniv_2026',
+      event_id: 'EVT-2026-012',
+      title: '📁 Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+      description: 'Dokumentasi resmi HUT ke-22 MB Club Indonesia, Press Conference Jamnas XXI, & Rakernas di TOPGOLF Jakarta',
+      cover_image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
+      is_public: true,
+      created_by: 'Derist Touriano (Admin)',
+      created_at: '05/09/2026 14:00',
+      views: 1540
+    },
+    {
       id: 'alb_1',
       title: '📁 OPENING CEREMONY',
       description: 'Dokumentasi pembukaan acara Jambore & Bakti Sosial MB INA Yogyakarta 2026',
@@ -19758,6 +19769,30 @@ const M6Engine = {
 
   // Default sample media items
   sampleMedia: [
+    {
+      id: 'med_anniv_vid_1',
+      album_id: 'alb_anniv_2026',
+      media_url: 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4',
+      type: 'VIDEO',
+      caption: 'Video Highlight Acara HUT ke-22 Mercedes-Benz Club Indonesia TOPGOLF',
+      uploaded_by: 'Tim Dokumentasi MB INA',
+      uploaded_at: '05/09/2026 16:30',
+      view_count: 512,
+      download_count: 120,
+      tags: ['Derist Touriano', 'Dr. Rochady Hendra Setya Wibawa']
+    },
+    {
+      id: 'med_anniv_img_1',
+      album_id: 'alb_anniv_2026',
+      media_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
+      type: 'IMAGE',
+      caption: 'Press Conference Jambore Nasional XXI & HUT ke-22 MB Club Indonesia',
+      uploaded_by: 'Humas MB INA',
+      uploaded_at: '05/09/2026 14:30',
+      view_count: 380,
+      download_count: 85,
+      tags: ['Derist Touriano']
+    },
     {
       id: 'med_1',
       album_id: 'alb_1',
@@ -19863,22 +19898,67 @@ const M6Engine = {
     return adminRoles.includes(role);
   },
 
+  loadGalleryFromStorage() {
+    try {
+      const savedAlb = localStorage.getItem('mbcina_m6_albums');
+      if (savedAlb) {
+        const parsed = JSON.parse(savedAlb);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          this.data.albums = parsed;
+        }
+      }
+      const savedMed = localStorage.getItem('mbcina_m6_media');
+      if (savedMed) {
+        const parsedM = JSON.parse(savedMed);
+        if (Array.isArray(parsedM) && parsedM.length > 0) {
+          this.data.media = parsedM;
+        }
+      }
+    } catch(e) {
+      console.warn('loadGalleryFromStorage error:', e);
+    }
+    if (!this.data.albums || this.data.albums.length === 0) {
+      this.data.albums = [...this.sampleAlbums];
+    } else {
+      if (!this.data.albums.some(a => a.id === 'alb_anniv_2026' || a.title.includes('Anniversary & Rakernas'))) {
+        this.data.albums.unshift(this.sampleAlbums[0]);
+      }
+    }
+    if (!this.data.media || this.data.media.length === 0) {
+      this.data.media = [...this.sampleMedia];
+    } else {
+      if (!this.data.media.some(m => m.album_id === 'alb_anniv_2026')) {
+        this.data.media.unshift(this.sampleMedia[0], this.sampleMedia[1]);
+      }
+    }
+  },
+
+  saveGalleryToStorage() {
+    try {
+      localStorage.setItem('mbcina_m6_albums', JSON.stringify(this.data.albums));
+      const safeMedia = (this.data.media || []).map(m => {
+        if (m.media_url && m.media_url.length > 500000) {
+          return { ...m, media_url: m.type === 'VIDEO' ? 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4' : 'assets/mb_hero.jpg' };
+        }
+        return m;
+      });
+      localStorage.setItem('mbcina_m6_media', JSON.stringify(safeMedia));
+    } catch(e) {
+      console.warn('saveGalleryToStorage error:', e);
+    }
+  },
+
   renderGaleri() {
     const container = document.getElementById('m6-galeri-container');
     if (!container) return;
+
+    this.loadGalleryFromStorage();
 
     const canManage = this.canUserManageGallery();
     const adminActions = document.getElementById('m6-gl-admin-actions');
     if (adminActions) adminActions.style.display = canManage ? 'flex' : 'none';
     const uploadPill = document.getElementById('m6-gl-inner-btn-652');
     if (uploadPill) uploadPill.style.display = canManage ? '' : 'none';
-
-    if (!this.data.albums || this.data.albums.length === 0) {
-      this.data.albums = this.sampleAlbums;
-    }
-    if (!this.data.media || this.data.media.length === 0) {
-      this.data.media = this.sampleMedia;
-    }
 
     const albums = this.data.albums;
     const media  = this.data.media;
@@ -19921,8 +20001,13 @@ const M6Engine = {
           ${albMedia.map(m => `
             <div class="glass-panel" style="padding:0; border:1px solid var(--chrome-border); border-radius:12px; overflow:hidden; position:relative;" onclick="M6Engine.openMediaDetailModal('${m.id}')">
               <div style="height:150px; overflow:hidden; position:relative; background:#000; cursor:pointer;">
-                <img src="${m.media_url}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
-                ${m.type === 'VIDEO' ? '<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.7); border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#fff;">▶</div>' : ''}
+                ${m.type === 'VIDEO' ? `
+                  <video src="${m.media_url}#t=0.5" preload="metadata" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
+                  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.75); border:1px solid rgba(255,255,255,0.3); border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.5);">▶</div>
+                  <div style="position:absolute; top:8px; left:8px; background:rgba(239,68,68,0.9); color:#fff; font-size:0.65rem; font-weight:800; padding:2px 6px; border-radius:4px; letter-spacing:0.5px;">🎬 VIDEO</div>
+                ` : `
+                  <img src="${m.media_url}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
+                `}
                 <div style="position:absolute; bottom:6px; left:6px; background:rgba(0,0,0,0.75); padding:2px 8px; border-radius:12px; font-size:0.7rem; color:#fff;">
                   👁️ ${m.view_count || 0} views
                 </div>
@@ -19955,7 +20040,7 @@ const M6Engine = {
           return `
           <div class="glass-panel" style="padding:0; border:1px solid var(--chrome-border); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;">
             <div>
-              <div style="height:170px; overflow:hidden; position:relative;">
+              <div style="height:170px; overflow:hidden; position:relative; background:#000;">
                 <img src="${cover}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
                 <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.8); padding:3px 10px; border-radius:20px; font-size:0.72rem; color:var(--accent-gold); font-weight:800;">
                   📷 ${imgCount} foto • 🎬 ${vidCount} video
@@ -19966,7 +20051,14 @@ const M6Engine = {
                 <div style="font-size:0.78rem; color:var(--text-muted); line-height:1.5; margin-bottom:12px;">${a.description || '–'}</div>
                 
                 <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:10px;">
-                  ${albMedia.slice(0,3).map(m => `<img src="${m.media_url}" style="width:100%; height:58px; object-fit:cover; border-radius:6px;" onerror="this.src='assets/mb_hero.jpg'">`).join('')}
+                  ${albMedia.slice(0,3).map(m => m.type === 'VIDEO' ? `
+                    <div style="width:100%; height:58px; position:relative; background:#000; border-radius:6px; overflow:hidden;">
+                      <video src="${m.media_url}#t=0.5" preload="metadata" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
+                      <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); font-size:0.75rem; color:#fff;">▶</div>
+                    </div>
+                  ` : `
+                    <img src="${m.media_url}" style="width:100%; height:58px; object-fit:cover; border-radius:6px;" onerror="this.src='assets/mb_hero.jpg'">
+                  `).join('')}
                 </div>
               </div>
             </div>
@@ -20211,6 +20303,7 @@ const M6Engine = {
     }
 
     AuthEngine.closeModal('modal-m6-create-album');
+    this.saveGalleryToStorage();
     this.renderGaleri();
     alert('✅ Album galeri berhasil disimpan!');
   },
@@ -20224,6 +20317,7 @@ const M6Engine = {
     this.data.albums = this.data.albums.filter(a => a.id !== albumId);
     this.data.media  = this.data.media.filter(m => m.album_id !== albumId);
     if (this.activeGalleryAlbumId === albumId) this.activeGalleryAlbumId = null;
+    this.saveGalleryToStorage();
     this.renderGaleri();
   },
 
@@ -20252,12 +20346,12 @@ const M6Engine = {
     if (input.files && input.files.length > 0) {
       this.stagedUploadFiles = Array.from(input.files);
       previewContainer.innerHTML = this.stagedUploadFiles.map((file, idx) => {
-        const isVid = file.type.includes('video') || file.name.endsWith('.mp4');
+        const isVid = file.type.startsWith('video/') || /\.(mp4|mov|webm|avi|mkv|3gp|m4v)$/i.test(file.name);
         return `
-          <div style="background:rgba(0,0,0,0.5); border:1px solid var(--chrome-border); border-radius:8px; padding:6px; text-align:center; position:relative;">
+          <div style="background:rgba(0,0,0,0.6); border:1px solid ${isVid ? 'var(--accent-gold)' : 'var(--chrome-border)'}; border-radius:8px; padding:8px 6px; text-align:center; position:relative;">
             <div style="font-size:1.6rem; margin-bottom:2px;">${isVid ? '🎬' : '📷'}</div>
-            <div style="font-size:0.68rem; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${file.name}</div>
-            <div style="font-size:0.65rem; color:var(--text-muted);">${(file.size / (1024*1024)).toFixed(1)}MB</div>
+            <div style="font-size:0.68rem; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700;">${file.name}</div>
+            <div style="font-size:0.65rem; color:${isVid ? 'var(--accent-gold)' : 'var(--text-muted)'};">${isVid ? 'VIDEO • ' : 'FOTO • '}${(file.size / (1024*1024)).toFixed(1)} MB</div>
           </div>
         `;
       }).join('');
@@ -20275,36 +20369,57 @@ const M6Engine = {
 
     if (!albumId) { alert('⚠️ Silakan pilih album tujuan!'); return; }
 
-    const count = this.stagedUploadFiles.length > 0 ? this.stagedUploadFiles.length : 3;
+    const alb = this.data.albums.find(a => a.id === albumId);
+    const albTitle = alb ? alb.title.replace(/^📁\s*/, '') : 'Event';
+    const uploaderName = (window.AuthEngine?.currentUser?.name) || (window.AppEngine?.currentUser?.name) || 'Derist Touriano (Admin)';
 
-    for (let i = 0; i < count; i++) {
-      const isVid = i === 1 && count > 2;
-      const sampleImg = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800';
+    if (!this.stagedUploadFiles || this.stagedUploadFiles.length === 0) {
+      alert('⚠️ Silakan pilih minimal 1 file foto atau video yang ingin diunggah!');
+      return;
+    }
+
+    let uploadCount = 0;
+    this.stagedUploadFiles.forEach((file, i) => {
+      const isVid = file.type.startsWith('video/') || /\.(mp4|mov|webm|avi|mkv|3gp|m4v)$/i.test(file.name);
+      let mediaUrl;
+      try {
+        mediaUrl = URL.createObjectURL(file);
+      } catch (err) {
+        mediaUrl = isVid ? 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4' : 'assets/mb_hero.jpg';
+      }
+
       const newMedia = {
         id: 'med_' + Date.now() + '_' + i,
         album_id: albumId,
-        media_url: sampleImg,
+        media_url: mediaUrl,
+        file_name: file.name,
+        file_size: file.size,
         type: isVid ? 'VIDEO' : 'IMAGE',
-        caption: caption || 'Dokumentasi Event Jambore MB INA Yogyakarta 2026',
-        uploaded_by: 'Derist Touriano (Admin)',
+        caption: caption || (isVid ? `Dokumentasi Video - ${file.name}` : `Dokumentasi Foto - ${albTitle}`),
+        uploaded_by: uploaderName,
         uploaded_at: new Date().toLocaleDateString('id-ID'),
-        view_count: 1,
+        view_count: 0,
         download_count: 0,
-        tags: ['Derist Touriano']
+        tags: ['MB INA']
       };
       this.data.media.unshift(newMedia);
-    }
+      uploadCount++;
+    });
 
+    this.saveGalleryToStorage();
     this.resetGalleryUploadForm();
-    alert(`🚀 BERHASIL UPLOAD ${count} MEDIA DEKONSTRUKSI EVENT!\n\nFile telah tersimpan di album terpilih.`);
+    alert(`🚀 BERHASIL UPLOAD ${uploadCount} MEDIA EVENT!\n\nFile telah tersimpan di album "${albTitle}".`);
+    this.activeGalleryAlbumId = albumId;
     this.switchGalleryInnerTab('651');
     this.renderGaleri();
   },
 
   resetGalleryUploadForm() {
     this.stagedUploadFiles = [];
+    const fileInput = document.getElementById('m6-gl-file-input');
     const prev = document.getElementById('m6-gl-upload-preview-container');
     const cap  = document.getElementById('m6-gl-upload-caption');
+    if (fileInput) fileInput.value = '';
     if (prev) prev.innerHTML = '';
     if (cap) cap.value = '';
   },
@@ -20419,12 +20534,12 @@ const M6Engine = {
     if (viewerEl) {
       if (m.type === 'VIDEO') {
         viewerEl.innerHTML = `
-          <video controls autoplay style="max-width:100%; max-height:360px; border-radius:8px;">
-            <source src="${m.media_url}" type="video/mp4">
-            Browser Anda tidak mendukung HTML5 video.
+          <video controls autoplay playsinline style="max-width:100%; max-height:420px; width:100%; border-radius:8px; background:#000; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+            <source src="${m.media_url}">
+            Browser Anda tidak mendukung pemutaran HTML5 video.
           </video>`;
       } else {
-        viewerEl.innerHTML = `<img src="${m.media_url}" style="max-width:100%; max-height:360px; object-fit:contain; border-radius:8px;" onerror="this.src='assets/mb_hero.jpg'">`;
+        viewerEl.innerHTML = `<img src="${m.media_url}" style="max-width:100%; max-height:420px; object-fit:contain; border-radius:8px;" onerror="this.src='assets/mb_hero.jpg'">`;
       }
     }
 
