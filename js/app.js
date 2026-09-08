@@ -13955,8 +13955,29 @@ const M6Engine = {
         this.data.participants      = (res.participants && res.participants.length > 0) ? res.participants : this.getSampleParticipants();
         this.data.posTransactions   = res.pos_transactions  || [];
         this.data.broadcasts        = res.broadcasts        || [];
-        this.data.albums            = res.albums            || [];
-        this.data.media             = res.media             || [];
+        
+        // Sanitize incoming albums & media from API and merge with storage
+        if (Array.isArray(res.albums) && res.albums.length > 0) {
+          const validApiAlbs = res.albums.filter(a => typeof this.isDummyAlbum === 'function' ? !this.isDummyAlbum(a) : true);
+          if (validApiAlbs.length > 0) {
+            const map = new Map();
+            validApiAlbs.forEach(a => map.set(a.id, a));
+            (this.data.albums || []).forEach(a => { if (!map.has(a.id)) map.set(a.id, a); });
+            this.data.albums = Array.from(map.values());
+          }
+        }
+
+        if (Array.isArray(res.media) && res.media.length > 0) {
+          const validApiMed = res.media.filter(m => typeof this.isDummyMedia === 'function' ? !this.isDummyMedia(m) : true);
+          if (validApiMed.length > 0) {
+            const map = new Map();
+            validApiMed.forEach(m => map.set(m.id, m));
+            (this.data.media || []).forEach(m => { if (!map.has(m.id)) map.set(m.id, m); });
+            this.data.media = Array.from(map.values());
+          }
+        }
+        this.loadGalleryFromStorage();
+
         this.data.sponsors          = res.sponsors          || [];
         this.data.banners           = res.banners           || [];
         this.data.reports           = res.reports           || [];
@@ -20417,27 +20438,51 @@ const M6Engine = {
     return adminRoles.includes(role);
   },
 
+  isDummyAlbum(a) {
+    if (!a) return true;
+    const id = (a.id || '').toLowerCase();
+    const title = (a.title || '').toLowerCase();
+    if (['alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3'].includes(id)) return true;
+    if (title.includes('gala dinner') || title.includes('opening ceremony') || title.includes('parade mercedes') || title.includes('bakti sosial')) return true;
+    return false;
+  },
+
+  isDummyMedia(m) {
+    if (!m) return true;
+    const id = (m.id || '').toLowerCase();
+    const albId = (m.album_id || '').toLowerCase();
+    const cap = (m.caption || '').toLowerCase();
+    const dummyMediaIds = new Set(['med_001', 'med_002', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
+    if (dummyMediaIds.has(id)) return true;
+    if (['alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3'].includes(albId)) return true;
+    if (cap.includes('gala dinner') || cap.includes('opening ceremony') || cap.includes('parade mercedes') || cap.includes('bakti sosial')) return true;
+    return false;
+  },
+
   loadGalleryFromStorage() {
     try {
-      const dummyAlbumIds = new Set(['alb_1', 'alb_2', 'alb_3']);
-      const dummyMediaIds = new Set(['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
-
       const savedAlb = localStorage.getItem('mbcina_m6_albums');
       if (savedAlb) {
         const parsed = JSON.parse(savedAlb);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          this.data.albums = parsed.filter(a => !dummyAlbumIds.has(a.id));
+          this.data.albums = parsed.filter(a => !this.isDummyAlbum(a));
         }
       }
 
       if (!this.data.albums || this.data.albums.length === 0) {
         this.data.albums = [...this.sampleAlbums];
       } else {
+        this.data.albums = this.data.albums.filter(a => !this.isDummyAlbum(a));
         const annivAlb = this.data.albums.find(a => a.id === 'alb_anniv_2026');
         if (!annivAlb) {
           this.data.albums.unshift(this.sampleAlbums[0]);
-        } else if (!annivAlb.gdrive_url && this.sampleAlbums[0].gdrive_url) {
-          annivAlb.gdrive_url = this.sampleAlbums[0].gdrive_url;
+        } else {
+          if (!annivAlb.gdrive_url && this.sampleAlbums[0].gdrive_url) {
+            annivAlb.gdrive_url = this.sampleAlbums[0].gdrive_url;
+          }
+          if (!annivAlb.title || !annivAlb.title.includes('22nd Anniversary')) {
+            annivAlb.title = this.sampleAlbums[0].title;
+          }
         }
       }
 
@@ -20445,13 +20490,14 @@ const M6Engine = {
       if (savedMed !== null) {
         const parsedM = JSON.parse(savedMed);
         if (Array.isArray(parsedM)) {
-          this.data.media = parsedM.filter(m => !dummyMediaIds.has(m.id) && !dummyAlbumIds.has(m.album_id));
+          this.data.media = parsedM.filter(m => !this.isDummyMedia(m));
         }
       }
 
       if (!this.data.media || this.data.media.length === 0) {
         this.data.media = [...this.sampleMedia];
       } else {
+        this.data.media = this.data.media.filter(m => !this.isDummyMedia(m));
         const hasRealYt = this.data.media.some(m => m.youtube_id === 'k68heI9xML0' || (m.media_url && m.media_url.includes('k68heI9xML0')));
         if (!hasRealYt) {
           this.data.media.unshift(this.sampleMedia[0]);
@@ -20479,13 +20525,11 @@ const M6Engine = {
 
   saveGalleryToStorage() {
     try {
-      const dummyAlbumIds = new Set(['alb_1', 'alb_2', 'alb_3']);
-      const dummyMediaIds = new Set(['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
-      const safeAlbums = (this.data.albums || []).filter(a => !dummyAlbumIds.has(a.id));
+      const safeAlbums = (this.data.albums || []).filter(a => !this.isDummyAlbum(a));
       localStorage.setItem('mbcina_m6_albums', JSON.stringify(safeAlbums));
 
       const safeMedia = (this.data.media || [])
-        .filter(m => !dummyMediaIds.has(m.id) && !dummyAlbumIds.has(m.album_id))
+        .filter(m => !this.isDummyMedia(m))
         .map(m => {
           if (m.media_url && m.media_url.length > 500000) {
             return { ...m, media_url: 'assets/mb_hero.jpg' };
@@ -20645,18 +20689,18 @@ const M6Engine = {
                     const mYtId = m.youtube_id || this.extractYouTubeId(m.media_url);
                     if (m.type === 'VIDEO') {
                       return `
-                        <div style="width:100%; height:58px; position:relative; background:#000; border-radius:6px; overflow:hidden;">
+                        <div style="width:100%; height:58px; position:relative; background:#000; border-radius:6px; overflow:hidden; cursor:pointer;" onclick="M6Engine.openMediaDetailModal('${m.id}')" title="Klik untuk putar video: ${m.caption || ''}">
                           ${mIsYt ? `
                             <img src="https://img.youtube.com/vi/${mYtId}/hqdefault.jpg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
-                            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(220,38,38,0.4); font-size:0.8rem; color:#fff;">▶</div>
+                            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(220,38,38,0.45); font-size:0.85rem; color:#fff; font-weight:bold;">▶</div>
                           ` : `
                             <video src="${m.media_url}#t=0.5" preload="metadata" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
-                            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); font-size:0.75rem; color:#fff;">▶</div>
+                            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.45); font-size:0.8rem; color:#fff;">▶</div>
                           `}
                         </div>
                       `;
                     }
-                    return `<img src="${m.media_url}" style="width:100%; height:58px; object-fit:cover; border-radius:6px;" onerror="this.src='assets/mb_hero.jpg'">`;
+                    return `<img src="${m.media_url}" style="width:100%; height:58px; object-fit:cover; border-radius:6px; cursor:pointer;" onclick="M6Engine.openMediaDetailModal('${m.id}')" onerror="this.src='assets/mb_hero.jpg'" title="${m.caption || ''}">`;
                   }).join('')}
                 </div>
                 ${a.gdrive_url ? `

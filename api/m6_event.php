@@ -13,8 +13,81 @@ switch ($action) {
             $participants = $sPdo->query("SELECT p.*, u.name as user_name, u.email as user_email, u.phone as user_phone, u.member_id as user_mid, u.tier_id as user_tier FROM event_participants p LEFT JOIN users u ON p.user_id = u.id ORDER BY p.registered_at DESC")->fetchAll();
             $posTx = $sPdo->query("SELECT * FROM event_offline_transactions ORDER BY created_at DESC")->fetchAll();
             $broadcasts = $sPdo->query("SELECT * FROM event_broadcasts ORDER BY created_at DESC")->fetchAll();
-            $albums = $sPdo->query("SELECT * FROM event_albums ORDER BY created_at DESC")->fetchAll();
-            $media = $sPdo->query("SELECT * FROM event_media ORDER BY uploaded_at DESC")->fetchAll();
+            $rawAlbums = $sPdo->query("SELECT * FROM event_albums ORDER BY created_at DESC")->fetchAll();
+            $rawMedia  = $sPdo->query("SELECT * FROM event_media ORDER BY uploaded_at DESC")->fetchAll();
+
+            // Try to clean up dummy rows from PostgreSQL if connected
+            try {
+                $sPdo->exec("DELETE FROM event_media WHERE id IN ('med_001', 'med_002', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1') OR album_id IN ('alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3')");
+                $sPdo->exec("DELETE FROM event_albums WHERE id IN ('alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3')");
+            } catch (Exception $ign) {}
+
+            // Filter dummy albums
+            $albums = array_values(array_filter($rawAlbums ?: [], function($a) {
+                $id = strtolower($a['id'] ?? '');
+                $title = strtolower($a['title'] ?? '');
+                if (in_array($id, ['alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3'])) return false;
+                if (str_contains($title, 'gala dinner') || str_contains($title, 'opening ceremony') || str_contains($title, 'parade mercedes') || str_contains($title, 'bakti sosial')) return false;
+                return true;
+            }));
+
+            // Ensure official album exists
+            $hasAnniv = false;
+            foreach ($albums as $a) {
+                if (($a['id'] ?? '') === 'alb_anniv_2026') { $hasAnniv = true; break; }
+            }
+            if (!$hasAnniv) {
+                array_unshift($albums, [
+                    'id' => 'alb_anniv_2026',
+                    'event_id' => 'EVT-2026-012',
+                    'title' => '📁 Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+                    'description' => 'Dokumentasi resmi HUT ke-22 MB Club Indonesia, Press Conference Jamnas XXI, & Rakernas di TOPGOLF Jakarta',
+                    'cover_image' => 'assets/mb_hero.jpg',
+                    'gdrive_url' => 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
+                    'is_public' => true,
+                    'created_by' => 'Derist Touriano (Admin)',
+                    'created_at' => '2026-09-05 14:00:00',
+                    'views' => 180
+                ]);
+            }
+
+            // Filter dummy media
+            $media = array_values(array_filter($rawMedia ?: [], function($m) {
+                $id = strtolower($m['id'] ?? '');
+                $albId = strtolower($m['album_id'] ?? '');
+                $cap = strtolower($m['caption'] ?? '');
+                if (in_array($id, ['med_001', 'med_002', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1'])) return false;
+                if (in_array($albId, ['alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3'])) return false;
+                if (str_contains($cap, 'gala dinner') || str_contains($cap, 'opening ceremony') || str_contains($cap, 'parade mercedes') || str_contains($cap, 'bakti sosial')) return false;
+                return true;
+            }));
+
+            // Ensure official YouTube video exists
+            $hasOfficialYt = false;
+            foreach ($media as $m) {
+                if (($m['youtube_id'] ?? '') === 'k68heI9xML0' || str_contains($m['media_url'] ?? '', 'k68heI9xML0')) {
+                    $hasOfficialYt = true;
+                    break;
+                }
+            }
+            if (!$hasOfficialYt) {
+                array_unshift($media, [
+                    'id' => 'med_anniv_yt_user',
+                    'album_id' => 'alb_anniv_2026',
+                    'media_url' => 'https://youtu.be/k68heI9xML0',
+                    'youtube_id' => 'k68heI9xML0',
+                    'is_youtube' => true,
+                    'file_name' => 'YouTube: Aftermovie HUT ke-22 & Rakernas MB Club Indonesia',
+                    'type' => 'VIDEO',
+                    'caption' => 'Aftermovie & Dokumentasi Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
+                    'uploaded_by' => 'Derist Touriano',
+                    'uploaded_at' => '08/09/2026 17:00',
+                    'view_count' => 85,
+                    'download_count' => 14,
+                    'tags' => ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
+                ]);
+            }
+
             $sponsors = $sPdo->query("SELECT * FROM sponsors ORDER BY created_at DESC")->fetchAll();
             $banners = $sPdo->query("SELECT * FROM sponsor_banners ORDER BY created_at DESC")->fetchAll();
             $reports = $sPdo->query("SELECT * FROM sponsor_reports ORDER BY created_at DESC")->fetchAll();
