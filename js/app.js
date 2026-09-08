@@ -13984,15 +13984,14 @@ const M6Engine = {
       return;
     }
     if (subtab === '6_4_archive') {
-      this._publishEventsFilter = 'COMPLETED';
       this.data.activeSubtab = '6_4_archive';
       document.querySelectorAll('[data-m6-subtab]').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-m6-subtab') === '6_4_archive');
       });
       document.querySelectorAll('.m6-subtab-content').forEach(c => {
-        c.style.display = c.id === 'm6-subtab-6_3_publish' ? 'block' : 'none';
+        c.style.display = c.id === 'm6-subtab-6_4_archive' ? 'block' : 'none';
       });
-      this.renderPublishPage();
+      this.renderArchivePage();
       return;
     }
     if (subtab === '6_3_publish') {
@@ -14017,6 +14016,7 @@ const M6Engine = {
     else if (sub === '6_2_approval')    this.renderApprovalPage();
     else if (sub === '6_3_publish')     this.renderPublishPage();
     else if (sub === '6_4_sponsorship') this.renderSponsorshipModule();
+    else if (sub === '6_4_archive')     this.renderArchivePage();
     else if (sub === '6_5_gallery')     this.renderGaleri();
   },
 
@@ -19719,6 +19719,571 @@ const M6Engine = {
   },
 
   // ─────────────────────────────────────────────────────────────────────
+  // 6.4 ARSIP DOKUMEN & LPJ EVENT ENGINE (BERKAS ADMINISTRASI & DOKUMEN KANTOR)
+  // Standar Kode Arsip: ARC-EVT-[TAHUN]-[NOMOR] & Sub-kode Jenis Berkas (LPJ/FIN/PPT/SK)
+  // Berkas Khusus: Word (.docx), Excel (.xlsx), PowerPoint (.pptx), PDF, LPJ
+  // ─────────────────────────────────────────────────────────────────────
+  activeArchiveFilter: 'ALL',
+  selectedArchiveEventId: '',
+  stagedArchiveFile: null,
+
+  defaultDocumentArchives: [
+    {
+      id: 'doc_lpj_evt_2026_012',
+      archive_code: 'ARC-EVT-2026-012',
+      doc_code: 'LPJ-EVT-2026-012',
+      event_id: 'EVT-2026-012',
+      event_title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+      title: 'Laporan Pertanggungjawaban (LPJ) Resmi & Evaluasi Kegiatan HUT ke-22 MB INA',
+      doc_type: 'WORD',
+      category: 'LPJ',
+      file_name: 'LPJ_Resmi_HUT22_Rakernas_MBINA_2026.docx',
+      file_size: '4.8 MB',
+      file_url: 'https://docs.google.com/document/d/1MBINA-LPJ-22nd-Anniversary-2026/edit?usp=sharing',
+      gdrive_url: 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
+      description: 'Naskah lengkap LPJ kepanitiaan pelaksana, susunan mata acara, daftar kehadiran 115 klub naungan, hasil Rakernas 2026, dan berita acara musyawarah.',
+      uploaded_by: 'Sekretariat Jenderal MB INA',
+      created_at: '02/09/2026',
+      is_public: true,
+      downloads: 48
+    },
+    {
+      id: 'doc_fin_evt_2026_012',
+      archive_code: 'ARC-EVT-2026-012',
+      doc_code: 'FIN-EVT-2026-012',
+      event_id: 'EVT-2026-012',
+      event_title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+      title: 'Laporan Finansial, Realisasi Anggaran, & Rekonsiliasi Kas Event HUT 22',
+      doc_type: 'EXCEL',
+      category: 'FINANCE',
+      file_name: 'Realisasi_Finansial_Audit_HUT22_MBINA.xlsx',
+      file_size: '2.4 MB',
+      file_url: 'https://docs.google.com/spreadsheets/d/1MBINA-Finance-Reconciliation-HUT22-2026/edit?usp=sharing',
+      gdrive_url: 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
+      description: 'Buku besar penerimaan sponsorship, registrasi delegasi klub regional, realisasi pengeluaran F&B, venue TOPGOLF Jakarta, dan sisa kas surplus.',
+      uploaded_by: 'Bendahara Umum MB INA',
+      created_at: '03/09/2026',
+      is_public: true,
+      downloads: 36
+    },
+    {
+      id: 'doc_ppt_evt_2026_012',
+      archive_code: 'ARC-EVT-2026-012',
+      doc_code: 'PPT-EVT-2026-012',
+      event_id: 'EVT-2026-012',
+      event_title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+      title: 'Slide Presentasi Evaluasi & Sosialisasi Hasil Rakernas & Jamnas XXI 2026',
+      doc_type: 'PPT',
+      category: 'PRESENTATION',
+      file_name: 'Presentasi_Rakernas_Sosialisasi_JamnasXXI.pptx',
+      file_size: '18.6 MB',
+      file_url: 'https://docs.google.com/presentation/d/1MBINA-Presentation-Rakernas-JamnasXXI-2026/edit?usp=sharing',
+      gdrive_url: 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
+      description: 'Deck materi paparan Presiden MB INA Bpk. Yoga Mahardhika, timeline touring nasional 2026, roadmap Jambore Nasional XXI, dan standardisasi logo klub.',
+      uploaded_by: 'Tim Media & Komunikasi MB INA',
+      created_at: '02/09/2026',
+      is_public: true,
+      downloads: 82
+    },
+    {
+      id: 'doc_sk_evt_2026_012',
+      archive_code: 'ARC-EVT-2026-012',
+      doc_code: 'SK-EVT-2026-012',
+      event_id: 'EVT-2026-012',
+      event_title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+      title: 'Surat Keputusan (SK) Panitia, Izin Kegiatan & Hasil Musyawarah Rakernas',
+      doc_type: 'PDF',
+      category: 'LEGAL',
+      file_name: 'SK_Kepanitiaan_Ketetapan_Rakernas_MBINA_2026.pdf',
+      file_size: '3.1 MB',
+      file_url: 'https://drive.google.com/file/d/1MBINA-SK-Kepanitiaan-Rakernas-2026/view?usp=sharing',
+      gdrive_url: 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
+      description: 'Dokumen bertanda tangan basah dan cap basah pengurus pusat, SK kepanitiaan, serta berita acara pengesahan kalender touring nasional 2026.',
+      uploaded_by: 'Bidang Hukum & Regulasi MB INA',
+      created_at: '01/09/2026',
+      is_public: true,
+      downloads: 95
+    }
+  ],
+
+  loadDocumentArchivesFromStorage() {
+    try {
+      const stored = localStorage.getItem('mbcina_m6_document_archives');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch(e) {
+      console.warn('Error loading document archives:', e);
+    }
+    return JSON.parse(JSON.stringify(this.defaultDocumentArchives));
+  },
+
+  saveDocumentArchivesToStorage(archives) {
+    try {
+      localStorage.setItem('mbcina_m6_document_archives', JSON.stringify(archives));
+    } catch(e) {
+      console.warn('Error saving document archives:', e);
+    }
+  },
+
+  getAllDocumentArchives() {
+    if (!this.data.documentArchives || !Array.isArray(this.data.documentArchives) || this.data.documentArchives.length === 0) {
+      this.data.documentArchives = this.loadDocumentArchivesFromStorage();
+    }
+    return this.data.documentArchives;
+  },
+
+  renderArchivePage() {
+    this.populateArchiveEventFilterSelect();
+    this.updateArchiveStats();
+    this.renderArchiveDocList();
+  },
+
+  populateArchiveEventFilterSelect() {
+    const sel = document.getElementById('m6-arc-filter-event');
+    if (!sel) return;
+
+    const allEvents = this.getAllAvailableEventsForGallery ? this.getAllAvailableEventsForGallery() : [];
+    let html = '<option value="">— Semua Kegiatan / Event —</option>';
+    
+    // Add completed events first
+    const completed = allEvents.filter(e => e.is_completed);
+    if (completed.length > 0) {
+      html += '<optgroup label="📁 EVENT SELESAI / MEMILIKI ARSIP">';
+      completed.forEach(ev => {
+        const isSel = this.selectedArchiveEventId === (ev.code || ev.id) ? 'selected' : '';
+        html += `<option value="${ev.code || ev.id}" ${isSel}>📁 [${ev.code}] ${ev.title}</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    const others = allEvents.filter(e => !e.is_completed);
+    if (others.length > 0) {
+      html += '<optgroup label="🔥 EVENT AKTIF & TOURING">';
+      others.forEach(ev => {
+        const isSel = this.selectedArchiveEventId === (ev.code || ev.id) ? 'selected' : '';
+        html += `<option value="${ev.code || ev.id}" ${isSel}>🔥 [${ev.code}] ${ev.title}</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    sel.innerHTML = html;
+  },
+
+  onArchiveEventFilterChange(val) {
+    this.selectedArchiveEventId = val;
+    this.renderArchiveDocList();
+  },
+
+  filterArchiveDocs(type) {
+    this.activeArchiveFilter = type || 'ALL';
+    document.querySelectorAll('.m6-doc-filter-btn').forEach(btn => {
+      const isMatch = btn.getAttribute('data-doc-filter') === this.activeArchiveFilter;
+      btn.style.background = isMatch ? 'var(--accent-gold)' : 'rgba(255,255,255,0.05)';
+      btn.style.color = isMatch ? '#000' : '#fff';
+      btn.style.borderColor = isMatch ? 'var(--accent-gold)' : 'var(--chrome-border)';
+    });
+    this.renderArchiveDocList();
+  },
+
+  updateArchiveStats() {
+    const docs = this.getAllDocumentArchives();
+    const totalCount = docs.length;
+    const wordCount = docs.filter(d => d.doc_type === 'WORD').length;
+    const excelCount = docs.filter(d => d.doc_type === 'EXCEL').length;
+    const pptCount = docs.filter(d => d.doc_type === 'PPT').length;
+    const pdfCount = docs.filter(d => d.doc_type === 'PDF').length;
+
+    const elTotal = document.getElementById('m6-arc-stat-total');
+    const elWord = document.getElementById('m6-arc-stat-word');
+    const elExcel = document.getElementById('m6-arc-stat-excel');
+    const elPpt = document.getElementById('m6-arc-stat-ppt');
+    const elPdf = document.getElementById('m6-arc-stat-pdf');
+
+    if (elTotal) elTotal.textContent = totalCount;
+    if (elWord) elWord.textContent = wordCount;
+    if (elExcel) elExcel.textContent = excelCount;
+    if (elPpt) elPpt.textContent = pptCount;
+    if (elPdf) elPdf.textContent = pdfCount;
+  },
+
+  renderArchiveDocList() {
+    const container = document.getElementById('m6-archive-docs-container');
+    if (!container) return;
+
+    const canManage = this.canUserManageGallery ? this.canUserManageGallery() : false;
+    const query = (document.getElementById('m6-arc-search-input')?.value || '').toLowerCase().trim();
+    let docs = this.getAllDocumentArchives();
+
+    // Event filter
+    if (this.selectedArchiveEventId) {
+      docs = docs.filter(d => d.event_id === this.selectedArchiveEventId);
+    }
+
+    // Type filter
+    if (this.activeArchiveFilter && this.activeArchiveFilter !== 'ALL') {
+      docs = docs.filter(d => d.doc_type === this.activeArchiveFilter);
+    }
+
+    // Search query
+    if (query) {
+      docs = docs.filter(d => 
+        (d.title && d.title.toLowerCase().includes(query)) ||
+        (d.doc_code && d.doc_code.toLowerCase().includes(query)) ||
+        (d.archive_code && d.archive_code.toLowerCase().includes(query)) ||
+        (d.file_name && d.file_name.toLowerCase().includes(query)) ||
+        (d.event_title && d.event_title.toLowerCase().includes(query)) ||
+        (d.description && d.description.toLowerCase().includes(query))
+      );
+    }
+
+    if (docs.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:50px 20px; color:var(--text-muted); background:rgba(255,255,255,0.02); border-radius:14px; border:1px dashed var(--chrome-border);">
+          <div style="font-size:3rem; margin-bottom:12px;">📂</div>
+          <div style="font-weight:800; color:#fff; font-size:1.1rem; margin-bottom:6px;">Tidak Ditemukan Berkas Dokumen</div>
+          <div style="font-size:0.85rem; max-width:520px; margin:0 auto 18px; line-height:1.5;">
+            ${query ? 'Tidak ada dokumen yang cocok dengan kata kunci "' + query + '". Coba kata kunci lain atau bersihkan filter pencarian.' : 'Belum ada berkas dokumen perkantoran (Word/Excel/PPT/PDF) yang tersimpan pada kategori filter ini.'}
+          </div>
+          ${canManage ? `
+            <button class="btn-primary" style="font-size:0.82rem; font-weight:800;" onclick="M6Engine.openUploadDocumentModal()">
+              📄 + Unggah Berkas Dokumen Baru
+            </button>
+          ` : ''}
+        </div>
+      `;
+      return;
+    }
+
+    // Render grouped or grid of document cards
+    const getBadgeInfo = (docType) => {
+      switch(docType) {
+        case 'WORD':
+          return { icon: '📝', label: 'WORD DOCUMENT (.DOCX)', bg: 'rgba(59,130,246,0.15)', color: '#60a5fa', border: 'rgba(59,130,246,0.4)' };
+        case 'EXCEL':
+          return { icon: '📊', label: 'EXCEL SPREADSHEET (.XLSX)', bg: 'rgba(16,185,129,0.15)', color: '#34d399', border: 'rgba(16,185,129,0.4)' };
+        case 'PPT':
+          return { icon: '📽️', label: 'POWERPOINT PRESENTATION (.PPTX)', bg: 'rgba(249,115,22,0.15)', color: '#fb923c', border: 'rgba(249,115,22,0.4)' };
+        case 'PDF':
+          return { icon: '📑', label: 'PDF DOCUMENT (.PDF)', bg: 'rgba(239,68,68,0.15)', color: '#f87171', border: 'rgba(239,68,68,0.4)' };
+        default:
+          return { icon: '📄', label: 'OFFICE DOCUMENT', bg: 'rgba(255,255,255,0.1)', color: '#fff', border: 'var(--chrome-border)' };
+      }
+    };
+
+    container.innerHTML = `
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:18px;">
+        ${docs.map(doc => {
+          const badge = getBadgeInfo(doc.doc_type);
+          return `
+            <div class="glass-panel" style="padding:18px; border:1px solid var(--chrome-border); border-radius:14px; display:flex; flex-direction:column; justify-content:space-between; position:relative; background:linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);">
+              <div>
+                <!-- TOP META ROW -->
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:12px;">
+                  <span style="display:inline-flex; align-items:center; gap:6px; font-size:0.72rem; font-weight:800; padding:4px 10px; border-radius:6px; background:${badge.bg}; color:${badge.color}; border:1px solid ${badge.border};">
+                    <span>${badge.icon}</span> ${badge.label}
+                  </span>
+                  <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                    <span style="font-family:monospace; font-size:0.75rem; font-weight:800; color:var(--accent-gold); letter-spacing:0.5px;" title="Kode Berkas Dokumen">
+                      ${doc.doc_code || doc.archive_code}
+                    </span>
+                    <span style="font-family:monospace; font-size:0.65rem; color:var(--text-muted);" title="Kode Arsip Master Event">
+                      Master: ${doc.archive_code || 'ARC-EVT'}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- TITLE & EVENT -->
+                <div style="font-weight:800; color:#fff; font-size:1rem; line-height:1.4; margin-bottom:6px;">
+                  ${doc.title}
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; font-size:0.76rem; color:var(--accent-gold); margin-bottom:10px; font-weight:600;">
+                  <span>🎯</span> <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${doc.event_title || doc.event_id}</span>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div style="font-size:0.78rem; color:var(--text-muted); line-height:1.55; margin-bottom:14px; background:rgba(0,0,0,0.25); padding:10px 12px; border-radius:8px; border-left:3px solid ${badge.color};">
+                  ${doc.description || 'Tidak ada keterangan tambahan untuk berkas dokumen ini.'}
+                </div>
+
+                <!-- FILE DETAILS PILL -->
+                <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:0.72rem; color:var(--text-muted); margin-bottom:14px; padding-bottom:12px; border-bottom:1px dashed var(--chrome-border);">
+                  <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px;">📦 <b>${doc.file_name}</b></span>
+                  <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px;">⚖️ ${doc.file_size || 'N/A'}</span>
+                  <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px;">👤 ${doc.uploaded_by}</span>
+                  <span style="background:rgba(255,255,255,0.05); padding:3px 8px; border-radius:4px;">📅 ${doc.created_at}</span>
+                  <span style="background:rgba(16,185,129,0.1); color:var(--primary-emerald); padding:3px 8px; border-radius:4px; font-weight:700;">📥 ${doc.downloads || 0} Unduhan</span>
+                </div>
+              </div>
+
+              <!-- ACTION BUTTONS -->
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <button class="btn-primary" style="flex:1; font-size:0.78rem; font-weight:800; padding:8px 12px; display:inline-flex; align-items:center; justify-content:center; gap:6px;" onclick="M6Engine.downloadArchiveDoc('${doc.id}')">
+                  📥 Download Berkas
+                </button>
+                <button class="btn-outline" style="font-size:0.78rem; padding:8px 12px; display:inline-flex; align-items:center; gap:6px;" onclick="M6Engine.viewArchiveDocOnline('${doc.id}')" title="Buka Dokumen Online di Browser">
+                  👁️ Buka Online ↗
+                </button>
+                ${doc.gdrive_url ? `
+                  <a href="${doc.gdrive_url}" target="_blank" rel="noopener noreferrer" class="btn-outline" style="font-size:0.78rem; padding:8px 10px; border-color:rgba(66,133,244,0.5); color:#93c5fd; text-decoration:none; display:inline-flex; align-items:center; gap:4px; background:rgba(66,133,244,0.08);" title="Buka folder arsip dokumen di Google Drive">
+                    📁 GDrive ↗
+                  </a>
+                ` : ''}
+                ${canManage ? `
+                  <button type="button" class="btn-outline m6-gallery-admin-only" style="padding:8px 10px; font-size:0.78rem; color:var(--accent-red); border-color:rgba(239,68,68,0.5);" onclick="M6Engine.deleteArchiveDoc('${doc.id}')" title="Hapus Berkas Dokumen Arsip">
+                    🗑️
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  },
+
+  downloadArchiveDoc(docId) {
+    const docs = this.getAllDocumentArchives();
+    const doc = docs.find(d => d.id === docId);
+    if (!doc) return;
+
+    doc.downloads = (doc.downloads || 0) + 1;
+    this.saveDocumentArchivesToStorage(docs);
+    this.updateArchiveStats();
+    this.renderArchiveDocList();
+
+    // Trigger download or open direct link
+    if (doc.file_url) {
+      window.open(doc.file_url, '_blank');
+    } else {
+      alert(`📥 Mengunduh berkas: ${doc.file_name}\nKode Dokumen: ${doc.doc_code || doc.archive_code}`);
+    }
+  },
+
+  viewArchiveDocOnline(docId) {
+    const docs = this.getAllDocumentArchives();
+    const doc = docs.find(d => d.id === docId);
+    if (!doc) return;
+
+    if (doc.file_url) {
+      window.open(doc.file_url, '_blank');
+    } else {
+      alert(`📄 Dokumen: ${doc.title}\nBerkas: ${doc.file_name}\nSilakan unduh dokumen untuk membukanya secara lokal.`);
+    }
+  },
+
+  openUploadDocumentModal() {
+    if (!this.canUserManageGallery || !this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin Pusat & Pengurus Resmi MB INA yang berhak mengunggah berkas dokumen arsip.');
+      return;
+    }
+
+    this.populateDocEventSelect();
+    this.stagedArchiveFile = null;
+    const fileInp = document.getElementById('m6-doc-file-input');
+    const prevCont = document.getElementById('m6-doc-upload-preview');
+    if (fileInp) fileInp.value = '';
+    if (prevCont) prevCont.innerHTML = '';
+    
+    // Auto generate default code based on selection
+    this.onDocEventSelectChange();
+
+    if (typeof AuthEngine !== 'undefined' && AuthEngine.openModal) {
+      AuthEngine.openModal('modal-m6-upload-doc');
+    }
+  },
+
+  populateDocEventSelect() {
+    const sel = document.getElementById('m6-doc-event-sel');
+    if (!sel) return;
+
+    const allEvents = this.getAllAvailableEventsForGallery ? this.getAllAvailableEventsForGallery() : [];
+    let html = '<option value="">— Dokumen Umum Federasi (Non-Event Khusus) —</option>';
+
+    const completed = allEvents.filter(e => e.is_completed);
+    if (completed.length > 0) {
+      html += '<optgroup label="📁 EVENT RESMI SELESAI (Arsip LPJ / Evaluasi)">';
+      completed.forEach(ev => {
+        html += `<option value="${ev.code || ev.id}" data-code="${ev.code}">📁 [${ev.code}] ${ev.title}</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    const others = allEvents.filter(e => !e.is_completed);
+    if (others.length > 0) {
+      html += '<optgroup label="🔥 EVENT AKTIF / KALENDER TOURING">';
+      others.forEach(ev => {
+        html += `<option value="${ev.code || ev.id}" data-code="${ev.code}">🔥 [${ev.code}] ${ev.title}</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    sel.innerHTML = html;
+  },
+
+  onDocEventSelectChange() {
+    const sel = document.getElementById('m6-doc-event-sel');
+    const catSel = document.getElementById('m6-doc-category-sel');
+    const codeInp = document.getElementById('m6-doc-code-input');
+    if (!codeInp) return;
+
+    const eventVal = sel ? sel.value : '';
+    const catVal = catSel ? catSel.value : 'LPJ';
+    const year = new Date().getFullYear();
+
+    let prefix = 'LPJ';
+    if (catVal === 'FINANCE') prefix = 'FIN';
+    else if (catVal === 'PRESENTATION') prefix = 'PPT';
+    else if (catVal === 'LEGAL') prefix = 'SK';
+    else if (catVal === 'OTHER') prefix = 'DOC';
+
+    if (eventVal) {
+      // Event code extraction e.g. EVT-2026-012 -> 2026-012
+      const cleaned = eventVal.replace(/^EVT-/, '');
+      codeInp.value = `${prefix}-EVT-${cleaned}`;
+    } else {
+      codeInp.value = `${prefix}-MBINA-${year}-001`;
+    }
+  },
+
+  handleArchiveFileSelect(input) {
+    const prevCont = document.getElementById('m6-doc-upload-preview');
+    if (!prevCont) return;
+
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      this.stagedArchiveFile = file;
+
+      let icon = '📄';
+      let typeLabel = 'Office Document';
+      let badgeColor = '#60a5fa';
+
+      if (/\.(docx|doc)$/i.test(file.name)) {
+        icon = '📝'; typeLabel = 'Microsoft Word'; badgeColor = '#60a5fa';
+      } else if (/\.(xlsx|xls|csv)$/i.test(file.name)) {
+        icon = '📊'; typeLabel = 'Microsoft Excel'; badgeColor = '#34d399';
+      } else if (/\.(pptx|ppt)$/i.test(file.name)) {
+        icon = '📽️'; typeLabel = 'Microsoft PowerPoint'; badgeColor = '#fb923c';
+      } else if (/\.pdf$/i.test(file.name)) {
+        icon = '📑'; typeLabel = 'Adobe PDF Document'; badgeColor = '#f87171';
+      }
+
+      prevCont.innerHTML = `
+        <div style="background:rgba(0,0,0,0.5); border:1px solid var(--chrome-border); border-radius:10px; padding:12px; display:flex; align-items:center; gap:12px;">
+          <div style="font-size:2rem;">${icon}</div>
+          <div style="flex:1; overflow:hidden;">
+            <div style="font-size:0.85rem; font-weight:800; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${file.name}</div>
+            <div style="font-size:0.75rem; color:${badgeColor}; font-weight:700;">${typeLabel} • ${(file.size / (1024 * 1024)).toFixed(2)} MB</div>
+          </div>
+          <span style="font-size:0.75rem; color:var(--primary-emerald); font-weight:800;">✓ Berkas Siap</span>
+        </div>
+      `;
+
+      // Auto-fill title if empty
+      const titleInp = document.getElementById('m6-doc-title-input');
+      if (titleInp && !titleInp.value.trim()) {
+        const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[_|-]+/g, ' ');
+        titleInp.value = cleanName;
+      }
+    }
+  },
+
+  submitArchiveDocForm(e) {
+    e.preventDefault();
+    if (!this.canUserManageGallery || !this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin Pusat & Pengurus Resmi MB INA yang berhak mengunggah berkas dokumen.');
+      return;
+    }
+
+    const title = document.getElementById('m6-doc-title-input')?.value.trim();
+    const eventId = document.getElementById('m6-doc-event-sel')?.value || '';
+    const category = document.getElementById('m6-doc-category-sel')?.value || 'LPJ';
+    const docCode = document.getElementById('m6-doc-code-input')?.value.trim();
+    const gdriveUrl = document.getElementById('m6-doc-gdrive-input')?.value.trim();
+    const desc = document.getElementById('m6-doc-desc-input')?.value.trim();
+
+    if (!title) {
+      alert('⚠️ Judul dokumen arsip wajib diisi!');
+      return;
+    }
+
+    let docType = 'WORD';
+    let fileName = 'Dokumen_Resmi_MBINA.docx';
+    let fileSize = '2.5 MB';
+
+    if (this.stagedArchiveFile) {
+      fileName = this.stagedArchiveFile.name;
+      fileSize = (this.stagedArchiveFile.size / (1024 * 1024)).toFixed(1) + ' MB';
+      if (/\.(docx|doc)$/i.test(fileName)) docType = 'WORD';
+      else if (/\.(xlsx|xls|csv)$/i.test(fileName)) docType = 'EXCEL';
+      else if (/\.(pptx|ppt)$/i.test(fileName)) docType = 'PPT';
+      else if (/\.pdf$/i.test(fileName)) docType = 'PDF';
+    } else {
+      if (category === 'FINANCE') { docType = 'EXCEL'; fileName = 'Laporan_Finansial.xlsx'; }
+      else if (category === 'PRESENTATION') { docType = 'PPT'; fileName = 'Presentasi_Event.pptx'; }
+      else if (category === 'LEGAL') { docType = 'PDF'; fileName = 'Surat_Keputusan_Resmi.pdf'; }
+      else { docType = 'WORD'; fileName = 'LPJ_Kegiatan_Resmi.docx'; }
+    }
+
+    // Resolve event title
+    let eventTitle = 'Kegiatan Resmi MB INA';
+    if (eventId) {
+      const allEvents = this.getAllAvailableEventsForGallery ? this.getAllAvailableEventsForGallery() : [];
+      const ev = allEvents.find(e => e.id === eventId || e.code === eventId);
+      if (ev) eventTitle = ev.title;
+    }
+
+    const newDoc = {
+      id: 'doc_' + Date.now(),
+      archive_code: eventId ? `ARC-${eventId}` : 'ARC-MBINA-' + new Date().getFullYear(),
+      doc_code: docCode || ('DOC-' + Date.now()),
+      event_id: eventId,
+      event_title: eventTitle,
+      title: title,
+      doc_type: docType,
+      category: category,
+      file_name: fileName,
+      file_size: fileSize,
+      file_url: gdriveUrl || '',
+      gdrive_url: gdriveUrl || '',
+      description: desc || '',
+      uploaded_by: 'Admin MB INA',
+      created_at: new Date().toLocaleDateString('id-ID'),
+      is_public: true,
+      downloads: 0
+    };
+
+    const docs = this.getAllDocumentArchives();
+    docs.unshift(newDoc);
+    this.saveDocumentArchivesToStorage(docs);
+    this.stagedArchiveFile = null;
+
+    if (typeof AuthEngine !== 'undefined' && AuthEngine.closeModal) {
+      AuthEngine.closeModal('modal-m6-upload-doc');
+    }
+
+    alert(`✅ BERHASIL MENGUNGGAH BERKAS ARSIP DOKUMEN!\n\nKode Berkas: ${newDoc.doc_code}\nJudul: ${newDoc.title}\nFormat: ${docType} (${fileName})`);
+    this.renderArchivePage();
+  },
+
+  deleteArchiveDoc(docId) {
+    if (!this.canUserManageGallery || !this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin Pusat yang berhak menghapus berkas arsip dokumen.');
+      return;
+    }
+    if (!confirm('Apakah Anda yakin ingin menghapus berkas dokumen arsip ini?')) return;
+
+    let docs = this.getAllDocumentArchives();
+    docs = docs.filter(d => d.id !== docId);
+    this.data.documentArchives = docs;
+    this.saveDocumentArchivesToStorage(docs);
+    this.renderArchivePage();
+  },
+
+  // ─────────────────────────────────────────────────────────────────────
   // 6.5 GALERI EVENT ENGINE (FULL SPECIFICATION)
   // ─────────────────────────────────────────────────────────────────────
 
@@ -19983,7 +20548,9 @@ const M6Engine = {
               <h4 style="color:var(--accent-gold); font-size:1.2rem; margin:0;">${alb ? alb.title : 'Album Event'}</h4>
               <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0;">${alb ? alb.description : ''} • ${albMedia.length} Media</p>
             </div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <button class="btn-outline" style="font-size:0.8rem; border-color:var(--accent-gold); color:var(--accent-gold); background:rgba(212,175,55,0.1);" onclick="M6Engine.switchSubtab('6_4_archive')" title="Lihat Berkas Dokumen LPJ, Word, Excel, PPT, & SK untuk Event Ini">
+                📄 Berkas Dokumen & LPJ Event
+              </button>
               ${alb && alb.gdrive_url ? `
                 <a href="${alb.gdrive_url}" target="_blank" rel="noopener noreferrer" class="btn-outline" style="font-size:0.8rem; border-color:#4285F4; color:#93c5fd; text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(66,133,244,0.12); padding:6px 12px; border-radius:6px; font-weight:700;" title="Akses seluruh file foto & video resolusi tinggi di Google Drive">
                   📁 Google Drive (Full HD) ↗

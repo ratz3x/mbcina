@@ -2770,11 +2770,109 @@
             <div id="m6-pub-events-grid-container"></div>
           </div>
 
-          <!-- SUBTAB 5.4: SPONSORSHIP MANAGEMENT -->
-          
+          <!-- SUBTAB 6.4: ARSIP BERKAS & LPJ EVENT (DOKUMEN ADMINISTRASI) -->
+          <div id="m6-subtab-6_4_archive" class="m6-subtab-content" style="display:none;">
+
+            <!-- ── HEADER & INNER ACTIONS ── -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h4 style="color:var(--accent-gold); font-size:1.15rem; margin:0;">📂 Arsip Dokumen & LPJ Event MB Club Indonesia</h4>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin:2px 0 0;">Pengarsipan resmi berkas administratif (Word, Excel, PowerPoint, & PDF) pasca-acara yang telah diverifikasi.</p>
+              </div>
+
+              <!-- ACTION BUTTONS -->
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <button class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:700; border-color:var(--accent-gold); color:var(--accent-gold); display:inline-flex; align-items:center; gap:6px;" onclick="M6Engine.switchSubtab('6_5_gallery')">
+                  🖼️ Buka Galeri Media (Foto & Video) →
+                </button>
+                <div id="m6-arc-admin-actions" style="display:flex; gap:8px;">
+                  <button class="btn-primary" style="font-size:0.8rem; font-weight:800; background:var(--accent-gold); color:#000;" onclick="M6Engine.openUploadDocumentModal()">📄 + Upload / Tautkan Berkas</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- OVERVIEW STATS CARD -->
+            <div class="glass-card" style="padding:16px 20px; border:1px solid var(--chrome-border); margin-bottom:20px; background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(59,130,246,0.06));">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+                <div style="display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
+                  <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Event Arsip Terpilih</div>
+                    <strong style="color:var(--accent-gold); font-size:0.95rem;" id="m6-arc-stat-selected-event">📍 [EVT-2026-012] Mercedes-Benz Club 22nd Anniversary & Rakernas 2026</strong>
+                  </div>
+                  <div style="height:28px; width:1px; background:var(--chrome-border);"></div>
+                  <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Format Standar Kode Arsip</div>
+                    <strong style="color:#60a5fa; font-size:0.95rem; font-family:monospace;" id="m6-arc-stat-code">ARC-EVT-2026-012</strong>
+                  </div>
+                  <div style="height:28px; width:1px; background:var(--chrome-border);"></div>
+                  <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Total Berkas Resmi</div>
+                    <strong style="color:var(--primary-emerald); font-size:1.1rem;" id="m6-arc-stat-total-files">4 Berkas</strong>
+                  </div>
+                  <div style="height:28px; width:1px; background:var(--chrome-border);"></div>
+                  <div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">Kategori Media Visual</div>
+                    <strong style="color:#e2e8f0; font-size:0.85rem;">Tersimpan di Galeri 6.5</strong>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:8px;">
+                  <a id="m6-arc-gdrive-master-btn" href="https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026" target="_blank" rel="noopener noreferrer" class="btn-outline" style="font-size:0.8rem; border-color:#4285F4; color:#93c5fd; text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(66,133,244,0.12); padding:7px 14px; border-radius:8px; font-weight:700;">
+                    📁 Google Drive Master Docs ↗
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- NOTICE BANNER: PEMISAHAN BERKAS VS MEDIA -->
+            <div style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); border-radius:12px; padding:12px 18px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:1.3rem;">📋</span>
+                <div style="font-size:0.8rem; color:#cbd5e1;">
+                  <strong style="color:#93c5fd;">Pemisahan Arsip Organisasi:</strong> Modul ini khusus mengarsipkan <strong>Dokumen & Berkas Administratif (Word, Excel, PowerPoint, PDF)</strong>. Dokumentasi visual berupa foto dan video kegiatan dikelola terpisah di tab <strong>Dokumentasi & Galeri</strong>.
+                </div>
+              </div>
+              <button class="btn-outline" style="font-size:0.75rem; padding:4px 12px; border-radius:8px; border-color:rgba(59,130,246,0.5); color:#93c5fd;" onclick="M6Engine.switchSubtab('6_5_gallery')">
+                Lihat Foto & Video →
+              </button>
+            </div>
+
+            <!-- FILTER FILE TYPE PILLS -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn-primary m6-arc-filter-btn active" data-arc-filter="ALL" style="font-size:0.78rem; padding:6px 14px; font-weight:800;" onclick="M6Engine.filterArchiveDocs('ALL')">Semua Berkas</button>
+                <button type="button" class="btn-outline m6-arc-filter-btn" data-arc-filter="WORD" style="font-size:0.78rem; padding:6px 14px; font-weight:700;" onclick="M6Engine.filterArchiveDocs('WORD')">📄 Word (.docx)</button>
+                <button type="button" class="btn-outline m6-arc-filter-btn" data-arc-filter="EXCEL" style="font-size:0.78rem; padding:6px 14px; font-weight:700;" onclick="M6Engine.filterArchiveDocs('EXCEL')">📊 Excel (.xlsx)</button>
+                <button type="button" class="btn-outline m6-arc-filter-btn" data-arc-filter="PPT" style="font-size:0.78rem; padding:6px 14px; font-weight:700;" onclick="M6Engine.filterArchiveDocs('PPT')">📑 PowerPoint (.pptx)</button>
+                <button type="button" class="btn-outline m6-arc-filter-btn" data-arc-filter="PDF" style="font-size:0.78rem; padding:6px 14px; font-weight:700;" onclick="M6Engine.filterArchiveDocs('PDF')">📜 PDF Resmi</button>
+              </div>
+
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="m6-arc-search-input" class="form-input" placeholder="🔍 Cari nama file / kode arsip..." style="width:230px; font-size:0.8rem; padding:6px 12px;" oninput="M6Engine.renderArchiveDocList()">
+              </div>
+            </div>
+
+            <!-- CONTAINER LIST OF ARCHIVED EVENT DOCUMENTS -->
+            <div id="m6-archive-docs-container">
+              <!-- Filled dynamically by JS M6Engine.renderArchiveDocList() -->
+            </div>
+
+          </div>
+          <!-- END SUBTAB 6.4 ARSIP BERKAS & LPJ EVENT -->
 
           <!-- SUBTAB 6.5: GALERI EVENT -->
           <div id="m6-subtab-6_5_gallery" class="m6-subtab-content" style="display:none;">
+
+            <!-- NOTICE BANNER: KHUSUS MEDIA VISUAL -->
+            <div style="background:rgba(245,158,11,0.06); border:1px solid rgba(245,158,11,0.25); border-radius:12px; padding:10px 16px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div style="display:flex; align-items:center; gap:8px; font-size:0.8rem; color:#cbd5e1;">
+                <span style="font-size:1.2rem;">📸</span>
+                <span><strong>Khusus Media Visual:</strong> Halaman ini khusus untuk foto resolusi tinggi & video resmi acara. Untuk berkas dokumen administratif (Word, Excel, PowerPoint, LPJ), silakan buka tab <strong><a href="javascript:void(0)" onclick="M6Engine.switchSubtab('6_4_archive')" style="color:var(--accent-gold); text-decoration:underline;">Arsip & LPJ Event</a></strong>.</span>
+              </div>
+              <button class="btn-outline" style="font-size:0.75rem; padding:4px 12px; border-radius:8px;" onclick="M6Engine.switchSubtab('6_4_archive')">
+                📂 Buka Arsip Dokumen →
+              </button>
+            </div>
 
             <!-- ── HEADER & INNER SUBTABS ── -->
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
@@ -10877,8 +10975,79 @@
               <button id="m6-md-btn-delete" class="btn-outline m6-gallery-admin-only" style="flex:1; font-size:0.78rem; color:var(--accent-red); border-color:var(--accent-red); font-weight:700;" onclick="M6Engine.deleteSingleMedia()">🗑️ Hapus</button>
             </div>
           </div>
+  <!-- MODAL M6: UPLOAD & TAUTKAN BERKAS DOKUMEN ARSIP (WORD/EXCEL/PPT/PDF) -->
+  <div id="modal-m6-upload-doc" class="modal-backdrop" style="display:none;">
+    <div class="modal-container" style="max-width:640px; width:100%; border-radius:16px; border:1px solid #3b82f6; background:rgba(18,18,22,0.98); box-shadow:0 20px 50px rgba(0,0,0,0.85); overflow:hidden;">
+      <div class="modal-header" style="padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.3rem;">📄</span>
+          <div>
+            <h3 style="font-size:1.05rem; margin:0; font-weight:800; color:#93c5fd;">Upload / Tautkan Berkas Dokumen Arsip</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);">Khusus berkas administratif: Word (.docx), Excel (.xlsx), PPT (.pptx), atau PDF</span>
+          </div>
         </div>
+        <button type="button" class="btn-close" onclick="AuthEngine.closeModal('modal-m6-upload-doc')" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; line-height:1;">✕</button>
       </div>
+
+      <form onsubmit="M6Engine.submitArchiveDocForm(event)" style="margin:0;">
+        <div class="modal-body" style="padding:20px; display:flex; flex-direction:column; gap:14px; max-height:75vh; overflow-y:auto;">
+          
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Pilih Event Terkait *</label>
+            <select id="m6-doc-event-sel" class="form-input" required style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px; font-weight:600;" onchange="M6Engine.onDocEventSelectChange(this.value)">
+              <!-- Options populated by JS -->
+            </select>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+              <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Tipe Berkas Dokumen *</label>
+              <select id="m6-doc-type-sel" class="form-input" required style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px; font-weight:700;">
+                <option value="WORD">📄 Word (.docx / .doc)</option>
+                <option value="EXCEL">📊 Excel (.xlsx / .csv)</option>
+                <option value="PPT">📑 PowerPoint (.pptx / .ppt)</option>
+                <option value="PDF">📜 Dokumen PDF Resmi (.pdf)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+              <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Kode Dokumen (Otomatis/Kustom)</label>
+              <input type="text" id="m6-doc-code-input" class="form-input" placeholder="LPJ-EVT-2026-012" style="font-family:monospace; font-size:0.85rem; padding:10px 12px; border-radius:8px; font-weight:700; color:#60a5fa;">
+            </div>
+          </div>
+
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Judul Dokumen Resmi *</label>
+            <input type="text" id="m6-doc-title-input" class="form-input" required placeholder="Contoh: Laporan Pertanggungjawaban (LPJ) Resmi HUT ke-22..." style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px;">
+          </div>
+
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Nama File Dokumen</label>
+            <input type="text" id="m6-doc-filename-input" class="form-input" placeholder="Contoh: LPJ_HUT22_Rakernas_MBINA_2026.docx" style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px;">
+          </div>
+
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px; background:rgba(59,130,246,0.06); border:1px dashed rgba(59,130,246,0.4); padding:12px; border-radius:10px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#93c5fd; margin:0;">
+              <span>🔗 Tautan Cloud / Google Drive File</span>
+            </label>
+            <input type="url" id="m6-doc-url-input" class="form-input" placeholder="https://docs.google.com/... atau https://drive.google.com/..." style="width:100%; font-size:0.85rem; padding:9px 12px; border-radius:8px;">
+            <span style="font-size:0.7rem; color:var(--text-muted);">Tautkan berkas Word, Spreadsheet, Slide, atau PDF dari Google Drive / Cloud Storage resmi.</span>
+          </div>
+
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Keterangan & Catatan Berkas</label>
+            <textarea id="m6-doc-desc-input" class="form-input" rows="3" placeholder="Jelaskan isi pokok dokumen, status verifikasi, dan pihak penyusun..." style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px; line-height:1.4;"></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer" style="padding:14px 20px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:flex-end; gap:10px; background:rgba(0,0,0,0.25);">
+          <button type="button" class="btn-outline" onclick="AuthEngine.closeModal('modal-m6-upload-doc')" style="padding:8px 16px; border-radius:10px; font-size:0.82rem;">Batal</button>
+          <button type="submit" class="btn-primary" style="background:#2563eb; color:#fff; font-weight:800; border-color:#3b82f6; padding:8px 20px; border-radius:10px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+            <span>💾 Simpan Berkas Arsip</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -11429,8 +11598,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260909_v212_purge_all_gallery_dummy"></script>
-  <script src="js/app.js?v=20260909_v212_purge_all_gallery_dummy"></script>
+  <script src="js/auth.js?v=20260909_v213_separated_doc_archive"></script>
+  <script src="js/app.js?v=20260909_v213_separated_doc_archive"></script>
   <script>
     lucide.createIcons();
     try {
