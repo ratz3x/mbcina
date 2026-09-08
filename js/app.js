@@ -14019,7 +14019,7 @@ const M6Engine = {
             this.data.media = Array.from(map.values());
           }
         }
-        this.loadGalleryFromStorage();
+        this.saveGalleryToStorage();
 
         this.data.sponsors          = res.sponsors          || [];
         this.data.banners           = res.banners           || [];
@@ -20383,6 +20383,45 @@ const M6Engine = {
       view_count: 128,
       download_count: 24,
       tags: ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
+    },
+    {
+      id: 'med_anniv_photo_1',
+      album_id: 'alb_anniv_2026',
+      media_url: 'assets/mb_hero.jpg',
+      file_name: 'Dokumentasi_Press_Conference_Jamnas_XXI_2026.jpg',
+      type: 'IMAGE',
+      caption: 'Dokumentasi Foto: Press Conference Jamnas XXI & Rakernas 2026 di TOPGOLF Jakarta',
+      uploaded_by: 'Derist Touriano (Admin)',
+      uploaded_at: '08/09/2026 17:05',
+      view_count: 95,
+      download_count: 18,
+      tags: ['MB Club Indonesia', 'Press Conference', 'TOPGOLF']
+    },
+    {
+      id: 'med_anniv_photo_2',
+      album_id: 'alb_anniv_2026',
+      media_url: 'assets/mb_founders.jpg',
+      file_name: 'Dokumentasi_Pelantikan_Pengurus_MBINA_2026_2028.jpg',
+      type: 'IMAGE',
+      caption: 'Dokumentasi Foto: Pelantikan & Pengukuhan Badan Pengurus Federasi MB Club Indonesia 2026-2028',
+      uploaded_by: 'Derist Touriano (Admin)',
+      uploaded_at: '08/09/2026 17:10',
+      view_count: 110,
+      download_count: 22,
+      tags: ['Pelantikan Pengurus', 'HUT ke-22 MBINA', 'Rakernas 2026']
+    },
+    {
+      id: 'med_anniv_photo_3',
+      album_id: 'alb_anniv_2026',
+      media_url: 'assets/gwagon_hero.jpg',
+      file_name: 'Dokumentasi_Lineup_Mercedes_Benz_Rakernas_2026.jpg',
+      type: 'IMAGE',
+      caption: 'Dokumentasi Foto: Display & Line-up Unit Mercedes-Benz di TOPGOLF Jakarta',
+      uploaded_by: 'Derist Touriano (Admin)',
+      uploaded_at: '08/09/2026 17:15',
+      view_count: 88,
+      download_count: 15,
+      tags: ['Display Unit', 'Mercedes-Benz', 'TOPGOLF']
     }
   ],
 
@@ -20492,6 +20531,8 @@ const M6Engine = {
     const id = (m.id || '').toLowerCase();
     const albId = (m.album_id || '').toLowerCase();
     const cap = (m.caption || '').toLowerCase();
+    const url = (m.media_url || '').toLowerCase();
+    if (url.startsWith('blob:')) return true;
     const dummyMediaIds = new Set(['med_001', 'med_002', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
     if (dummyMediaIds.has(id)) return true;
     if (['alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3'].includes(albId)) return true;
@@ -20514,50 +20555,61 @@ const M6Engine = {
 
   loadGalleryFromStorage() {
     try {
+      // 1. ALBUMS MERGE (In-memory/API -> LocalStorage -> SampleAlbums)
+      const mapAlb = new Map();
+      (this.data.albums || []).forEach(a => { if (a && a.id) mapAlb.set(a.id, a); });
+
       const savedAlb = localStorage.getItem('mbcina_m6_albums');
       if (savedAlb) {
-        const parsed = JSON.parse(savedAlb);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          this.data.albums = parsed.filter(a => !this.isDummyAlbum(a));
+        try {
+          const parsed = JSON.parse(savedAlb);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            parsed.forEach(a => { if (a && a.id && !mapAlb.has(a.id)) mapAlb.set(a.id, a); });
+          }
+        } catch(e) {}
+      }
+
+      (this.sampleAlbums || []).forEach(a => { if (a && a.id && !mapAlb.has(a.id)) mapAlb.set(a.id, a); });
+      this.data.albums = Array.from(mapAlb.values()).filter(a => !this.isDummyAlbum(a));
+
+      const annivAlb = this.data.albums.find(a => a.id === 'alb_anniv_2026');
+      if (!annivAlb && this.sampleAlbums[0]) {
+        this.data.albums.unshift(this.sampleAlbums[0]);
+      } else if (annivAlb && this.sampleAlbums[0]) {
+        if (!annivAlb.gdrive_url && this.sampleAlbums[0].gdrive_url) {
+          annivAlb.gdrive_url = this.sampleAlbums[0].gdrive_url;
+        }
+        if (!annivAlb.title || !annivAlb.title.includes('22nd Anniversary')) {
+          annivAlb.title = this.sampleAlbums[0].title;
         }
       }
 
-      if (!this.data.albums || this.data.albums.length === 0) {
-        this.data.albums = [...this.sampleAlbums];
-      } else {
-        this.data.albums = this.data.albums.filter(a => !this.isDummyAlbum(a));
-        const annivAlb = this.data.albums.find(a => a.id === 'alb_anniv_2026');
-        if (!annivAlb) {
-          this.data.albums.unshift(this.sampleAlbums[0]);
-        } else {
-          if (!annivAlb.gdrive_url && this.sampleAlbums[0].gdrive_url) {
-            annivAlb.gdrive_url = this.sampleAlbums[0].gdrive_url;
-          }
-          if (!annivAlb.title || !annivAlb.title.includes('22nd Anniversary')) {
-            annivAlb.title = this.sampleAlbums[0].title;
-          }
-        }
-      }
-
-      // Ensure PH9foXkufB8 is unblocked from tombstones
+      // Ensure official media are unblocked from tombstones
       try {
         let delList = JSON.parse(localStorage.getItem('mbcina_m6_deleted_media') || '[]');
-        if (delList.includes('med_anniv_yt_user') || delList.includes('PH9foXkufB8') || delList.includes('https://youtu.be/PH9foXkufB8')) {
-          delList = delList.filter(x => x !== 'med_anniv_yt_user' && x !== 'PH9foXkufB8' && x !== 'https://youtu.be/PH9foXkufB8');
+        const protectedIds = ['med_anniv_yt_user', 'PH9foXkufB8', 'https://youtu.be/PH9foXkufB8', 'med_anniv_photo_1', 'med_anniv_photo_2', 'med_anniv_photo_3'];
+        if (delList.some(x => protectedIds.includes(x))) {
+          delList = delList.filter(x => !protectedIds.includes(x));
           localStorage.setItem('mbcina_m6_deleted_media', JSON.stringify(delList));
         }
       } catch(e) {}
 
+      // 2. MEDIA MERGE (In-memory/API -> LocalStorage -> SampleMedia)
+      const mapMed = new Map();
+      (this.data.media || []).forEach(m => { if (m && m.id) mapMed.set(m.id, m); });
+
       const savedMed = localStorage.getItem('mbcina_m6_media');
       if (savedMed !== null) {
-        const parsedM = JSON.parse(savedMed);
-        if (Array.isArray(parsedM)) {
-          this.data.media = parsedM.filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
-        }
-      } else {
-        // Initial setup only: load default sample media if not previously deleted
-        this.data.media = this.sampleMedia.filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
+        try {
+          const parsedM = JSON.parse(savedMed);
+          if (Array.isArray(parsedM)) {
+            parsedM.forEach(m => { if (m && m.id && !mapMed.has(m.id)) mapMed.set(m.id, m); });
+          }
+        } catch(e) {}
       }
+
+      (this.sampleMedia || []).forEach(m => { if (m && m.id && !mapMed.has(m.id)) mapMed.set(m.id, m); });
+      this.data.media = Array.from(mapMed.values()).filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
 
       // Auto-migrate any existing item with old YouTube ID to the official public video (PH9foXkufB8)
       if (Array.isArray(this.data.media)) {
@@ -20580,7 +20632,7 @@ const M6Engine = {
     } catch(e) {
       console.warn('loadGalleryFromStorage error:', e);
       if (!this.data.albums || this.data.albums.length === 0) this.data.albums = [...this.sampleAlbums];
-      if (!this.data.media) this.data.media = [];
+      if (!this.data.media || this.data.media.length === 0) this.data.media = [...this.sampleMedia];
     }
   },
 
@@ -20592,7 +20644,7 @@ const M6Engine = {
       const safeMedia = (this.data.media || [])
         .filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m))
         .map(m => {
-          if (m.media_url && m.media_url.length > 500000) {
+          if (m.media_url && m.media_url.length > 500000 && !m.media_url.startsWith('assets/')) {
             return { ...m, media_url: 'assets/mb_hero.jpg' };
           }
           return m;
@@ -21206,7 +21258,44 @@ const M6Engine = {
     }
   },
 
-  submitGalleryUploadForm(e) {
+  compressImageFile(file, maxWidth = 1280, maxHeight = 1280, quality = 0.8) {
+    return new Promise((resolve) => {
+      if (!file || !file.type || !file.type.startsWith('image/')) {
+        resolve('assets/mb_hero.jpg');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+          if (w > maxWidth || h > maxHeight) {
+            if (w > h) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
+            } else {
+              w = Math.round((w * maxHeight) / h);
+              h = maxHeight;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressed);
+        };
+        img.onerror = () => resolve(e.target.result || 'assets/mb_hero.jpg');
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve('assets/mb_hero.jpg');
+      reader.readAsDataURL(file);
+    });
+  },
+
+  async submitGalleryUploadForm(e) {
     e.preventDefault();
     if (!this.canUserManageGallery()) {
       alert('⚠️ Akses Terbatas: Hanya Admin & Tim Dokumentasi/Humas yang berhak mengunggah media galeri.');
@@ -21270,15 +21359,16 @@ const M6Engine = {
       } catch(e) {}
     }
 
-    // Process local files if selected
+    // Process local files if selected (convert photos to compressed base64 data)
     if (hasFiles) {
-      this.stagedUploadFiles.forEach((file, i) => {
+      for (let i = 0; i < this.stagedUploadFiles.length; i++) {
+        const file = this.stagedUploadFiles[i];
         const isVid = file.type.startsWith('video/') || /\.(mp4|mov|webm|avi|mkv|3gp|m4v)$/i.test(file.name);
         let mediaUrl;
-        try {
-          mediaUrl = URL.createObjectURL(file);
-        } catch (err) {
-          mediaUrl = isVid ? 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4' : 'assets/mb_hero.jpg';
+        if (!isVid) {
+          mediaUrl = await this.compressImageFile(file);
+        } else {
+          mediaUrl = 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4';
         }
 
         const newMedia = {
@@ -21314,7 +21404,7 @@ const M6Engine = {
             })
           }).catch(() => {});
         } catch(e) {}
-      });
+      }
     }
 
     this.saveGalleryToStorage();
@@ -21582,19 +21672,28 @@ const M6Engine = {
 
   downloadSingleMedia() {
     if (!this.activeDetailMediaId) return;
-    const m = this.data.media.find(x => x.id === this.activeDetailMediaId);
+    const m = (this.data.media || []).find(x => x && x.id === this.activeDetailMediaId) || (this.sampleMedia || []).find(x => x && x.id === this.activeDetailMediaId);
     if (!m) return;
 
     m.download_count = (m.download_count || 0) + 1;
+    this.saveGalleryToStorage();
     const el = document.getElementById('m6-md-downloads');
     if (el) el.textContent = m.download_count;
 
     if (m.is_youtube || this.extractYouTubeId(m.media_url)) {
-      window.open(m.media_url, '_blank');
+      const ytId = m.youtube_id || this.extractYouTubeId(m.media_url);
+      window.open(`https://youtu.be/${ytId}`, '_blank');
       return;
     }
 
-    alert(`📥 Mengunduh file high-res: ${m.type === 'VIDEO' ? 'video_event.mp4' : 'foto_event.jpg'}\n\nTerima kasih telah mengunduh dokumentasi MB INA!`);
+    if (m.media_url) {
+      const a = document.createElement('a');
+      a.href = m.media_url;
+      a.download = m.file_name || `MBINA_Foto_${m.id}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   },
 
   shareMediaLink() {
@@ -21732,9 +21831,37 @@ const M6Engine = {
   },
 
   downloadAlbumZip(albumId) {
-    const alb = this.data.albums.find(a => a.id === albumId);
-    const title = alb ? alb.title.replace(/[^\w\s]/gi, '').trim() : 'Album_Event';
-    alert(`📦 MEMPROSES KOMPRESI ALBUM ZIP...\n\nFile '${title}_MB_INA_2026.zip' berhasil dibuat!\nMengunduh paket ZIP foto high-resolution...`);
+    const alb = (this.data.albums || []).find(a => a.id === albumId) || (this.sampleAlbums || []).find(a => a.id === albumId);
+    const albMedia = (this.data.media || []).filter(m => m.album_id === albumId);
+    const photos = albMedia.filter(m => m.type !== 'VIDEO');
+
+    if (alb && alb.gdrive_url) {
+      const openDrive = confirm(`📁 UNDUH ARSIP DOKUMENTASI LENGKAP (FULL HD)\n\nAlbum: ${alb.title}\n\nFolder arsip master Google Drive berisi seluruh file foto & video resolusi tinggi siap dibuka.\n\nKlik 'OK' untuk membuka Google Drive (Full HD), atau 'Batal' untuk mengunduh foto yang tampil di galeri.`);
+      if (openDrive) {
+        window.open(alb.gdrive_url, '_blank');
+        return;
+      }
+    }
+
+    if (photos.length > 0) {
+      alert(`📥 Memulai pengunduhan ${photos.length} foto dokumentasi dari album...`);
+      photos.forEach((p, idx) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = p.media_url;
+          a.download = p.file_name || `MBINA_Foto_${idx+1}.jpg`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, idx * 400);
+      });
+    } else {
+      if (alb && alb.gdrive_url) {
+        window.open(alb.gdrive_url, '_blank');
+      } else {
+        alert('ℹ️ Berkas dokumentasi dapat diakses melalui Google Drive resmi MB Club Indonesia.');
+      }
+    }
   },
 
   shareAlbumLink(albumId) {

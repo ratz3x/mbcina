@@ -51,33 +51,84 @@ switch ($action) {
                 ]);
             }
 
-            // Filter dummy media
+            // Attach gdrive_url to alb_anniv_2026 if missing
+            foreach ($albums as &$a) {
+                if (($a['id'] ?? '') === 'alb_anniv_2026' && empty($a['gdrive_url'])) {
+                    $a['gdrive_url'] = 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026';
+                }
+            }
+            unset($a);
+
+            // Filter dummy & blob media
             $media = array_values(array_filter($rawMedia ?: [], function($m) {
                 $id = strtolower($m['id'] ?? '');
                 $albId = strtolower($m['album_id'] ?? '');
                 $cap = strtolower($m['caption'] ?? '');
+                $url = strtolower($m['media_url'] ?? '');
+                if (str_starts_with($url, 'blob:')) return false;
                 if (in_array($id, ['med_001', 'med_002', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1'])) return false;
                 if (in_array($albId, ['alb_001', 'alb_002', 'alb_1', 'alb_2', 'alb_3'])) return false;
                 if (str_contains($cap, 'gala dinner') || str_contains($cap, 'opening ceremony') || str_contains($cap, 'parade mercedes') || str_contains($cap, 'bakti sosial')) return false;
                 return true;
             }));
 
-            // Only provide default official video if no media exists at all in database
+            // If no media exists in database, seed official video and photos
             if (empty($media)) {
-                $media[] = [
-                    'id' => 'med_anniv_yt_user',
-                    'album_id' => 'alb_anniv_2026',
-                    'media_url' => 'https://youtu.be/PH9foXkufB8',
-                    'youtube_id' => 'PH9foXkufB8',
-                    'is_youtube' => true,
-                    'file_name' => 'YouTube: Dokumentasi & Aftermovie HUT ke-22 & Rakernas MB Club Indonesia',
-                    'type' => 'VIDEO',
-                    'caption' => 'Dokumentasi & Video Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
-                    'uploaded_by' => 'Derist Touriano',
-                    'uploaded_at' => '08/09/2026 17:00',
-                    'view_count' => 128,
-                    'download_count' => 24,
-                    'tags' => ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
+                $media = [
+                    [
+                        'id' => 'med_anniv_yt_user',
+                        'album_id' => 'alb_anniv_2026',
+                        'media_url' => 'https://youtu.be/PH9foXkufB8',
+                        'youtube_id' => 'PH9foXkufB8',
+                        'is_youtube' => true,
+                        'file_name' => 'YouTube: Dokumentasi & Aftermovie HUT ke-22 & Rakernas MB Club Indonesia',
+                        'type' => 'VIDEO',
+                        'caption' => 'Dokumentasi & Video Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
+                        'uploaded_by' => 'Derist Touriano',
+                        'uploaded_at' => '08/09/2026 17:00',
+                        'view_count' => 128,
+                        'download_count' => 24,
+                        'tags' => ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
+                    ],
+                    [
+                        'id' => 'med_anniv_photo_1',
+                        'album_id' => 'alb_anniv_2026',
+                        'media_url' => 'assets/mb_hero.jpg',
+                        'file_name' => 'Dokumentasi_Press_Conference_Jamnas_XXI_2026.jpg',
+                        'type' => 'IMAGE',
+                        'caption' => 'Dokumentasi Foto: Press Conference Jamnas XXI & Rakernas 2026 di TOPGOLF Jakarta',
+                        'uploaded_by' => 'Derist Touriano (Admin)',
+                        'uploaded_at' => '08/09/2026 17:05',
+                        'view_count' => 95,
+                        'download_count' => 18,
+                        'tags' => ['MB Club Indonesia', 'Press Conference', 'TOPGOLF']
+                    ],
+                    [
+                        'id' => 'med_anniv_photo_2',
+                        'album_id' => 'alb_anniv_2026',
+                        'media_url' => 'assets/mb_founders.jpg',
+                        'file_name' => 'Dokumentasi_Pelantikan_Pengurus_MBINA_2026_2028.jpg',
+                        'type' => 'IMAGE',
+                        'caption' => 'Dokumentasi Foto: Pelantikan & Pengukuhan Badan Pengurus Federasi MB Club Indonesia 2026-2028',
+                        'uploaded_by' => 'Derist Touriano (Admin)',
+                        'uploaded_at' => '08/09/2026 17:10',
+                        'view_count' => 110,
+                        'download_count' => 22,
+                        'tags' => ['Pelantikan Pengurus', 'HUT ke-22 MBINA', 'Rakernas 2026']
+                    ],
+                    [
+                        'id' => 'med_anniv_photo_3',
+                        'album_id' => 'alb_anniv_2026',
+                        'media_url' => 'assets/gwagon_hero.jpg',
+                        'file_name' => 'Dokumentasi_Lineup_Mercedes_Benz_Rakernas_2026.jpg',
+                        'type' => 'IMAGE',
+                        'caption' => 'Dokumentasi Foto: Display & Line-up Unit Mercedes-Benz di TOPGOLF Jakarta',
+                        'uploaded_by' => 'Derist Touriano (Admin)',
+                        'uploaded_at' => '08/09/2026 17:15',
+                        'view_count' => 88,
+                        'download_count' => 15,
+                        'tags' => ['Display Unit', 'Mercedes-Benz', 'TOPGOLF']
+                    ]
                 ];
             }
 
@@ -204,6 +255,11 @@ switch ($action) {
                 $uploadedBy = 'usr_superadmin';
             }
 
+            if (str_starts_with(strtolower($mediaUrl), 'blob:')) {
+                echo json_encode(['success' => false, 'message' => 'Blob URL tidak dapat disimpan ke cloud.']);
+                break;
+            }
+
             if ($sPdo && $id && $mediaUrl) {
                 // Verify album exists to avoid FK failure
                 $chkAlb = $sPdo->prepare("SELECT id FROM event_albums WHERE id = :aid");
@@ -265,6 +321,20 @@ switch ($action) {
             echo json_encode(['success' => true, 'message' => 'Media berhasil disimpan ke Supabase!', 'id' => $id]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Gagal simpan media ke Supabase: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'delete_m6_media':
+        try {
+            $id = $_GET['id'] ?? $input['id'] ?? '';
+            if ($id && $sPdo) {
+                $stmtM = $sPdo->prepare("DELETE FROM event_media WHERE id = :id");
+                $stmtM->execute([':id' => $id]);
+                logAudit('usr_superadmin', 'DELETE', 'M6_GALLERY_MEDIA', ['mediaId' => $id]);
+            }
+            echo json_encode(['success' => true, 'message' => 'Media berhasil dihapus dari Supabase!']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
         break;
 
