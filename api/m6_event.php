@@ -62,16 +62,9 @@ switch ($action) {
                 return true;
             }));
 
-            // Ensure official YouTube video exists
-            $hasOfficialYt = false;
-            foreach ($media as $m) {
-                if (($m['youtube_id'] ?? '') === 'k68heI9xML0' || str_contains($m['media_url'] ?? '', 'k68heI9xML0')) {
-                    $hasOfficialYt = true;
-                    break;
-                }
-            }
-            if (!$hasOfficialYt) {
-                array_unshift($media, [
+            // Only provide default official video if no media exists at all in database
+            if (empty($media)) {
+                $media[] = [
                     'id' => 'med_anniv_yt_user',
                     'album_id' => 'alb_anniv_2026',
                     'media_url' => 'https://youtu.be/k68heI9xML0',
@@ -85,7 +78,7 @@ switch ($action) {
                     'view_count' => 85,
                     'download_count' => 14,
                     'tags' => ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
-                ]);
+                ];
             }
 
             $sponsors = $sPdo->query("SELECT * FROM sponsors ORDER BY created_at DESC")->fetchAll();
@@ -178,6 +171,20 @@ switch ($action) {
 
             logAudit('usr_superadmin', 'DELETE', 'M6_EVENT', ['eventId' => $id]);
             echo json_encode(['success' => true, 'message' => 'Event berhasil dihapus!']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'delete_m6_media':
+        try {
+            $id = $_GET['id'] ?? $input['id'] ?? '';
+            if ($id && $sPdo) {
+                $stmt = $sPdo->prepare("DELETE FROM event_media WHERE id = :id");
+                $stmt->execute([':id' => $id]);
+                logAudit('usr_superadmin', 'DELETE', 'M6_GALLERY_MEDIA', ['mediaId' => $id]);
+            }
+            echo json_encode(['success' => true, 'message' => 'Media berhasil dihapus dari database!']);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }

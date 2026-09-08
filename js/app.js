@@ -13968,7 +13968,12 @@ const M6Engine = {
         }
 
         if (Array.isArray(res.media) && res.media.length > 0) {
-          const validApiMed = res.media.filter(m => typeof this.isDummyMedia === 'function' ? !this.isDummyMedia(m) : true);
+          const deletedMedia = new Set(JSON.parse(localStorage.getItem('mbcina_m6_deleted_media') || '[]'));
+          const validApiMed = res.media.filter(m => {
+            if (typeof this.isDummyMedia === 'function' && this.isDummyMedia(m)) return false;
+            if (deletedMedia.has(m.id) || (m.youtube_id && deletedMedia.has(m.youtube_id)) || (m.media_url && deletedMedia.has(m.media_url))) return false;
+            return true;
+          });
           if (validApiMed.length > 0) {
             const map = new Map();
             validApiMed.forEach(m => map.set(m.id, m));
@@ -20459,6 +20464,19 @@ const M6Engine = {
     return false;
   },
 
+  isDeletedMedia(m) {
+    if (!m) return true;
+    try {
+      const deletedList = JSON.parse(localStorage.getItem('mbcina_m6_deleted_media') || '[]');
+      if (deletedList.length === 0) return false;
+      const set = new Set(deletedList);
+      if (set.has(m.id)) return true;
+      if (m.youtube_id && set.has(m.youtube_id)) return true;
+      if (m.media_url && set.has(m.media_url)) return true;
+    } catch(e) {}
+    return false;
+  },
+
   loadGalleryFromStorage() {
     try {
       const savedAlb = localStorage.getItem('mbcina_m6_albums');
@@ -20490,36 +20508,23 @@ const M6Engine = {
       if (savedMed !== null) {
         const parsedM = JSON.parse(savedMed);
         if (Array.isArray(parsedM)) {
-          this.data.media = parsedM.filter(m => !this.isDummyMedia(m));
+          this.data.media = parsedM.filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
         }
-      }
-
-      if (!this.data.media || this.data.media.length === 0) {
-        this.data.media = [...this.sampleMedia];
       } else {
-        this.data.media = this.data.media.filter(m => !this.isDummyMedia(m));
-        const hasRealYt = this.data.media.some(m => m.youtube_id === 'k68heI9xML0' || (m.media_url && m.media_url.includes('k68heI9xML0')));
-        if (!hasRealYt) {
-          this.data.media.unshift(this.sampleMedia[0]);
-        }
+        // Initial setup only: load default sample media if not previously deleted
+        this.data.media = this.sampleMedia.filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
       }
 
-      const userYt = this.data.media.find(m => m.youtube_id === 'k68heI9xML0' || (m.media_url && m.media_url.includes('k68heI9xML0')));
-      if (userYt) {
-        if (!userYt.caption || userYt.caption.startsWith('Dokumentasi Video YouTube')) {
-          userYt.caption = 'Aftermovie & Dokumentasi Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026';
-        }
-        userYt.album_id = 'alb_anniv_2026';
-        userYt.type = 'VIDEO';
-        userYt.is_youtube = true;
-        userYt.youtube_id = 'k68heI9xML0';
+      // Filter in-memory media as well
+      if (Array.isArray(this.data.media)) {
+        this.data.media = this.data.media.filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
       }
 
       this.saveGalleryToStorage();
     } catch(e) {
       console.warn('loadGalleryFromStorage error:', e);
       if (!this.data.albums || this.data.albums.length === 0) this.data.albums = [...this.sampleAlbums];
-      if (!this.data.media || this.data.media.length === 0) this.data.media = [...this.sampleMedia];
+      if (!this.data.media) this.data.media = [];
     }
   },
 
@@ -20529,7 +20534,7 @@ const M6Engine = {
       localStorage.setItem('mbcina_m6_albums', JSON.stringify(safeAlbums));
 
       const safeMedia = (this.data.media || [])
-        .filter(m => !this.isDummyMedia(m))
+        .filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m))
         .map(m => {
           if (m.media_url && m.media_url.length > 500000) {
             return { ...m, media_url: 'assets/mb_hero.jpg' };
@@ -21460,7 +21465,27 @@ const M6Engine = {
 
     if (!confirm(`Hapus ${mediaType} ini secara permanen dari galeri?`)) return;
 
-    this.data.media = this.data.media.filter(item => item.id !== targetId);
+    // Record in persistent deleted list so it will NEVER be resurrected
+    try {
+      const deletedList = JSON.parse(localStorage.getItem('mbcina_m6_deleted_media') || '[]');
+      if (!deletedList.includes(targetId)) deletedList.push(targetId);
+      if (m) {
+        if (m.youtube_id && !deletedList.includes(m.youtube_id)) deletedList.push(m.youtube_id);
+        if (m.media_url && !deletedList.includes(m.media_url)) deletedList.push(m.media_url);
+      }
+      localStorage.setItem('mbcina_m6_deleted_media', JSON.stringify(deletedList));
+    } catch(e) {}
+
+    // Call backend API to delete from database if available
+    try {
+      fetch('api.php?action=delete_m6_media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: targetId })
+      }).catch(() => {});
+    } catch(e) {}
+
+    this.data.media = (this.data.media || []).filter(item => item.id !== targetId);
     this.saveGalleryToStorage();
 
     AuthEngine.closeModal('modal-m6-media-detail');
@@ -21477,8 +21502,15 @@ const M6Engine = {
 
     if (!confirm('Hapus seluruh foto & video contoh bawaan (dummy) dari album ini sehingga hanya tersisa dokumentasi asli Anda?')) return;
 
-    const dummyIds = new Set(['med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5']);
-    this.data.media = (this.data.media || []).filter(m => !(m.album_id === targetAlbId && dummyIds.has(m.id)));
+    const dummyIds = ['med_001', 'med_002', 'med_anniv_yt_1', 'med_anniv_vid_1', 'med_anniv_img_1', 'med_1', 'med_2', 'med_3', 'med_4', 'med_5', 'med_anniv_yt_user'];
+    try {
+      const deletedList = JSON.parse(localStorage.getItem('mbcina_m6_deleted_media') || '[]');
+      dummyIds.forEach(id => { if (!deletedList.includes(id)) deletedList.push(id); });
+      localStorage.setItem('mbcina_m6_deleted_media', JSON.stringify(deletedList));
+    } catch(e) {}
+
+    const dummySet = new Set(dummyIds);
+    this.data.media = (this.data.media || []).filter(m => !(m.album_id === targetAlbId && dummySet.has(m.id)));
     this.saveGalleryToStorage();
     this.renderGaleri();
     this.renderTagParticipantGrid();

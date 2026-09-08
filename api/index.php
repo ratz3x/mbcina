@@ -168,6 +168,7 @@ $moduleMap = [
     'get_m6_init_data' => 'm6_event',
     'save_m6_event' => 'm6_event',
     'delete_m6_event' => 'm6_event',
+    'delete_m6_media' => 'm6_event',
     'create_m6_proposal' => 'm6_event',
     'save_m6_bep_proposal' => 'm6_event',
     'approve_m6_proposal' => 'm6_event',
