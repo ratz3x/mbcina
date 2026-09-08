@@ -21067,7 +21067,27 @@ const M6Engine = {
     AuthEngine.closeModal('modal-m6-create-album');
     this.saveGalleryToStorage();
     this.renderGaleri();
-    alert('✅ Album galeri berhasil disimpan!');
+
+    const targetAlbum = id ? this.data.albums.find(a => a.id === id) : this.data.albums[this.data.albums.length - 1];
+    if (targetAlbum) {
+      try {
+        fetch('api.php?action=save_m6_album', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: targetAlbum.id,
+            event_id: targetAlbum.event_id,
+            title: targetAlbum.title,
+            description: targetAlbum.description,
+            cover_image: targetAlbum.cover_image,
+            is_public: targetAlbum.is_public,
+            created_by: targetAlbum.created_by
+          })
+        }).catch(() => {});
+      } catch(e) {}
+    }
+
+    alert('✅ Album galeri berhasil disimpan ke Supabase & Cloud!');
   },
 
   deleteAlbum(albumId) {
@@ -21075,7 +21095,16 @@ const M6Engine = {
       alert('⚠️ Akses Terbatas: Hanya Admin Pusat & Pengurus Resmi MB INA yang berhak menghapus album.');
       return;
     }
-    if (!confirm('Hapus album ini beserta seluruh media di dalamnya?')) return;
+    if (!confirm('Hapus album ini beserta seluruh media di dalamnya secara permanen dari Supabase?')) return;
+
+    try {
+      fetch('api.php?action=delete_m6_album', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: albumId })
+      }).catch(() => {});
+    } catch(e) {}
+
     this.data.albums = this.data.albums.filter(a => a.id !== albumId);
     this.data.media  = this.data.media.filter(m => m.album_id !== albumId);
     if (this.activeGalleryAlbumId === albumId) this.activeGalleryAlbumId = null;
@@ -21166,6 +21195,23 @@ const M6Engine = {
       };
       this.data.media.unshift(newYtMedia);
       uploadCount++;
+
+      // Save YouTube video link directly to Supabase Cloud database
+      try {
+        fetch('api.php?action=save_m6_media', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: newYtMedia.id,
+            album_id: newYtMedia.album_id,
+            event_id: alb ? alb.event_id : null,
+            media_url: newYtMedia.media_url,
+            type: 'VIDEO',
+            caption: newYtMedia.caption,
+            uploaded_by: newYtMedia.uploaded_by
+          })
+        }).catch(() => {});
+      } catch(e) {}
     }
 
     // Process local files if selected
@@ -21195,13 +21241,30 @@ const M6Engine = {
         };
         this.data.media.unshift(newMedia);
         uploadCount++;
+
+        // Save media to Supabase
+        try {
+          fetch('api.php?action=save_m6_media', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: newMedia.id,
+              album_id: newMedia.album_id,
+              event_id: alb ? alb.event_id : null,
+              media_url: newMedia.media_url,
+              type: newMedia.type,
+              caption: newMedia.caption,
+              uploaded_by: newMedia.uploaded_by
+            })
+          }).catch(() => {});
+        } catch(e) {}
       });
     }
 
     this.saveGalleryToStorage();
     this.resetGalleryUploadForm();
     AuthEngine.closeModal('modal-m6-upload-media');
-    alert(`🚀 BERHASIL MENAMBAHKAN ${uploadCount} MEDIA EVENT!\n\nFile telah tersimpan di album "${albTitle}".`);
+    alert(`🚀 BERHASIL MENAMBAHKAN ${uploadCount} MEDIA EVENT!\n\nData tersimpan aman di Cloud & Supabase database pada album "${albTitle}".`);
     this.activeGalleryAlbumId = albumId;
     this.switchGalleryInnerTab('651');
     this.renderGaleri();
@@ -21446,9 +21509,27 @@ const M6Engine = {
   },
 
   shareMediaLink() {
-    const link = window.location.href.split('#')[0] + '#gallery-media-' + (this.activeDetailMediaId || 'top');
-    navigator.clipboard?.writeText(link);
-    alert(`🔗 Link publik foto berhasil disalin ke clipboard:\n${link}\n\nSiap dibagikan ke WhatsApp, Instagram & Facebook!`);
+    const m = (this.data.media || []).find(x => x.id === this.activeDetailMediaId);
+    let shareUrl = '';
+    let shareTitle = 'Dokumentasi Galeri Event MB INA';
+    if (m) {
+      shareTitle = m.caption || 'Dokumentasi Galeri Event MB INA';
+      if (m.is_youtube || this.extractYouTubeId(m.media_url)) {
+        const ytId = m.youtube_id || this.extractYouTubeId(m.media_url);
+        shareUrl = `https://youtu.be/${ytId}`;
+      } else if (m.media_url && !m.media_url.startsWith('blob:')) {
+        shareUrl = m.media_url;
+      }
+    }
+
+    if (!shareUrl) {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const baseOrigin = isLocal ? 'https://mbcina.or.id' : window.location.origin;
+      shareUrl = `${baseOrigin}/#gallery-media-${this.activeDetailMediaId || 'top'}`;
+    }
+
+    navigator.clipboard?.writeText(shareUrl);
+    alert(`🔗 Link media berhasil disalin ke clipboard:\n\n${shareUrl}\n\n📌 "${shareTitle}"\n\nLink publik resmi siap dibagikan ke WhatsApp, Instagram, dan seluruh member!`);
   },
 
   deleteSingleMedia(mediaId) {

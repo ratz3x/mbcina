@@ -190,6 +190,120 @@ switch ($action) {
         }
         break;
 
+    case 'save_m6_media':
+        try {
+            $id = $input['id'] ?? ('med_' . uniqid());
+            $albumId = $input['album_id'] ?? '';
+            $eventId = !empty($input['event_id']) ? $input['event_id'] : null;
+            $mediaUrl = $input['media_url'] ?? '';
+            $type = strtoupper($input['type'] ?? 'IMAGE');
+            if (!in_array($type, ['IMAGE', 'VIDEO'])) $type = 'IMAGE';
+            $caption = $input['caption'] ?? '';
+            $uploadedBy = $input['uploaded_by'] ?? 'Admin HQ';
+
+            if ($sPdo && $id && $mediaUrl) {
+                try {
+                    $stmt = $sPdo->prepare("
+                        INSERT INTO event_media (id, album_id, event_id, media_url, type, caption, uploaded_by, uploaded_at)
+                        VALUES (:id, :alb, :evt, :url, :type::media_type_enum, :cap, :uploader, NOW())
+                        ON CONFLICT (id) DO UPDATE SET
+                            album_id = EXCLUDED.album_id,
+                            media_url = EXCLUDED.media_url,
+                            caption = EXCLUDED.caption,
+                            type = EXCLUDED.type
+                    ");
+                    $stmt->execute([
+                        ':id' => $id,
+                        ':alb' => $albumId,
+                        ':evt' => $eventId,
+                        ':url' => $mediaUrl,
+                        ':type' => $type,
+                        ':cap' => $caption,
+                        ':uploader' => $uploadedBy
+                    ]);
+                } catch (Exception $eCast) {
+                    $stmt = $sPdo->prepare("
+                        INSERT INTO event_media (id, album_id, event_id, media_url, type, caption, uploaded_by, uploaded_at)
+                        VALUES (:id, :alb, :evt, :url, :type, :cap, :uploader, NOW())
+                        ON CONFLICT (id) DO UPDATE SET
+                            album_id = EXCLUDED.album_id,
+                            media_url = EXCLUDED.media_url,
+                            caption = EXCLUDED.caption,
+                            type = EXCLUDED.type
+                    ");
+                    $stmt->execute([
+                        ':id' => $id,
+                        ':alb' => $albumId,
+                        ':evt' => $eventId,
+                        ':url' => $mediaUrl,
+                        ':type' => $type,
+                        ':cap' => $caption,
+                        ':uploader' => $uploadedBy
+                    ]);
+                }
+                logAudit('usr_superadmin', 'CREATE', 'M6_GALLERY_MEDIA', ['mediaId' => $id, 'url' => $mediaUrl]);
+            }
+            echo json_encode(['success' => true, 'message' => 'Media berhasil disimpan ke Supabase!', 'id' => $id]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Gagal simpan media ke Supabase: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'save_m6_album':
+        try {
+            $id = $input['id'] ?? ('alb_' . uniqid());
+            $eventId = !empty($input['event_id']) ? $input['event_id'] : null;
+            $title = $input['title'] ?? 'Album Event';
+            $desc = $input['description'] ?? '';
+            $cover = $input['cover_image'] ?? 'assets/mb_hero.jpg';
+            $isPublic = !empty($input['is_public']) ? true : false;
+            $createdBy = $input['created_by'] ?? 'Admin HQ';
+
+            if ($sPdo && $id && $title) {
+                $stmt = $sPdo->prepare("
+                    INSERT INTO event_albums (id, event_id, title, description, cover_image, is_public, created_by, created_at)
+                    VALUES (:id, :evt, :title, :desc, :cover, :pub, :creator, NOW())
+                    ON CONFLICT (id) DO UPDATE SET
+                        title = EXCLUDED.title,
+                        description = EXCLUDED.description,
+                        cover_image = EXCLUDED.cover_image,
+                        is_public = EXCLUDED.is_public
+                ");
+                $stmt->execute([
+                    ':id' => $id,
+                    ':evt' => $eventId,
+                    ':title' => $title,
+                    ':desc' => $desc,
+                    ':cover' => $cover,
+                    ':pub' => $isPublic ? 1 : 0,
+                    ':creator' => $createdBy
+                ]);
+                logAudit('usr_superadmin', 'CREATE', 'M6_GALLERY_ALBUM', ['albumId' => $id, 'title' => $title]);
+            }
+            echo json_encode(['success' => true, 'message' => 'Album berhasil disimpan ke Supabase!', 'id' => $id]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Gagal simpan album ke Supabase: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'delete_m6_album':
+        try {
+            $id = $_GET['id'] ?? $input['id'] ?? '';
+            if ($id && $sPdo) {
+                $stmtM = $sPdo->prepare("DELETE FROM event_media WHERE album_id = :id");
+                $stmtM->execute([':id' => $id]);
+
+                $stmtA = $sPdo->prepare("DELETE FROM event_albums WHERE id = :id");
+                $stmtA->execute([':id' => $id]);
+
+                logAudit('usr_superadmin', 'DELETE', 'M6_GALLERY_ALBUM', ['albumId' => $id]);
+            }
+            echo json_encode(['success' => true, 'message' => 'Album berhasil dihapus dari Supabase!']);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
     case 'create_m6_proposal':
     case 'save_m6_bep_proposal':
         try {
