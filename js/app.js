@@ -141,7 +141,42 @@ const AppEngine = {
       if (this.currentRole === 'GUEST' || !this.currentRole) {
         this.initLandingVersion();
       }
+      this.checkPublicMediaDeepLink();
     }, 20);
+
+    window.addEventListener('hashchange', () => this.checkPublicMediaDeepLink());
+  },
+
+  checkPublicMediaDeepLink() {
+    try {
+      const hash = window.location.hash || '';
+      const params = new URLSearchParams(window.location.search);
+      let mediaTarget = null;
+
+      if (hash.startsWith('#gallery-media-')) {
+        mediaTarget = hash.replace('#gallery-media-', '').trim();
+      } else if (hash.startsWith('#video-')) {
+        mediaTarget = hash.replace('#video-', '').trim();
+      } else if (hash === '#gallery' || hash === '#galeri') {
+        mediaTarget = 'med_anniv_yt_user';
+      } else if (params.get('video')) {
+        mediaTarget = params.get('video').trim();
+      } else if (params.get('media')) {
+        mediaTarget = params.get('media').trim();
+      } else if (params.get('open_gallery_media')) {
+        mediaTarget = params.get('open_gallery_media').trim();
+      }
+
+      if (mediaTarget) {
+        setTimeout(() => {
+          if (window.M6Engine) {
+            window.M6Engine.openMediaDetailModal(mediaTarget);
+          }
+        }, 350);
+      }
+    } catch(e) {
+      console.warn('checkPublicMediaDeepLink error:', e);
+    }
   },
 
   closeAllModals() {
@@ -1196,7 +1231,10 @@ const AppEngine = {
               <span style="font-size:0.8rem; color:#94a3b8; background:rgba(255,255,255,0.04); padding:6px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
                 🔒 Pendaftaran Ditutup (Event Selesai)
               </span>
-              <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px; border-radius:8px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; if(window.M6Engine){ M6Engine.switchSubtab('6_5_gallery'); }">
+              <button class="btn-primary" style="background:#dc2626; color:#fff; font-weight:800; font-size:0.8rem; padding:8px 16px; border-radius:8px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer; box-shadow:0 4px 14px rgba(220,38,38,0.4);" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; if(window.M6Engine){ M6Engine.openMediaDetailModal('med_anniv_yt_user'); }">
+                ▶ Putar Video (YouTube)
+              </button>
+              <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; if(window.M6Engine){ if (document.body.classList.contains('landing-mode') || !window.AppEngine || window.AppEngine.currentRole === 'GUEST') { M6Engine.openMediaDetailModal('med_anniv_yt_user'); } else { M6Engine.switchSubtab('6_5_gallery'); } }">
                 🖼️ Buka Galeri & Dokumentasi
               </button>
             ` : `
@@ -20334,16 +20372,16 @@ const M6Engine = {
     {
       id: 'med_anniv_yt_user',
       album_id: 'alb_anniv_2026',
-      media_url: 'https://youtu.be/k68heI9xML0',
-      youtube_id: 'k68heI9xML0',
+      media_url: 'https://youtu.be/PH9foXkufB8',
+      youtube_id: 'PH9foXkufB8',
       is_youtube: true,
-      file_name: 'YouTube: Aftermovie HUT ke-22 & Rakernas MB Club Indonesia',
+      file_name: 'YouTube: Dokumentasi & Aftermovie HUT ke-22 & Rakernas MB Club Indonesia',
       type: 'VIDEO',
-      caption: 'Aftermovie & Dokumentasi Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
+      caption: 'Dokumentasi & Video Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
       uploaded_by: 'Derist Touriano',
       uploaded_at: '08/09/2026 17:00',
-      view_count: 85,
-      download_count: 14,
+      view_count: 128,
+      download_count: 24,
       tags: ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
     }
   ],
@@ -20423,22 +20461,19 @@ const M6Engine = {
   },
 
   canUserManageGallery() {
+    const currentRole = (window.AppEngine && window.AppEngine.currentRole) || 'GUEST';
+    if (currentRole === 'GUEST' || document.body.classList.contains('landing-mode')) {
+      return false;
+    }
     const isMem = (window.AppEngine && typeof window.AppEngine.isMemberUser === 'function')
       ? window.AppEngine.isMemberUser()
       : document.body.classList.contains('member-mode');
     if (isMem) return false;
 
-    // Check current nav or role
-    const activeNav = (window.AppEngine && window.AppEngine.currentNavTab) || '';
-    if (activeNav === 'admin' || !isMem) {
-      // In Admin mode or non-member mode, grant management rights
-      return true;
-    }
-
     const sessionUser = JSON.parse(localStorage.getItem('mbina_session_user') || localStorage.getItem('mbina_user') || '{}');
-    const role = (window.AppEngine && window.AppEngine.currentRole) ||
+    const role = currentRole ||
                  (window.AuthEngine && window.AuthEngine.currentUser && window.AuthEngine.currentUser.role) ||
-                 sessionUser.role || 'SUPER_ADMIN';
+                 sessionUser.role || 'GUEST';
     const adminRoles = ['SUPER_ADMIN', 'PRESIDEN', 'SEKRETARIS_PUSAT', 'BENDAHARA_PUSAT', 'PENGURUS_PUSAT', 'ADMIN_ORGANISASI', 'PENGURUS_KLUB', 'ADMIN'];
     return adminRoles.includes(role);
   },
@@ -20504,6 +20539,15 @@ const M6Engine = {
         }
       }
 
+      // Ensure PH9foXkufB8 is unblocked from tombstones
+      try {
+        let delList = JSON.parse(localStorage.getItem('mbcina_m6_deleted_media') || '[]');
+        if (delList.includes('med_anniv_yt_user') || delList.includes('PH9foXkufB8') || delList.includes('https://youtu.be/PH9foXkufB8')) {
+          delList = delList.filter(x => x !== 'med_anniv_yt_user' && x !== 'PH9foXkufB8' && x !== 'https://youtu.be/PH9foXkufB8');
+          localStorage.setItem('mbcina_m6_deleted_media', JSON.stringify(delList));
+        }
+      } catch(e) {}
+
       const savedMed = localStorage.getItem('mbcina_m6_media');
       if (savedMed !== null) {
         const parsedM = JSON.parse(savedMed);
@@ -20515,8 +20559,20 @@ const M6Engine = {
         this.data.media = this.sampleMedia.filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
       }
 
-      // Filter in-memory media as well
+      // Auto-migrate any existing item with old YouTube ID to the official public video (PH9foXkufB8)
       if (Array.isArray(this.data.media)) {
+        this.data.media.forEach(m => {
+          if (m && (m.youtube_id === 'k68heI9xML0' || (m.media_url && m.media_url.includes('k68heI9xML0')))) {
+            m.media_url = 'https://youtu.be/PH9foXkufB8';
+            m.youtube_id = 'PH9foXkufB8';
+            m.caption = 'Dokumentasi & Video Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026';
+          }
+        });
+        // Ensure the official video is present
+        const hasOfficial = this.data.media.some(m => m.id === 'med_anniv_yt_user' || (m.youtube_id === 'PH9foXkufB8'));
+        if (!hasOfficial && this.sampleMedia && this.sampleMedia[0]) {
+          this.data.media.unshift(this.sampleMedia[0]);
+        }
         this.data.media = this.data.media.filter(m => !this.isDummyMedia(m) && !this.isDeletedMedia(m));
       }
 
@@ -21381,13 +21437,22 @@ const M6Engine = {
   // 6.5.4 LIGHTBOX & DETAIL MEDIA MODAL
   // ─────────────────────────────────────────────
   openMediaDetailModal(mediaId) {
-    const m = this.data.media.find(x => x.id === mediaId);
+    this.loadGalleryFromStorage();
+    let m = null;
+    if (mediaId) {
+      m = (this.data.media || []).find(x => x && (x.id === mediaId || x.youtube_id === mediaId || (x.media_url && x.media_url.includes(mediaId))))
+       || (this.sampleMedia || []).find(x => x && (x.id === mediaId || x.youtube_id === mediaId || (x.media_url && x.media_url.includes(mediaId))));
+    }
+    if (!m) {
+      m = (this.data.media && this.data.media[0]) || (this.sampleMedia && this.sampleMedia[0]);
+    }
     if (!m) return;
 
+    mediaId = m.id;
     this.activeDetailMediaId = mediaId;
     m.view_count = (m.view_count || 0) + 1;
 
-    const alb = this.data.albums.find(a => a.id === m.album_id);
+    const alb = (this.data.albums || []).find(a => a.id === m.album_id) || (this.sampleAlbums || []).find(a => a.id === m.album_id);
 
     const titleEl = document.getElementById('m6-md-title');
     const albNameEl = document.getElementById('m6-md-album-name');
@@ -21414,13 +21479,26 @@ const M6Engine = {
       if (m.type === 'VIDEO') {
         if (isYt && ytId) {
           viewerEl.innerHTML = `
-            <div style="position:relative; width:100%; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,0.6); background:#000;">
-              <iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-            </div>
-            <div style="margin-top:10px; text-align:center;">
-              <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener noreferrer" class="btn-outline" style="font-size:0.75rem; padding:4px 12px; display:inline-flex; align-items:center; gap:6px; color:#f87171; border-color:rgba(239,68,68,0.5); text-decoration:none;">
-                ▶ Buka langsung di YouTube ↗
-              </a>
+            <div style="width:100%; display:flex; flex-direction:column; gap:12px;">
+              <div style="position:relative; width:100%; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.7); background:#000; border:1px solid rgba(255,255,255,0.1);">
+                <iframe 
+                  src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&enablejsapi=1" 
+                  style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                  referrerpolicy="strict-origin-when-cross-origin" 
+                  allowfullscreen
+                  title="${m.caption || 'Dokumentasi Video MB INA'}">
+                </iframe>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px; align-items:center; background:rgba(255,255,255,0.03); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+                <a href="https://youtu.be/${ytId}" target="_blank" rel="noopener noreferrer" style="font-size:0.8rem; font-weight:700; padding:8px 20px; border-radius:8px; background:#dc2626; color:#ffffff; display:inline-flex; align-items:center; gap:8px; text-decoration:none; box-shadow:0 4px 14px rgba(220,38,38,0.4); transition:all 0.2s;" onmouseover="this.style.background='#b91c1c'" onmouseout="this.style.background='#dc2626'">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                  <span>Putar Langsung di YouTube (Akses Penuh) ↗</span>
+                </a>
+                <span style="font-size:0.72rem; color:var(--text-muted); text-align:center;">
+                  🌐 Video ini dapat diakses oleh publik luas tanpa perlu login.
+                </span>
+              </div>
             </div>`;
         } else {
           viewerEl.innerHTML = `
@@ -21444,6 +21522,9 @@ const M6Engine = {
     if (capBtn) capBtn.style.display = canManage ? '' : 'none';
     if (delBtn) delBtn.style.display = canManage ? '' : 'none';
 
+    const tagBtnBottom = document.querySelector('#modal-m6-media-detail button[onclick*="openTagMemberModal"]');
+    if (tagBtnBottom) tagBtnBottom.style.display = canManage ? '' : 'none';
+
     if (tagsListEl) {
       tagsListEl.innerHTML = (m.tags || []).map(t => `
         <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">
@@ -21452,7 +21533,15 @@ const M6Engine = {
       `).join('') + (canManage ? '<button class="btn-outline m6-gallery-admin-only" style="font-size:0.7rem; padding:2px 8px;" onclick="M6Engine.openTagMemberModal()">+ Tag</button>' : '');
     }
 
-    AuthEngine.openModal('modal-m6-media-detail');
+    if (window.AuthEngine && typeof window.AuthEngine.openModal === 'function') {
+      AuthEngine.openModal('modal-m6-media-detail');
+    } else {
+      const modal = document.getElementById('modal-m6-media-detail');
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
+    }
   },
 
   toggleEditMediaCaption() {
@@ -21509,9 +21598,12 @@ const M6Engine = {
   },
 
   shareMediaLink() {
-    const m = (this.data.media || []).find(x => x.id === this.activeDetailMediaId);
+    const m = (this.data.media || []).find(x => x.id === this.activeDetailMediaId) || (this.sampleMedia || []).find(x => x.id === this.activeDetailMediaId);
     let shareUrl = '';
     let shareTitle = 'Dokumentasi Galeri Event MB INA';
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const baseOrigin = isLocal ? 'https://mbcina.or.id' : window.location.origin;
+
     if (m) {
       shareTitle = m.caption || 'Dokumentasi Galeri Event MB INA';
       if (m.is_youtube || this.extractYouTubeId(m.media_url)) {
@@ -21522,14 +21614,13 @@ const M6Engine = {
       }
     }
 
+    const webPortalUrl = `${baseOrigin}/#gallery-media-${(m && m.id) || this.activeDetailMediaId || 'med_anniv_yt_user'}`;
     if (!shareUrl) {
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const baseOrigin = isLocal ? 'https://mbcina.or.id' : window.location.origin;
-      shareUrl = `${baseOrigin}/#gallery-media-${this.activeDetailMediaId || 'top'}`;
+      shareUrl = webPortalUrl;
     }
 
     navigator.clipboard?.writeText(shareUrl);
-    alert(`🔗 Link media berhasil disalin ke clipboard:\n\n${shareUrl}\n\n📌 "${shareTitle}"\n\nLink publik resmi siap dibagikan ke WhatsApp, Instagram, dan seluruh member!`);
+    alert(`🔗 Link media berhasil disalin ke clipboard:\n\n${shareUrl}\n\n🌐 Tautan Web MBCINA:\n${webPortalUrl}\n\n📌 "${shareTitle}"\n\nLink publik resmi siap dibagikan ke WhatsApp, media sosial, dan seluruh member!`);
   },
 
   deleteSingleMedia(mediaId) {

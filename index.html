@@ -6503,13 +6503,14 @@
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:20px;">
                 <!-- Event 1: Anniversary & Rakernas (Completed) -->
                 <div class="v2-event-card">
-                  <div class="v2-event-img-wrap">
+                  <div class="v2-event-img-wrap" style="cursor:pointer;" onclick="if(window.M6Engine){ M6Engine.openMediaDetailModal('med_anniv_yt_user'); }" title="Klik untuk putar video dokumentasi YouTube">
                     <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&q=80" alt="Mercedes-Benz Anniversary & Rakernas" class="v2-event-img">
+                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border-radius:50%; background:rgba(220,38,38,0.92); border:2px solid rgba(255,255,255,0.8); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.3rem; box-shadow:0 4px 20px rgba(0,0,0,0.7); transition:transform 0.2s;" onmouseover="this.style.transform='translate(-50%,-50%) scale(1.1)'" onmouseout="this.style.transform='translate(-50%,-50%) scale(1)'">▶</div>
                     <div style="position:absolute; top:12px; left:12px; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.15); backdrop-filter:blur(8px); padding:3px 8px; border-radius:6px; font-size:0.68rem; font-weight:700; color:#fff; font-family:monospace;">
                       EVT-2026-012
                     </div>
-                    <div style="position:absolute; top:12px; right:12px; background:rgba(148,163,184,0.25); border:1px solid rgba(148,163,184,0.4); backdrop-filter:blur(8px); padding:3px 10px; border-radius:9999px; font-size:0.68rem; font-weight:800; color:#cbd5e1;">
-                      SELESAI
+                    <div style="position:absolute; top:12px; right:12px; background:rgba(220,38,38,0.3); border:1px solid rgba(220,38,38,0.6); backdrop-filter:blur(8px); padding:3px 10px; border-radius:9999px; font-size:0.68rem; font-weight:800; color:#fca5a5;">
+                      ▶ VIDEO RESMI
                     </div>
                   </div>
                   <div style="padding:20px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
@@ -6526,11 +6527,16 @@
                         Press Conference Jamnas XXI, Pelantikan Pengurus MB Club Indonesia 2025-2027, & HUT ke-22.
                       </p>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px; gap:8px;">
                       <span style="font-size:0.72rem; color:#94a3b8;">150 Peserta Hadir</span>
-                      <button type="button" class="btn-outline" style="font-size:0.72rem; padding:4px 10px; border-radius:8px;" onclick="AppEngine.openMemberEventDetailModal('EVT-2026-012')">
-                        Arsip Event
-                      </button>
+                      <div style="display:flex; gap:6px; align-items:center;">
+                        <button type="button" class="btn-primary" style="font-size:0.72rem; padding:5px 12px; border-radius:8px; background:#dc2626; color:#fff; font-weight:800; border:none; display:inline-flex; align-items:center; gap:5px; cursor:pointer; box-shadow:0 2px 10px rgba(220,38,38,0.35);" onclick="if(window.M6Engine){ M6Engine.openMediaDetailModal('med_anniv_yt_user'); }">
+                          <span>▶ Putar Video</span>
+                        </button>
+                        <button type="button" class="btn-outline" style="font-size:0.72rem; padding:4px 10px; border-radius:8px;" onclick="AppEngine.openMemberEventDetailModal('EVT-2026-012')">
+                          Arsip Event
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -11603,13 +11609,22 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260909_v216_direct_supabase_gallery"></script>
-  <script src="js/app.js?v=20260909_v216_direct_supabase_gallery"></script>
+  <script src="js/auth.js?v=20260909_v217_public_video_access"></script>
+  <script src="js/app.js?v=20260909_v217_public_video_access"></script>
   <script>
     lucide.createIcons();
     try {
       localStorage.removeItem('mbcina_rotator_campaigns_v4');
       localStorage.removeItem('mbcina_sponsors_custom');
+
+      // Unblock official video from deleted tombstone
+      try {
+        var dels = JSON.parse(localStorage.getItem('mbcina_m6_deleted_media') || '[]');
+        if (dels.includes('PH9foXkufB8') || dels.includes('https://youtu.be/PH9foXkufB8') || dels.includes('med_anniv_yt_user')) {
+          dels = dels.filter(function(x) { return x !== 'PH9foXkufB8' && x !== 'https://youtu.be/PH9foXkufB8' && x !== 'med_anniv_yt_user'; });
+          localStorage.setItem('mbcina_m6_deleted_media', JSON.stringify(dels));
+        }
+      } catch(e) {}
       
       // Auto purge legacy dummy albums & media from browser storage
       var storedAlbs = JSON.parse(localStorage.getItem('mbcina_m6_albums') || '[]');
@@ -11630,7 +11645,14 @@
 
       var storedMeds = JSON.parse(localStorage.getItem('mbcina_m6_media') || '[]');
       if (Array.isArray(storedMeds)) {
-        var cleanMeds = storedMeds.filter(function(m) {
+        var cleanMeds = storedMeds.map(function(m) {
+          if (m && (m.youtube_id === 'k68heI9xML0' || (m.media_url && m.media_url.indexOf('k68heI9xML0') !== -1))) {
+            m.media_url = 'https://youtu.be/PH9foXkufB8';
+            m.youtube_id = 'PH9foXkufB8';
+            m.caption = 'Dokumentasi & Video Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026';
+          }
+          return m;
+        }).filter(function(m) {
           var id = (m.id || '').toLowerCase();
           var albId = (m.album_id || '').toLowerCase();
           var cap = (m.caption || '').toLowerCase();
@@ -11641,9 +11663,7 @@
                  !cap.includes('parade') && 
                  !cap.includes('bakti sosial');
         });
-        if (cleanMeds.length !== storedMeds.length) {
-          localStorage.setItem('mbcina_m6_media', JSON.stringify(cleanMeds));
-        }
+        localStorage.setItem('mbcina_m6_media', JSON.stringify(cleanMeds));
       }
     } catch(e) {}
     // Cache-busting fallback: forcefully inject missing functions if browser uses old app.js cache

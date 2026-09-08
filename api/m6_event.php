@@ -67,16 +67,16 @@ switch ($action) {
                 $media[] = [
                     'id' => 'med_anniv_yt_user',
                     'album_id' => 'alb_anniv_2026',
-                    'media_url' => 'https://youtu.be/k68heI9xML0',
-                    'youtube_id' => 'k68heI9xML0',
+                    'media_url' => 'https://youtu.be/PH9foXkufB8',
+                    'youtube_id' => 'PH9foXkufB8',
                     'is_youtube' => true,
-                    'file_name' => 'YouTube: Aftermovie HUT ke-22 & Rakernas MB Club Indonesia',
+                    'file_name' => 'YouTube: Dokumentasi & Aftermovie HUT ke-22 & Rakernas MB Club Indonesia',
                     'type' => 'VIDEO',
-                    'caption' => 'Aftermovie & Dokumentasi Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
+                    'caption' => 'Dokumentasi & Video Resmi HUT ke-22 & Rakernas MB Club Indonesia 2026',
                     'uploaded_by' => 'Derist Touriano',
                     'uploaded_at' => '08/09/2026 17:00',
-                    'view_count' => 85,
-                    'download_count' => 14,
+                    'view_count' => 128,
+                    'download_count' => 24,
                     'tags' => ['Derist Touriano', 'MB Club Indonesia', 'Rakernas 2026']
                 ];
             }
@@ -193,21 +193,39 @@ switch ($action) {
     case 'save_m6_media':
         try {
             $id = $input['id'] ?? ('med_' . uniqid());
-            $albumId = $input['album_id'] ?? '';
-            $eventId = !empty($input['event_id']) ? $input['event_id'] : null;
+            $albumId = $input['album_id'] ?? 'alb_anniv_2026';
+            $eventId = !empty($input['event_id']) ? $input['event_id'] : 'EVT-2026-012';
             $mediaUrl = $input['media_url'] ?? '';
             $type = strtoupper($input['type'] ?? 'IMAGE');
             if (!in_array($type, ['IMAGE', 'VIDEO'])) $type = 'IMAGE';
             $caption = $input['caption'] ?? '';
-            $uploadedBy = $input['uploaded_by'] ?? 'Admin HQ';
+            $uploadedBy = $input['uploaded_by'] ?? 'usr_superadmin';
+            if (!str_starts_with($uploadedBy, 'usr_')) {
+                $uploadedBy = 'usr_superadmin';
+            }
 
             if ($sPdo && $id && $mediaUrl) {
+                // Verify album exists to avoid FK failure
+                $chkAlb = $sPdo->prepare("SELECT id FROM event_albums WHERE id = :aid");
+                $chkAlb->execute([':aid' => $albumId]);
+                if (!$chkAlb->fetch()) {
+                    $albumId = 'alb_anniv_2026';
+                }
+
+                // Verify event exists
+                if ($eventId) {
+                    $chkEvt = $sPdo->prepare("SELECT id FROM events WHERE id = :eid");
+                    $chkEvt->execute([':eid' => $eventId]);
+                    if (!$chkEvt->fetch()) $eventId = null;
+                }
+
                 try {
                     $stmt = $sPdo->prepare("
                         INSERT INTO event_media (id, album_id, event_id, media_url, type, caption, uploaded_by, uploaded_at)
                         VALUES (:id, :alb, :evt, :url, :type::media_type_enum, :cap, :uploader, NOW())
                         ON CONFLICT (id) DO UPDATE SET
                             album_id = EXCLUDED.album_id,
+                            event_id = EXCLUDED.event_id,
                             media_url = EXCLUDED.media_url,
                             caption = EXCLUDED.caption,
                             type = EXCLUDED.type
@@ -227,6 +245,7 @@ switch ($action) {
                         VALUES (:id, :alb, :evt, :url, :type, :cap, :uploader, NOW())
                         ON CONFLICT (id) DO UPDATE SET
                             album_id = EXCLUDED.album_id,
+                            event_id = EXCLUDED.event_id,
                             media_url = EXCLUDED.media_url,
                             caption = EXCLUDED.caption,
                             type = EXCLUDED.type
@@ -260,10 +279,17 @@ switch ($action) {
             $createdBy = $input['created_by'] ?? 'Admin HQ';
 
             if ($sPdo && $id && $title) {
+                if ($eventId) {
+                    $chkEvt = $sPdo->prepare("SELECT id FROM events WHERE id = :eid");
+                    $chkEvt->execute([':eid' => $eventId]);
+                    if (!$chkEvt->fetch()) $eventId = null;
+                }
+
                 $stmt = $sPdo->prepare("
                     INSERT INTO event_albums (id, event_id, title, description, cover_image, is_public, created_by, created_at)
                     VALUES (:id, :evt, :title, :desc, :cover, :pub, :creator, NOW())
                     ON CONFLICT (id) DO UPDATE SET
+                        event_id = EXCLUDED.event_id,
                         title = EXCLUDED.title,
                         description = EXCLUDED.description,
                         cover_image = EXCLUDED.cover_image,
