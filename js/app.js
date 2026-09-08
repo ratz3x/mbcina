@@ -19907,9 +19907,9 @@ const M6Engine = {
         }
       }
       const savedMed = localStorage.getItem('mbcina_m6_media');
-      if (savedMed) {
+      if (savedMed !== null) {
         const parsedM = JSON.parse(savedMed);
-        if (Array.isArray(parsedM) && parsedM.length > 0) {
+        if (Array.isArray(parsedM)) {
           this.data.media = parsedM;
         }
       }
@@ -19918,17 +19918,11 @@ const M6Engine = {
     }
     if (!this.data.albums || this.data.albums.length === 0) {
       this.data.albums = [...this.sampleAlbums];
-    } else {
-      if (!this.data.albums.some(a => a.id === 'alb_anniv_2026' || a.title.includes('Anniversary & Rakernas'))) {
-        this.data.albums.unshift(this.sampleAlbums[0]);
-      }
+      this.saveGalleryToStorage();
     }
-    if (!this.data.media || this.data.media.length === 0) {
+    if (!this.data.media || (this.data.media.length === 0 && localStorage.getItem('mbcina_m6_media') === null)) {
       this.data.media = [...this.sampleMedia];
-    } else {
-      if (!this.data.media.some(m => m.album_id === 'alb_anniv_2026')) {
-        this.data.media.unshift(this.sampleMedia[0], this.sampleMedia[1]);
-      }
+      this.saveGalleryToStorage();
     }
   },
 
@@ -19998,8 +19992,13 @@ const M6Engine = {
         <!-- ALBUM MEDIA GRID -->
         <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px;">
           ${albMedia.map(m => `
-            <div class="glass-panel" style="padding:0; border:1px solid var(--chrome-border); border-radius:12px; overflow:hidden; position:relative;" onclick="M6Engine.openMediaDetailModal('${m.id}')">
-              <div style="height:150px; overflow:hidden; position:relative; background:#000; cursor:pointer;">
+            <div class="glass-panel" style="padding:0; border:1px solid var(--chrome-border); border-radius:12px; overflow:hidden; position:relative;">
+              ${canManage ? `
+                <button type="button" class="btn-outline m6-gallery-admin-only" style="position:absolute; top:8px; right:8px; z-index:10; background:rgba(0,0,0,0.8); color:var(--accent-red); border:1px solid rgba(239,68,68,0.6); font-size:0.75rem; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="event.stopPropagation(); M6Engine.deleteSingleMedia('${m.id}')" title="Hapus ${m.type === 'VIDEO' ? 'Video' : 'Foto'}">
+                  🗑️
+                </button>
+              ` : ''}
+              <div style="height:150px; overflow:hidden; position:relative; background:#000; cursor:pointer;" onclick="M6Engine.openMediaDetailModal('${m.id}')">
                 ${m.type === 'VIDEO' ? `
                   <video src="${m.media_url}#t=0.5" preload="metadata" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
                   <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.75); border:1px solid rgba(255,255,255,0.3); border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.5);">▶</div>
@@ -20014,7 +20013,7 @@ const M6Engine = {
                   📥 ${m.download_count || 0}
                 </div>
               </div>
-              <div style="padding:10px 12px;">
+              <div style="padding:10px 12px; cursor:pointer;" onclick="M6Engine.openMediaDetailModal('${m.id}')">
                 <div style="font-size:0.78rem; color:#fff; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-bottom:4px;">${m.caption || 'Dokumentasi Event'}</div>
                 <div style="font-size:0.7rem; color:var(--text-muted);">Uploaded by ${m.uploaded_by}</div>
               </div>
@@ -20544,8 +20543,17 @@ const M6Engine = {
       }
     }
 
+    const capTxt = document.getElementById('m6-md-caption-txt');
+    const capBox = document.getElementById('m6-md-caption-edit-box');
+    const capBtn = document.getElementById('m6-md-btn-edit-cap');
+    const delBtn = document.getElementById('m6-md-btn-delete');
+    if (capTxt) capTxt.style.display = 'block';
+    if (capBox) capBox.style.display = 'none';
+    const canManage = this.canUserManageGallery();
+    if (capBtn) capBtn.style.display = canManage ? '' : 'none';
+    if (delBtn) delBtn.style.display = canManage ? '' : 'none';
+
     if (tagsListEl) {
-      const canManage = this.canUserManageGallery();
       tagsListEl.innerHTML = (m.tags || []).map(t => `
         <span class="tier-badge" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid var(--accent-gold); font-size:0.72rem;">
           @${t} ${canManage ? `<a href="javascript:void(0)" onclick="M6Engine.removeTagFromMedia('${m.id}', '${t}')" style="color:var(--accent-red); margin-left:4px; text-decoration:none;" title="Hapus Tag">✕</a>` : ''}
@@ -20554,6 +20562,42 @@ const M6Engine = {
     }
 
     AuthEngine.openModal('modal-m6-media-detail');
+  },
+
+  toggleEditMediaCaption() {
+    const m = this.data.media.find(x => x.id === this.activeDetailMediaId);
+    if (!m) return;
+    const txt = document.getElementById('m6-md-caption-txt');
+    const box = document.getElementById('m6-md-caption-edit-box');
+    const input = document.getElementById('m6-md-caption-input');
+    if (txt) txt.style.display = 'none';
+    if (box) box.style.display = 'block';
+    if (input) {
+      input.value = m.caption || '';
+      input.focus();
+    }
+  },
+
+  cancelEditMediaCaption() {
+    const txt = document.getElementById('m6-md-caption-txt');
+    const box = document.getElementById('m6-md-caption-edit-box');
+    if (txt) txt.style.display = 'block';
+    if (box) box.style.display = 'none';
+  },
+
+  saveMediaCaption() {
+    const m = this.data.media.find(x => x.id === this.activeDetailMediaId);
+    if (!m) return;
+    const input = document.getElementById('m6-md-caption-input');
+    const newCaption = input ? input.value.trim() : '';
+    m.caption = newCaption || (m.type === 'VIDEO' ? 'Dokumentasi Video Event' : 'Dokumentasi Foto Event');
+    this.saveGalleryToStorage();
+
+    const captionEl = document.getElementById('m6-md-caption-txt');
+    if (captionEl) captionEl.textContent = '"' + m.caption + '"';
+    this.cancelEditMediaCaption();
+    this.renderGaleri();
+    alert('✅ Keterangan / caption berhasil diperbarui!');
   },
 
   downloadSingleMedia() {
@@ -20574,11 +20618,27 @@ const M6Engine = {
     alert(`🔗 Link publik foto berhasil disalin ke clipboard:\n${link}\n\nSiap dibagikan ke WhatsApp, Instagram & Facebook!`);
   },
 
-  deleteSingleMedia() {
-    if (!this.activeDetailMediaId) return;
-    if (!confirm('Hapus foto/video ini secara permanen dari galeri?')) return;
-    this.data.media = this.data.media.filter(m => m.id !== this.activeDetailMediaId);
+  deleteSingleMedia(mediaId) {
+    const targetId = mediaId || this.activeDetailMediaId;
+    if (!targetId) return;
+
+    if (!this.canUserManageGallery()) {
+      alert('⚠️ Akses Terbatas: Hanya Admin & Tim Dokumentasi/Humas yang berhak menghapus media galeri.');
+      return;
+    }
+
+    const m = this.data.media.find(x => x.id === targetId);
+    const mediaType = m && m.type === 'VIDEO' ? 'video' : 'foto';
+
+    if (!confirm(`Hapus ${mediaType} ini secara permanen dari galeri?`)) return;
+
+    this.data.media = this.data.media.filter(item => item.id !== targetId);
+    this.saveGalleryToStorage();
+
     AuthEngine.closeModal('modal-m6-media-detail');
+    this.activeDetailMediaId = null;
+
+    alert(`🗑️ ${mediaType === 'video' ? 'Video' : 'Foto'} berhasil dihapus dari galeri.`);
     this.renderGaleri();
     this.renderTagParticipantGrid();
   },

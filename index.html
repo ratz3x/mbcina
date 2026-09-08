@@ -10802,9 +10802,19 @@
             </div>
 
             <!-- CAPTION SECTION -->
-            <div style="font-size:0.82rem; font-weight:800; color:var(--accent-gold); margin-bottom:6px; border-bottom:1px solid var(--chrome-border); padding-bottom:6px;">💬 CAPTION</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; border-bottom:1px solid var(--chrome-border); padding-bottom:6px;">
+              <div style="font-size:0.82rem; font-weight:800; color:var(--accent-gold);">💬 CAPTION / KETERANGAN</div>
+              <button type="button" id="m6-md-btn-edit-cap" class="btn-outline m6-gallery-admin-only" style="font-size:0.7rem; padding:2px 8px; border-radius:6px;" onclick="M6Engine.toggleEditMediaCaption()">✏️ Edit</button>
+            </div>
             <div id="m6-md-caption-txt" style="font-size:0.8rem; color:#ddd; line-height:1.5; font-style:italic; margin-bottom:14px;">
               "Opening Ceremony Jambore MB INA Yogyakarta 2026"
+            </div>
+            <div id="m6-md-caption-edit-box" style="display:none; margin-bottom:14px;">
+              <textarea id="m6-md-caption-input" class="form-input" rows="2" style="font-size:0.8rem; width:100%; margin-bottom:6px;" placeholder="Tulis caption foto / video..."></textarea>
+              <div style="display:flex; gap:6px; justify-content:flex-end;">
+                <button type="button" class="btn-outline" style="font-size:0.72rem; padding:3px 10px;" onclick="M6Engine.cancelEditMediaCaption()">Batal</button>
+                <button type="button" class="btn-primary" style="font-size:0.72rem; padding:3px 12px; background:var(--accent-gold); color:#000; font-weight:800;" onclick="M6Engine.saveMediaCaption()">💾 Simpan</button>
+              </div>
             </div>
           </div>
 
@@ -10816,7 +10826,7 @@
             </div>
             <div style="display:flex; gap:8px;">
               <button class="btn-outline" style="flex:1; font-size:0.78rem;" onclick="M6Engine.shareMediaLink()">🔗 Share Link</button>
-              <button class="btn-outline" style="flex:1; font-size:0.78rem; color:var(--accent-red); border-color:var(--accent-red);" onclick="M6Engine.deleteSingleMedia()">🗑️ Hapus</button>
+              <button id="m6-md-btn-delete" class="btn-outline m6-gallery-admin-only" style="flex:1; font-size:0.78rem; color:var(--accent-red); border-color:var(--accent-red); font-weight:700;" onclick="M6Engine.deleteSingleMedia()">🗑️ Hapus</button>
             </div>
           </div>
         </div>
@@ -11371,8 +11381,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260908_v206_modal_upload_media_clean_gallery"></script>
-  <script src="js/app.js?v=20260908_v206_modal_upload_media_clean_gallery"></script>
+  <script src="js/auth.js?v=20260908_v207_fix_video_delete_and_edit"></script>
+  <script src="js/app.js?v=20260908_v207_fix_video_delete_and_edit"></script>
   <script>
     lucide.createIcons();
     try {
