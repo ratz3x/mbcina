@@ -38,6 +38,7 @@
     body.member-mode #m6-gl-admin-actions,
     body.member-mode #m6-gl-inner-btn-652,
     body.member-mode #m6-gl-inner-652,
+    body.member-mode #modal-m6-upload-media,
     body.member-mode .m6-gallery-admin-only,
     #member-return-banner,
     #btn-m2-return-member,
@@ -2772,7 +2773,7 @@
               <!-- SUB-TAB INNER PILLS -->
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <button id="m6-gl-inner-btn-651" class="btn-primary" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('651')">📁 Album Event</button>
-                <button id="m6-gl-inner-btn-652" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('652')">📤 Upload Media</button>
+                <button id="m6-gl-inner-btn-652" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.openUploadMediaModal()">📤 Upload Media</button>
                 <button id="m6-gl-inner-btn-653" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('653')">🏷️ Tag Peserta</button>
                 <button id="m6-gl-inner-btn-654" class="btn-outline" style="font-size:0.8rem; padding:7px 14px; font-weight:800;" onclick="M6Engine.switchGalleryInnerTab('654')">📥 Unduh & Bagikan</button>
               </div>
@@ -2816,51 +2817,6 @@
             <div id="m6-gl-inner-651" style="display:block;">
               <div id="m6-galeri-container">
                 <!-- Filled dynamically by JS M6Engine.renderGaleri() -->
-              </div>
-            </div>
-
-            <!-- ╔═════════════════════════════════════════════════════╗ -->
-            <!-- ║  6.5.2 UPLOAD MEDIA (MULTIPLE & CAPTION)            ║ -->
-            <!-- ╚═════════════════════════════════════════════════════╝ -->
-            <div id="m6-gl-inner-652" style="display:none;">
-              <div class="glass-card" style="padding:22px; border:1px solid var(--accent-gold); max-width:800px; margin:0 auto; position:relative;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                  <h5 style="color:var(--accent-gold); font-size:1.05rem; margin:0; display:flex; align-items:center; gap:8px;">
-                    📤 Upload Media (Foto & Video Event)
-                  </h5>
-                  <button type="button" style="background:none; border:none; color:var(--text-muted); font-size:1.3rem; cursor:pointer; line-height:1; padding:4px 8px;" onclick="M6Engine.switchGalleryInnerTab('651')" title="Tutup / Batal">✕</button>
-                </div>
-
-                <form onsubmit="M6Engine.submitGalleryUploadForm(event)">
-                  <div class="form-group">
-                    <label class="form-label" style="font-size:0.82rem; font-weight:700;">Pilih Album Tujuan *</label>
-                    <select id="m6-gl-upload-album-sel" class="form-input" style="font-weight:700;" required>
-                      <!-- Filled dynamically by JS -->
-                    </select>
-                  </div>
-
-                  <!-- DROPZONE -->
-                  <div style="border:2px dashed var(--accent-gold); border-radius:12px; padding:30px 20px; text-align:center; background:rgba(245,158,11,0.03); margin-bottom:16px; cursor:pointer; position:relative;" onclick="document.getElementById('m6-gl-file-input').click()">
-                    <input type="file" id="m6-gl-file-input" multiple accept="image/*,video/*" style="display:none;" onchange="M6Engine.handleGalleryFileSelect(this)">
-                    <div style="font-size:2.5rem; margin-bottom:8px;">📁</div>
-                    <div style="font-weight:800; color:#fff; font-size:0.95rem; margin-bottom:4px;">Drag & Drop file foto/video di sini atau Klik untuk memilih</div>
-                    <div style="font-size:0.75rem; color:var(--text-muted);">Format Support: JPG, PNG, WebP, GIF | Video MP4, MOV, WebM, AVI, MKV • Bisa pilih banyak file sekaligus</div>
-                  </div>
-
-                  <!-- PREVIEW THUMBNAILS CONTAINER -->
-                  <div id="m6-gl-upload-preview-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px; margin-bottom:16px;"></div>
-
-                  <div class="form-group">
-                    <label class="form-label" style="font-size:0.82rem; font-weight:700;">Caption Media (berlaku untuk semua file yang diunggah)</label>
-                    <textarea id="m6-gl-upload-caption" class="form-input" rows="2" placeholder="Dokumentasi acara Jambore MB INA Yogyakarta 2026..."></textarea>
-                  </div>
-
-                  <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px; border-top:1px solid var(--chrome-border); padding-top:14px;">
-                    <button type="button" class="btn-outline" onclick="M6Engine.switchGalleryInnerTab('651')">Batal</button>
-                    <button type="button" class="btn-outline" onclick="M6Engine.resetGalleryUploadForm()">Reset</button>
-                    <button type="submit" class="btn-primary" style="background:var(--accent-gold); color:#000; font-weight:800; border-color:var(--accent-gold);">🚀 Mulai Upload Media</button>
-                  </div>
-                </form>
               </div>
             </div>
 
@@ -10758,6 +10714,56 @@
     </div>
   </div>
 
+  <!-- MODAL M6: UPLOAD MEDIA (FOTO & VIDEO EVENT) -->
+  <div id="modal-m6-upload-media" class="modal-backdrop" style="display:none;">
+    <div class="modal-container" style="max-width:680px; width:100%; border-radius:16px; border:1px solid var(--accent-gold); background:rgba(18,18,22,0.98); box-shadow:0 20px 50px rgba(0,0,0,0.8); overflow:hidden;">
+      <div class="modal-header" style="padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.2rem;">📤</span>
+          <h3 style="font-size:1.05rem; margin:0; font-weight:800; color:var(--accent-gold);">Upload Media (Foto & Video Event)</h3>
+        </div>
+        <button type="button" class="btn-close" onclick="AuthEngine.closeModal('modal-m6-upload-media')" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; line-height:1;">✕</button>
+      </div>
+
+      <form onsubmit="M6Engine.submitGalleryUploadForm(event)" style="margin:0;">
+        <div class="modal-body" style="padding:20px; display:flex; flex-direction:column; gap:16px; max-height:75vh; overflow-y:auto;">
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Pilih Album Tujuan *</label>
+            <select id="m6-gl-upload-album-sel" class="form-input" style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px; font-weight:700;" required>
+              <!-- Filled dynamically by JS -->
+            </select>
+          </div>
+
+          <!-- DROPZONE -->
+          <div style="border:2px dashed var(--accent-gold); border-radius:12px; padding:26px 20px; text-align:center; background:rgba(245,158,11,0.03); cursor:pointer; position:relative;" onclick="document.getElementById('m6-gl-file-input').click()">
+            <input type="file" id="m6-gl-file-input" multiple accept="image/*,video/*" style="display:none;" onchange="M6Engine.handleGalleryFileSelect(this)">
+            <div style="font-size:2.3rem; margin-bottom:6px;">📁</div>
+            <div style="font-weight:800; color:#fff; font-size:0.92rem; margin-bottom:4px;">Drag & Drop file foto/video di sini atau Klik untuk memilih</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Format: JPG, PNG, WebP, GIF | Video MP4, MOV, WebM, AVI, MKV • Multi-file support</div>
+          </div>
+
+          <!-- PREVIEW THUMBNAILS CONTAINER -->
+          <div id="m6-gl-upload-preview-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px;"></div>
+
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Caption Media (Opsional)</label>
+            <textarea id="m6-gl-upload-caption" class="form-input" rows="2" placeholder="Contoh: Dokumentasi Parade & Gala Dinner MB INA 2026..." style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px;"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding:14px 20px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.25);">
+          <button type="button" class="btn-outline" onclick="M6Engine.resetGalleryUploadForm()" style="padding:8px 14px; border-radius:10px; font-size:0.8rem; color:var(--text-muted);">Reset Form</button>
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn-outline" onclick="AuthEngine.closeModal('modal-m6-upload-media')" style="padding:8px 16px; border-radius:10px; font-size:0.82rem;">Batal</button>
+            <button type="submit" class="btn-primary" style="background:var(--accent-gold); color:#000; font-weight:800; border-color:var(--accent-gold); padding:8px 20px; border-radius:10px; font-size:0.82rem; display:inline-flex; align-items:center; gap:6px;">
+              <span>🚀 Mulai Upload Media</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL M6: DETAIL & LIGHTBOX MEDIA GALERI (6.5.3 & 6.5.4) -->
   <div id="modal-m6-media-detail" class="modal-backdrop" style="display:none;">
     <div class="modal-container" style="max-width:860px; max-height:92vh; display:flex; flex-direction:column; padding:0; overflow:hidden; border:1px solid var(--accent-gold);">
@@ -11365,8 +11371,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260908_v205_enable_video_upload_gallery_anniversary"></script>
-  <script src="js/app.js?v=20260908_v205_enable_video_upload_gallery_anniversary"></script>
+  <script src="js/auth.js?v=20260908_v206_modal_upload_media_clean_gallery"></script>
+  <script src="js/app.js?v=20260908_v206_modal_upload_media_clean_gallery"></script>
   <script>
     lucide.createIcons();
     try {

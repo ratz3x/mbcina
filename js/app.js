@@ -5112,8 +5112,6 @@ const AppEngine = {
           if (adminActions) adminActions.style.removeProperty('display');
           const uploadPill = document.getElementById('m6-gl-inner-btn-652');
           if (uploadPill) uploadPill.style.removeProperty('display');
-          const uploadPanel = document.getElementById('m6-gl-inner-652');
-          if (uploadPanel) uploadPanel.style.removeProperty('display');
           M6Engine.switchSubtab('6_1_proposal');
         }
       }
@@ -6660,6 +6658,8 @@ const AppEngine = {
     if (uploadPill) uploadPill.style.setProperty('display', 'none', 'important');
     const uploadPanel = document.getElementById('m6-gl-inner-652');
     if (uploadPanel) uploadPanel.style.setProperty('display', 'none', 'important');
+    const uploadModal = document.getElementById('modal-m6-upload-media');
+    if (uploadModal) uploadModal.style.setProperty('display', 'none', 'important');
     document.querySelectorAll('.m6-gallery-admin-only').forEach(el => {
       el.style.setProperty('display', 'none', 'important');
     });
@@ -19860,12 +19860,12 @@ const M6Engine = {
   stagedUploadFiles: [],
 
   switchGalleryInnerTab(tabId) {
-    if (tabId === '652' && !this.canUserManageGallery()) {
-      alert('⚠️ Akses Terbatas: Pengunggahan media hanya dapat dilakukan oleh Admin Pusat & Pengurus MB INA.');
-      tabId = '651';
+    if (tabId === '652') {
+      this.openUploadMediaModal();
+      return;
     }
 
-    ['651','652','653','654'].forEach(id => {
+    ['651','653','654'].forEach(id => {
       const panel = document.getElementById('m6-gl-inner-' + id);
       const btn   = document.getElementById('m6-gl-inner-btn-' + id);
       if (panel) panel.style.display = id === tabId ? 'block' : 'none';
@@ -19881,7 +19881,6 @@ const M6Engine = {
     });
 
     if (tabId === '651') this.renderGaleri();
-    if (tabId === '652') this.populateGalleryUploadAlbumSelect();
     if (tabId === '653') this.renderTagParticipantGrid();
     if (tabId === '654') this.renderDownloadShareList();
   },
@@ -20332,11 +20331,12 @@ const M6Engine = {
       alert('⚠️ Akses Terbatas: Hanya Admin & Tim Dokumentasi/Humas yang berhak mengunggah media galeri.');
       return;
     }
-    this.switchGalleryInnerTab('652');
+    this.populateGalleryUploadAlbumSelect();
     if (albumId) {
       const sel = document.getElementById('m6-gl-upload-album-sel');
       if (sel) sel.value = albumId;
     }
+    AuthEngine.openModal('modal-m6-upload-media');
   },
 
   handleGalleryFileSelect(input) {
@@ -20408,6 +20408,7 @@ const M6Engine = {
 
     this.saveGalleryToStorage();
     this.resetGalleryUploadForm();
+    AuthEngine.closeModal('modal-m6-upload-media');
     alert(`🚀 BERHASIL UPLOAD ${uploadCount} MEDIA EVENT!\n\nFile telah tersimpan di album "${albTitle}".`);
     this.activeGalleryAlbumId = albumId;
     this.switchGalleryInnerTab('651');
