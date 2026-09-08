@@ -19730,6 +19730,7 @@ const M6Engine = {
       title: '📁 Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
       description: 'Dokumentasi resmi HUT ke-22 MB Club Indonesia, Press Conference Jamnas XXI, & Rakernas di TOPGOLF Jakarta',
       cover_image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800',
+      gdrive_url: 'https://drive.google.com/drive/folders/1-MBINA-22nd-Anniversary-Rakernas-Master-Arsip-2026',
       is_public: true,
       created_by: 'Derist Touriano (Admin)',
       created_at: '05/09/2026 14:00',
@@ -19769,6 +19770,21 @@ const M6Engine = {
 
   // Default sample media items
   sampleMedia: [
+    {
+      id: 'med_anniv_yt_1',
+      album_id: 'alb_anniv_2026',
+      media_url: 'https://www.youtube.com/watch?v=kYJybw_v2z0',
+      youtube_id: 'kYJybw_v2z0',
+      is_youtube: true,
+      file_name: 'YouTube: Highlight 22nd Anniversary MB Club Indonesia',
+      type: 'VIDEO',
+      caption: 'Official Highlight Video HUT ke-22 & Rakernas MB Club Indonesia 2026 (YouTube)',
+      uploaded_by: 'Tim Media & Humas MB INA',
+      uploaded_at: '06/09/2026 10:00',
+      view_count: 890,
+      download_count: 140,
+      tags: ['Derist Touriano', 'MB Club INA', 'YouTube']
+    },
     {
       id: 'med_anniv_vid_1',
       album_id: 'alb_anniv_2026',
@@ -19859,6 +19875,35 @@ const M6Engine = {
   activeDetailMediaId: null,
   stagedUploadFiles: [],
 
+  extractYouTubeId(url) {
+    if (!url || typeof url !== 'string') return null;
+    url = url.trim();
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|\/shorts\/)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  },
+
+  previewYouTubeInput(url) {
+    const previewEl = document.getElementById('m6-gl-youtube-preview');
+    const imgEl = document.getElementById('m6-gl-yt-preview-img');
+    const idEl = document.getElementById('m6-gl-yt-preview-id');
+    const ytId = this.extractYouTubeId(url);
+    if (ytId) {
+      if (imgEl) imgEl.src = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+      if (idEl) idEl.textContent = `ID: ${ytId} (https://youtu.be/${ytId})`;
+      if (previewEl) previewEl.style.display = 'flex';
+    } else {
+      if (previewEl) previewEl.style.display = 'none';
+    }
+  },
+
+  clearYouTubeInput() {
+    const input = document.getElementById('m6-gl-upload-youtube');
+    const previewEl = document.getElementById('m6-gl-youtube-preview');
+    if (input) input.value = '';
+    if (previewEl) previewEl.style.display = 'none';
+  },
+
   switchGalleryInnerTab(tabId) {
     if (tabId === '652') {
       this.openUploadMediaModal();
@@ -19904,6 +19949,12 @@ const M6Engine = {
         const parsed = JSON.parse(savedAlb);
         if (Array.isArray(parsed) && parsed.length > 0) {
           this.data.albums = parsed;
+          // Ensure default sample albums exist if not present in saved storage
+          this.sampleAlbums.forEach(sa => {
+            if (!this.data.albums.some(a => a.id === sa.id)) {
+              this.data.albums.unshift(sa);
+            }
+          });
         }
       }
       const savedMed = localStorage.getItem('mbcina_m6_media');
@@ -19911,6 +19962,12 @@ const M6Engine = {
         const parsedM = JSON.parse(savedMed);
         if (Array.isArray(parsedM)) {
           this.data.media = parsedM;
+          // Ensure default sample media (including YouTube) exists if not present
+          this.sampleMedia.forEach(sm => {
+            if (!this.data.media.some(m => m.id === sm.id)) {
+              this.data.media.unshift(sm);
+            }
+          });
         }
       }
     } catch(e) {
@@ -19981,7 +20038,12 @@ const M6Engine = {
               <h4 style="color:var(--accent-gold); font-size:1.2rem; margin:0;">${alb ? alb.title : 'Album Event'}</h4>
               <p style="font-size:0.8rem; color:var(--text-muted); margin:3px 0 0;">${alb ? alb.description : ''} • ${albMedia.length} Media</p>
             </div>
-            <div style="display:flex; gap:8px;">
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              ${alb && alb.gdrive_url ? `
+                <a href="${alb.gdrive_url}" target="_blank" rel="noopener noreferrer" class="btn-outline" style="font-size:0.8rem; border-color:#4285F4; color:#93c5fd; text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:rgba(66,133,244,0.12); padding:6px 12px; border-radius:6px; font-weight:700;" title="Akses seluruh file foto & video resolusi tinggi di Google Drive">
+                  📁 Google Drive (Full HD) ↗
+                </a>
+              ` : ''}
               ${canManage ? `<button class="btn-primary m6-gallery-admin-only" style="font-size:0.8rem; font-weight:800;" onclick="M6Engine.openUploadMediaModal('${this.activeGalleryAlbumId}')">📤 Upload ke Album ini</button>` : ''}
               <button class="btn-outline" style="font-size:0.8rem;" onclick="M6Engine.downloadAlbumZip('${this.activeGalleryAlbumId}')">📥 Download ZIP</button>
               ${canManage ? `<button class="btn-outline m6-gallery-admin-only" style="font-size:0.8rem;" onclick="M6Engine.editAlbum('${this.activeGalleryAlbumId}')">✏️ Edit Album</button>` : ''}
@@ -19991,7 +20053,11 @@ const M6Engine = {
 
         <!-- ALBUM MEDIA GRID -->
         <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px;">
-          ${albMedia.map(m => `
+          ${albMedia.map(m => {
+            const isYt = m.is_youtube || !!this.extractYouTubeId(m.media_url);
+            const ytId = m.youtube_id || this.extractYouTubeId(m.media_url);
+            const ytThumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
+            return `
             <div class="glass-panel" style="padding:0; border:1px solid var(--chrome-border); border-radius:12px; overflow:hidden; position:relative;">
               ${canManage ? `
                 <button type="button" class="btn-outline m6-gallery-admin-only" style="position:absolute; top:8px; right:8px; z-index:10; background:rgba(0,0,0,0.8); color:var(--accent-red); border:1px solid rgba(239,68,68,0.6); font-size:0.75rem; padding:4px 8px; border-radius:6px; cursor:pointer;" onclick="event.stopPropagation(); M6Engine.deleteSingleMedia('${m.id}')" title="Hapus ${m.type === 'VIDEO' ? 'Video' : 'Foto'}">
@@ -20000,9 +20066,15 @@ const M6Engine = {
               ` : ''}
               <div style="height:150px; overflow:hidden; position:relative; background:#000; cursor:pointer;" onclick="M6Engine.openMediaDetailModal('${m.id}')">
                 ${m.type === 'VIDEO' ? `
-                  <video src="${m.media_url}#t=0.5" preload="metadata" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
-                  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.75); border:1px solid rgba(255,255,255,0.3); border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.5);">▶</div>
-                  <div style="position:absolute; top:8px; left:8px; background:rgba(239,68,68,0.9); color:#fff; font-size:0.65rem; font-weight:800; padding:2px 6px; border-radius:4px; letter-spacing:0.5px;">🎬 VIDEO</div>
+                  ${isYt ? `
+                    <img src="${ytThumb}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
+                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(220,38,38,0.9); border:1px solid rgba(255,255,255,0.4); border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 14px rgba(0,0,0,0.6);">▶</div>
+                    <div style="position:absolute; top:8px; left:8px; background:rgba(220,38,38,0.95); color:#fff; font-size:0.65rem; font-weight:800; padding:2px 7px; border-radius:4px; letter-spacing:0.5px;">▶ YOUTUBE</div>
+                  ` : `
+                    <video src="${m.media_url}#t=0.5" preload="metadata" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
+                    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.75); border:1px solid rgba(255,255,255,0.3); border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.5);">▶</div>
+                    <div style="position:absolute; top:8px; left:8px; background:rgba(239,68,68,0.9); color:#fff; font-size:0.65rem; font-weight:800; padding:2px 6px; border-radius:4px; letter-spacing:0.5px;">🎬 VIDEO</div>
+                  `}
                 ` : `
                   <img src="${m.media_url}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
                 `}
@@ -20018,7 +20090,8 @@ const M6Engine = {
                 <div style="font-size:0.7rem; color:var(--text-muted);">Uploaded by ${m.uploaded_by}</div>
               </div>
             </div>
-          `).join('')}
+            `;
+          }).join('')}
           ${albMedia.length === 0 ? '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">Belum ada foto/video dalam album ini. Klik "+ Upload Media" untuk menambahkan.</div>' : ''}
         </div>
       `;
@@ -20049,15 +20122,32 @@ const M6Engine = {
                 <div style="font-size:0.78rem; color:var(--text-muted); line-height:1.5; margin-bottom:12px;">${a.description || '–'}</div>
                 
                 <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:10px;">
-                  ${albMedia.slice(0,3).map(m => m.type === 'VIDEO' ? `
-                    <div style="width:100%; height:58px; position:relative; background:#000; border-radius:6px; overflow:hidden;">
-                      <video src="${m.media_url}#t=0.5" preload="metadata" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
-                      <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); font-size:0.75rem; color:#fff;">▶</div>
-                    </div>
-                  ` : `
-                    <img src="${m.media_url}" style="width:100%; height:58px; object-fit:cover; border-radius:6px;" onerror="this.src='assets/mb_hero.jpg'">
-                  `).join('')}
+                  ${albMedia.slice(0,3).map(m => {
+                    const mIsYt = m.is_youtube || !!this.extractYouTubeId(m.media_url);
+                    const mYtId = m.youtube_id || this.extractYouTubeId(m.media_url);
+                    if (m.type === 'VIDEO') {
+                      return `
+                        <div style="width:100%; height:58px; position:relative; background:#000; border-radius:6px; overflow:hidden;">
+                          ${mIsYt ? `
+                            <img src="https://img.youtube.com/vi/${mYtId}/hqdefault.jpg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='assets/mb_hero.jpg'">
+                            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(220,38,38,0.4); font-size:0.8rem; color:#fff;">▶</div>
+                          ` : `
+                            <video src="${m.media_url}#t=0.5" preload="metadata" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
+                            <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); font-size:0.75rem; color:#fff;">▶</div>
+                          `}
+                        </div>
+                      `;
+                    }
+                    return `<img src="${m.media_url}" style="width:100%; height:58px; object-fit:cover; border-radius:6px;" onerror="this.src='assets/mb_hero.jpg'">`;
+                  }).join('')}
                 </div>
+                ${a.gdrive_url ? `
+                  <div style="margin-bottom:10px;">
+                    <a href="${a.gdrive_url}" target="_blank" rel="noopener noreferrer" class="btn-outline" style="width:100%; font-size:0.72rem; padding:6px 10px; border-color:rgba(66,133,244,0.5); color:#93c5fd; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px; box-sizing:border-box; border-radius:6px; background:rgba(66,133,244,0.08);" title="Buka folder arsip foto master resolusi penuh di Google Drive">
+                      📁 Buka Google Drive (HD) ↗
+                    </a>
+                  </div>
+                ` : ''}
               </div>
             </div>
 
@@ -20210,6 +20300,7 @@ const M6Engine = {
     const covPrv = document.getElementById('m6-alb-cover-preview');
     const covFile = document.getElementById('m6-alb-cover-file');
     const covStat = document.getElementById('m6-alb-cover-status');
+    const gdEl = document.getElementById('m6-alb-gdrive');
     const headerTxt = document.getElementById('modal-m6-album-title-txt');
 
     if (idEl) idEl.value = '';
@@ -20218,6 +20309,7 @@ const M6Engine = {
     if (pubEl) pubEl.value = 'true';
     if (covEl) covEl.value = '';
     if (covFile) covFile.value = '';
+    if (gdEl) gdEl.value = '';
     if (covPrv) covPrv.src = 'assets/mb_hero.jpg';
     if (covStat) covStat.textContent = 'Format: JPG, PNG, WebP (Bebas upload / gunakan banner event)';
     if (headerTxt) headerTxt.textContent = '📁 Buat Album Event Baru';
@@ -20242,6 +20334,7 @@ const M6Engine = {
     const covPrv = document.getElementById('m6-alb-cover-preview');
     const covFile = document.getElementById('m6-alb-cover-file');
     const covStat = document.getElementById('m6-alb-cover-status');
+    const gdEl = document.getElementById('m6-alb-gdrive');
     const headerTxt = document.getElementById('modal-m6-album-title-txt');
 
     if (idEl) idEl.value = alb.id;
@@ -20249,6 +20342,7 @@ const M6Engine = {
     if (deEl) deEl.value = alb.description || '';
     if (pubEl) pubEl.value = alb.is_public ? 'true' : 'false';
     if (covFile) covFile.value = '';
+    if (gdEl) gdEl.value = alb.gdrive_url || '';
 
     const currentCover = alb.cover_image || this.getEventBannerForAlbum(alb) || 'assets/mb_hero.jpg';
     if (covEl) covEl.value = alb.cover_image || '';
@@ -20271,6 +20365,7 @@ const M6Engine = {
     const title     = document.getElementById('m6-alb-title')?.value.trim();
     const eventId   = document.getElementById('m6-alb-event-sel')?.value || '';
     const cover     = document.getElementById('m6-alb-cover')?.value || '';
+    const gdriveUrl = document.getElementById('m6-alb-gdrive')?.value.trim() || '';
     const desc      = document.getElementById('m6-alb-desc')?.value.trim();
     const isPublic  = document.getElementById('m6-alb-public')?.value === 'true';
 
@@ -20282,6 +20377,7 @@ const M6Engine = {
         alb.title = title;
         alb.event_id = eventId;
         alb.cover_image = cover;
+        alb.gdrive_url = gdriveUrl;
         alb.description = desc;
         alb.is_public = isPublic;
       }
@@ -20292,6 +20388,7 @@ const M6Engine = {
         title: title.startsWith('📁') ? title : '📁 ' + title,
         description: desc,
         cover_image: cover,
+        gdrive_url: gdriveUrl,
         is_public: isPublic,
         created_by: 'Admin MB INA',
         created_at: new Date().toLocaleDateString('id-ID'),
@@ -20365,50 +20462,79 @@ const M6Engine = {
     }
     const albumId = document.getElementById('m6-gl-upload-album-sel')?.value;
     const caption = document.getElementById('m6-gl-upload-caption')?.value.trim();
+    const ytUrl   = document.getElementById('m6-gl-upload-youtube')?.value.trim() || '';
+    const ytId    = this.extractYouTubeId(ytUrl);
+    const hasFiles = this.stagedUploadFiles && this.stagedUploadFiles.length > 0;
 
     if (!albumId) { alert('⚠️ Silakan pilih album tujuan!'); return; }
+
+    if (!hasFiles && !ytId) {
+      alert('⚠️ Silakan pilih minimal 1 file foto/video ATAU masukkan link Video YouTube yang valid!');
+      return;
+    }
 
     const alb = this.data.albums.find(a => a.id === albumId);
     const albTitle = alb ? alb.title.replace(/^📁\s*/, '') : 'Event';
     const uploaderName = (window.AuthEngine?.currentUser?.name) || (window.AppEngine?.currentUser?.name) || 'Derist Touriano (Admin)';
 
-    if (!this.stagedUploadFiles || this.stagedUploadFiles.length === 0) {
-      alert('⚠️ Silakan pilih minimal 1 file foto atau video yang ingin diunggah!');
-      return;
-    }
-
     let uploadCount = 0;
-    this.stagedUploadFiles.forEach((file, i) => {
-      const isVid = file.type.startsWith('video/') || /\.(mp4|mov|webm|avi|mkv|3gp|m4v)$/i.test(file.name);
-      let mediaUrl;
-      try {
-        mediaUrl = URL.createObjectURL(file);
-      } catch (err) {
-        mediaUrl = isVid ? 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4' : 'assets/mb_hero.jpg';
-      }
 
-      const newMedia = {
-        id: 'med_' + Date.now() + '_' + i,
+    // Process YouTube link if entered
+    if (ytId) {
+      const newYtMedia = {
+        id: 'med_' + Date.now() + '_yt',
         album_id: albumId,
-        media_url: mediaUrl,
-        file_name: file.name,
-        file_size: file.size,
-        type: isVid ? 'VIDEO' : 'IMAGE',
-        caption: caption || (isVid ? `Dokumentasi Video - ${file.name}` : `Dokumentasi Foto - ${albTitle}`),
+        media_url: `https://www.youtube.com/watch?v=${ytId}`,
+        youtube_id: ytId,
+        is_youtube: true,
+        file_name: `YouTube: ${ytId}`,
+        file_size: 0,
+        type: 'VIDEO',
+        caption: caption || `Dokumentasi Video YouTube - ${albTitle}`,
         uploaded_by: uploaderName,
         uploaded_at: new Date().toLocaleDateString('id-ID'),
         view_count: 0,
         download_count: 0,
-        tags: ['MB INA']
+        tags: ['MB INA', 'YouTube']
       };
-      this.data.media.unshift(newMedia);
+      this.data.media.unshift(newYtMedia);
       uploadCount++;
-    });
+    }
+
+    // Process local files if selected
+    if (hasFiles) {
+      this.stagedUploadFiles.forEach((file, i) => {
+        const isVid = file.type.startsWith('video/') || /\.(mp4|mov|webm|avi|mkv|3gp|m4v)$/i.test(file.name);
+        let mediaUrl;
+        try {
+          mediaUrl = URL.createObjectURL(file);
+        } catch (err) {
+          mediaUrl = isVid ? 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-through-the-city-at-night-4228-large.mp4' : 'assets/mb_hero.jpg';
+        }
+
+        const newMedia = {
+          id: 'med_' + Date.now() + '_' + i,
+          album_id: albumId,
+          media_url: mediaUrl,
+          file_name: file.name,
+          file_size: file.size,
+          type: isVid ? 'VIDEO' : 'IMAGE',
+          caption: caption || (isVid ? `Dokumentasi Video - ${file.name}` : `Dokumentasi Foto - ${albTitle}`),
+          uploaded_by: uploaderName,
+          uploaded_at: new Date().toLocaleDateString('id-ID'),
+          view_count: 0,
+          download_count: 0,
+          tags: ['MB INA']
+        };
+        this.data.media.unshift(newMedia);
+        uploadCount++;
+      });
+    }
 
     this.saveGalleryToStorage();
     this.resetGalleryUploadForm();
     AuthEngine.closeModal('modal-m6-upload-media');
-    alert(`🚀 BERHASIL UPLOAD ${uploadCount} MEDIA EVENT!\n\nFile telah tersimpan di album "${albTitle}".`);
+    alert(`🚀 BERHASIL MENAMBAHKAN ${uploadCount} MEDIA EVENT!\n\nFile telah tersimpan di album "${albTitle}".`);
     this.activeGalleryAlbumId = albumId;
     this.switchGalleryInnerTab('651');
     this.renderGaleri();
@@ -20422,6 +20548,7 @@ const M6Engine = {
     if (fileInput) fileInput.value = '';
     if (prev) prev.innerHTML = '';
     if (cap) cap.value = '';
+    this.clearYouTubeInput();
   },
 
   // ─────────────────────────────────────────────
@@ -20523,7 +20650,10 @@ const M6Engine = {
     const tagsListEl = document.getElementById('m6-md-tags-list');
     const captionEl = document.getElementById('m6-md-caption-txt');
 
-    if (titleEl) titleEl.textContent = m.type === 'VIDEO' ? '🎬 DETAIL VIDEO EVENT' : '📷 DETAIL FOTO EVENT';
+    const isYt = m.is_youtube || !!this.extractYouTubeId(m.media_url);
+    const ytId = m.youtube_id || this.extractYouTubeId(m.media_url);
+
+    if (titleEl) titleEl.textContent = m.type === 'VIDEO' ? (isYt ? '🎬 DETAIL VIDEO YOUTUBE' : '🎬 DETAIL VIDEO EVENT') : '📷 DETAIL FOTO EVENT';
     if (albNameEl) albNameEl.textContent = alb ? alb.title : '📁 Album Event';
     if (uploaderEl) uploaderEl.textContent = m.uploaded_by || 'Admin HQ';
     if (dateEl) dateEl.textContent = m.uploaded_at || '13/09/2026';
@@ -20533,11 +20663,23 @@ const M6Engine = {
 
     if (viewerEl) {
       if (m.type === 'VIDEO') {
-        viewerEl.innerHTML = `
-          <video controls autoplay playsinline style="max-width:100%; max-height:420px; width:100%; border-radius:8px; background:#000; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
-            <source src="${m.media_url}">
-            Browser Anda tidak mendukung pemutaran HTML5 video.
-          </video>`;
+        if (isYt && ytId) {
+          viewerEl.innerHTML = `
+            <div style="position:relative; width:100%; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,0.6); background:#000;">
+              <iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div style="margin-top:10px; text-align:center;">
+              <a href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener noreferrer" class="btn-outline" style="font-size:0.75rem; padding:4px 12px; display:inline-flex; align-items:center; gap:6px; color:#f87171; border-color:rgba(239,68,68,0.5); text-decoration:none;">
+                ▶ Buka langsung di YouTube ↗
+              </a>
+            </div>`;
+        } else {
+          viewerEl.innerHTML = `
+            <video controls autoplay playsinline style="max-width:100%; max-height:420px; width:100%; border-radius:8px; background:#000; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+              <source src="${m.media_url}">
+              Browser Anda tidak mendukung pemutaran HTML5 video.
+            </video>`;
+        }
       } else {
         viewerEl.innerHTML = `<img src="${m.media_url}" style="max-width:100%; max-height:420px; object-fit:contain; border-radius:8px;" onerror="this.src='assets/mb_hero.jpg'">`;
       }
@@ -20608,6 +20750,11 @@ const M6Engine = {
     m.download_count = (m.download_count || 0) + 1;
     const el = document.getElementById('m6-md-downloads');
     if (el) el.textContent = m.download_count;
+
+    if (m.is_youtube || this.extractYouTubeId(m.media_url)) {
+      window.open(m.media_url, '_blank');
+      return;
+    }
 
     alert(`📥 Mengunduh file high-res: ${m.type === 'VIDEO' ? 'video_event.mp4' : 'foto_event.jpg'}\n\nTerima kasih telah mengunduh dokumentasi MB INA!`);
   },

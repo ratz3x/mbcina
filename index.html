@@ -10695,6 +10695,14 @@
             <textarea id="m6-alb-desc" class="form-input" rows="3" placeholder="Tuliskan gambaran singkat dokumentasi acara dalam album ini..." style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px; line-height:1.4;"></textarea>
           </div>
 
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px; background:rgba(56,189,248,0.05); border:1px dashed rgba(56,189,248,0.4); padding:12px; border-radius:10px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#38bdf8; display:flex; align-items:center; gap:6px; margin:0;">
+              <span>📁 Tautan Google Drive (Master Arsip Foto/Video Full HD)</span>
+            </label>
+            <input type="url" id="m6-alb-gdrive" class="form-input" placeholder="https://drive.google.com/drive/folders/..." style="width:100%; font-size:0.85rem; padding:9px 12px; border-radius:8px;">
+            <span style="font-size:0.7rem; color:var(--text-muted);">Opsional. Member & pengurus dapat langsung membuka folder Google Drive ini untuk mengunduh arsip foto asli tanpa kompresi.</span>
+          </div>
+
           <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
             <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Visibilitas Album *</label>
             <select id="m6-alb-public" class="form-input" style="width:100%; font-size:0.85rem; padding:10px 12px; border-radius:8px; font-weight:600;">
@@ -10744,6 +10752,33 @@
 
           <!-- PREVIEW THUMBNAILS CONTAINER -->
           <div id="m6-gl-upload-preview-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:10px;"></div>
+
+          <!-- SEPARATOR / OR -->
+          <div style="display:flex; align-items:center; gap:12px; margin:4px 0;">
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></div>
+            <span style="font-size:0.72rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:1px;">ATAU TAUTKAN DARI YOUTUBE</span>
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.1);"></div>
+          </div>
+
+          <!-- YOUTUBE LINK INPUT -->
+          <div class="form-group" style="display:flex; flex-direction:column; gap:6px; background:rgba(239,68,68,0.06); border:1px dashed rgba(239,68,68,0.4); padding:14px; border-radius:10px;">
+            <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#f87171; display:flex; align-items:center; gap:6px; margin:0;">
+              <span>🎬 Tautkan Video YouTube (Aftermovie / Highlight / Livestream)</span>
+            </label>
+            <div style="display:flex; gap:8px;">
+              <input type="url" id="m6-gl-upload-youtube" class="form-input" placeholder="Contoh: https://www.youtube.com/watch?v=xxxx atau https://youtu.be/xxxx" style="flex:1; font-size:0.85rem; padding:9px 12px; border-radius:8px;" oninput="M6Engine.previewYouTubeInput(this.value)">
+              <button type="button" class="btn-outline" style="font-size:0.75rem; padding:6px 12px; border-radius:8px; border-color:rgba(239,68,68,0.4); color:#f87171;" onclick="M6Engine.clearYouTubeInput()">Reset</button>
+            </div>
+            <div id="m6-gl-youtube-preview" style="display:none; margin-top:8px; align-items:center; gap:10px; background:rgba(0,0,0,0.5); padding:8px 12px; border-radius:8px; border:1px solid rgba(239,68,68,0.3);">
+              <img id="m6-gl-yt-preview-img" src="" style="width:74px; height:48px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.2);">
+              <div style="flex:1; overflow:hidden;">
+                <div style="font-size:0.78rem; font-weight:800; color:#fff;">Video YouTube Terdeteksi</div>
+                <div id="m6-gl-yt-preview-id" style="font-size:0.68rem; color:var(--text-muted); font-family:monospace;"></div>
+              </div>
+              <span style="font-size:0.72rem; color:var(--primary-emerald); font-weight:800;">✅ Valid</span>
+            </div>
+            <span style="font-size:0.7rem; color:var(--text-muted);">Mendukung format link standar, youtu.be, embed, dan YouTube Shorts. Putar lancar & hemat server!</span>
+          </div>
 
           <div class="form-group" style="display:flex; flex-direction:column; gap:6px;">
             <label class="form-label" style="font-size:0.82rem; font-weight:700; color:#cbd5e1;">Caption Media (Opsional)</label>
@@ -11381,8 +11416,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260908_v207_fix_video_delete_and_edit"></script>
-  <script src="js/app.js?v=20260908_v207_fix_video_delete_and_edit"></script>
+  <script src="js/auth.js?v=20260908_v208_youtube_and_gdrive_gallery_integration"></script>
+  <script src="js/app.js?v=20260908_v208_youtube_and_gdrive_gallery_integration"></script>
   <script>
     lucide.createIcons();
     try {
