@@ -20187,14 +20187,94 @@ const M6Engine = {
     this.renderGaleri();
   },
 
+  getAllAvailableEventsForGallery() {
+    if (typeof this.syncPublishedEventsFromProposals === 'function') {
+      try { this.syncPublishedEventsFromProposals(); } catch(e) {}
+    }
+
+    const eventMap = new Map();
+
+    const addEvent = (ev, defaultLifecycle) => {
+      if (!ev) return;
+      const key = (ev.event_code || ev.code || ev.id || '').trim().toUpperCase();
+      if (!key) return;
+
+      const now = new Date();
+      let isCompleted = ev.lifecycle === 'COMPLETED' || ev.status === 'ARCHIVED' || ev.status === 'COMPLETED';
+      if (!isCompleted && ev.end_date) {
+        const eDate = new Date(ev.end_date);
+        if (!isNaN(eDate.getTime()) && now > eDate) isCompleted = true;
+      }
+      if (!isCompleted && ev.date_end) {
+        const eDate = new Date(ev.date_end);
+        if (!isNaN(eDate.getTime()) && now > eDate) isCompleted = true;
+      }
+      if (defaultLifecycle === 'COMPLETED') isCompleted = true;
+
+      const existing = eventMap.get(key);
+      if (!existing) {
+        eventMap.set(key, {
+          id: ev.id || ev.event_code || ev.code || key,
+          code: ev.code || ev.event_code || ev.id || key,
+          title: ev.title || 'Event MB INA',
+          description: ev.description || '',
+          banner_image: ev.banner_image || ev.image_url || ev.bannerUrl || 'assets/mb_hero.jpg',
+          is_completed: isCompleted,
+          date_start: ev.start_date || ev.date_start || '',
+          date_end: ev.end_date || ev.date_end || ''
+        });
+      } else {
+        if (isCompleted) existing.is_completed = true;
+        if (!existing.banner_image || existing.banner_image === 'assets/mb_hero.jpg') {
+          existing.banner_image = ev.banner_image || ev.image_url || ev.bannerUrl || existing.banner_image;
+        }
+        if (!existing.description && ev.description) {
+          existing.description = ev.description;
+        }
+      }
+    };
+
+    // 1. Published events
+    (this.publishedEvents || []).forEach(e => addEvent(e));
+
+    // 2. Master official proposals (EVT-2026-012 Anniversary, EVT-2026-001, EVT-2026-002, EVT-2026-003, EVT-2026-004)
+    if (typeof this.getMasterOfficialProposals === 'function') {
+      this.getMasterOfficialProposals().forEach(p => addEvent(p));
+    }
+
+    // 3. Current proposals in data
+    (this.data?.proposals || []).forEach(p => {
+      if (p.status === 'APPROVED' || p.status === 'ACCEPTED' || p.status === 'COMPLETED') addEvent(p);
+    });
+
+    // 4. Data events
+    (this.data?.events || []).forEach(e => addEvent(e));
+
+    // 5. AppEngine events
+    (window.AppEngine?.publishedEvents || []).forEach(e => addEvent(e));
+    (window.AppEngine?.events || []).forEach(e => addEvent(e));
+
+    // 6. LocalStorage backups
+    try {
+      const localProps = JSON.parse(localStorage.getItem('mbcina_m6_proposals') || '[]');
+      if (Array.isArray(localProps)) {
+        localProps.forEach(p => {
+          if (p.status === 'APPROVED' || p.status === 'ACCEPTED' || p.status === 'COMPLETED') addEvent(p);
+        });
+      }
+      const localPub = JSON.parse(localStorage.getItem('mbcina_m6_published_events') || '[]');
+      if (Array.isArray(localPub)) localPub.forEach(e => addEvent(e));
+    } catch(e) {}
+
+    return Array.from(eventMap.values());
+  },
+
   getEventBannerForAlbum(album) {
     if (!album) return 'assets/mb_hero.jpg';
     const eventId = album.event_id;
-    const events = (this.publishedEvents && this.publishedEvents.length) ? this.publishedEvents :
-                   ((window.AppEngine && window.AppEngine.publishedEvents) ? window.AppEngine.publishedEvents :
-                   (this.data && this.data.events ? this.data.events : []));
     if (eventId) {
-      const ev = events.find(e => e.id === eventId || e.code === eventId);
+      const allEvents = this.getAllAvailableEventsForGallery();
+      const ev = allEvents.find(e => e.id === eventId || e.code === eventId);
       if (ev && ev.banner_image) return ev.banner_image;
       if (ev && ev.image_url) return ev.image_url;
     }
@@ -20215,37 +20295,60 @@ const M6Engine = {
   populateAlbumEventSelect(selectedEventId) {
     const sel = document.getElementById('m6-alb-event-sel');
     if (!sel) return;
-    const events = (this.publishedEvents && this.publishedEvents.length) ? this.publishedEvents :
-                   ((window.AppEngine && window.AppEngine.publishedEvents) ? window.AppEngine.publishedEvents :
-                   (this.data && this.data.events ? this.data.events : []));
-    
-    let options = '<option value="">— Tidak terhubung event tertentu (Album Mandiri) —</option>';
-    events.forEach(ev => {
-      const code = ev.code || ev.id || '';
-      const isSel = (selectedEventId && (ev.id === selectedEventId || code === selectedEventId)) ? 'selected' : '';
-      options += `<option value="${ev.id || code}" ${isSel}>[${code}] ${ev.title}</option>`;
-    });
-    sel.innerHTML = options;
+
+    const allEvents = this.getAllAvailableEventsForGallery();
+    const completedEvents = allEvents.filter(e => e.is_completed);
+    const activeEvents    = allEvents.filter(e => !e.is_completed);
+
+    let html = '<option value="">— Tidak terhubung event tertentu (Album Mandiri) —</option>';
+
+    if (completedEvents.length > 0) {
+      html += '<optgroup label="📁 EVENT SELESAI / ARSIP DOKUMENTASI (Resmi MB INA)">';
+      completedEvents.forEach(ev => {
+        const isSel = (selectedEventId && (ev.id === selectedEventId || ev.code === selectedEventId)) ? 'selected' : '';
+        html += `<option value="${ev.code || ev.id}" ${isSel}>📁 [${ev.code}] ${ev.title} (Selesai)</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    if (activeEvents.length > 0) {
+      html += '<optgroup label="🔥 EVENT AKTIF & AKAN DATANG">';
+      activeEvents.forEach(ev => {
+        const isSel = (selectedEventId && (ev.id === selectedEventId || ev.code === selectedEventId)) ? 'selected' : '';
+        html += `<option value="${ev.code || ev.id}" ${isSel}>🔥 [${ev.code}] ${ev.title}</option>`;
+      });
+      html += '</optgroup>';
+    }
+
+    sel.innerHTML = html;
   },
 
   onAlbumEventSelectChange(eventId) {
     const preview = document.getElementById('m6-alb-cover-preview');
     const coverInput = document.getElementById('m6-alb-cover');
     const statusText = document.getElementById('m6-alb-cover-status');
+    const titleInput = document.getElementById('m6-alb-title');
+    const descInput  = document.getElementById('m6-alb-desc');
+
     if (!eventId) {
       if (statusText) statusText.textContent = 'Format: JPG, PNG, WebP (Bebas upload / gunakan banner event)';
       return;
     }
-    const events = (this.publishedEvents && this.publishedEvents.length) ? this.publishedEvents :
-                   ((window.AppEngine && window.AppEngine.publishedEvents) ? window.AppEngine.publishedEvents :
-                   (this.data && this.data.events ? this.data.events : []));
-    const ev = events.find(e => e.id === eventId || e.code === eventId);
+
+    const allEvents = this.getAllAvailableEventsForGallery();
+    const ev = allEvents.find(e => e.id === eventId || e.code === eventId);
     if (ev) {
       const banner = ev.banner_image || ev.image_url || 'assets/mb_hero.jpg';
       if (!coverInput.value || coverInput.value.startsWith('http') || coverInput.value.startsWith('assets')) {
         coverInput.value = banner;
         if (preview) preview.src = banner;
         if (statusText) statusText.textContent = `⭐ Banner otomatis disinkronkan dengan event: [${ev.code || ev.id}]`;
+      }
+      if (titleInput && (!titleInput.value.trim() || titleInput.value.startsWith('📁'))) {
+        titleInput.value = ev.title.startsWith('📁') ? ev.title : '📁 ' + ev.title;
+      }
+      if (descInput && !descInput.value.trim() && ev.description) {
+        descInput.value = ev.description;
       }
     }
   },
