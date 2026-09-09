@@ -1244,10 +1244,46 @@ const AppEngine = {
               <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; if(window.M6Engine){ if (document.body.classList.contains('landing-mode') || !window.AppEngine || window.AppEngine.currentRole === 'GUEST') { M6Engine.openMediaDetailModal('med_anniv_yt_user'); } else { M6Engine.switchSubtab('6_5_gallery'); } }">
                 🖼️ Buka Galeri & Dokumentasi
               </button>
-            ` : `
-              <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','ONLINE');">Daftar Online</button>
-              <button class="btn-primary" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); font-weight:600; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','OFFLINE');">Daftar Offline</button>
-            `}
+            ` : (function() {
+              const curU = (window.AppEngine && window.AppEngine.currentUser) || (window.AuthEngine && window.AuthEngine.currentUser) || {};
+              const existingPart = (window.M6Engine && typeof window.M6Engine.findUserParticipantForEvent === 'function')
+                ? window.M6Engine.findUserParticipantForEvent(evt.id || evt.code, curU)
+                : null;
+              const isVerified = existingPart && (
+                String(existingPart.status || existingPart.payment_status || '').toUpperCase() === 'VERIFIED' ||
+                String(existingPart.status || existingPart.payment_status || '').toUpperCase() === 'ACCEPTED' ||
+                String(existingPart.status || existingPart.payment_status || '').toUpperCase() === 'PAID'
+              );
+              const isPending = existingPart && String(existingPart.status || existingPart.payment_status || '').toUpperCase() === 'PENDING';
+
+              if (isVerified) {
+                return `
+                  <div style="background:rgba(16,185,129,0.12); border:1px solid var(--primary-emerald); border-radius:12px; padding:12px 16px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <div>
+                      <div style="color:var(--primary-emerald); font-weight:900; font-size:0.88rem;">✅ Anda Sudah Menjadi Tamu Undangan Resmi</div>
+                      <div style="font-size:0.75rem; color:#cbd5e1; margin-top:2px;">E-Tiket & Kartu Undangan telah aktif atas nama <strong>${existingPart.name || curU.name}</strong> (${existingPart.member_id || curU.member_id || '-'}). Silakan simpan kartu undangan Anda.</div>
+                    </div>
+                    <button type="button" class="btn-primary" style="background:var(--primary-emerald); border-color:var(--primary-emerald); color:#fff; font-weight:800; font-size:0.8rem; padding:8px 16px; border-radius:8px; white-space:nowrap; cursor:pointer;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; if(window.M6Engine){ M6Engine.viewParticipantKtaQr('${existingPart.id}'); }">
+                      📄 Buka & Simpan Kartu Undangan
+                    </button>
+                  </div>
+                `;
+              } else if (isPending) {
+                return `
+                  <div style="background:rgba(245,158,11,0.12); border:1px solid var(--accent-gold); border-radius:12px; padding:12px 16px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <div>
+                      <div style="color:var(--accent-gold); font-weight:900; font-size:0.88rem;">⏳ Pendaftaran Anda Sedang Menunggu Verifikasi</div>
+                      <div style="font-size:0.75rem; color:#cbd5e1; margin-top:2px;">Pendaftaran atas nama <strong>${existingPart.name || curU.name}</strong> sedang menunggu verifikasi oleh Admin.</div>
+                    </div>
+                    <span style="font-size:0.75rem; color:var(--accent-gold); font-weight:700;">Status: PENDING</span>
+                  </div>
+                `;
+              }
+              return `
+                <button class="btn-primary" style="background:rgba(245,158,11,0.15); color:var(--accent-gold); border:1px solid rgba(245,158,11,0.3); font-weight:700; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','ONLINE');">Daftar Online</button>
+                <button class="btn-primary" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.15); font-weight:600; font-size:0.8rem; padding:8px 16px;" onclick="document.getElementById('modal-member-event-detail').classList.remove('active'); document.getElementById('modal-member-event-detail').style.display='none'; AppEngine.openMemberEventRegisterModal('${evt.id}','OFFLINE');">Daftar Offline</button>
+              `;
+            })()}
           </div>
         </div>
       </div>
@@ -1311,6 +1347,33 @@ const AppEngine = {
   // ── MODAL REGISTER EVENT MEMBER ──
   openMemberEventRegisterModal(eventId, regType = 'ONLINE') {
     const targetId = eventId || 'EVT-2026-012';
+
+    // Guard: Check if member/user is already registered and verified for this event
+    const curU = this.currentUser || (window.AuthEngine && window.AuthEngine.currentUser) || {};
+    const existing = (window.M6Engine && typeof window.M6Engine.findUserParticipantForEvent === 'function')
+      ? window.M6Engine.findUserParticipantForEvent(targetId, curU)
+      : null;
+
+    if (existing) {
+      const st = String(existing.status || existing.payment_status || '').toUpperCase();
+      if (st === 'VERIFIED' || st === 'ACCEPTED' || st === 'PAID') {
+        const allEvents = [
+          ...(window.M6Engine?.publishedEvents || []),
+          ...(window.M6Engine?.data?.events || []),
+          ...(this.events || [])
+        ];
+        const ev = allEvents.find(e => e && (e.id === targetId || e.code === targetId || e.event_code === targetId)) || { title: 'Event MB INA' };
+        alert(`Anda sudah menjadi tamu undangan di event ${ev.title}.\n\nSilakan Anda menyimpan kartu undangan.`);
+        if (window.M6Engine && typeof window.M6Engine.viewParticipantKtaQr === 'function') {
+          window.M6Engine.viewParticipantKtaQr(existing.id);
+        }
+        return;
+      } else if (st === 'PENDING') {
+        alert(`⏳ Pendaftaran Anda untuk event ini sudah tercatat dan sedang menunggu verifikasi pembayaran oleh Admin.\n\nAnda tidak perlu mendaftar ulang.`);
+        return;
+      }
+    }
+
     if (window.M6Engine && typeof window.M6Engine.selectEventToPublish === 'function') {
       window.M6Engine.selectEventToPublish(targetId);
       if (regType === 'ONLINE' && typeof window.M6Engine.openMemberRegModal === 'function') {
@@ -1387,6 +1450,23 @@ const AppEngine = {
 
     const u = this.currentUser || {};
     const memberId = u.member_id || u.id || ('MBINA-REG-' + Date.now().toString().slice(-4));
+    
+    // Guard: Check if already registered & verified
+    const existingCheck = (window.M6Engine && typeof window.M6Engine.findUserParticipantForEvent === 'function')
+      ? window.M6Engine.findUserParticipantForEvent(eventId, { member_id: memberId, name: name, phone: phone })
+      : null;
+    if (existingCheck) {
+      const st = String(existingCheck.status || existingCheck.payment_status || '').toUpperCase();
+      if (st === 'VERIFIED' || st === 'ACCEPTED' || st === 'PAID') {
+        alert(`Anda sudah menjadi tamu undangan di event ini.\n\nSilakan Anda menyimpan kartu undangan.`);
+        const modal = document.getElementById('modal-member-event-reg');
+        if (modal) { modal.classList.remove('active'); modal.style.display = 'none'; }
+        if (window.M6Engine && typeof window.M6Engine.viewParticipantKtaQr === 'function') {
+          window.M6Engine.viewParticipantKtaQr(existingCheck.id);
+        }
+        return;
+      }
+    }
     const club = u.club || 'HQ MB INA';
     const cleanName = (name || 'MBINA').toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4) || 'MBIN';
     const generatedQr = 'QR-' + eventId + '-' + cleanName + '-' + Math.floor(1000 + Math.random() * 9000);
@@ -14668,6 +14748,47 @@ const M6Engine = {
     });
   },
 
+  findUserParticipantForEvent(eventId, userOrQuery) {
+    if (!eventId || !userOrQuery) return null;
+    const participants = this.getParticipantsForEvent(eventId);
+    if (!participants || participants.length === 0) return null;
+
+    let searchMid = '';
+    let searchUid = '';
+    let searchName = '';
+    let searchEmail = '';
+    let searchPhone = '';
+
+    if (typeof userOrQuery === 'string') {
+      const q = userOrQuery.trim().toUpperCase();
+      searchMid = q;
+      searchName = q;
+    } else if (typeof userOrQuery === 'object') {
+      searchMid = (userOrQuery.member_id || userOrQuery.memberId || userOrQuery.user_mid || '').trim().toUpperCase();
+      searchUid = (userOrQuery.id || userOrQuery.user_id || '').trim().toUpperCase();
+      searchName = (userOrQuery.name || userOrQuery.user_name || '').trim().toUpperCase();
+      searchEmail = (userOrQuery.email || userOrQuery.user_email || '').trim().toLowerCase();
+      searchPhone = (userOrQuery.phone || userOrQuery.user_phone || '').trim().replace(/\D/g, '');
+    }
+
+    return participants.find(p => {
+      if (!p) return false;
+      const pMid = String(p.member_id || p.user_id || '').trim().toUpperCase();
+      const pUid = String(p.user_id || p.id || '').trim().toUpperCase();
+      const pName = String(p.name || p.user_name || '').trim().toUpperCase();
+      const pEmail = String(p.email || p.user_email || '').trim().toLowerCase();
+      const pPhone = String(p.phone || p.user_phone || '').trim().replace(/\D/g, '');
+
+      if (searchMid && (pMid === searchMid || pUid === searchMid)) return true;
+      if (searchUid && (pUid === searchUid || pMid === searchUid)) return true;
+      if (searchEmail && pEmail && pEmail === searchEmail) return true;
+      if (searchPhone && pPhone && (pPhone === searchPhone || (searchPhone.length >= 8 && pPhone.endsWith(searchPhone.slice(-8))))) return true;
+      if (searchName && pName && (pName === searchName || (searchName.length >= 5 && (pName.includes(searchName) || searchName.includes(pName))))) return true;
+
+      return false;
+    }) || null;
+  },
+
   renderParticipantsTable() {
     const container = document.getElementById('m6-participants-table-container');
     if (!container) {
@@ -15081,6 +15202,18 @@ const M6Engine = {
 
     this.activeRegisteringEvent = evt;
 
+    // Guard: Check if member is already accepted/verified as guest
+    const curU = (window.AppEngine && window.AppEngine.currentUser) || (window.AuthEngine && window.AuthEngine.currentUser) || {};
+    const existing = this.findUserParticipantForEvent(evt.id || evt.code, curU);
+    if (existing) {
+      const st = String(existing.status || existing.payment_status || '').toUpperCase();
+      if (st === 'VERIFIED' || st === 'ACCEPTED' || st === 'PAID') {
+        alert(`Anda sudah menjadi tamu undangan di event ${evt.title}.\n\nSilakan Anda menyimpan kartu undangan.`);
+        this.viewParticipantKtaQr(existing.id);
+        return;
+      }
+    }
+
     const titleEl = document.getElementById('m6-reg-modal-title');
     const detailEl = document.getElementById('m6-reg-modal-event-detail');
 
@@ -15103,7 +15236,6 @@ const M6Engine = {
     }
 
     const inputId = document.getElementById('m6-reg-member-id');
-    const curU = (window.AppEngine && window.AppEngine.currentUser) || (window.AuthEngine && window.AuthEngine.currentUser) || {};
     const defaultId = curU.member_id || curU.id || 'MBINA-HQ-2026-000004';
     if (inputId) inputId.value = defaultId;
 
@@ -15380,6 +15512,46 @@ const M6Engine = {
       </div>
     `;
 
+    // Check if this member is already registered & verified for active event
+    const existingPart = this.findUserParticipantForEvent(curEvt.id || curEvt.code, member);
+    if (existingPart) {
+      const st = String(existingPart.status || existingPart.payment_status || '').toUpperCase();
+      if (st === 'VERIFIED' || st === 'ACCEPTED' || st === 'PAID') {
+        ticketBox.innerHTML = `
+          <div style="background:rgba(16,185,129,0.15); border:1px solid var(--primary-emerald); padding:16px; border-radius:12px; text-align:center;">
+            <div style="font-weight:900; color:var(--primary-emerald); font-size:0.95rem; margin-bottom:4px;">
+              ✅ ANDA SUDAH MENJADI TAMU UNDANGAN DI EVENT INI
+            </div>
+            <div style="font-size:0.82rem; color:#e2e8f0; line-height:1.5;">
+              Member <strong>${member.name}</strong> (${member.id}) telah resmi diterima & terverifikasi di event ini.<br>
+              Silakan Anda menyimpan kartu undangan / E-Tiket Anda.
+            </div>
+            <button type="button" class="btn-primary" style="margin-top:12px; background:var(--primary-emerald); border-color:var(--primary-emerald); color:#fff; font-weight:800; font-size:0.82rem; padding:8px 18px; border-radius:8px; cursor:pointer; box-shadow:0 4px 12px rgba(16,185,129,0.4);" onclick="M6Engine.viewParticipantKtaQr('${existingPart.id}')">
+              📄 Buka & Simpan Kartu Undangan
+            </button>
+          </div>
+        `;
+        const submitBtn = document.getElementById('m6-reg-submit-btn');
+        if (submitBtn) {
+          submitBtn.innerHTML = '📄 BUKA KARTU UNDANGAN';
+          submitBtn.style.background = 'var(--primary-emerald)';
+          submitBtn.style.borderColor = 'var(--primary-emerald)';
+          submitBtn.style.color = '#fff';
+          submitBtn.onclick = () => {
+            alert(`Anda sudah menjadi tamu undangan di event ${curEvt.title || 'MB INA'}.\n\nSilakan Anda menyimpan kartu undangan.`);
+            M6Engine.viewParticipantKtaQr(existingPart.id);
+          };
+        }
+        this.updateRegPaymentVisibility(true);
+        return;
+      }
+    }
+
+    const submitBtn = document.getElementById('m6-reg-submit-btn');
+    if (submitBtn) {
+      submitBtn.onclick = () => { M6Engine.submitMemberRegistration(); };
+    }
+
     if (basePrice === 0) {
       ticketBox.innerHTML = `
         <div style="background:rgba(16,185,129,0.1); border:1px solid var(--primary-emerald); padding:14px; border-radius:12px;">
@@ -15458,6 +15630,18 @@ const M6Engine = {
     const cleanName = (name || 'MBINA').toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4) || 'MBIN';
     const generatedQr = 'QR-' + evtCode + '-' + cleanName + '-' + Math.floor(1000 + Math.random() * 9000);
 
+    // Guard: Check if this participant is already registered & verified
+    const existingCheck = this.findUserParticipantForEvent(evtId, { member_id: memberIdStr, name: name });
+    if (existingCheck) {
+      const st = String(existingCheck.status || existingCheck.payment_status || '').toUpperCase();
+      if (st === 'VERIFIED' || st === 'ACCEPTED' || st === 'PAID') {
+        alert(`Anda sudah menjadi tamu undangan di event ${curEvt.title || 'MB INA'}.\n\nSilakan Anda menyimpan kartu undangan.`);
+        AuthEngine.closeAllModals();
+        this.viewParticipantKtaQr(existingCheck.id);
+        return;
+      }
+    }
+
     const payload = {
       id: partId,
       event_id: evtId,
@@ -15486,6 +15670,13 @@ const M6Engine = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       }).then(r => r.json());
+
+      if (res && res.already_registered) {
+        alert(res.message || `Anda sudah menjadi tamu undangan di event ${curEvt.title || 'MB INA'}.\n\nSilakan Anda menyimpan kartu undangan.`);
+        AuthEngine.closeAllModals();
+        this.viewParticipantKtaQr(res.participant?.id || existingCheck?.id || partId);
+        return;
+      }
 
       if (res && res.success && res.participant) {
         serverPart = res.participant;
@@ -15971,20 +16162,42 @@ const M6Engine = {
   },
 
   viewParticipantKtaQr(partId) {
-    const part = (this.data.participants || []).find(p => p.id === partId) || {
-      id: partId,
-      name: 'Derist Touriano',
-      member_id: 'MBINA-HQ-2026-000001',
-      club: 'HQ MB INA',
-      tier: 'Platinum',
-      qr_code: 'QR-EVT-2026-001-DERIST'
-    };
+    const all = this.getAllMasterParticipants();
+    const part = (this.data.participants || []).find(p => p.id === partId)
+      || all.find(p => p.id === partId)
+      || {
+        id: partId,
+        name: 'Derist Touriano',
+        member_id: 'MBINA-HQ-2026-000001',
+        club: 'HQ MB INA',
+        tier: 'Platinum',
+        qr_code: 'QR-EVT-2026-001-DERIST'
+      };
+
+    const targetEid = String(part.event_id || part.event_code || 'EVT-2026-001').toUpperCase();
+    const allEvents = [
+      ...(this.publishedEvents || []),
+      ...(this.data?.events || []),
+      ...(this.data?.proposals || []),
+      ...(window.AppEngine?.events || [])
+    ];
+    let evt = allEvents.find(e => e && (String(e.id || '').toUpperCase() === targetEid || String(e.code || '').toUpperCase() === targetEid || String(e.event_code || '').toUpperCase() === targetEid));
+    if (!evt && targetEid === 'EVT-2026-012') {
+      evt = {
+        title: 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026',
+        start_date: '2026-09-05T14:00',
+        location: 'TOPGOLF Fatmawati, Jakarta'
+      };
+    }
+    const evtTitle = evt?.title || (targetEid.includes('012') ? 'Mercedes-Benz Club 22nd Anniversary & Rakernas 2026' : 'Touring & Bakti Sosial MB INA - Yogyakarta 2026');
+    const evtDate = evt?.start_date ? (this.formatEventDateTime ? this.formatEventDateTime(evt.start_date) : new Date(evt.start_date).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' })) : (targetEid.includes('012') ? 'Sabtu, 5 September 2026' : '13 - 14 September 2026');
+    const evtLoc = evt?.location || evt?.address || evt?.city || (targetEid.includes('012') ? 'TOPGOLF Fatmawati, Jakarta' : 'Yogyakarta');
 
     const container = document.getElementById('m6-invitation-card-body');
     const titleEl = document.getElementById('m6-invitation-modal-title');
-    if (titleEl) titleEl.innerText = `📄 KARTU UNDANGAN - Touring & Bakti Sosial MB INA - Yogyakarta 2026`;
+    if (titleEl) titleEl.innerText = `📄 KARTU UNDANGAN - ${evtTitle}`;
 
-    const qrText = part.qr_code || ('QR-EVT-2026-001-' + (part.name || 'DERIST').toUpperCase().substring(0, 6));
+    const qrText = part.qr_code || ('QR-' + targetEid + '-' + (part.name || 'DERIST').toUpperCase().substring(0, 6));
     const tierIcons = { 'PLATINUM': '💎', 'GOLD': '🥇', 'SILVER': '🥈', 'BRONZE': '🥉' };
     const tierUpper = (part.tier || 'PLATINUM').toUpperCase();
 
@@ -16001,7 +16214,7 @@ const M6Engine = {
               KARTU UNDANGAN
             </div>
             <div style="font-size:0.92rem; color:var(--accent-gold); font-weight:700; margin-top:4px;">
-              Touring & Bakti Sosial MB INA - Yogyakarta 2026
+              ${evtTitle}
             </div>
           </div>
 
@@ -16029,8 +16242,8 @@ const M6Engine = {
 
           <!-- JADWAL & LOKASI -->
           <div style="background:rgba(0,0,0,0.35); border:1px solid var(--chrome-border); border-radius:12px; padding:12px 18px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; font-size:0.9rem;">
-            <div>📅 <strong>13 - 14 September 2026</strong></div>
-            <div>📍 <strong>Yogyakarta</strong></div>
+            <div>📅 <strong>${evtDate}</strong></div>
+            <div>📍 <strong>${evtLoc}</strong></div>
           </div>
 
           <div style="border-bottom:1px solid rgba(245,158,11,0.35); margin:18px 0;"></div>

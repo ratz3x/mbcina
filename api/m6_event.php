@@ -652,6 +652,57 @@ switch ($action) {
             $regMethod = 'ONLINE';
             $paymentStatus = ($feePaid == 0) ? 'VERIFIED' : 'PENDING';
             
+            // Check if member/user is already registered and accepted/verified for this event
+            $checkExisting = $sPdo->prepare("
+                SELECT id, event_id, user_id, user_name, club_name, ticket_type, payment_status, fee_paid, qr_code, created_at
+                FROM event_participants
+                WHERE event_id = :eid AND (
+                    user_id = :uid OR 
+                    (NULLIF(:uname, '') IS NOT NULL AND LOWER(user_name) = LOWER(:uname))
+                )
+                ORDER BY CASE WHEN payment_status IN ('VERIFIED', 'PAID', 'ACCEPTED', 'CONFIRMED') THEN 1 ELSE 2 END
+                LIMIT 1
+            ");
+            $checkExisting->execute([':eid' => $eventId, ':uid' => $userId, ':uname' => $userName]);
+            $existing = $checkExisting->fetch(PDO::FETCH_ASSOC);
+
+            if ($existing) {
+                $statusUpper = strtoupper($existing['payment_status'] ?? 'PENDING');
+                if (in_array($statusUpper, ['VERIFIED', 'PAID', 'ACCEPTED', 'CONFIRMED'])) {
+                    // Fetch event title
+                    $evStmt = $sPdo->prepare("SELECT title FROM events WHERE id = :eid LIMIT 1");
+                    $evStmt->execute([':eid' => $eventId]);
+                    $evTitle = $evStmt->fetchColumn() ?: 'Event MB INA';
+
+                    echo json_encode([
+                        'success' => true,
+                        'already_registered' => true,
+                        'is_verified' => true,
+                        'message' => "Anda sudah menjadi tamu undangan di event {$evTitle}. Silakan Anda menyimpan kartu undangan Anda.",
+                        'participant' => [
+                            'id' => $existing['id'],
+                            'event_id' => $existing['event_id'],
+                            'event_code' => $existing['event_id'],
+                            'user_id' => $existing['user_id'],
+                            'member_id' => $existing['user_id'],
+                            'name' => $existing['user_name'],
+                            'user_name' => $existing['user_name'],
+                            'club' => $existing['club_name'] ?: 'HQ MB INA',
+                            'club_name' => $existing['club_name'] ?: 'HQ MB INA',
+                            'tier' => $existing['ticket_type'] ?: 'Platinum',
+                            'ticket_type' => $existing['ticket_type'] ?: 'Platinum',
+                            'htm' => $existing['fee_paid'],
+                            'fee_paid' => $existing['fee_paid'],
+                            'status' => 'VERIFIED',
+                            'payment_status' => 'VERIFIED',
+                            'qr_code' => $existing['qr_code'] ?: ('QR-' . $eventId . '-' . substr(strtoupper(preg_replace('/[^A-Za-z]/', '', $userName) . 'MBIN'), 0, 4) . '-VERIFIED'),
+                            'created_at' => date('d/m/Y H:i')
+                        ]
+                    ]);
+                    exit;
+                }
+            }
+            
             // Generate unique participant ID
             $partId = !empty($input['id']) && str_starts_with($input['id'], 'part_') ? $input['id'] : ('part_' . uniqid());
             
