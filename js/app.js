@@ -14372,6 +14372,23 @@ const M6Engine = {
     const pendingCount = participants.filter(p => p.status === 'PENDING').length;
     const totalCount = participants.length;
 
+    const isParticipantCheckedIn = (p) => {
+      return (p.check_in_status === true || p.check_in_status === 'true' || p.check_in_status === 't' || p.check_in_status === 1 || p.check_in_status === '1');
+    };
+    const checkedInCount = participants.filter(p => isParticipantCheckedIn(p)).length;
+    const notCheckedInCount = Math.max(0, totalCount - checkedInCount);
+    const attendancePercent = totalCount > 0 ? Math.round((checkedInCount / totalCount) * 100) : 0;
+
+    const currentAttendanceFilter = this._participantAttendanceFilter || 'ALL';
+    let filteredParticipants = participants;
+    if (currentAttendanceFilter === 'CHECKED_IN') {
+      filteredParticipants = participants.filter(p => isParticipantCheckedIn(p));
+    } else if (currentAttendanceFilter === 'NOT_CHECKED_IN') {
+      filteredParticipants = participants.filter(p => !isParticipantCheckedIn(p));
+    } else if (currentAttendanceFilter === 'PENDING') {
+      filteredParticipants = participants.filter(p => p.status === 'PENDING');
+    }
+
     const statusBadges = {
       'VERIFIED': '<span class="tier-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Diterima</span>',
       'ACCEPTED': '<span class="tier-badge" style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); font-weight:700; padding:3px 10px; font-size:0.72rem; border-radius:20px; display:inline-flex; align-items:center; gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Diterima</span>',
@@ -14579,11 +14596,15 @@ const M6Engine = {
           <div>
             <div style="font-size:0.72rem; color:var(--accent-gold); font-weight:800; letter-spacing:1px; text-transform:uppercase;">EVENT TERPILIH: [${curEvent.code}] ${curEvent.title}</div>
             <h4 style="color:#fff; font-size:1.15rem; margin:2px 0 0 0; font-weight:800;">
-              🎟️ Daftar Peserta & Verifikasi Tiket
+              🎟️ Daftar Peserta & Rekap Kehadiran Event
             </h4>
-            <p style="font-size:0.75rem; color:var(--text-muted); margin:2px 0 0 0;">Verifikasi bukti transfer pembayaran tiket peserta dan cetak Kartu Undangan Event QR Code</p>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin:2px 0 0 0;">Koleksi kehadiran peserta, scan/input QR code gate masuk, verifikasi tiket dan cetak Kartu Undangan Resmi</p>
           </div>
-          <div style="display:flex; gap:8px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-primary" style="padding:6px 14px; font-size:0.75rem; border-radius:8px; display:flex; align-items:center; gap:6px; font-weight:800; background:linear-gradient(135deg, #10b981, #059669); color:#fff; border:none; box-shadow:0 2px 8px rgba(16,185,129,0.3); cursor:pointer;" onclick="M6Engine.openQrScannerModal('${curEvent.id || curEvent.code}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+              <span>📷 Scan / Input QR Check-In</span>
+            </button>
             <button class="btn-outline" style="padding:6px 14px; font-size:0.75rem; border-radius:8px; display:flex; align-items:center; gap:5px; font-weight:600;" onclick="alert('Data Peserta Event ${curEvent.code} Berhasil Di-Export ke Excel!')">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
               <span>Export Excel</span>
@@ -14596,15 +14617,33 @@ const M6Engine = {
         </div>
 
         <!-- STAT HEADER PILLS -->
-        <div style="margin-bottom:16px; font-size:0.8rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+        <div style="margin-bottom:12px; font-size:0.8rem; display:flex; align-items:center; gap:10px; flex-wrap:wrap; background:rgba(255,255,255,0.02); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
           <span style="background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.12); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;">Total Pendaftar: ${totalCount}/${curEvent.capacity}</span>
-          <span style="background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.3); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;">Terverifikasi: ${verifiedCount}</span>
-          <span style="background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;">Pending: ${pendingCount}</span>
+          <span style="background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.4); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:800;">🟢 Hadir (Check-In): ${checkedInCount} (${attendancePercent}%)</span>
+          <span style="background:rgba(148,163,184,0.1); color:#cbd5e1; border:1px solid rgba(148,163,184,0.25); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;">⏳ Belum Hadir: ${notCheckedInCount}</span>
+          <span style="background:rgba(16,185,129,0.1); color:#34d399; border:1px solid rgba(16,185,129,0.25); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;">Terverifikasi: ${verifiedCount}</span>
+          <span style="background:rgba(245,158,11,0.1); color:#fbbf24; border:1px solid rgba(245,158,11,0.25); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700;">Pending: ${pendingCount}</span>
+        </div>
+
+        <!-- REKAPITULASI & FILTER TABS (MENGUMPULKAN MEMBER YANG SUDAH CHECK IN) -->
+        <div style="margin-bottom:16px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${currentAttendanceFilter === 'ALL' ? 'var(--accent-gold)' : 'rgba(255,255,255,0.08)'}; background:${currentAttendanceFilter === 'ALL' ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.03)'}; color:${currentAttendanceFilter === 'ALL' ? 'var(--accent-gold)' : '#94a3b8'}; font-weight:${currentAttendanceFilter === 'ALL' ? '800' : '600'};" onclick="M6Engine.setParticipantAttendanceFilter('ALL')">
+            📋 Semua Peserta (${totalCount})
+          </button>
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${currentAttendanceFilter === 'CHECKED_IN' ? '#34d399' : 'rgba(255,255,255,0.08)'}; background:${currentAttendanceFilter === 'CHECKED_IN' ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.03)'}; color:${currentAttendanceFilter === 'CHECKED_IN' ? '#34d399' : '#94a3b8'}; font-weight:${currentAttendanceFilter === 'CHECKED_IN' ? '800' : '600'};" onclick="M6Engine.setParticipantAttendanceFilter('CHECKED_IN')">
+            🟢 Sudah Check-In / Hadir (${checkedInCount})
+          </button>
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${currentAttendanceFilter === 'NOT_CHECKED_IN' ? '#94a3b8' : 'rgba(255,255,255,0.08)'}; background:${currentAttendanceFilter === 'NOT_CHECKED_IN' ? 'rgba(148,163,184,0.15)' : 'rgba(255,255,255,0.03)'}; color:${currentAttendanceFilter === 'NOT_CHECKED_IN' ? '#e2e8f0' : '#94a3b8'}; font-weight:${currentAttendanceFilter === 'NOT_CHECKED_IN' ? '800' : '600'};" onclick="M6Engine.setParticipantAttendanceFilter('NOT_CHECKED_IN')">
+            ⏳ Belum Hadir (${notCheckedInCount})
+          </button>
+          <button type="button" style="font-size:0.75rem; padding:6px 14px; border-radius:10px; cursor:pointer; transition:all 0.2s; border:1px solid ${currentAttendanceFilter === 'PENDING' ? '#fbbf24' : 'rgba(255,255,255,0.08)'}; background:${currentAttendanceFilter === 'PENDING' ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.03)'}; color:${currentAttendanceFilter === 'PENDING' ? '#fbbf24' : '#94a3b8'}; font-weight:${currentAttendanceFilter === 'PENDING' ? '800' : '600'};" onclick="M6Engine.setParticipantAttendanceFilter('PENDING')">
+            💳 Menunggu Bayar (${pendingCount})
+          </button>
         </div>
 
         <!-- PARTICIPANTS DATA TABLE -->
         <div style="overflow-x:auto;">
-          <table class="data-table" style="width:100%; border-collapse:collapse; min-width:850px; font-size:0.8rem;">
+          <table class="data-table" style="width:100%; border-collapse:collapse; min-width:920px; font-size:0.8rem;">
             <thead>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.08); color:#94a3b8; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; text-align:left; background:rgba(255,255,255,0.03);">
                 <th style="padding:10px 8px; width:35px; text-align:center; font-weight:600;">#</th>
@@ -14613,28 +14652,45 @@ const M6Engine = {
                 <th style="padding:10px 8px; text-align:center; font-weight:600;">Tier</th>
                 <th style="padding:10px 8px; text-align:right; font-weight:600;">Harga Bayar</th>
                 <th style="padding:10px 8px; text-align:center; font-weight:600;">Status Bayar</th>
+                <th style="padding:10px 8px; text-align:center; font-weight:600;">Status Kehadiran</th>
                 <th style="padding:10px 8px; text-align:center; font-weight:600;">Tanggal Daftar</th>
                 <th style="padding:10px 8px; text-align:center; font-weight:600;">Aksi</th>
               </tr>
             </thead>
             <tbody>
-              ${participants.length === 0 ? `
+              ${filteredParticipants.length === 0 ? `
                 <tr>
-                  <td colspan="8" style="padding:28px; text-align:center; color:var(--text-muted); font-size:0.83rem;">
-                    Belum ada peserta yang mendaftar untuk event ini. Klik tombol <strong>[Daftar Online Event]</strong> atau <strong>[Daftar Offline]</strong> di atas untuk mendaftarkan peserta.
+                  <td colspan="9" style="padding:28px; text-align:center; color:var(--text-muted); font-size:0.83rem;">
+                    ${currentAttendanceFilter === 'CHECKED_IN' ? 'Belum ada member yang check-in / hadir untuk event ini. Klik tombol <strong>[Scan / Input QR Check-In]</strong> untuk mencatat kehadiran.' : 'Tidak ada data peserta untuk filter yang dipilih.'}
                   </td>
                 </tr>
-              ` : participants.map((p, idx) => `
+              ` : filteredParticipants.map((p, idx) => {
+                const isChecked = isParticipantCheckedIn(p);
+                const timeStr = p.check_in_at ? (p.check_in_at.includes(' ') ? p.check_in_at.split(' ')[1].substring(0, 5) : p.check_in_at) : '';
+                return `
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
                   <td style="padding:10px 8px; text-align:center; font-weight:600; color:var(--text-muted);">${idx + 1}</td>
                   <td style="padding:10px 8px;">
                     <div style="font-weight:700; color:#fff;">${p.name}</div>
                     <div style="font-size:0.72rem; color:var(--text-muted); font-family:monospace;">${p.member_id || ''} ${p.phone ? '• ' + p.phone : ''}</div>
+                    ${p.qr_code ? `<div style="font-size:0.68rem; color:var(--accent-gold); font-family:monospace; opacity:0.85;">QR: ${p.qr_code}</div>` : ''}
                   </td>
                   <td style="padding:10px 8px; font-size:0.78rem; color:var(--text-muted);">${p.club || 'HQ MB INA'}</td>
                   <td style="padding:10px 8px; text-align:center;">${getTierBadgeFormat(getDynamicTierForParticipant(p))}</td>
                   <td style="padding:10px 8px; text-align:right; font-weight:800; color:var(--primary-emerald); white-space:nowrap;">Rp ${new Intl.NumberFormat('id-ID').format(p.htm)}</td>
                   <td style="padding:10px 8px; text-align:center;">${statusBadges[p.status] || statusBadges['PENDING']}</td>
+                  <td style="padding:10px 8px; text-align:center;">
+                    ${isChecked ? `
+                      <span class="tier-badge" style="background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.4); font-weight:800; font-size:0.72rem; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; box-shadow:0 0 8px rgba(16,185,129,0.2);">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        HADIR ${timeStr ? `(${timeStr})` : ''}
+                      </span>
+                    ` : `
+                      <span class="tier-badge" style="background:rgba(148,163,184,0.08); color:#94a3b8; border:1px solid rgba(148,163,184,0.2); font-weight:600; font-size:0.72rem; padding:3px 10px; border-radius:20px;">
+                        ⏳ Belum Hadir
+                      </span>
+                    `}
+                  </td>
                   <td style="padding:10px 8px; text-align:center; font-size:0.75rem; color:var(--text-muted); white-space:nowrap;">${(p.created_at || '10/08/2026').split(' ')[0]}</td>
                   <td style="padding:10px 8px; text-align:center; white-space:nowrap;">
                     <div style="display:flex; align-items:center; justify-content:center; gap:4px;">
@@ -14653,11 +14709,21 @@ const M6Engine = {
                         <button class="btn-outline" style="padding:4px 7px; font-size:0.72rem; border-color:rgba(255,255,255,0.1); border-radius:6px;" onclick="M6Engine.viewParticipantKtaQr('${p.id}')" title="Kartu Undangan QR">
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
                         </button>
+                        ${isChecked ? `
+                          <button class="btn-outline" style="padding:4px 7px; font-size:0.72rem; color:#94a3b8; border-color:rgba(148,163,184,0.3); border-radius:6px;" onclick="M6Engine.toggleParticipantCheckin('${p.id}', false)" title="Batalkan Status Check-In (Kembalikan ke Belum Hadir)">
+                            ↩ Batal
+                          </button>
+                        ` : `
+                          <button class="btn-outline" style="padding:4px 7px; font-size:0.72rem; color:#34d399; border-color:rgba(16,185,129,0.35); background:rgba(16,185,129,0.08); border-radius:6px; font-weight:700;" onclick="M6Engine.toggleParticipantCheckin('${p.id}', true)" title="Check-In Manual (Tandai Hadir di Lokasi)">
+                            ✅ Check-In
+                          </button>
+                        `}
                       `}
                     </div>
                   </td>
                 </tr>
-              `).join('')}
+                `;
+              }).join('')}
             </tbody>
           </table>
         </div>
@@ -14678,29 +14744,29 @@ const M6Engine = {
 
     const seedParticipants = [
       // 1. FK: EVT-2026-012 (Anniversary & Rakernas 2026 - Bebas Biaya Rp 0)
-      { id: 'part_rak_1', event_code: 'EVT-2026-012', event_id: 'EVT-2026-012', member_id: 'MBINA-HQ-2026-000004', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', club: 'HQ MB INA (Presiden MB INA)', tier: 'Platinum', htm: 0, status: 'VERIFIED', phone: '082527000001', created_at: '02/09/2026 14:00', qr_code: 'QR-EVT-2026-012-PRES' },
-      { id: 'part_rak_2', event_code: 'EVT-2026-012', event_id: 'EVT-2026-012', member_id: 'MBINA-HQ-2026-000001', name: 'Derist Touriano', club: 'HQ MB INA (Sekjen)', tier: 'Platinum', htm: 0, status: 'VERIFIED', phone: '082129709595', created_at: '02/09/2026 14:15', qr_code: 'QR-EVT-2026-012-SEKJEN' },
+      { id: 'part_rak_1', event_code: 'EVT-2026-012', event_id: 'EVT-2026-012', member_id: 'MBINA-HQ-2026-000004', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', club: 'HQ MB INA (Presiden MB INA)', tier: 'Platinum', htm: 0, status: 'VERIFIED', phone: '082527000001', created_at: '02/09/2026 14:00', qr_code: 'QR-EVT-2026-012-PRES', check_in_status: false, check_in_at: null },
+      { id: 'part_rak_2', event_code: 'EVT-2026-012', event_id: 'EVT-2026-012', member_id: 'MBINA-HQ-2026-000001', name: 'Derist Touriano', club: 'HQ MB INA (Sekjen)', tier: 'Platinum', htm: 0, status: 'VERIFIED', phone: '082129709595', created_at: '02/09/2026 14:15', qr_code: 'QR-EVT-2026-012-SEKJEN', check_in_status: false, check_in_at: null },
 
       // 2. FK: EVT-2026-001 (Touring & Baksos Yogyakarta - Rp 350.000)
-      { id: 'part_1', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-HQ-2026-000001', name: 'Derist Touriano', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082129709595', created_at: '10/08/2026 08:30', qr_code: 'QR-EVT-2026-001-1' },
-      { id: 'part_2', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-HQ-2026-000002', name: 'Ir. Raymond Sanjaya', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '08112233445', created_at: '09/08/2026 09:15', qr_code: 'QR-EVT-2026-001-2' },
-      { id: 'part_3', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-HQ-2026-000004', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082527000001', created_at: '05/08/2026 10:00', qr_code: 'QR-EVT-2026-001-3' },
-      { id: 'part_4', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-PUSAT-2025-002527', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom. (Presiden MB INA)', club: 'Pusat MBClubINA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082527000001', created_at: '05/08/2026 10:00', qr_code: 'QR-EVT-2026-001-4' },
-      { id: 'part_5', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-JKT-2026-000005', name: 'Andi Pratama', club: 'W124 MBCI Jakarta Chapter', tier: 'Gold', htm: 400000, status: 'PENDING', phone: '081234567890', created_at: '04/08/2026 14:20', qr_code: 'QR-EVT-2026-001-5' },
-      { id: 'part_6', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-BDG-2026-000006', name: 'Budi Santoso', club: 'MBC Bandung', tier: 'Bronze', htm: 500000, status: 'PENDING', phone: '081987654321', created_at: '04/08/2026 15:45', qr_code: 'QR-EVT-2026-001-6' },
-      { id: 'part_7', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-JAM-2026-000011', name: 'Ratih Kusumastuti', club: 'MBC Jambi', tier: 'Platinum', htm: 400000, status: 'VERIFIED', phone: '08545585568', created_at: '11/08/2026 11:20', qr_code: 'QR-EVT-2026-001-7' },
+      { id: 'part_1', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-HQ-2026-000001', name: 'Derist Touriano', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082129709595', created_at: '10/08/2026 08:30', qr_code: 'QR-EVT-2026-001-1', check_in_status: false, check_in_at: null },
+      { id: 'part_2', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-HQ-2026-000002', name: 'Ir. Raymond Sanjaya', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '08112233445', created_at: '09/08/2026 09:15', qr_code: 'QR-EVT-2026-001-2', check_in_status: false, check_in_at: null },
+      { id: 'part_3', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-HQ-2026-000004', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', club: 'HQ MB INA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082527000001', created_at: '05/08/2026 10:00', qr_code: 'QR-EVT-2026-001-3', check_in_status: false, check_in_at: null },
+      { id: 'part_4', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-PUSAT-2025-002527', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom. (Presiden MB INA)', club: 'Pusat MBClubINA', tier: 'Platinum', htm: 350000, status: 'VERIFIED', phone: '082527000001', created_at: '05/08/2026 10:00', qr_code: 'QR-EVT-2026-001-4', check_in_status: false, check_in_at: null },
+      { id: 'part_5', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-JKT-2026-000005', name: 'Andi Pratama', club: 'W124 MBCI Jakarta Chapter', tier: 'Gold', htm: 400000, status: 'PENDING', phone: '081234567890', created_at: '04/08/2026 14:20', qr_code: 'QR-EVT-2026-001-5', check_in_status: false, check_in_at: null },
+      { id: 'part_6', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-BDG-2026-000006', name: 'Budi Santoso', club: 'MBC Bandung', tier: 'Bronze', htm: 500000, status: 'PENDING', phone: '081987654321', created_at: '04/08/2026 15:45', qr_code: 'QR-EVT-2026-001-6', check_in_status: false, check_in_at: null },
+      { id: 'part_7', event_code: 'EVT-2026-001', event_id: 'EVT-2026-001', member_id: 'MBINA-JAM-2026-000011', name: 'Ratih Kusumastuti', club: 'MBC Jambi', tier: 'Platinum', htm: 400000, status: 'VERIFIED', phone: '08545585568', created_at: '11/08/2026 11:20', qr_code: 'QR-EVT-2026-001-7', check_in_status: false, check_in_at: null },
 
       // 3. FK: EVT-2026-002 (Jamnas XXV ICE BSD - Rp 500.000)
-      { id: 'part_bsd_1', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-JKT-2026-000101', name: 'Ir. Hendra Gunawan', club: 'W124 MBCI Jakarta', tier: 'Platinum', htm: 500000, status: 'VERIFIED', phone: '081122334455', created_at: '11/08/2026 09:15', qr_code: 'QR-EVT-2026-002-1' },
-      { id: 'part_bsd_2', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-BDG-2026-000102', name: 'Rina Wijaya', club: 'MBC Bandung Chapter', tier: 'Gold', htm: 500000, status: 'VERIFIED', phone: '081299887766', created_at: '11/08/2026 10:30', qr_code: 'QR-EVT-2026-002-2' },
-      { id: 'part_bsd_3', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-TNG-2026-000103', name: 'Dedi Kurniawan', club: 'MBC Tangerang BSD', tier: 'Silver', htm: 500000, status: 'PENDING', phone: '081344556677', created_at: '11/08/2026 11:45', qr_code: 'QR-EVT-2026-002-3' },
-      { id: 'part_bsd_4', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-SMG-2026-000104', name: 'Eko Prasetyo', club: 'MBC Semarang', tier: 'Bronze', htm: 500000, status: 'PENDING', phone: '081566778899', created_at: '11/08/2026 14:20', qr_code: 'QR-EVT-2026-002-4' },
-      { id: 'part_bsd_5', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-JAM-2026-000011', name: 'Ratih Kusumastuti', club: 'MBC Jambi', tier: 'Platinum', htm: 400000, status: 'VERIFIED', phone: '08545585568', created_at: '12/08/2026 10:15', qr_code: 'QR-EVT-2026-002-5' },
+      { id: 'part_bsd_1', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-JKT-2026-000101', name: 'Ir. Hendra Gunawan', club: 'W124 MBCI Jakarta', tier: 'Platinum', htm: 500000, status: 'VERIFIED', phone: '081122334455', created_at: '11/08/2026 09:15', qr_code: 'QR-EVT-2026-002-1', check_in_status: false, check_in_at: null },
+      { id: 'part_bsd_2', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-BDG-2026-000102', name: 'Rina Wijaya', club: 'MBC Bandung Chapter', tier: 'Gold', htm: 500000, status: 'VERIFIED', phone: '081299887766', created_at: '11/08/2026 10:30', qr_code: 'QR-EVT-2026-002-2', check_in_status: false, check_in_at: null },
+      { id: 'part_bsd_3', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-TNG-2026-000103', name: 'Dedi Kurniawan', club: 'MBC Tangerang BSD', tier: 'Silver', htm: 500000, status: 'PENDING', phone: '081344556677', created_at: '11/08/2026 11:45', qr_code: 'QR-EVT-2026-002-3', check_in_status: false, check_in_at: null },
+      { id: 'part_bsd_4', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-SMG-2026-000104', name: 'Eko Prasetyo', club: 'MBC Semarang', tier: 'Bronze', htm: 500000, status: 'PENDING', phone: '081566778899', created_at: '11/08/2026 14:20', qr_code: 'QR-EVT-2026-002-4', check_in_status: false, check_in_at: null },
+      { id: 'part_bsd_5', event_code: 'EVT-2026-002', event_id: 'EVT-2026-002', member_id: 'MBINA-JAM-2026-000011', name: 'Ratih Kusumastuti', club: 'MBC Jambi', tier: 'Platinum', htm: 400000, status: 'VERIFIED', phone: '08545585568', created_at: '12/08/2026 10:15', qr_code: 'QR-EVT-2026-002-5', check_in_status: false, check_in_at: null },
 
       // 4. FK: EVT-2026-003 (Trans Sumatra - Rp 600.000)
-      { id: 'part_sum_1', event_code: 'EVT-2026-003', event_id: 'EVT-2026-003', member_id: 'MBINA-MDN-2026-000201', name: 'Mayor Bambang S.', club: 'MBC Medan Trans', tier: 'Platinum', htm: 600000, status: 'VERIFIED', phone: '081311223344', created_at: '12/08/2026 08:00', qr_code: 'QR-EVT-2026-003-1' },
-      { id: 'part_sum_2', event_code: 'EVT-2026-003', event_id: 'EVT-2026-003', member_id: 'MBINA-BKT-2026-000202', name: 'Dr. Aris Munandar', club: 'MBC Bukittinggi Chapter', tier: 'Gold', htm: 600000, status: 'VERIFIED', phone: '081233445566', created_at: '12/08/2026 08:45', qr_code: 'QR-EVT-2026-003-2' },
-      { id: 'part_sum_3', event_code: 'EVT-2026-003', event_id: 'EVT-2026-003', member_id: 'MBINA-PLB-2026-000203', name: 'Herman Susanto', club: 'MBC Palembang', tier: 'Silver', htm: 600000, status: 'PENDING', phone: '081355667788', created_at: '12/08/2026 09:30', qr_code: 'QR-EVT-2026-003-3' }
+      { id: 'part_sum_1', event_code: 'EVT-2026-003', event_id: 'EVT-2026-003', member_id: 'MBINA-MDN-2026-000201', name: 'Mayor Bambang S.', club: 'MBC Medan Trans', tier: 'Platinum', htm: 600000, status: 'VERIFIED', phone: '081311223344', created_at: '12/08/2026 08:00', qr_code: 'QR-EVT-2026-003-1', check_in_status: false, check_in_at: null },
+      { id: 'part_sum_2', event_code: 'EVT-2026-003', event_id: 'EVT-2026-003', member_id: 'MBINA-BKT-2026-000202', name: 'Dr. Aris Munandar', club: 'MBC Bukittinggi Chapter', tier: 'Gold', htm: 600000, status: 'VERIFIED', phone: '081233445566', created_at: '12/08/2026 08:45', qr_code: 'QR-EVT-2026-003-2', check_in_status: false, check_in_at: null },
+      { id: 'part_sum_3', event_code: 'EVT-2026-003', event_id: 'EVT-2026-003', member_id: 'MBINA-PLB-2026-000203', name: 'Herman Susanto', club: 'MBC Palembang', tier: 'Silver', htm: 600000, status: 'PENDING', phone: '081355667788', created_at: '12/08/2026 09:30', qr_code: 'QR-EVT-2026-003-3', check_in_status: false, check_in_at: null }
     ];
 
     const runtimeList = [...(Array.isArray(this.data?.participants) ? this.data.participants : []), ...(Array.isArray(saved) ? saved : [])];
@@ -14717,10 +14783,14 @@ const M6Engine = {
       if (!seen.has(compKey)) {
         seen.add(compKey);
         const normStatus = (p.payment_status || p.status || 'PENDING').toUpperCase();
+        const isChecked = (p.check_in_status === true || p.check_in_status === 'true' || p.check_in_status === 't' || p.check_in_status === 1 || p.check_in_status === '1');
         result.push({
           ...p,
           status: normStatus,
           payment_status: normStatus,
+          check_in_status: isChecked,
+          check_in_at: isChecked ? (p.check_in_at || p.created_at || '02/09/2026 14:00') : null,
+          qr_code: p.qr_code || ('QR-' + fKey + '-' + (p.member_id || p.id || 'VALID')),
           event_code: fKey,
           event_id: fKey
         });
@@ -16459,6 +16529,10 @@ const M6Engine = {
     }
 
     AuthEngine.openModal('modal-m6-invitation-card');
+  },
+
+  viewParticipantKtaQr(participantId) {
+    return this.openQrModal(participantId);
   },
 
   // ─────────────────────────────────────────────
@@ -22440,18 +22514,231 @@ const M6Engine = {
     } catch (e) { alert('Terjadi kesalahan jaringan!'); }
   },
 
-  async processQrCheckin() {
-    const input = document.getElementById('m6-qr-manual-input')?.value?.trim();
-    if (!input) { alert('Masukkan Member ID terlebih dahulu!'); return; }
+  setParticipantAttendanceFilter(filter) {
+    this._participantAttendanceFilter = filter;
+    this.renderPublishPage();
+  },
+
+  openQrScannerModal(eventId) {
+    const curEvent = this.publishedEvents?.find(e => e.id === eventId || e.code === eventId) || 
+                     this.publishedEvents?.find(e => e.id === this.selectedEventId || e.code === this.selectedEventId) || 
+                     this.publishedEvents?.[0] || { code: 'EVT-2026-012', title: 'Anniversary & Rakernas 2026' };
+
+    this._scannerEventId = curEvent.code || curEvent.id;
+
+    // Update modal header info
+    const titleEl = document.getElementById('m6-scanner-event-title');
+    if (titleEl) titleEl.innerText = `[${curEvent.code}] ${curEvent.title}`;
+
+    const participants = this.getParticipantsForEvent(this._scannerEventId);
+    const checkedIn = participants.filter(p => (p.check_in_status === true || p.check_in_status === 'true' || p.check_in_status === 't' || p.check_in_status === 1 || p.check_in_status === '1')).length;
+    const total = participants.length;
+
+    const statsMini = document.getElementById('m6-scanner-stats-mini');
+    if (statsMini) {
+      statsMini.innerHTML = `
+        <span style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid rgba(16,185,129,0.4); padding:3px 10px; border-radius:14px; font-weight:800; font-size:0.75rem;">🟢 Hadir: ${checkedIn}/${total}</span>
+      `;
+    }
+
+    // Clear result container & input
+    const resBox = document.getElementById('m6-scanner-result-container');
+    if (resBox) { resBox.style.display = 'none'; resBox.innerHTML = ''; }
+
+    const input = document.getElementById('m6-qr-scan-input');
+    if (input) {
+      input.value = '';
+      setTimeout(() => input.focus(), 250);
+    }
+
+    AuthEngine.openModal('modal-m6-qr-scanner');
+  },
+
+  submitQrScannerForm(event) {
+    if (event && event.preventDefault) event.preventDefault();
+    const input = document.getElementById('m6-qr-scan-input');
+    const rawVal = input?.value?.trim();
+    if (!rawVal) {
+      alert('Arahkan scanner ke QR Code atau ketik Member ID / Kode QR!');
+      return;
+    }
+    this.processQrCheckin(rawVal);
+  },
+
+  async processQrCheckin(rawCode) {
+    const input = document.getElementById('m6-qr-scan-input');
+    const code = String(rawCode || input?.value || '').trim();
+    if (!code) return;
+
+    const resBox = document.getElementById('m6-scanner-result-container');
+    const targetEvt = this._scannerEventId || this.selectedEventId || 'EVT-2026-012';
+
+    if (resBox) {
+      resBox.style.display = 'block';
+      resBox.innerHTML = `
+        <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:14px; text-align:center; color:#fff;">
+          <div class="spinner" style="display:inline-block; width:20px; height:20px; border:2px solid var(--accent-gold); border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:8px;"></div>
+          <span>Memverifikasi QR Code <strong>${code}</strong> di gate masuk...</span>
+        </div>
+      `;
+    }
+
     try {
       const res = await fetch('api.php?action=process_m6_qr_checkin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event_id: this.data.events[0]?.id || 'evt_jamnas_2026', member_id: input })
+        body: JSON.stringify({ event_id: targetEvt, qr_code: code, member_id: code })
       }).then(r => r.json());
-      alert(res.message);
-      if (res.success) { await this.fetchData(); this.renderParticipantsTable(); }
-    } catch (e) { alert('Terjadi kesalahan verifikasi QR!'); }
+
+      if (res.success) {
+        const p = res.participant || {};
+        const isAlready = !!res.already_checked_in;
+        const checkinTime = p.check_in_at ? (p.check_in_at.includes(' ') ? p.check_in_at : p.check_in_at) : new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        // Update local memory and localStorage
+        const masterList = this.getAllMasterParticipants();
+        const existing = masterList.find(item => 
+          (p.id && item.id === p.id) || 
+          (p.qr_code && item.qr_code === p.qr_code) ||
+          (p.member_id && item.member_id === p.member_id)
+        );
+        if (existing) {
+          existing.check_in_status = true;
+          existing.check_in_at = p.check_in_at || new Date().toISOString();
+        } else if (p.id) {
+          masterList.unshift(p);
+        }
+        localStorage.setItem('mbcina_m6_participants', JSON.stringify(masterList));
+
+        // Render success/warning in modal
+        if (resBox) {
+          resBox.style.display = 'block';
+          resBox.innerHTML = `
+            <div style="background:${isAlready ? 'rgba(245,158,11,0.15)' : 'rgba(16,185,129,0.15)'}; border:2px solid ${isAlready ? '#fbbf24' : '#10b981'}; border-radius:14px; padding:16px; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <span style="font-size:1.6rem;">${isAlready ? '⚠️' : '✅'}</span>
+                <div>
+                  <div style="font-weight:900; color:#fff; font-size:1.05rem;">${isAlready ? 'SUDAH CHECK-IN SEBELUMNYA' : 'CHECK-IN BERHASIL DITERIMA'}</div>
+                  <div style="font-size:0.75rem; color:${isAlready ? '#fbbf24' : '#34d399'}; font-weight:700;">Gate Kehadiran: Status Hadir Terverifikasi</div>
+                </div>
+              </div>
+              <div style="background:rgba(0,0,0,0.35); border-radius:10px; padding:12px; font-size:0.82rem; color:#cbd5e1; display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <div>Nama: <strong style="color:#fff;">${p.name || 'Member MB INA'}</strong></div>
+                <div>ID: <strong style="color:var(--accent-gold); font-family:monospace;">${p.member_id || code}</strong></div>
+                <div>Klub: <strong style="color:#fff;">${p.club || 'HQ MB INA'}</strong></div>
+                <div>Waktu Check-In: <strong style="color:#34d399;">${checkinTime}</strong></div>
+              </div>
+            </div>
+          `;
+        }
+
+        // Add to recent list in modal
+        const recentList = document.getElementById('m6-scanner-recent-list');
+        const recentCount = document.getElementById('m6-scanner-recent-count');
+        if (recentList) {
+          const emptyPlaceholder = recentList.querySelector('div[style*="text-align:center"]');
+          if (emptyPlaceholder) emptyPlaceholder.remove();
+
+          const itemRow = document.createElement('div');
+          itemRow.style.cssText = 'background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; font-size:0.78rem;';
+          itemRow.innerHTML = `
+            <div>
+              <strong style="color:#fff;">${p.name || 'Peserta'}</strong> 
+              <span style="color:var(--text-muted); font-size:0.72rem; font-family:monospace;">(${p.member_id || code})</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="background:rgba(16,185,129,0.18); color:#34d399; padding:2px 8px; border-radius:12px; font-size:0.68rem; font-weight:700;">🟢 HADIR</span>
+              <span style="color:var(--text-muted); font-size:0.7rem;">${checkinTime.split(' ')[1] || checkinTime}</span>
+            </div>
+          `;
+          recentList.insertBefore(itemRow, recentList.firstChild);
+          if (recentCount) {
+            recentCount.innerText = `${recentList.children.length} terdata`;
+          }
+        }
+
+        // Update mini stats
+        const updatedParts = this.getParticipantsForEvent(targetEvt);
+        const curCheckedIn = updatedParts.filter(item => (item.check_in_status === true || item.check_in_status === 'true' || item.check_in_status === 't' || item.check_in_status === 1 || item.check_in_status === '1')).length;
+        const statsMini = document.getElementById('m6-scanner-stats-mini');
+        if (statsMini) {
+          statsMini.innerHTML = `
+            <span style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid rgba(16,185,129,0.4); padding:3px 10px; border-radius:14px; font-weight:800; font-size:0.75rem;">🟢 Hadir: ${curCheckedIn}/${updatedParts.length}</span>
+          `;
+        }
+
+        // Re-render main table in background
+        this.renderPublishPage();
+
+        // Clear input and refocus for rapid consecutive scans
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+
+      } else {
+        if (resBox) {
+          resBox.style.display = 'block';
+          resBox.innerHTML = `
+            <div style="background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.4); border-radius:12px; padding:14px; color:#fb7185; font-size:0.83rem;">
+              <strong>${res.message || 'QR Code tidak valid atau peserta tidak terdaftar!'}</strong>
+            </div>
+          `;
+        }
+        if (input) {
+          input.select();
+          input.focus();
+        }
+      }
+    } catch (e) {
+      if (resBox) {
+        resBox.style.display = 'block';
+        resBox.innerHTML = `
+          <div style="background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.4); border-radius:12px; padding:14px; color:#fb7185; font-size:0.83rem;">
+            <strong>Terjadi kesalahan jaringan atau server saat verifikasi QR!</strong>
+          </div>
+        `;
+      }
+    }
+  },
+
+  async toggleParticipantCheckin(participantId, newStatus) {
+    if (!participantId) return;
+    try {
+      const res = await fetch('api.php?action=toggle_participant_checkin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participant_id: participantId, check_in_status: newStatus })
+      }).then(r => r.json());
+
+      if (res.success) {
+        // Update local participant state
+        const masterList = this.getAllMasterParticipants();
+        const p = masterList.find(item => item.id === participantId);
+        if (p) {
+          p.check_in_status = res.check_in_status;
+          p.check_in_at = res.check_in_at;
+        }
+        localStorage.setItem('mbcina_m6_participants', JSON.stringify(masterList));
+        this.renderPublishPage();
+      } else {
+        alert('❌ ' + res.message);
+      }
+    } catch (e) {
+      // Local fallback if offline
+      const masterList = this.getAllMasterParticipants();
+      const p = masterList.find(item => item.id === participantId);
+      if (p) {
+        p.check_in_status = newStatus;
+        p.check_in_at = newStatus ? new Date().toISOString() : null;
+      }
+      localStorage.setItem('mbcina_m6_participants', JSON.stringify(masterList));
+      this.renderPublishPage();
+    }
+  },
+
+  renderParticipantsTable() {
+    this.renderPublishPage();
   },
 
   openSopModal() {

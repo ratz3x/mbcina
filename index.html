@@ -7197,6 +7197,75 @@
   </div>
 
   <!-- ============================================================ -->
+  <!-- MODAL M6: SCANNER & INPUT QR CHECK-IN EVENT RESMI -->
+  <!-- ============================================================ -->
+  <div id="modal-m6-qr-scanner" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
+    <div class="modal-box glass-panel" style="width:min(640px,95vw); padding:0; border-radius:20px; border:1px solid var(--accent-gold); position:relative; max-height:94vh; display:flex; flex-direction:column; box-shadow:0 20px 50px rgba(0,0,0,0.7);">
+      <div style="padding:16px 24px; border-bottom:1px solid var(--chrome-border); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.5);">
+        <div>
+          <span style="font-size:0.7rem; color:var(--accent-gold); font-weight:800; letter-spacing:1px; text-transform:uppercase;">GATE SCANNER & KEHADIRAN EVENT</span>
+          <h3 class="text-gradient" style="font-size:1.15rem; margin:0; display:flex; align-items:center; gap:8px;">
+            📷 <span>Scan / Input QR Check-In</span>
+          </h3>
+        </div>
+        <button onclick="AuthEngine.closeAllModals()" style="background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer; line-height:1;">✕</button>
+      </div>
+
+      <div style="padding:22px; overflow-y:auto; flex:1;" id="m6-qr-scanner-body">
+        <!-- Event Active Info Badge -->
+        <div id="m6-scanner-active-event-badge" style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.25); border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div>
+            <div style="font-size:0.7rem; color:var(--accent-gold); font-weight:700;">EVENT TERPILIH:</div>
+            <div id="m6-scanner-event-title" style="font-weight:800; font-size:0.95rem; color:#fff;">-</div>
+          </div>
+          <div id="m6-scanner-stats-mini" style="display:flex; gap:6px;">
+            <!-- Stats pill -->
+          </div>
+        </div>
+
+        <!-- Input Area (Compatible with QR Scanner Gun, Webcam, or Manual Typing) -->
+        <form onsubmit="M6Engine.submitQrScannerForm(event)" style="margin-bottom:16px;">
+          <label style="display:block; font-size:0.8rem; font-weight:700; color:#fff; margin-bottom:6px;">
+            Scan Barcode / QR Code Kartu Undangan atau Masukkan Kode / Member ID:
+          </label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="m6-qr-scan-input" class="form-input" placeholder="Contoh: QR-EVT-2026-012-PRES atau MBINA-HQ-2026-..." style="flex:1; font-family:monospace; font-weight:700; font-size:0.95rem; letter-spacing:0.5px; border:1px solid var(--accent-gold); background:rgba(0,0,0,0.6);" autofocus autocomplete="off">
+            <button type="submit" class="btn-primary" style="background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-weight:800; padding:10px 18px; border:none; border-radius:10px; display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <span>Check-In</span>
+            </button>
+          </div>
+          <p style="font-size:0.72rem; color:var(--text-muted); margin:6px 0 0 0;">
+            💡 <em>Dukungan penuh untuk Barcode/QR Reader Gun (USB/Bluetooth) & input manual. Tekan Enter untuk langsung memproses check-in.</em>
+          </p>
+        </form>
+
+        <!-- Feedback & Notification Banner -->
+        <div id="m6-scanner-result-container" style="display:none; margin-bottom:18px;">
+          <!-- Injected dynamically on scan -->
+        </div>
+
+        <!-- RECENT CHECK-INS (DAFTAR MEMBER YANG BARU SAJA CHECK-IN) -->
+        <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:16px; margin-top:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:0.75rem; font-weight:800; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.5px;">📋 Rekapitulasi Member Baru Check-In</span>
+            <span id="m6-scanner-recent-count" style="font-size:0.72rem; color:var(--text-muted);">0 terdata</span>
+          </div>
+          <div id="m6-scanner-recent-list" style="max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
+            <div style="text-align:center; padding:14px; font-size:0.75rem; color:var(--text-muted);">
+              Belum ada aktivitas scan pada sesi ini.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:14px 24px; border-top:1px solid var(--chrome-border); background:rgba(0,0,0,0.3); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.72rem; color:var(--text-muted);">Status Gate: <strong style="color:#34d399;">🟢 ONLINE</strong></span>
+        <button type="button" class="btn-outline" style="font-size:0.8rem; padding:6px 16px;" onclick="AuthEngine.closeAllModals()">Selesai / Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
   <!-- MODAL M6: VIEW BUKTI TRANSFER PESERTA EVENT -->
   <!-- ============================================================ -->
   <div id="modal-m6-view-proof" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
@@ -11609,8 +11678,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260909_v221_prevent_duplicate_guest_ticket"></script>
-  <script src="js/app.js?v=20260909_v221_prevent_duplicate_guest_ticket"></script>
+  <script src="js/auth.js?v=20260909_v222_qr_checkin_collection"></script>
+  <script src="js/app.js?v=20260909_v222_qr_checkin_collection"></script>
   <script>
     lucide.createIcons();
     try {

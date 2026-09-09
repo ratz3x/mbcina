@@ -564,74 +564,228 @@ switch ($action) {
 
     case 'process_m6_qr_checkin':
         try {
-            $eventId = $input['event_id'] ?? 'evt_jamnas_19';
-            $memberId = trim($input['member_id'] ?? '');
+            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+            $rawCode = trim($input['qr_code'] ?? $input['member_id'] ?? $input['code'] ?? '');
+            $eventId = trim($input['event_id'] ?? $input['event_code'] ?? '');
 
-            // Find user
-            $stmtUser = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, province, city, birth_date, gender, occupation, vehicle_model, license_plate, points, total_events, total_donation, photo_url, join_date, is_system_architect, is_protected, is_active, created_at, updated_at FROM users WHERE member_id = :mid OR username = :mid OR id = :mid LIMIT 1");
-            $stmtUser->execute([':mid' => $memberId]);
-            $u = $stmtUser->fetch();
-
-            if (!$u) {
-                echo json_encode(['success' => false, 'message' => "❌ Member ID '$memberId' tidak ditemukan di database!"]);
+            if (empty($rawCode)) {
+                echo json_encode(['success' => false, 'message' => "❌ Kode QR / Member ID tidak boleh kosong!"]);
                 exit;
             }
 
-            $userId = $u['id'];
-
-            // Check participant
-            $stmtP = $sPdo->prepare("SELECT * FROM event_participants WHERE event_id = :eid AND user_id = :uid LIMIT 1");
-            $stmtP->execute([':eid' => $eventId, ':uid' => $userId]);
-            $p = $stmtP->fetch();
-
-            if (!$p) {
-                // Auto register & checkin
-                $partId = 'part_' . uniqid();
-                $sPdo->exec("INSERT INTO event_participants (id, event_id, user_id, ticket_type, fee_paid, payment_status, payment_method, registration_method, check_in_status, check_in_at, check_in_method)
-                VALUES ('$partId', '$eventId', '$userId', 'MEMBER', 250000, 'VERIFIED', 'CASH', 'OFFLINE', TRUE, NOW(), 'QR_CODE')");
-            } else {
-                $sPdo->exec("UPDATE event_participants SET check_in_status = TRUE, check_in_at = NOW(), check_in_method = 'QR_CODE' WHERE id = '{$p['id']}'");
+            // Normalise eventId variants if available
+            $evtVariants = [];
+            if (!empty($eventId)) {
+                $evtVariants[] = $eventId;
+                if ($eventId === 'PROP_EVT_012') $evtVariants[] = 'EVT-2026-012';
+                if ($eventId === 'EVT-2026-012') $evtVariants[] = 'PROP_EVT_012';
+                if ($eventId === 'EVT-2026-001') $evtVariants[] = 'evt_001';
+                if ($eventId === 'evt_001') $evtVariants[] = 'EVT-2026-001';
+                if ($eventId === 'EVT-2026-002') $evtVariants[] = 'evt_002';
+                if ($eventId === 'evt_002') $evtVariants[] = 'EVT-2026-002';
             }
 
-            // Auto-recalculate total_donation & tier in database SQL
-            $sPdo->exec("
-                UPDATE users u
-                SET total_donation = COALESCE((
-                    SELECT SUM(d.amount)
-                    FROM donations d
-                    WHERE (d.user_id = u.id OR d.member_id = u.member_id)
-                      AND d.status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
-                ), 0) + COALESCE((
-                    SELECT SUM(p.fee_paid)
+            // 1. Try finding participant directly by qr_code, id, user_id, or member_id with event filter
+            $part = null;
+            if (!empty($evtVariants)) {
+                $inClause = "'" . implode("','", array_map('addslashes', $evtVariants)) . "'";
+                $stmtP = $sPdo->prepare("
+                    SELECT p.*, 
+                           COALESCE(u.name, p.user_name) as display_name,
+                           COALESCE(u.member_id, p.user_id) as display_mid,
+                           COALESCE(u.phone, '') as display_phone,
+                           COALESCE(u.club, p.club_name, 'HQ MB INA') as display_club,
+                           COALESCE(u.tier, p.ticket_type, 'Platinum') as display_tier,
+                           u.id as db_user_id
                     FROM event_participants p
-                    WHERE (p.user_id = u.id OR p.member_id = u.member_id)
-                      AND p.payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')
-                ), 0);
+                    LEFT JOIN users u ON (p.user_id = u.id OR p.user_id = u.member_id)
+                    WHERE (p.event_id IN ($inClause) OR p.event_id LIKE :eidlike)
+                      AND (p.qr_code = :c OR p.id = :c OR p.user_id = :c OR u.member_id = :c OR u.username = :c)
+                    LIMIT 1
+                ");
+                $stmtP->execute([':eidlike' => '%' . $eventId . '%', ':c' => $rawCode]);
+                $part = $stmtP->fetch(PDO::FETCH_ASSOC);
+            }
 
-                UPDATE users u
-                SET tier = CASE
-                    WHEN u.total_donation >= 9000000 THEN 'PLATINUM'
-                    WHEN u.total_donation >= 4500000 THEN 'GOLD'
-                    WHEN u.total_donation >= 1500000 THEN 'SILVER'
-                    ELSE 'BRONZE'
-                END;
-            ");
+            // 2. If not found with event filter, search without event filter (QR code is globally unique)
+            if (!$part) {
+                $stmtP2 = $sPdo->prepare("
+                    SELECT p.*, 
+                           COALESCE(u.name, p.user_name) as display_name,
+                           COALESCE(u.member_id, p.user_id) as display_mid,
+                           COALESCE(u.phone, '') as display_phone,
+                           COALESCE(u.club, p.club_name, 'HQ MB INA') as display_club,
+                           COALESCE(u.tier, p.ticket_type, 'Platinum') as display_tier,
+                           u.id as db_user_id
+                    FROM event_participants p
+                    LEFT JOIN users u ON (p.user_id = u.id OR p.user_id = u.member_id)
+                    WHERE p.qr_code = :c OR p.id = :c OR p.user_id = :c OR u.member_id = :c OR u.username = :c
+                    ORDER BY p.created_at DESC
+                    LIMIT 1
+                ");
+                $stmtP2->execute([':c' => $rawCode]);
+                $part = $stmtP2->fetch(PDO::FETCH_ASSOC);
+            }
 
-            // Award 50 bonus check-in points
-            try {
-                $sPdo->prepare("UPDATE users SET points = points + 50, total_events = (SELECT COUNT(*) FROM event_participants WHERE user_id = :uid AND payment_status IN ('SUCCESS', 'CONFIRMED', 'VERIFIED', 'APPROVED')) WHERE id = :uid")->execute([':uid' => $userId]);
-                $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'EVENT', 'Check-In Event Berhasil', 'Hadir di event MB INA (+50 Poin Kehadiran).')")->execute([':id' => 'act_' . uniqid(), ':uid' => $userId]);
-            } catch (Exception $ePts) {}
+            // 3. If still not found, check if it's an existing member in users table
+            if (!$part) {
+                $stmtUser = $sPdo->prepare("SELECT id, name, username, email, phone, role, status, tier, member_id, club FROM users WHERE member_id = :mid OR username = :mid OR id = :mid LIMIT 1");
+                $stmtUser->execute([':mid' => $rawCode]);
+                $u = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+                if (!$u) {
+                    echo json_encode(['success' => false, 'message' => "❌ Kode QR / Member ID '$rawCode' tidak ditemukan dalam data event maupun member!"]);
+                    exit;
+                }
+
+                // On-site registration & instant checkin for registered member
+                $targetEvt = !empty($eventId) ? $eventId : 'EVT-2026-012';
+                $partId = 'part_' . uniqid();
+                $qrVal = 'QR-' . $targetEvt . '-' . ($u['member_id'] ?: uniqid());
+                $sPdo->prepare("
+                    INSERT INTO event_participants (id, event_id, user_id, user_name, club_name, ticket_type, fee_paid, payment_status, payment_method, registration_method, check_in_status, check_in_at, check_in_method, qr_code)
+                    VALUES (:id, :eid, :uid, :name, :club, 'MEMBER', 0, 'VERIFIED', 'ON_SITE', 'GATE_QR', TRUE, NOW(), 'QR_CODE', :qr)
+                ")->execute([
+                    ':id' => $partId,
+                    ':eid' => $targetEvt,
+                    ':uid' => $u['id'],
+                    ':name' => $u['name'],
+                    ':club' => $u['club'] ?? 'HQ MB INA',
+                    ':qr' => $qrVal
+                ]);
+
+                // Award points
+                try {
+                    $sPdo->prepare("UPDATE users SET points = COALESCE(points, 0) + 50, total_events = COALESCE(total_events, 0) + 1 WHERE id = :uid")->execute([':uid' => $u['id']]);
+                    $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'EVENT', 'Check-In On-Site Berhasil', 'Check-in gate event MB INA (+50 Poin Kehadiran).')")->execute([':id' => 'act_' . uniqid(), ':uid' => $u['id']]);
+                } catch (Exception $ePts) {}
+
+                // Log checkin
+                try {
+                    $logId = 'chk_' . uniqid();
+                    $sPdo->exec("INSERT INTO event_checkin_logs (id, event_id, user_id, scanned_by) VALUES ('$logId', '$targetEvt', '{$u['id']}', 'usr_superadmin')");
+                } catch (Exception $eLog) {}
+
+                echo json_encode([
+                    'success' => true,
+                    'already_checked_in' => false,
+                    'message' => "✅ Check-in ON-SITE Berhasil! Member: {$u['name']} ({$u['member_id']}) telah dikumpulkan ke daftar kehadiran.",
+                    'participant' => [
+                        'id' => $partId,
+                        'event_id' => $targetEvt,
+                        'name' => $u['name'],
+                        'member_id' => $u['member_id'],
+                        'club' => $u['club'] ?? 'HQ MB INA',
+                        'tier' => $u['tier'] ?? 'Platinum',
+                        'check_in_status' => true,
+                        'check_in_at' => date('d/m/Y H:i'),
+                        'qr_code' => $qrVal
+                    ]
+                ]);
+                exit;
+            }
+
+            // Participant found! Check if already checked in:
+            $isAlreadyCheckedIn = ($part['check_in_status'] === true || $part['check_in_status'] === 'true' || $part['check_in_status'] === 't' || $part['check_in_status'] === 1 || $part['check_in_status'] === '1');
+
+            if ($isAlreadyCheckedIn) {
+                $checkinTime = $part['check_in_at'] ? date('d/m/Y H:i', strtotime($part['check_in_at'])) : 'sebelumnya';
+                echo json_encode([
+                    'success' => true,
+                    'already_checked_in' => true,
+                    'message' => "⚠️ Peserta {$part['display_name']} ({$part['display_mid']}) SUDAH CHECK-IN pada {$checkinTime}!",
+                    'participant' => [
+                        'id' => $part['id'],
+                        'event_id' => $part['event_id'],
+                        'name' => $part['display_name'],
+                        'member_id' => $part['display_mid'],
+                        'club' => $part['display_club'],
+                        'tier' => $part['display_tier'],
+                        'check_in_status' => true,
+                        'check_in_at' => $part['check_in_at'],
+                        'qr_code' => $part['qr_code']
+                    ]
+                ]);
+                exit;
+            }
+
+            // Perform check-in in database
+            $sPdo->prepare("UPDATE event_participants SET check_in_status = TRUE, check_in_at = NOW(), check_in_method = 'QR_CODE' WHERE id = :pid")->execute([':pid' => $part['id']]);
+
+            // Award points to user
+            $userIdForPts = !empty($part['db_user_id']) ? $part['db_user_id'] : $part['user_id'];
+            if (!empty($userIdForPts)) {
+                try {
+                    $sPdo->prepare("UPDATE users SET points = COALESCE(points, 0) + 50, total_events = COALESCE(total_events, 0) + 1 WHERE id = :uid OR member_id = :uid")->execute([':uid' => $userIdForPts]);
+                    $sPdo->prepare("INSERT INTO user_activities (id, user_id, activity_type, title, detail) VALUES (:id, :uid, 'EVENT', 'Check-In Event Berhasil', 'Hadir di event MB INA (+50 Poin Kehadiran).')")->execute([':id' => 'act_' . uniqid(), ':uid' => $userIdForPts]);
+                } catch (Exception $ePts) {}
+            }
 
             // Log checkin
-            $logId = 'chk_' . uniqid();
-            $sPdo->exec("INSERT INTO event_checkin_logs (id, event_id, user_id, scanned_by) VALUES ('$logId', '$eventId', '$userId', 'usr_superadmin')");
+            try {
+                $logId = 'chk_' . uniqid();
+                $sPdo->exec("INSERT INTO event_checkin_logs (id, event_id, user_id, scanned_by) VALUES ('$logId', '{$part['event_id']}', '$userIdForPts', 'usr_superadmin')");
+            } catch (Exception $eLog) {}
 
-            logAudit('usr_superadmin', 'UPDATE', 'M6_CHECKIN', ['eventId' => $eventId, 'userId' => $userId, 'memberId' => $u['member_id']]);
+            logAudit('usr_superadmin', 'UPDATE', 'M6_CHECKIN', ['event_id' => $part['event_id'], 'participant_id' => $part['id'], 'member_id' => $part['display_mid']]);
+
             echo json_encode([
                 'success' => true,
-                'message' => "✅ Check-in BERHASIL! Member: {$u['name']} ({$u['member_id']})",
-                'member' => $u
+                'already_checked_in' => false,
+                'message' => "✅ Check-in BERHASIL! Peserta: {$part['display_name']} ({$part['display_mid']}) terdata hadir di lokasi event.",
+                'participant' => [
+                    'id' => $part['id'],
+                    'event_id' => $part['event_id'],
+                    'name' => $part['display_name'],
+                    'member_id' => $part['display_mid'],
+                    'club' => $part['display_club'],
+                    'tier' => $part['display_tier'],
+                    'check_in_status' => true,
+                    'check_in_at' => date('d/m/Y H:i'),
+                    'qr_code' => $part['qr_code']
+                ]
+            ]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'toggle_participant_checkin':
+        try {
+            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+            $partId = trim($input['participant_id'] ?? $input['id'] ?? '');
+            $setCheckin = isset($input['check_in_status']) ? filter_var($input['check_in_status'], FILTER_VALIDATE_BOOLEAN) : null;
+
+            if (empty($partId)) {
+                echo json_encode(['success' => false, 'message' => 'Participant ID tidak valid!']);
+                exit;
+            }
+
+            $stmt = $sPdo->prepare("SELECT * FROM event_participants WHERE id = :id LIMIT 1");
+            $stmt->execute([':id' => $partId]);
+            $p = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$p) {
+                echo json_encode(['success' => false, 'message' => 'Peserta tidak ditemukan di database!']);
+                exit;
+            }
+
+            $current = ($p['check_in_status'] === true || $p['check_in_status'] === 'true' || $p['check_in_status'] === 't' || $p['check_in_status'] === 1 || $p['check_in_status'] === '1');
+            $newStatus = ($setCheckin !== null) ? $setCheckin : !$current;
+
+            if ($newStatus) {
+                $sPdo->prepare("UPDATE event_participants SET check_in_status = TRUE, check_in_at = NOW(), check_in_method = 'MANUAL_ADMIN' WHERE id = :id")->execute([':id' => $partId]);
+                $msg = "✅ Peserta berhasil di-check in (HADIR)!";
+            } else {
+                $sPdo->prepare("UPDATE event_participants SET check_in_status = FALSE, check_in_at = NULL, check_in_method = NULL WHERE id = :id")->execute([':id' => $partId]);
+                $msg = "⚪ Status check-in peserta berhasil dibatalkan (BELUM HADIR).";
+            }
+
+            echo json_encode([
+                'success' => true,
+                'message' => $msg,
+                'check_in_status' => $newStatus,
+                'check_in_at' => $newStatus ? date('d/m/Y H:i') : null
             ]);
         } catch (Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -747,7 +901,7 @@ switch ($action) {
                 ':fee_paid' => $feePaid,
                 ':registration_method' => $regMethod,
                 ':payment_method' => $paymentMethod,
-                ':check_in_status' => ($feePaid == 0) ? 'true' : 'false',
+                ':check_in_status' => 'false',
                 ':discount_amount' => $discountAmount,
                 ':qr_code' => $qrCode
             ]);
