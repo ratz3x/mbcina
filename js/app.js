@@ -22548,10 +22548,115 @@ const M6Engine = {
     const input = document.getElementById('m6-qr-scan-input');
     if (input) {
       input.value = '';
-      setTimeout(() => input.focus(), 250);
     }
 
+    // Reset scanner mode to Barcode Gun / Manual by default
+    this.switchScannerMode('gun');
+
     AuthEngine.openModal('modal-m6-qr-scanner');
+  },
+
+  switchScannerMode(mode) {
+    const gunBtn = document.getElementById('m6-tab-btn-gun');
+    const camBtn = document.getElementById('m6-tab-btn-camera');
+    const camBox = document.getElementById('m6-camera-viewport-container');
+    const input = document.getElementById('m6-qr-scan-input');
+
+    if (mode === 'camera') {
+      if (gunBtn) {
+        gunBtn.style.background = 'rgba(255,255,255,0.03)';
+        gunBtn.style.color = '#94a3b8';
+        gunBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+        gunBtn.style.fontWeight = '600';
+      }
+      if (camBtn) {
+        camBtn.style.background = 'rgba(212,175,55,0.15)';
+        camBtn.style.color = 'var(--accent-gold)';
+        camBtn.style.borderColor = 'var(--accent-gold)';
+        camBtn.style.fontWeight = '700';
+      }
+      if (camBox) camBox.style.display = 'block';
+      this.startCameraQrScanner();
+    } else {
+      if (camBtn) {
+        camBtn.style.background = 'rgba(255,255,255,0.03)';
+        camBtn.style.color = '#94a3b8';
+        camBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+        camBtn.style.fontWeight = '600';
+      }
+      if (gunBtn) {
+        gunBtn.style.background = 'rgba(212,175,55,0.15)';
+        gunBtn.style.color = 'var(--accent-gold)';
+        gunBtn.style.borderColor = 'var(--accent-gold)';
+        gunBtn.style.fontWeight = '700';
+      }
+      if (camBox) camBox.style.display = 'none';
+      this.stopCameraQrScanner();
+      if (input) setTimeout(() => input.focus(), 150);
+    }
+  },
+
+  async startCameraQrScanner() {
+    if (typeof Html5Qrcode === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+      script.onload = () => this.initHtml5Qrcode();
+      script.onerror = () => {
+        alert('Tidak dapat memuat library kamera. Silakan gunakan mode Barcode Gun atau input teks!');
+        this.switchScannerMode('gun');
+      };
+      document.head.appendChild(script);
+    } else {
+      this.initHtml5Qrcode();
+    }
+  },
+
+  initHtml5Qrcode() {
+    if (this._html5QrScanner) {
+      try { this._html5QrScanner.stop(); } catch(e) {}
+    }
+    try {
+      this._html5QrScanner = new Html5Qrcode('m6-qr-reader');
+      this._html5QrScanner.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decodedText) => {
+          if (decodedText) {
+            this.processQrCheckin(decodedText);
+          }
+        },
+        () => {}
+      ).catch(err => {
+        console.warn('Camera start error:', err);
+        const camBox = document.getElementById('m6-camera-viewport-container');
+        if (camBox) {
+          camBox.innerHTML = `
+            <div style="padding:16px; text-align:center; color:#fb7185; font-size:0.8rem;">
+              ⚠️ Izin kamera belum diberikan atau kamera tidak terdeteksi.<br>
+              Gunakan mode <strong>Barcode Gun / Input Manual</strong> di bawah.
+            </div>
+          `;
+        }
+      });
+    } catch(e) {
+      console.warn('Html5Qrcode init error:', e);
+    }
+  },
+
+  stopCameraQrScanner() {
+    if (this._html5QrScanner) {
+      try {
+        this._html5QrScanner.stop().then(() => {
+          this._html5QrScanner.clear();
+        }).catch(() => {});
+      } catch(e) {}
+      this._html5QrScanner = null;
+    }
+  },
+
+  closeQrScannerModal() {
+    this.stopCameraQrScanner();
+    AuthEngine.closeModal('modal-m6-qr-scanner');
   },
 
   submitQrScannerForm(event) {

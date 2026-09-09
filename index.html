@@ -7208,7 +7208,7 @@
             📷 <span>Scan / Input QR Check-In</span>
           </h3>
         </div>
-        <button onclick="AuthEngine.closeAllModals()" style="background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer; line-height:1;">✕</button>
+        <button onclick="M6Engine.closeQrScannerModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer; line-height:1;">✕</button>
       </div>
 
       <div style="padding:22px; overflow-y:auto; flex:1;" id="m6-qr-scanner-body">
@@ -7220,6 +7220,24 @@
           </div>
           <div id="m6-scanner-stats-mini" style="display:flex; gap:6px;">
             <!-- Stats pill -->
+          </div>
+        </div>
+
+        <!-- Scanner Mode Toggle (Barcode Gun / Manual vs Live Camera) -->
+        <div style="display:flex; gap:8px; margin-bottom:14px;">
+          <button type="button" id="m6-tab-btn-gun" class="btn-outline" style="flex:1; padding:8px 12px; font-size:0.75rem; border-radius:8px; background:rgba(212,175,55,0.12); color:var(--accent-gold); border-color:var(--accent-gold); font-weight:700;" onclick="M6Engine.switchScannerMode('gun')">
+            🔫 Barcode Gun / Input Manual
+          </button>
+          <button type="button" id="m6-tab-btn-camera" class="btn-outline" style="flex:1; padding:8px 12px; font-size:0.75rem; border-radius:8px; background:rgba(255,255,255,0.03); color:#94a3b8; border-color:rgba(255,255,255,0.1); font-weight:600;" onclick="M6Engine.switchScannerMode('camera')">
+            🎥 Kamera Langsung (Webcam / HP)
+          </button>
+        </div>
+
+        <!-- Camera Viewport (Active in camera mode) -->
+        <div id="m6-camera-viewport-container" style="display:none; margin-bottom:16px; background:#000; border:2px solid var(--accent-gold); border-radius:12px; overflow:hidden; position:relative;">
+          <div id="m6-qr-reader" style="width:100%; min-height:220px;"></div>
+          <div style="text-align:center; padding:8px; background:rgba(0,0,0,0.8); font-size:0.72rem; color:var(--accent-gold); font-weight:700;">
+            Arahkan kamera ke QR Code di layar HP Member yang hadir
           </div>
         </div>
 
@@ -7260,7 +7278,7 @@
 
       <div style="padding:14px 24px; border-top:1px solid var(--chrome-border); background:rgba(0,0,0,0.3); display:flex; justify-content:space-between; align-items:center;">
         <span style="font-size:0.72rem; color:var(--text-muted);">Status Gate: <strong style="color:#34d399;">🟢 ONLINE</strong></span>
-        <button type="button" class="btn-outline" style="font-size:0.8rem; padding:6px 16px;" onclick="AuthEngine.closeAllModals()">Selesai / Tutup</button>
+        <button type="button" class="btn-outline" style="font-size:0.8rem; padding:6px 16px;" onclick="M6Engine.closeQrScannerModal()">Selesai / Tutup</button>
       </div>
     </div>
   </div>
@@ -11678,8 +11696,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260909_v222_qr_checkin_collection"></script>
-  <script src="js/app.js?v=20260909_v222_qr_checkin_collection"></script>
+  <script src="js/auth.js?v=20260909_v223_camera_qr_scanner"></script>
+  <script src="js/app.js?v=20260909_v223_camera_qr_scanner"></script>
   <script>
     lucide.createIcons();
     try {
