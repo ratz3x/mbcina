@@ -564,9 +564,20 @@ switch ($action) {
 
     case 'process_m6_qr_checkin':
         try {
-            $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
-            $rawCode = trim($input['qr_code'] ?? $input['member_id'] ?? $input['code'] ?? '');
-            $eventId = trim($input['event_id'] ?? $input['event_code'] ?? '');
+            $rawInput = file_get_contents('php://input');
+            $parsedJson = !empty($rawInput) ? json_decode($rawInput, true) : null;
+            $in = is_array($parsedJson) ? $parsedJson : (is_array($input) ? $input : $_POST);
+
+            $rawCode = trim($in['qr_code'] ?? $in['member_id'] ?? $in['code'] ?? $_GET['qr_code'] ?? $_GET['code'] ?? '');
+            $eventId = trim($in['event_id'] ?? $in['event_code'] ?? $_GET['event_id'] ?? '');
+
+            // Decode URL if rawCode contains full URL or query params like checkin=
+            if (strpos($rawCode, 'checkin=') !== false || strpos($rawCode, 'code=') !== false || strpos($rawCode, 'qr_checkin=') !== false) {
+                if (preg_match('/[?&](?:checkin|qr_checkin|code)=([^&]+)/', $rawCode, $m)) {
+                    $rawCode = urldecode($m[1]);
+                }
+            }
+            $rawCode = trim($rawCode);
 
             if (empty($rawCode)) {
                 echo json_encode(['success' => false, 'message' => "❌ Kode QR / Member ID tidak boleh kosong!"]);
@@ -583,9 +594,11 @@ switch ($action) {
                 if ($eventId === 'evt_001') $evtVariants[] = 'EVT-2026-001';
                 if ($eventId === 'EVT-2026-002') $evtVariants[] = 'evt_002';
                 if ($eventId === 'evt_002') $evtVariants[] = 'EVT-2026-002';
+                if ($eventId === 'EVT-2026-003') $evtVariants[] = 'evt_003';
+                if ($eventId === 'evt_003') $evtVariants[] = 'EVT-2026-003';
             }
 
-            // 1. Try finding participant directly by qr_code, id, user_id, or member_id with event filter
+            // 1. Try finding participant directly by qr_code, id, user_id, member_id, or name with event filter
             $part = null;
             if (!empty($evtVariants)) {
                 $inClause = "'" . implode("','", array_map('addslashes', $evtVariants)) . "'";
@@ -600,7 +613,15 @@ switch ($action) {
                     FROM event_participants p
                     LEFT JOIN users u ON (p.user_id = u.id OR p.user_id = u.member_id)
                     WHERE (p.event_id IN ($inClause) OR p.event_id LIKE :eidlike)
-                      AND (p.qr_code = :c OR p.id = :c OR p.user_id = :c OR u.member_id = :c OR u.username = :c)
+                      AND (
+                          p.qr_code = :c 
+                       OR p.id = :c 
+                       OR p.user_id = :c 
+                       OR u.member_id = :c 
+                       OR u.username = :c
+                       OR LOWER(p.user_name) = LOWER(:c)
+                       OR LOWER(u.name) = LOWER(:c)
+                      )
                     LIMIT 1
                 ");
                 $stmtP->execute([':eidlike' => '%' . $eventId . '%', ':c' => $rawCode]);
@@ -619,7 +640,13 @@ switch ($action) {
                            u.id as db_user_id
                     FROM event_participants p
                     LEFT JOIN users u ON (p.user_id = u.id OR p.user_id = u.member_id)
-                    WHERE p.qr_code = :c OR p.id = :c OR p.user_id = :c OR u.member_id = :c OR u.username = :c
+                    WHERE p.qr_code = :c 
+                       OR p.id = :c 
+                       OR p.user_id = :c 
+                       OR u.member_id = :c 
+                       OR u.username = :c
+                       OR LOWER(p.user_name) = LOWER(:c)
+                       OR LOWER(u.name) = LOWER(:c)
                     ORDER BY p.created_at DESC
                     LIMIT 1
                 ");

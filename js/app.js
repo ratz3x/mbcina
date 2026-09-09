@@ -14392,8 +14392,23 @@ const M6Engine = {
     const pendingCount = participants.filter(p => p.status === 'PENDING').length;
     const totalCount = participants.length;
 
+    let checkedMap = {};
+    try {
+      const rawMap = localStorage.getItem('mbcina_m6_checkedin_map');
+      if (rawMap) checkedMap = JSON.parse(rawMap) || {};
+    } catch(e) { checkedMap = {}; }
+    if (this._checkinOverrides && typeof this._checkinOverrides === 'object') {
+      Object.assign(checkedMap, this._checkinOverrides);
+    }
+
     const isParticipantCheckedIn = (p) => {
-      return (p.check_in_status === true || p.check_in_status === 'true' || p.check_in_status === 't' || p.check_in_status === 1 || p.check_in_status === '1');
+      if (!p) return false;
+      const ov = (p.id && checkedMap[p.id]) || (p.qr_code && checkedMap[p.qr_code]) || (p.member_id && checkedMap[p.member_id]);
+      if (ov && (ov === false || ov.status === false)) return false;
+      if (ov && (ov === true || ov.status === true)) return true;
+      if (p.check_in_status === true || p.check_in_status === 'true' || p.check_in_status === 't' || p.check_in_status === 1 || p.check_in_status === '1') return true;
+      if (p.check_in_at && p.check_in_at !== 'null' && p.check_in_at !== '' && !String(p.check_in_at).startsWith('0000')) return true;
+      return false;
     };
     const checkedInCount = participants.filter(p => isParticipantCheckedIn(p)).length;
     const notCheckedInCount = Math.max(0, totalCount - checkedInCount);
@@ -14762,6 +14777,15 @@ const M6Engine = {
       }
     } catch(e) { saved = []; }
 
+    let checkedMap = {};
+    try {
+      const rawMap = localStorage.getItem('mbcina_m6_checkedin_map');
+      if (rawMap) checkedMap = JSON.parse(rawMap) || {};
+    } catch(e) { checkedMap = {}; }
+    if (this._checkinOverrides && typeof this._checkinOverrides === 'object') {
+      Object.assign(checkedMap, this._checkinOverrides);
+    }
+
     const seedParticipants = [
       // 1. FK: EVT-2026-012 (Anniversary & Rakernas 2026 - Bebas Biaya Rp 0)
       { id: 'part_rak_1', event_code: 'EVT-2026-012', event_id: 'EVT-2026-012', member_id: 'MBINA-HQ-2026-000004', name: 'Dr. Rochady Hendra Setya Wibawa, Sp.OG., M.Kes., S.Kom.', club: 'HQ MB INA (Presiden MB INA)', tier: 'Platinum', htm: 0, status: 'VERIFIED', phone: '082527000001', created_at: '02/09/2026 14:00', qr_code: 'QR-EVT-2026-012-PRES', check_in_status: false, check_in_at: null },
@@ -14789,34 +14813,62 @@ const M6Engine = {
       { id: 'part_sum_3', event_code: 'EVT-2026-003', event_id: 'EVT-2026-003', member_id: 'MBINA-PLB-2026-000203', name: 'Herman Susanto', club: 'MBC Palembang', tier: 'Silver', htm: 600000, status: 'PENDING', phone: '081355667788', created_at: '12/08/2026 09:30', qr_code: 'QR-EVT-2026-003-3', check_in_status: false, check_in_at: null }
     ];
 
-    const runtimeList = [...(Array.isArray(this.data?.participants) ? this.data.participants : []), ...(Array.isArray(saved) ? saved : [])];
+    const runtimeList = [...(Array.isArray(saved) ? saved : []), ...(Array.isArray(this.data?.participants) ? this.data.participants : [])];
     const combined = [...runtimeList, ...seedParticipants];
 
     // Deduplicate by composite key: event_code + member_id + name
-    const seen = new Set();
-    const result = [];
+    const seen = new Map();
     for (const p of combined) {
       if (!p) continue;
       const fKey = (p.event_code || p.event_id || 'EVT-2026-001').toUpperCase();
       const mKey = (p.member_id || p.name || p.id).toUpperCase();
       const compKey = `${fKey}__${mKey}`;
+
+      // Check if participant is checked in across any field or override map
+      const ov = (p.id && checkedMap[p.id]) || (p.qr_code && checkedMap[p.qr_code]) || (p.member_id && checkedMap[p.member_id]) || checkedMap[compKey];
+      const isOverriddenFalse = ov && (ov === false || ov.status === false);
+      const isOverriddenTrue = ov && (ov === true || ov.status === true);
+
+      let isChecked = false;
+      if (isOverriddenFalse) {
+        isChecked = false;
+      } else if (isOverriddenTrue) {
+        isChecked = true;
+      } else {
+        isChecked = Boolean(
+          p.check_in_status === true || p.check_in_status === 'true' || p.check_in_status === 't' || p.check_in_status === 1 || p.check_in_status === '1' ||
+          (p.check_in_at && p.check_in_at !== 'null' && p.check_in_at !== '' && !String(p.check_in_at).startsWith('0000'))
+        );
+      }
+
+      const checkinTime = isChecked ? (p.check_in_at || (ov && ov.time) || new Date().toISOString()) : null;
+      const normStatus = (p.payment_status || p.status || 'PENDING').toUpperCase();
+
       if (!seen.has(compKey)) {
-        seen.add(compKey);
-        const normStatus = (p.payment_status || p.status || 'PENDING').toUpperCase();
-        const isChecked = (p.check_in_status === true || p.check_in_status === 'true' || p.check_in_status === 't' || p.check_in_status === 1 || p.check_in_status === '1');
-        result.push({
+        seen.set(compKey, {
           ...p,
           status: normStatus,
           payment_status: normStatus,
           check_in_status: isChecked,
-          check_in_at: isChecked ? (p.check_in_at || p.created_at || '02/09/2026 14:00') : null,
+          check_in_at: checkinTime,
           qr_code: p.qr_code || ('QR-' + fKey + '-' + (p.member_id || p.id || 'VALID')),
           event_code: fKey,
           event_id: fKey
         });
+      } else {
+        // Upgrade existing record if this record is checked in
+        const existing = seen.get(compKey);
+        if (isChecked && !existing.check_in_status) {
+          existing.check_in_status = true;
+          existing.check_in_at = checkinTime || existing.check_in_at || new Date().toISOString();
+        }
+        if (normStatus === 'VERIFIED' && existing.status === 'PENDING') {
+          existing.status = 'VERIFIED';
+          existing.payment_status = 'VERIFIED';
+        }
       }
     }
-    return result;
+    return Array.from(seen.values());
   },
 
   getParticipantsForEvent(eventId) {
@@ -22593,8 +22645,11 @@ const M6Engine = {
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         (decodedText) => {
-          if (decodedText) {
-            this.processQrCheckin(decodedText);
+          if (decodedText && !this._isScanningActive) {
+            this._isScanningActive = true;
+            this.processQrCheckin(decodedText).finally(() => {
+              setTimeout(() => { this._isScanningActive = false; }, 2500);
+            });
           }
         },
         () => {}
@@ -22684,20 +22739,50 @@ const M6Engine = {
         const isAlready = !!res.already_checked_in;
         const checkinTime = p.check_in_at ? (p.check_in_at.includes(' ') ? p.check_in_at : p.check_in_at) : new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
+        // Record in check-in overrides map
+        this._checkinOverrides = this._checkinOverrides || {};
+        if (p.id) this._checkinOverrides[p.id] = { status: true, time: checkinTime };
+        if (p.qr_code) this._checkinOverrides[p.qr_code] = { status: true, time: checkinTime };
+        if (p.member_id) this._checkinOverrides[p.member_id] = { status: true, time: checkinTime };
+        try {
+          let savedMap = JSON.parse(localStorage.getItem('mbcina_m6_checkedin_map') || '{}');
+          Object.assign(savedMap, this._checkinOverrides);
+          localStorage.setItem('mbcina_m6_checkedin_map', JSON.stringify(savedMap));
+        } catch(e) {}
+
         // Update local memory and localStorage
         const masterList = this.getAllMasterParticipants();
         const existing = masterList.find(item => 
           (p.id && item.id === p.id) || 
           (p.qr_code && item.qr_code === p.qr_code) ||
-          (p.member_id && item.member_id === p.member_id)
+          (p.member_id && item.member_id === p.member_id) ||
+          (p.name && item.name && item.name.toLowerCase() === p.name.toLowerCase())
         );
         if (existing) {
           existing.check_in_status = true;
-          existing.check_in_at = p.check_in_at || new Date().toISOString();
+          existing.check_in_at = checkinTime;
         } else if (p.id) {
+          p.check_in_status = true;
+          p.check_in_at = checkinTime;
           masterList.unshift(p);
         }
         localStorage.setItem('mbcina_m6_participants', JSON.stringify(masterList));
+
+        // Directly update this.data.participants in memory
+        if (Array.isArray(this.data?.participants)) {
+          const dPart = this.data.participants.find(item => 
+            (p.id && item.id === p.id) || 
+            (p.qr_code && item.qr_code === p.qr_code) ||
+            (p.member_id && item.member_id === p.member_id) ||
+            (p.name && item.name && item.name.toLowerCase() === p.name.toLowerCase())
+          );
+          if (dPart) {
+            dPart.check_in_status = true;
+            dPart.check_in_at = checkinTime;
+          } else if (p.id) {
+            this.data.participants.unshift({ ...p, check_in_status: true, check_in_at: checkinTime });
+          }
+        }
 
         // Render success/warning in modal
         if (resBox) {
@@ -22830,20 +22915,53 @@ const M6Engine = {
         const isAlready = !!res.already_checked_in;
         const checkinTime = p.check_in_at ? (p.check_in_at.includes(' ') ? p.check_in_at : p.check_in_at) : new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
+        // Record in check-in overrides map
+        this._checkinOverrides = this._checkinOverrides || {};
+        if (p.id) this._checkinOverrides[p.id] = { status: true, time: checkinTime };
+        if (p.qr_code) this._checkinOverrides[p.qr_code] = { status: true, time: checkinTime };
+        if (p.member_id) this._checkinOverrides[p.member_id] = { status: true, time: checkinTime };
+        try {
+          let savedMap = JSON.parse(localStorage.getItem('mbcina_m6_checkedin_map') || '{}');
+          Object.assign(savedMap, this._checkinOverrides);
+          localStorage.setItem('mbcina_m6_checkedin_map', JSON.stringify(savedMap));
+        } catch(e) {}
+
         // Update local memory and localStorage
         const masterList = this.getAllMasterParticipants();
         const existing = masterList.find(item => 
           (p.id && item.id === p.id) || 
           (p.qr_code && item.qr_code === p.qr_code) ||
-          (p.member_id && item.member_id === p.member_id)
+          (p.member_id && item.member_id === p.member_id) ||
+          (p.name && item.name && item.name.toLowerCase() === p.name.toLowerCase())
         );
         if (existing) {
           existing.check_in_status = true;
-          existing.check_in_at = p.check_in_at || new Date().toISOString();
+          existing.check_in_at = checkinTime;
         } else if (p.id) {
+          p.check_in_status = true;
+          p.check_in_at = checkinTime;
           masterList.unshift(p);
         }
         localStorage.setItem('mbcina_m6_participants', JSON.stringify(masterList));
+
+        // Directly update this.data.participants in memory
+        if (Array.isArray(this.data?.participants)) {
+          const dPart = this.data.participants.find(item => 
+            (p.id && item.id === p.id) || 
+            (p.qr_code && item.qr_code === p.qr_code) ||
+            (p.member_id && item.member_id === p.member_id) ||
+            (p.name && item.name && item.name.toLowerCase() === p.name.toLowerCase())
+          );
+          if (dPart) {
+            dPart.check_in_status = true;
+            dPart.check_in_at = checkinTime;
+          } else if (p.id) {
+            this.data.participants.unshift({ ...p, check_in_status: true, check_in_at: checkinTime });
+          }
+        }
+
+        // Re-render publish page and tables behind modal immediately
+        this.renderPublishPage();
 
         if (modalBody) {
           modalBody.innerHTML = `
@@ -22928,6 +23046,39 @@ const M6Engine = {
 
   async toggleParticipantCheckin(participantId, newStatus) {
     if (!participantId) return;
+
+    // Immediately record override in memory and localStorage
+    this._checkinOverrides = this._checkinOverrides || {};
+    this._checkinOverrides[participantId] = { status: newStatus, time: newStatus ? new Date().toISOString() : null };
+    try {
+      let savedMap = JSON.parse(localStorage.getItem('mbcina_m6_checkedin_map') || '{}');
+      if (newStatus) {
+        savedMap[participantId] = { status: true, time: new Date().toISOString() };
+      } else {
+        delete savedMap[participantId];
+      }
+      localStorage.setItem('mbcina_m6_checkedin_map', JSON.stringify(savedMap));
+    } catch(e) {}
+
+    // Update local memory and master participants
+    const masterList = this.getAllMasterParticipants();
+    const p = masterList.find(item => item.id === participantId);
+    if (p) {
+      p.check_in_status = newStatus;
+      p.check_in_at = newStatus ? (p.check_in_at || new Date().toISOString()) : null;
+    }
+    localStorage.setItem('mbcina_m6_participants', JSON.stringify(masterList));
+
+    if (Array.isArray(this.data?.participants)) {
+      const dPart = this.data.participants.find(item => item.id === participantId);
+      if (dPart) {
+        dPart.check_in_status = newStatus;
+        dPart.check_in_at = newStatus ? (dPart.check_in_at || new Date().toISOString()) : null;
+      }
+    }
+
+    this.renderPublishPage();
+
     try {
       const res = await fetch('api.php?action=toggle_participant_checkin', {
         method: 'POST',
@@ -22936,9 +23087,6 @@ const M6Engine = {
       }).then(r => r.json());
 
       if (res.success) {
-        // Update local participant state
-        const masterList = this.getAllMasterParticipants();
-        const p = masterList.find(item => item.id === participantId);
         if (p) {
           p.check_in_status = res.check_in_status;
           p.check_in_at = res.check_in_at;
@@ -22949,15 +23097,7 @@ const M6Engine = {
         alert('❌ ' + res.message);
       }
     } catch (e) {
-      // Local fallback if offline
-      const masterList = this.getAllMasterParticipants();
-      const p = masterList.find(item => item.id === participantId);
-      if (p) {
-        p.check_in_status = newStatus;
-        p.check_in_at = newStatus ? new Date().toISOString() : null;
-      }
-      localStorage.setItem('mbcina_m6_participants', JSON.stringify(masterList));
-      this.renderPublishPage();
+      // Local fallback already applied
     }
   },
 
