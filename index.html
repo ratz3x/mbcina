@@ -7284,6 +7284,37 @@
   </div>
 
   <!-- ============================================================ -->
+  <!-- MODAL M6: HASIL VERIFIKASI KEHADIRAN (DIRECT SCAN GOOGLE LENS / KAMERA HP) -->
+  <!-- ============================================================ -->
+  <div id="modal-m6-direct-checkin" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.88); backdrop-filter:blur(10px); align-items:center; justify-content:center;">
+    <div class="modal-box glass-panel" style="width:min(540px,94vw); padding:0; border-radius:24px; border:2px solid var(--accent-gold); position:relative; max-height:94vh; overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,0.85);">
+      <div style="padding:18px 24px; border-bottom:1px solid var(--chrome-border); display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.95);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.5rem;">⭐</span>
+          <div>
+            <span style="font-size:0.7rem; color:var(--accent-gold); font-weight:800; letter-spacing:1px; text-transform:uppercase;">GATE CHECK-IN RESMI MB CLUB INA</span>
+            <h3 class="text-gradient" style="font-size:1.15rem; margin:0; font-weight:900;">Verifikasi Kehadiran Peserta</h3>
+          </div>
+        </div>
+        <button onclick="AuthEngine.closeModal('modal-m6-direct-checkin')" style="background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer; line-height:1;">✕</button>
+      </div>
+
+      <div style="padding:24px; overflow-y:auto; max-height:calc(94vh - 140px);" id="m6-direct-checkin-body">
+        <div style="text-align:center; padding:30px 20px;">
+          <div class="spinner" style="display:inline-block; width:36px; height:36px; border:3px solid var(--accent-gold); border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:16px;"></div>
+          <div style="font-size:1rem; font-weight:800; color:#fff;">Memverifikasi Kehadiran di Gate...</div>
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;">Menghubungkan ke database Supabase Cloud...</div>
+        </div>
+      </div>
+
+      <div style="padding:14px 24px; border-top:1px solid var(--chrome-border); background:rgba(15,23,42,0.95); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.75rem; color:var(--text-muted);">Platform Resmi MB Club Indonesia</span>
+        <button type="button" class="btn-primary" style="background:var(--accent-gold); color:#000; font-weight:800; font-size:0.82rem; padding:8px 20px;" onclick="AuthEngine.closeModal('modal-m6-direct-checkin')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
   <!-- MODAL M6: VIEW BUKTI TRANSFER PESERTA EVENT -->
   <!-- ============================================================ -->
   <div id="modal-m6-view-proof" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.88); backdrop-filter:blur(8px); align-items:center; justify-content:center;">
@@ -11696,8 +11727,8 @@
 
   <!-- JS Engine Scripts & Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
-  <script src="js/auth.js?v=20260909_v223_camera_qr_scanner"></script>
-  <script src="js/app.js?v=20260909_v223_camera_qr_scanner"></script>
+  <script src="js/auth.js?v=20260909_v224_google_lens_direct_checkin"></script>
+  <script src="js/app.js?v=20260909_v224_google_lens_direct_checkin"></script>
   <script>
     lucide.createIcons();
     try {

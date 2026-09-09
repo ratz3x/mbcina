@@ -149,9 +149,13 @@ const AppEngine = {
         });
       }
       this.checkPublicMediaDeepLink();
+      this.checkUrlCheckinDeepLink();
     }, 20);
 
-    window.addEventListener('hashchange', () => this.checkPublicMediaDeepLink());
+    window.addEventListener('hashchange', () => {
+      this.checkPublicMediaDeepLink();
+      this.checkUrlCheckinDeepLink();
+    });
   },
 
   checkPublicMediaDeepLink() {
@@ -183,6 +187,22 @@ const AppEngine = {
       }
     } catch(e) {
       console.warn('checkPublicMediaDeepLink error:', e);
+    }
+  },
+
+  checkUrlCheckinDeepLink() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const checkinCode = params.get('checkin') || params.get('qr_checkin') || params.get('code');
+      if (checkinCode) {
+        setTimeout(() => {
+          if (window.M6Engine && typeof window.M6Engine.processDirectQrCheckin === 'function') {
+            window.M6Engine.processDirectQrCheckin(checkinCode);
+          }
+        }, 500);
+      }
+    } catch(e) {
+      console.warn('checkUrlCheckinDeepLink error:', e);
     }
   },
 
@@ -16318,17 +16338,17 @@ const M6Engine = {
 
           <div style="border-bottom:1px solid rgba(245,158,11,0.35); margin:18px 0;"></div>
 
-          <!-- QR CODE DISPLAY -->
+          <!-- QR CODE DISPLAY WITH WEB CHECK-IN URL (KLIKABLE GOOGLE LENS & KAMERA HP) -->
           <div style="text-align:center; margin-bottom:18px;">
             <div style="display:inline-block; background:#fff; padding:14px; border-radius:16px; border:2px solid var(--accent-gold); box-shadow:0 6px 20px rgba(0,0,0,0.5);">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrText)}" 
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.origin + window.location.pathname + '?checkin=' + encodeURIComponent(qrText))}" 
                    alt="QR Code ${qrText}" 
                    style="width:170px; height:170px; display:block; border-radius:6px; background:#fff;"
-                   onerror="this.onerror=null; this.src='https://chart.googleapis.com/chart?cht=qr&chs=180x180&chl=' + encodeURIComponent('${qrText}');">
+                   onerror="this.onerror=null; this.src='https://chart.googleapis.com/chart?cht=qr&chs=180x180&chl=' + encodeURIComponent('${window.location.origin + window.location.pathname + '?checkin=' + encodeURIComponent(qrText)}');">
             </div>
             <div style="font-size:0.83rem; color:var(--accent-gold); font-weight:800; font-family:monospace; margin-top:8px; letter-spacing:1px;">${qrText}</div>
-            <div style="font-size:0.83rem; color:var(--text-muted); font-weight:600; margin-top:6px;">
-              Scan QR Code ini untuk check-in di lokasi kegiatan
+            <div style="font-size:0.8rem; color:#34d399; font-weight:700; margin-top:6px; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span>🌐</span> <span>Dapat di-scan Kamera HP / Google Lens / Barcode Scanner Gate</span>
             </div>
           </div>
 
@@ -16484,55 +16504,7 @@ const M6Engine = {
   },
 
   openQrModal(participantId) {
-    let participant = null;
-    ['EVT-2026-012', 'EVT-2026-001', 'EVT-2026-003', 'EVT-2026-004', 'EVT-2026-002'].forEach(evtId => {
-      const list = this.getParticipantsForEvent(evtId);
-      const found = list.find(p => p.id === participantId);
-      if (found) participant = found;
-    });
-
-    if (!participant) {
-      participant = {
-        name: 'Peserta MB INA',
-        member_id: 'MBINA-HQ-2026-000001',
-        club: 'HQ MB INA',
-        tier: 'Platinum',
-        qr_code: 'QR-EVT-2026-001'
-      };
-    }
-
-    const cardBody = document.getElementById('m6-invitation-card-body');
-    if (cardBody) {
-      cardBody.innerHTML = `
-        <div style="background:linear-gradient(135deg,#0f172a,#1e293b); border:2px solid var(--accent-gold); border-radius:16px; padding:24px; color:#fff; text-align:center;">
-          <div style="font-size:0.78rem; font-weight:800; color:var(--accent-gold); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">⭐ KARTU UNDANGAN RESMI MB CLUB INDONESIA ⭐</div>
-          <h4 style="color:#fff; font-size:1.1rem; margin:0 0 14px 0; font-weight:900;">Touring & Bakti Sosial MB INA - Yogyakarta 2026</h4>
-
-          <div style="background:rgba(255,255,255,0.05); border:1px solid var(--chrome-border); border-radius:12px; padding:16px; margin-bottom:16px; text-align:left;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <span style="font-size:0.75rem; color:var(--text-muted);">Nama Peserta:</span>
-              <span class="tier-badge" style="background:var(--accent-gold); color:#000; font-weight:800; font-size:0.7rem;">${participant.tier || 'Platinum'}</span>
-            </div>
-            <strong style="color:var(--accent-gold); font-size:1.1rem; display:block; margin-bottom:4px;">${participant.name}</strong>
-            <div style="font-size:0.78rem; color:#ddd; font-family:monospace;">${participant.member_id || 'MBINA-HQ-2026-000001'}</div>
-            <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">Klub: <strong>${participant.club || 'HQ MB INA'}</strong></div>
-          </div>
-
-          <div style="background:#fff; padding:12px; border-radius:12px; display:inline-block; margin-bottom:12px;">
-            <div style="font-weight:900; color:#000; font-family:monospace; font-size:0.9rem; margin-bottom:6px;">${participant.qr_code || 'QR-EVT-VALID'}</div>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(participant.qr_code || 'QR-EVT-VALID')}" alt="QR Code" style="width:140px; height:140px; border-radius:6px;">
-          </div>
-          
-          <div style="font-size:0.72rem; color:var(--text-muted);">Tunjukkan QR Code ini pada scanner gate event di lokasi untuk Akses POS & Check-In Mandiri.</div>
-        </div>
-      `;
-    }
-
-    AuthEngine.openModal('modal-m6-invitation-card');
-  },
-
-  viewParticipantKtaQr(participantId) {
-    return this.openQrModal(participantId);
+    return this.viewParticipantKtaQr(participantId);
   },
 
   // ─────────────────────────────────────────────
@@ -22672,8 +22644,20 @@ const M6Engine = {
 
   async processQrCheckin(rawCode) {
     const input = document.getElementById('m6-qr-scan-input');
-    const code = String(rawCode || input?.value || '').trim();
+    let code = String(rawCode || input?.value || '').trim();
     if (!code) return;
+
+    // Handle full URL format from phone cameras or Google Lens
+    if (code.includes('checkin=') || code.includes('code=') || code.includes('qr_checkin=')) {
+      try {
+        const urlObj = new URL(code.startsWith('http') ? code : 'http://dummy.com/' + code);
+        const extracted = urlObj.searchParams.get('checkin') || urlObj.searchParams.get('qr_checkin') || urlObj.searchParams.get('code');
+        if (extracted) code = extracted.trim();
+      } catch (e) {
+        const match = code.match(/[?&](?:checkin|qr_checkin|code)=([^&]+)/);
+        if (match && match[1]) code = decodeURIComponent(match[1]).trim();
+      }
+    }
 
     const resBox = document.getElementById('m6-scanner-result-container');
     const targetEvt = this._scannerEventId || this.selectedEventId || 'EVT-2026-012';
@@ -22801,6 +22785,141 @@ const M6Engine = {
         resBox.innerHTML = `
           <div style="background:rgba(244,63,94,0.15); border:1px solid rgba(244,63,94,0.4); border-radius:12px; padding:14px; color:#fb7185; font-size:0.83rem;">
             <strong>Terjadi kesalahan jaringan atau server saat verifikasi QR!</strong>
+          </div>
+        `;
+      }
+    }
+  },
+
+  async processDirectQrCheckin(rawCode) {
+    let code = String(rawCode || '').trim();
+    if (!code) return;
+
+    if (code.includes('checkin=') || code.includes('code=') || code.includes('qr_checkin=')) {
+      try {
+        const urlObj = new URL(code.startsWith('http') ? code : 'http://dummy.com/' + code);
+        const extracted = urlObj.searchParams.get('checkin') || urlObj.searchParams.get('qr_checkin') || urlObj.searchParams.get('code');
+        if (extracted) code = extracted.trim();
+      } catch (e) {
+        const match = code.match(/[?&](?:checkin|qr_checkin|code)=([^&]+)/);
+        if (match && match[1]) code = decodeURIComponent(match[1]).trim();
+      }
+    }
+
+    const modalBody = document.getElementById('m6-direct-checkin-body');
+    if (modalBody) {
+      modalBody.innerHTML = `
+        <div style="text-align:center; padding:30px 20px;">
+          <div class="spinner" style="display:inline-block; width:36px; height:36px; border:3px solid var(--accent-gold); border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:16px;"></div>
+          <div style="font-size:1.05rem; font-weight:800; color:#fff;">Memverifikasi Kode: <strong style="color:var(--accent-gold);">${code}</strong></div>
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;">Menghubungkan ke Gate & Supabase Cloud...</div>
+        </div>
+      `;
+    }
+    AuthEngine.openModal('modal-m6-direct-checkin');
+
+    try {
+      const res = await fetch('api.php?action=process_m6_qr_checkin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qr_code: code, member_id: code })
+      }).then(r => r.json());
+
+      if (res.success) {
+        const p = res.participant || {};
+        const isAlready = !!res.already_checked_in;
+        const checkinTime = p.check_in_at ? (p.check_in_at.includes(' ') ? p.check_in_at : p.check_in_at) : new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        // Update local memory and localStorage
+        const masterList = this.getAllMasterParticipants();
+        const existing = masterList.find(item => 
+          (p.id && item.id === p.id) || 
+          (p.qr_code && item.qr_code === p.qr_code) ||
+          (p.member_id && item.member_id === p.member_id)
+        );
+        if (existing) {
+          existing.check_in_status = true;
+          existing.check_in_at = p.check_in_at || new Date().toISOString();
+        } else if (p.id) {
+          masterList.unshift(p);
+        }
+        localStorage.setItem('mbcina_m6_participants', JSON.stringify(masterList));
+
+        if (modalBody) {
+          modalBody.innerHTML = `
+            <div style="text-align:center; padding:10px 0 20px 0;">
+              <div style="width:72px; height:72px; border-radius:50%; background:${isAlready ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}; border:2px solid ${isAlready ? '#fbbf24' : '#10b981'}; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto; font-size:2.2rem; box-shadow:0 0 25px ${isAlready ? 'rgba(245,158,11,0.4)' : 'rgba(16,185,129,0.4)'};">
+                ${isAlready ? '⚠️' : '✅'}
+              </div>
+              <span class="badge" style="background:${isAlready ? 'rgba(245,158,11,0.25)' : 'rgba(16,185,129,0.25)'}; color:${isAlready ? '#fbbf24' : '#34d399'}; font-size:0.75rem; font-weight:800; padding:4px 14px; border-radius:14px; border:1px solid ${isAlready ? '#fbbf24' : '#10b981'};">
+                ${isAlready ? 'SUDAH CHECK-IN SEBELUMNYA' : 'CHECK-IN BERHASIL TERVERIFIKASI'}
+              </span>
+              <h2 style="color:#fff; font-size:1.35rem; font-weight:900; margin:12px 0 4px 0;">
+                ${p.name || 'Member MB Club Indonesia'}
+              </h2>
+              <div style="color:var(--accent-gold); font-weight:700; font-family:monospace; font-size:0.95rem;">
+                ${p.member_id || code}
+              </div>
+            </div>
+
+            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:16px; margin-bottom:18px; font-size:0.85rem; line-height:1.7;">
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px; margin-bottom:6px;">
+                <span style="color:var(--text-muted);">Event:</span>
+                <strong style="color:#fff; text-align:right; max-width:65%;">${p.event_title || 'Event MB Club Indonesia'}</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px; margin-bottom:6px;">
+                <span style="color:var(--text-muted);">Klub / Chapter:</span>
+                <strong style="color:#fff;">${p.club || 'HQ MB INA'}</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:6px; margin-bottom:6px;">
+                <span style="color:var(--text-muted);">Tipe Tiket:</span>
+                <strong style="color:var(--accent-gold);">${p.tier || 'Peserta'}</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-muted);">Waktu Check-In Gate:</span>
+                <strong style="color:#34d399;">🟢 ${checkinTime}</strong>
+              </div>
+            </div>
+
+            <div style="background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(5,150,105,0.05)); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:12px;">
+              <span style="font-size:1.6rem;">🏆</span>
+              <div style="font-size:0.78rem; color:#cbd5e1; line-height:1.4;">
+                <strong style="color:#34d399;">+50 Loyalty Points Diperoleh!</strong><br>
+                Kehadiran fisik Anda di gate acara telah dicatat secara resmi di server MB INA.
+              </div>
+            </div>
+          `;
+        }
+
+        // Clean up URL parameter to avoid re-triggering on page refresh
+        try {
+          const cleanUrl = window.location.origin + window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        } catch (e) {}
+
+      } else {
+        if (modalBody) {
+          modalBody.innerHTML = `
+            <div style="text-align:center; padding:20px 0;">
+              <div style="width:68px; height:68px; border-radius:50%; background:rgba(244,63,94,0.15); border:2px solid #fb7185; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto; font-size:2rem;">
+                ❌
+              </div>
+              <h3 style="color:#fff; font-size:1.15rem; font-weight:900; margin-bottom:6px;">QR Code Tidak Valid / Tidak Terdaftar</h3>
+              <p style="color:#fb7185; font-size:0.85rem; margin-bottom:14px;">${res.message || 'Data peserta tidak ditemukan pada database event.'}</p>
+              <div style="background:rgba(0,0,0,0.3); border-radius:10px; padding:10px; font-family:monospace; font-size:0.8rem; color:#cbd5e1;">
+                Kode: ${code}
+              </div>
+            </div>
+          `;
+        }
+      }
+    } catch (e) {
+      if (modalBody) {
+        modalBody.innerHTML = `
+          <div style="text-align:center; padding:20px 0;">
+            <div style="font-size:2rem; margin-bottom:10px;">⚠️</div>
+            <h3 style="color:#fff; font-size:1.1rem; font-weight:800;">Gangguan Jaringan</h3>
+            <p style="color:#cbd5e1; font-size:0.82rem;">Tidak dapat menghubungi server verifikasi gate. Silakan coba kembali.</p>
           </div>
         `;
       }
